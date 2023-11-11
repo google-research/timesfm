@@ -25,12 +25,12 @@ import pandas as pd
 from utilsforecast.processing import make_future_dataframe
 
 if TYPE_CHECKING:
-    from . import xreg_lib
-    Category = xreg_lib.Category
-    XRegMode = xreg_lib.XRegMode
+  from . import xreg_lib
+  Category = xreg_lib.Category
+  XRegMode = xreg_lib.XRegMode
 else:
-    Category = int | str
-    XRegMode = str
+  Category = int | str
+  XRegMode = str
 
 _TOL = 1e-6
 DEFAULT_QUANTILES = (0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9)
@@ -45,7 +45,7 @@ def moving_average(arr, window_size):
   """Calculates the moving average using NumPy's convolution function."""
   # Pad with zeros to handle initial window positions
   arr_padded = np.pad(arr, (window_size - 1, 0), "constant")
-  smoothed_arr = (np.convolve(arr_padded, np.ones(window_size), "valid") / 
+  smoothed_arr = (np.convolve(arr_padded, np.ones(window_size), "valid") /
                   window_size)
   return [smoothed_arr, arr - smoothed_arr]
 
@@ -57,18 +57,11 @@ def freq_map(freq: str):
     return 1
   elif freq.endswith(("H", "T", "MIN", "D", "B", "U", "S")):
     return 0
-  elif (
-    freq.endswith(("W", "M"))
-    or freq.startswith("W-")
-    or (freq.startswith("M") and len(freq) == 2)
-  ):
+  elif (freq.endswith(("W", "M")) or freq.startswith("W-") or
+        (freq.startswith("M") and len(freq) == 2)):
     return 1
-  elif (
-    freq.endswith(("Y", "Q", "A"))
-    or freq.startswith("Y-")
-    or freq.startswith("Q-")
-    or freq.startswith("A-")
-  ):
+  elif (freq.endswith(("Y", "Q", "A")) or freq.startswith("Y-") or
+        freq.startswith("Q-") or freq.startswith("A-")):
     return 2
   else:
     raise ValueError(f"Invalid frequency: {freq}")

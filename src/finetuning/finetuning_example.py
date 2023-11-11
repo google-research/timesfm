@@ -43,10 +43,10 @@ flags.DEFINE_list(
 )
 
 flags.DEFINE_string(
-    "local_model_path",
-    None,
+    "local_model_path", None,
     "Path to a local .safetensors model file. If provided, overrides Hugging Face download."
 )
+
 
 class TimeSeriesDataset(Dataset):
   """Dataset for time series data compatible with TimesFM."""
@@ -148,7 +148,7 @@ def get_model(load_weights: bool = False):
       use_positional_embedding=False,
       context_len=192,
   )
-  
+
   if load_weights:
     if FLAGS.local_model_path:
       tfm_config = TimesFMConfig()
@@ -157,11 +157,12 @@ def get_model(load_weights: bool = False):
     else:
       repo_id = "google/timesfm-2.0-500m-pytorch"
       tfm = TimesFm(hparams=hparams,
-              checkpoint=TimesFmCheckpoint(huggingface_repo_id=repo_id))
+                    checkpoint=TimesFmCheckpoint(huggingface_repo_id=repo_id))
 
       tfm_config = tfm._model_config
       model = PatchedTimeSeriesDecoder(tfm_config)
-      checkpoint_path = path.join(snapshot_download(repo_id), "torch_model.ckpt")
+      checkpoint_path = path.join(snapshot_download(repo_id),
+                                  "torch_model.ckpt")
       loaded_checkpoint = torch.load(checkpoint_path, weights_only=True)
 
     model.load_state_dict(loaded_checkpoint)
