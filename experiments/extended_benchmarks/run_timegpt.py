@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Evaluation script for timegpt."""
 
 import os
@@ -23,6 +24,7 @@ import pandas as pd
 
 from ..baselines.timegpt_pipeline import run_timegpt
 from .utils import ExperimentHandler
+
 
 dataset_names = [
     "m1_monthly",
@@ -61,6 +63,7 @@ _MODEL_NAME = flags.DEFINE_string(
 )
 _SAVE_DIR = flags.DEFINE_string("save_dir", "./results", "Save directory")
 
+
 QUANTILES = list(np.arange(1, 10) / 10.0)
 
 
@@ -87,9 +90,9 @@ def main():
     )
     time_df = pd.DataFrame({"time": [total_time], "model": model_name})
     fcsts_df = exp.fcst_from_level_to_quantiles(fcsts_df, model_name)
-    results = exp.evaluate_from_predictions(models=[model_name],
-                                            fcsts_df=fcsts_df,
-                                            times_df=time_df)
+    results = exp.evaluate_from_predictions(
+        models=[model_name], fcsts_df=fcsts_df, times_df=time_df
+    )
     print(results, flush=True)
     results_list.append(results)
     results_full = pd.concat(results_list)
