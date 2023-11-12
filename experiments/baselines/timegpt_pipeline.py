@@ -34,8 +34,9 @@ def get_seasonality(freq: str) -> int:
   return _get_seasonality(freq, seasonalities={"D": 7})
 
 
-def maybe_convert_col_to_datetime(df: pd.DataFrame,
-                                  col_name: str) -> pd.DataFrame:
+def maybe_convert_col_to_datetime(
+    df: pd.DataFrame, col_name: str
+) -> pd.DataFrame:
   if not pd.api.types.is_datetime64_any_dtype(df[col_name]):
     df = df.copy()
     df[col_name] = pd.to_datetime(df[col_name])
@@ -63,15 +64,14 @@ def zero_pad_time_series(df, freq, min_length=36):
           end=start_date,
           periods=min_length - len(subset) + 1,
           freq=freq,  # 'MS' for month start
-      )[:-1]  # Exclude the start_date itself
+      )[
+          :-1
+      ]  # Exclude the start_date itself
 
       # 2c. Create padding data
-      padding_df = pd.DataFrame({
-          "ds": padding_dates,
-          "unique_id": unique_id,
-          "y": 0
-      }  # Zero padding
-                               )
+      padding_df = pd.DataFrame(
+          {"ds": padding_dates, "unique_id": unique_id, "y": 0}  # Zero padding
+      )
 
       # 2d. Combine original and padding data, and append to the list
       padded_data.append(pd.concat([padding_df, subset]).sort_values("ds"))
@@ -121,7 +121,8 @@ class Forecaster:
     for _, (cutoffs, train, valid) in tqdm(enumerate(splits)):
       if len(valid.columns) > 3:
         raise NotImplementedError(
-            "Cross validation with exogenous variables is not yet supported.")
+            "Cross validation with exogenous variables is not yet supported."
+        )
       y_pred = self.forecast(
           df=train,
           h=h,
@@ -137,7 +138,8 @@ class Forecaster:
         raise ValueError(
             "Cross validation result produced less results than expected."
             " Please verify that the frequency parameter (freq) matches your"
-            " series' and that there aren't any missing periods.")
+            " series' and that there aren't any missing periods."
+        )
       results.append(result)
     out = vertical_concat(results)
     out = drop_index_if_pandas(out)
@@ -201,7 +203,7 @@ class TimeGPT(Forecaster):
       all_unique_ids = df["unique_id"].unique()
       all_fcst_df = []
       for i in range(0, len(all_unique_ids), chunk_size):
-        chunk_ids = all_unique_ids[i:i + chunk_size]
+        chunk_ids = all_unique_ids[i : i + chunk_size]
         chunk_df = df[df["unique_id"].isin(chunk_ids)]
         fct_chunk_df = client.forecast(
             df=chunk_df,
