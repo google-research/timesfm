@@ -1,0 +1,24 @@
+# This project can be installed with `python3 -m pip install -e .` from the main directory. 
+
+[project]
+name = "timesfm"
+description = "Open weights time-series foundation model from Google Research."
+version = "0.0.1"
+dependencies = [
+    "paxml>=1.4.0",
+    "praxis>=1.4.0",
+    "jax>=0.4.26",
+    "numpy>=1.26.4",
+    "pandas>=2.1.4",
+]
+authors = [
+     {name = "Rajat Sen", email = "senrajat@google.com"},
+     {name = "Yichen Zhou", email = "yichenzhou@google.com"},
+     {name = "Abhimanyu Das", email = "abhidas@google.com"},
+     {name = "Petros Mol", email = "pmol@google.com"},
+]
+
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
