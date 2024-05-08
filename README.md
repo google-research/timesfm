@@ -18,7 +18,7 @@ This is not an officially supported Google product.
 
 timesfm-1.0-200m is the first open model checkpoint:
 
-- It performs univariate time series forecasting for context lengths up tp 512 timepoints and any horizon lengths, with an optional frequency indicator.
+- It performs univariate time series forecasting for context lengths up to 512 timepoints and any horizon lengths, with an optional frequency indicator.
 - It focuses on point forecasts, and does not support probabilistic forecasts. We experimentally offer quantile heads but they have not been calibrated after pretraining.
 - It requires the context to be contiguous (i.e. no "holes"), and the context and the horizon to be of the same frequency.
 
