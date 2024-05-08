@@ -112,7 +112,7 @@ Array inputs, with the frequencies set to low, medium and high respectively.
 ```python
 import numpy as np
 forecast_input = [
-    np.sin(np.linspace(0, 20, 100))
+    np.sin(np.linspace(0, 20, 100)),
     np.sin(np.linspace(0, 20, 200)),
     np.sin(np.linspace(0, 20, 400)),
 ]
