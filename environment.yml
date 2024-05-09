@@ -10,6 +10,7 @@ dependencies:
   - python=3.10
   - pip:
     - huggingface_hub[cli]
+    - utilsforecast
     - praxis
     - paxml
     - -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html  
