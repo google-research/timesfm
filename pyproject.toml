@@ -5,6 +5,7 @@ name = "timesfm"
 description = "Open weights time-series foundation model from Google Research."
 version = "0.0.1"
 dependencies = [
+    "einshape>=1.0.0",
     "paxml>=1.4.0",
     "praxis>=1.4.0",
     "jax>=0.4.26",

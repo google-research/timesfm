@@ -30,9 +30,9 @@ Please look into the README files in the respective benchmark directories within
 
 ## Installation
 
-We have two environment files. For GPU installation (assuming CUDA 12 has been
-setup), you can create a conda environment `tfm_env` from the base folder
-through:
+For calling TimesFM, We have two environment files. Inside `timesfm`, for
+GPU installation (assuming CUDA 12 has been setup), you can create a conda
+environment `tfm_env` from the base folder through:
 
 ```
 conda env create --file=environment.yml
@@ -52,6 +52,14 @@ conda activate tfm_env
 pip install -e .
 ```
 to install the package.
+
+**Note**: 
+
+1. Running the provided benchmarks would require additional dependencies.
+Please use the environment files under `experiments` instead.
+
+2. The dependency `lingvo` does not support `pip install` for macOS. For now you
+can manually install it from the source following [these instructions](https://github.com/tensorflow/lingvo).
 
 ## Usage 
 
@@ -112,7 +120,7 @@ Array inputs, with the frequencies set to low, medium and high respectively.
 ```python
 import numpy as np
 forecast_input = [
-    np.sin(np.linspace(0, 20, 100))
+    np.sin(np.linspace(0, 20, 100)),
     np.sin(np.linspace(0, 20, 200)),
     np.sin(np.linspace(0, 20, 400)),
 ]
