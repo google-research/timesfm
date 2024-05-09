@@ -33,8 +33,9 @@ from praxis import py_utils
 from praxis import pytypes
 from praxis.layers import normalizations
 from praxis.layers import transformers
-from src import patched_decoder
 from utilsforecast.processing import make_future_dataframe
+
+from . import patched_decoder
 
 instantiate = base_hyperparams.instantiate
 NestedMap = py_utils.NestedMap

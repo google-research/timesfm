@@ -16,6 +16,6 @@
 
 from __future__ import absolute_import
 
-from src.patched_decoder import PatchedTimeSeriesDecoder
-from src.timesfm import TimesFm
-from src.timesfm import freq_map
+from .patched_decoder import PatchedTimeSeriesDecoder
+from .timesfm import TimesFm
+from .timesfm import freq_map
