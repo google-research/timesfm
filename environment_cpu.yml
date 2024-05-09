@@ -10,6 +10,7 @@ dependencies:
   - python=3.10
   - pip:
     - huggingface_hub[cli]
+    - utilsforecast
     - praxis
     - paxml
     - jax[cpu]
