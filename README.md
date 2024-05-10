@@ -78,7 +78,7 @@ tfm = timesfm.TimesFm(
     model_dims=1280,
     backend=<backend>,
 )
-tfm.load_from_checkpoint(<checkpoint_path>)
+tfm.load_from_checkpoint(repo_id="google/timesfm-1.0-200m")
 ```
 
 Note that the four parameters are fixed to load the 200m model
