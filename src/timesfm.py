@@ -231,7 +231,7 @@ class TimesFm:
     Args:
       checkpoint_path: path to the checkpoint directory.
       checkpoint_type: type of PAX checkpoint
-      step: step of the checkpoint to load. If `None`, load lastest checkpoint.
+      step: step of the checkpoint to load. If `None`, load latest checkpoint.
     """
     #  Initialize the model weights.
     self._logging("Constructing model weights.")
