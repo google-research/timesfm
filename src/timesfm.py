@@ -24,7 +24,7 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 import pandas as pd
-from huggingface_hub import hf_hub_download
+from huggingface_hub import snapshot_download
 from paxml import checkpoints
 from paxml import tasks_lib
 from praxis import base_hyperparams
@@ -235,7 +235,7 @@ class TimesFm:
       step: step of the checkpoint to load. If `None`, load lastest checkpoint.
     """
     # Download the checkpoint from Hugging Face Hub
-    checkpoint_path = hf_hub_download(repo_id)
+    checkpoint_path = snapshot_download(repo_id)
 
     #  Initialize the model weights.
     self._logging("Constructing model weights.")
