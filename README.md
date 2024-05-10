@@ -94,6 +94,8 @@ model_dims=1280,
 
 2. The horizon length can be set to anything. We recommend setting it to the largest horizon length you would need in the forecasting tasks for your application. We generally recommend horizon length <= context length but it is not a requirement in the function call.
 
+3. `backend` is one of "cpu", "gpu" or "tpu", case sensitive.
+
 ### Perform inference
 
 We provide APIs to forecast from either array inputs or `pandas` dataframe. Both forecast methods expect (1) the input time series contexts, (2) along with their frequencies. Please look at the documentation of the functions `tfm.forecast()` and `tfm.forecast_on_df()` for detailed instructions.
