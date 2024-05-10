@@ -16,6 +16,7 @@
 
 import logging
 import multiprocessing
+from os import path
 import time
 from typing import Any, Literal, Sequence
 
@@ -235,7 +236,7 @@ class TimesFm:
       step: step of the checkpoint to load. If `None`, load lastest checkpoint.
     """
     # Download the checkpoint from Hugging Face Hub
-    checkpoint_path = snapshot_download(repo_id)
+    checkpoint_path = path.join(snapshot_download(repo_id), "checkpoints")
 
     #  Initialize the model weights.
     self._logging("Constructing model weights.")
