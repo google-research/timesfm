@@ -18,7 +18,7 @@ import logging
 import multiprocessing
 from os import path
 import time
-from typing import Any, Literal, Sequence
+from typing import Any, Literal, Optional, Sequence
 
 import einshape as es
 import jax
@@ -224,6 +224,7 @@ class TimesFm:
 
   def load_from_checkpoint(
       self,
+      checkpoint_path: Optional[str] = None,
       repo_id: str = "google/timesfm-1.0-200m",
       checkpoint_type: checkpoints.CheckpointType = checkpoints.CheckpointType.FLAX,
       step: int | None = None,
@@ -231,12 +232,14 @@ class TimesFm:
     """Loads a checkpoint and compiles the decoder.
 
     Args:
-      checkpoint_path: path to the checkpoint directory.
+      checkpoint_path: Optional path to the checkpoint directory.
+      repo_id: Hugging Face Hub repo id.
       checkpoint_type: type of PAX checkpoint
       step: step of the checkpoint to load. If `None`, load lastest checkpoint.
     """
-    # Download the checkpoint from Hugging Face Hub
-    checkpoint_path = path.join(snapshot_download(repo_id), "checkpoints")
+    # Download the checkpoint from Hugging Face Hub if not given
+    if checkpoint_path is None:
+      checkpoint_path = path.join(snapshot_download(repo_id), "checkpoints")
 
     #  Initialize the model weights.
     self._logging("Constructing model weights.")
