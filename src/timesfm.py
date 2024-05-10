@@ -509,7 +509,7 @@ class TimesFm:
   def forecast_on_df(
       self,
       inputs: pd.DataFrame,
-      freq: str,
+      freq: Optional[str] = None,
       forecast_context_len: int = 0,
       value_name: str = "values",
       model_name: str = "timesfm",
@@ -575,7 +575,12 @@ class TimesFm:
         )
       new_inputs, uids = zip(*results)
     print("Finished preprocessing dataframe.")
-    freq_inps = [freq_map(freq)] * len(new_inputs)
+    if freq is not None:
+      freq_inps = [freq_map(freq)] * len(new_inputs)
+    else:
+      # with freq_ipns = None, `forecast` will
+      # create a default list of zeros
+      freq_inps = None
     _, full_forecast = self.forecast(
         new_inputs, freq=freq_inps, window_size=window_size
     )
