@@ -126,7 +126,7 @@ class TimesFm:
       num_layers: int,
       model_dims: int,
       per_core_batch_size: int = 32,
-      backend: Literal["cpu", "gpu", "tpu"] = "cpu",
+      backend: Literal = "cpu",
       quantiles: Sequence[float] | None = None,
       verbose: bool = True,
   ) -> None:
@@ -144,12 +144,12 @@ class TimesFm:
       num_layers: Number of transformer layers.
       model_dims: Model dimension.
       per_core_batch_size: Batch size on each core for data parallelism.
-      backend: One of "cpu", "gpu" or "tpu".
+      backend: One of "cpu", "gpu" or "tpu" (case-insensitive).
       quantiles: list of output quantiles supported by the model.
       verbose: Whether to print logging messages.
     """
     self.per_core_batch_size = per_core_batch_size
-    self.backend = backend
+    self.backend = backend.lower()
     self.num_devices = jax.local_device_count(self.backend)
     self.global_batch_size = self.per_core_batch_size * self.num_devices
 
