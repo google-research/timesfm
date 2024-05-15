@@ -35,7 +35,7 @@ from praxis import py_utils
 from praxis import pytypes
 from praxis.layers import normalizations
 from praxis.layers import transformers
-from . import patched_decoder
+import patched_decoder
 from utilsforecast.processing import make_future_dataframe
 
 instantiate = base_hyperparams.instantiate
