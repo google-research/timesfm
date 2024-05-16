@@ -1,0 +1,171 @@
+.\" Man page generated from reStructuredText.
+.
+.TH "KPROPD" "8" " " "1.21.2" "MIT Kerberos"
+.SH NAME
+kpropd \- Kerberos V5 replica KDC update server
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.SH SYNOPSIS
+.sp
+\fBkpropd\fP
+[\fB\-r\fP \fIrealm\fP]
+[\fB\-A\fP \fIadmin_server\fP]
+[\fB\-a\fP \fIacl_file\fP]
+[\fB\-f\fP \fIreplica_dumpfile\fP]
+[\fB\-F\fP \fIprincipal_database\fP]
+[\fB\-p\fP \fIkdb5_util_prog\fP]
+[\fB\-P\fP \fIport\fP]
+[\fB\-\-pid\-file\fP=\fIpid_file\fP]
+[\fB\-D\fP]
+[\fB\-d\fP]
+[\fB\-s\fP \fIkeytab_file\fP]
+.SH DESCRIPTION
+.sp
+The \fIkpropd\fP command runs on the replica KDC server.  It listens for
+update requests made by the kprop(8) program.  If incremental
+propagation is enabled, it periodically requests incremental updates
+from the primary KDC.
+.sp
+When the replica receives a kprop request from the primary, kpropd
+accepts the dumped KDC database and places it in a file, and then runs
+kdb5_util(8) to load the dumped database into the active
+database which is used by krb5kdc(8)\&.  This allows the primary
+Kerberos server to use kprop(8) to propagate its database to
+the replica servers.  Upon a successful download of the KDC database
+file, the replica Kerberos server will have an up\-to\-date KDC
+database.
+.sp
+Where incremental propagation is not used, kpropd is commonly invoked
+out of inetd(8) as a nowait service.  This is done by adding a line to
+the \fB/etc/inetd.conf\fP file which looks like this:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+kprop  stream  tcp  nowait  root  /usr/local/sbin/kpropd  kpropd
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+kpropd can also run as a standalone daemon, backgrounding itself and
+waiting for connections on port 754 (or the port specified with the
+\fB\-P\fP option if given).  Standalone mode is required for incremental
+propagation.  Starting in release 1.11, kpropd automatically detects
+whether it was run from inetd and runs in standalone mode if it is
+not.  Prior to release 1.11, the \fB\-S\fP option is required to run
+kpropd in standalone mode; this option is now accepted for backward
+compatibility but does nothing.
+.sp
+Incremental propagation may be enabled with the \fBiprop_enable\fP
+variable in kdc.conf(5)\&.  If incremental propagation is
+enabled, the replica periodically polls the primary KDC for updates, at
+an interval determined by the \fBiprop_replica_poll\fP variable.  If the
+replica receives updates, kpropd updates its log file with any updates
+from the primary.  kproplog(8) can be used to view a summary of
+the update entry log on the replica KDC.  If incremental propagation
+is enabled, the principal \fBkiprop/replicahostname@REALM\fP (where
+\fIreplicahostname\fP is the name of the replica KDC host, and \fIREALM\fP is
+the name of the Kerberos realm) must be present in the replica\(aqs
+keytab file.
+.sp
+kproplog(8) can be used to force full replication when iprop is
+enabled.
+.SH OPTIONS
+.INDENT 0.0
+.TP
+\fB\-r\fP \fIrealm\fP
+Specifies the realm of the primary server.
+.TP
+\fB\-A\fP \fIadmin_server\fP
+Specifies the server to be contacted for incremental updates; by
+default, the primary admin server is contacted.
+.TP
+\fB\-f\fP \fIfile\fP
+Specifies the filename where the dumped principal database file is
+to be stored; by default the dumped database file is \fB/workspaces/timesfm/venv/var\fP\fB/krb5kdc\fP\fB/from_master\fP\&.
+.TP
+\fB\-F\fP \fIkerberos_db\fP
+Path to the Kerberos database file, if not the default.
+.TP
+\fB\-p\fP
+Allows the user to specify the pathname to the kdb5_util(8)
+program; by default the pathname used is \fB/workspaces/timesfm/venv/sbin\fP\fB/kdb5_util\fP\&.
+.TP
+\fB\-D\fP
+In this mode, kpropd will not detach itself from the current job
+and run in the background.  Instead, it will run in the
+foreground.
+.TP
+\fB\-d\fP
+Turn on debug mode.  kpropd will print out debugging messages
+during the database propogation and will run in the foreground
+(implies \fB\-D\fP).
+.TP
+\fB\-P\fP
+Allow for an alternate port number for kpropd to listen on.  This
+is only useful in combination with the \fB\-S\fP option.
+.TP
+\fB\-a\fP \fIacl_file\fP
+Allows the user to specify the path to the kpropd.acl file; by
+default the path used is \fB/workspaces/timesfm/venv/var\fP\fB/krb5kdc\fP\fB/kpropd.acl\fP\&.
+.TP
+\fB\-\-pid\-file\fP=\fIpid_file\fP
+In standalone mode, write the process ID of the daemon into
+\fIpid_file\fP\&.
+.TP
+\fB\-s\fP \fIkeytab_file\fP
+Path to a keytab to use for acquiring acceptor credentials.
+.TP
+\fB\-x\fP \fIdb_args\fP
+Database\-specific arguments.  See Database Options in kadmin(1) for supported arguments.
+.UNINDENT
+.SH FILES
+.INDENT 0.0
+.TP
+.B kpropd.acl
+Access file for kpropd; the default location is
+\fB/usr/local/var/krb5kdc/kpropd.acl\fP\&.  Each entry is a line
+containing the principal of a host from which the local machine
+will allow Kerberos database propagation via kprop(8)\&.
+.UNINDENT
+.SH ENVIRONMENT
+.sp
+See kerberos(7) for a description of Kerberos environment
+variables.
+.SH SEE ALSO
+.sp
+kprop(8), kdb5_util(8), krb5kdc(8),
+kerberos(7), inetd(8)
+.SH AUTHOR
+MIT
+.SH COPYRIGHT
+1985-2023, MIT
+.\" Generated by docutils manpage writer.
+.

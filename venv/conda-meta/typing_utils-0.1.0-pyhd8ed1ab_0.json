@@ -1,0 +1,112 @@
+{
+  "build": "pyhd8ed1ab_0",
+  "build_number": 0,
+  "channel": "https://conda.anaconda.org/conda-forge/noarch",
+  "constrains": [],
+  "depends": [
+    "python >=3.6.1"
+  ],
+  "extracted_package_dir": "/opt/conda/pkgs/typing_utils-0.1.0-pyhd8ed1ab_0",
+  "files": [
+    "lib/python3.10/site-packages/typing_utils-0.1.0.dist-info/INSTALLER",
+    "lib/python3.10/site-packages/typing_utils-0.1.0.dist-info/LICENSE",
+    "lib/python3.10/site-packages/typing_utils-0.1.0.dist-info/METADATA",
+    "lib/python3.10/site-packages/typing_utils-0.1.0.dist-info/RECORD",
+    "lib/python3.10/site-packages/typing_utils-0.1.0.dist-info/REQUESTED",
+    "lib/python3.10/site-packages/typing_utils-0.1.0.dist-info/WHEEL",
+    "lib/python3.10/site-packages/typing_utils-0.1.0.dist-info/direct_url.json",
+    "lib/python3.10/site-packages/typing_utils-0.1.0.dist-info/top_level.txt",
+    "lib/python3.10/site-packages/typing_utils/__init__.py",
+    "lib/python3.10/site-packages/typing_utils/__pycache__/__init__.cpython-310.pyc"
+  ],
+  "fn": "typing_utils-0.1.0-pyhd8ed1ab_0.tar.bz2",
+  "license": "Apache-2.0",
+  "link": {
+    "source": "/opt/conda/pkgs/typing_utils-0.1.0-pyhd8ed1ab_0",
+    "type": 1
+  },
+  "md5": "eb67e3cace64c66233e2d35949e20f92",
+  "name": "typing_utils",
+  "noarch": "python",
+  "package_tarball_full_path": "/opt/conda/pkgs/typing_utils-0.1.0-pyhd8ed1ab_0.tar.bz2",
+  "package_type": "noarch_python",
+  "paths_data": {
+    "paths": [
+      {
+        "_path": "site-packages/typing_utils-0.1.0.dist-info/INSTALLER",
+        "path_type": "hardlink",
+        "sha256": "d0edee15f91b406f3f99726e44eb990be6e34fd0345b52b910c568e0eef6a2a8",
+        "sha256_in_prefix": "d0edee15f91b406f3f99726e44eb990be6e34fd0345b52b910c568e0eef6a2a8",
+        "size_in_bytes": 5
+      },
+      {
+        "_path": "site-packages/typing_utils-0.1.0.dist-info/LICENSE",
+        "path_type": "hardlink",
+        "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+        "sha256_in_prefix": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+        "size_in_bytes": 11357
+      },
+      {
+        "_path": "site-packages/typing_utils-0.1.0.dist-info/METADATA",
+        "path_type": "hardlink",
+        "sha256": "b4b147b5435450ceec872d3d7a2c9c011821f5dd2cdf6eb8f60633196b3877e6",
+        "sha256_in_prefix": "b4b147b5435450ceec872d3d7a2c9c011821f5dd2cdf6eb8f60633196b3877e6",
+        "size_in_bytes": 5009
+      },
+      {
+        "_path": "site-packages/typing_utils-0.1.0.dist-info/RECORD",
+        "path_type": "hardlink",
+        "sha256": "e02169dc4cb78abc800de593567688753e3653b08777edbd3108b1c3e7b9b31d",
+        "sha256_in_prefix": "e02169dc4cb78abc800de593567688753e3653b08777edbd3108b1c3e7b9b31d",
+        "size_in_bytes": 839
+      },
+      {
+        "_path": "site-packages/typing_utils-0.1.0.dist-info/REQUESTED",
+        "path_type": "hardlink",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256_in_prefix": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_in_bytes": 0
+      },
+      {
+        "_path": "site-packages/typing_utils-0.1.0.dist-info/WHEEL",
+        "path_type": "hardlink",
+        "sha256": "3aa464174798e461ecb0ca2b16395b4c8ab4ef6be91e917ad1f21003a952f710",
+        "sha256_in_prefix": "3aa464174798e461ecb0ca2b16395b4c8ab4ef6be91e917ad1f21003a952f710",
+        "size_in_bytes": 92
+      },
+      {
+        "_path": "site-packages/typing_utils-0.1.0.dist-info/direct_url.json",
+        "path_type": "hardlink",
+        "sha256": "c9b83c0e54e4b867db98de4e10f6382df13cf175fa54d7df2d9164347f1fae85",
+        "sha256_in_prefix": "c9b83c0e54e4b867db98de4e10f6382df13cf175fa54d7df2d9164347f1fae85",
+        "size_in_bytes": 108
+      },
+      {
+        "_path": "site-packages/typing_utils-0.1.0.dist-info/top_level.txt",
+        "path_type": "hardlink",
+        "sha256": "5c00af0374ba71100deef928a738abdd38dcfa6c548705199f15bb4f5d07c2e6",
+        "sha256_in_prefix": "5c00af0374ba71100deef928a738abdd38dcfa6c548705199f15bb4f5d07c2e6",
+        "size_in_bytes": 13
+      },
+      {
+        "_path": "site-packages/typing_utils/__init__.py",
+        "path_type": "hardlink",
+        "sha256": "6d8bdb0cc97fd9812965b3d61267befaa232aaa8e3c0c22ec7fab6991fd0a1f0",
+        "sha256_in_prefix": "6d8bdb0cc97fd9812965b3d61267befaa232aaa8e3c0c22ec7fab6991fd0a1f0",
+        "size_in_bytes": 13237
+      },
+      {
+        "_path": "lib/python3.10/site-packages/typing_utils/__pycache__/__init__.cpython-310.pyc",
+        "path_type": "pyc_file"
+      }
+    ],
+    "paths_version": 1
+  },
+  "requested_spec": "None",
+  "sha256": "9e3758b620397f56fb709f796969de436d63b7117897159619b87938e1f78739",
+  "size": 13829,
+  "subdir": "noarch",
+  "timestamp": 1622899345000,
+  "url": "https://conda.anaconda.org/conda-forge/noarch/typing_utils-0.1.0-pyhd8ed1ab_0.tar.bz2",
+  "version": "0.1.0"
+}

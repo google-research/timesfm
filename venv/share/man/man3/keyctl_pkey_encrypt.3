@@ -1,0 +1,113 @@
+.\"
+.\" Copyright (C) 2018 Red Hat, Inc. All Rights Reserved.
+.\" Written by David Howells (dhowells@redhat.com)
+.\"
+.\" This program is free software; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public Licence
+.\" as published by the Free Software Foundation; either version
+.\" 2 of the Licence, or (at your option) any later version.
+.\"
+.TH KEYCTL_PKEY_ENCRYPT 3 "8 Nov 2018" Linux "Linux Public-Key Encryption"
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH NAME
+keyctl_pkey_encrypt, keyctl_pkey_decrypt \- Encrypt and decrypt data
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH SYNOPSIS
+.nf
+.B #include <keyutils.h>
+.sp
+.BI "long keyctl_pkey_encrypt(key_serial_t " key ", const char *" info ,
+.BI "                         const void *" data ", size_t " data_len ,
+.BI "                         void *" enc ", size_t " enc_len ");"
+.sp
+.BI "long keyctl_pkey_decrypt(key_serial_t " key ", const char *" info ,
+.BI "                         const void *" enc ", size_t " enc_len ,
+.BI "                         void *" data ", size_t " data_len ");"
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH DESCRIPTION
+.BR keyctl_pkey_encrypt ()
+asks the kernel to use the crypto material attached to a key to encrypt a blob
+of data and
+.BR keyctl_pkey_decrypt ()
+asks the kernel to use the key to reverse the operation and recover the
+original data.  Note that these operations may involve the kernel calling out
+to cryptographic hardware.  The caller must have
+.B search
+permission on a key to be able to use them in this manner.
+.PP
+.PP
+When invoking the function,
+.I key
+indicates the key that will provide the cryptographic material and
+.I info
+points to a comma-separated string of "key[=value]" parameters that indicate
+things like encoding forms and passwords to unlock the key; see
+asymmetric-key(7) for more information.
+.PP
+.IR data " and " datalen
+indicate the address and size of the decrypted data buffer and
+.IR enc " and " enclen
+indicate the address and size of the encrypted data buffer.  The encrypt
+function draws data from the decrypted data buffer and places the output into
+the encryption buffer.  The decrypt function does the reverse, drawing from
+the encryption buffer and writing into the data buffer.
+.PP
+.BR keyctl_pkey_query (2)
+can be called to find out how large the buffers need to be.
+.PP
+Note that not all asymmetric-type keys will support these operations; further,
+the operations available may depend on which components of the key material are
+available: typically encryption only requires the public key, but decryption
+requires the private key as well.  Which operations are supported on a
+particular key can also be determined using the query function.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH RETURN VALUE
+On success
+.BR keyctl_pkey_encrypt "() and " keyctl_pkey_decrypt ()
+return the amount of data written into the output buffer.  On error, the value
+.B -1
+will be returned and
+.I errno
+will have been set to an appropriate error.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH ERRORS
+.TP
+.B ENOKEY
+The key specified is invalid.
+.TP
+.B EKEYEXPIRED
+The key specified has expired.
+.TP
+.B EKEYREVOKED
+The key specified has been revoked.
+.TP
+.B EACCES
+The key exists, but is not
+.B searchable
+by the calling process.
+.TP
+.B ENOPKG
+Some facility needed to complete the requested operation is not available.
+This is most probably a requested or required digest or encryption algorithm.
+.TP
+.B EFAULT
+Bad address.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH LINKING
+This is a library function that can be found in
+.IR libkeyutils .
+When linking,
+.B \-lkeyutils
+should be specified to the linker.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH SEE ALSO
+.ad l
+.nh
+.BR keyctl (1),
+.BR add_key (2),
+.BR keyctl (2),
+.BR keyctl (3),
+.BR keyctl_pkey_query (3),
+.BR keyctl_pkey_sign (3),
+.BR keyrings (7),
+.BR keyutils (7)

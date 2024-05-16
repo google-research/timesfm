@@ -1,0 +1,172 @@
+{
+  "build": "pyhd8ed1ab_0",
+  "build_number": 0,
+  "channel": "https://conda.anaconda.org/conda-forge/noarch",
+  "constrains": [],
+  "depends": [
+    "python >=3.7"
+  ],
+  "extracted_package_dir": "/opt/conda/pkgs/uri-template-1.3.0-pyhd8ed1ab_0",
+  "files": [
+    "lib/python3.10/site-packages/uri_template-1.3.0.dist-info/INSTALLER",
+    "lib/python3.10/site-packages/uri_template-1.3.0.dist-info/LICENSE",
+    "lib/python3.10/site-packages/uri_template-1.3.0.dist-info/METADATA",
+    "lib/python3.10/site-packages/uri_template-1.3.0.dist-info/RECORD",
+    "lib/python3.10/site-packages/uri_template-1.3.0.dist-info/REQUESTED",
+    "lib/python3.10/site-packages/uri_template-1.3.0.dist-info/WHEEL",
+    "lib/python3.10/site-packages/uri_template-1.3.0.dist-info/direct_url.json",
+    "lib/python3.10/site-packages/uri_template-1.3.0.dist-info/top_level.txt",
+    "lib/python3.10/site-packages/uri_template/__init__.py",
+    "lib/python3.10/site-packages/uri_template/charset.py",
+    "lib/python3.10/site-packages/uri_template/expansions.py",
+    "lib/python3.10/site-packages/uri_template/py.typed",
+    "lib/python3.10/site-packages/uri_template/uritemplate.py",
+    "lib/python3.10/site-packages/uri_template/variable.py",
+    "lib/python3.10/site-packages/uri_template/__pycache__/__init__.cpython-310.pyc",
+    "lib/python3.10/site-packages/uri_template/__pycache__/charset.cpython-310.pyc",
+    "lib/python3.10/site-packages/uri_template/__pycache__/expansions.cpython-310.pyc",
+    "lib/python3.10/site-packages/uri_template/__pycache__/uritemplate.cpython-310.pyc",
+    "lib/python3.10/site-packages/uri_template/__pycache__/variable.cpython-310.pyc"
+  ],
+  "fn": "uri-template-1.3.0-pyhd8ed1ab_0.conda",
+  "license": "MIT",
+  "link": {
+    "source": "/opt/conda/pkgs/uri-template-1.3.0-pyhd8ed1ab_0",
+    "type": 1
+  },
+  "md5": "0944dc65cb4a9b5b68522c3bb585d41c",
+  "name": "uri-template",
+  "noarch": "python",
+  "package_tarball_full_path": "/opt/conda/pkgs/uri-template-1.3.0-pyhd8ed1ab_0.conda",
+  "package_type": "noarch_python",
+  "paths_data": {
+    "paths": [
+      {
+        "_path": "site-packages/uri_template-1.3.0.dist-info/INSTALLER",
+        "path_type": "hardlink",
+        "sha256": "d0edee15f91b406f3f99726e44eb990be6e34fd0345b52b910c568e0eef6a2a8",
+        "sha256_in_prefix": "d0edee15f91b406f3f99726e44eb990be6e34fd0345b52b910c568e0eef6a2a8",
+        "size_in_bytes": 5
+      },
+      {
+        "_path": "site-packages/uri_template-1.3.0.dist-info/LICENSE",
+        "path_type": "hardlink",
+        "sha256": "9d3c97efe95551ee3e05c14cf0b447acfa2128e16d0fc993b649b756f763e13d",
+        "sha256_in_prefix": "9d3c97efe95551ee3e05c14cf0b447acfa2128e16d0fc993b649b756f763e13d",
+        "size_in_bytes": 1068
+      },
+      {
+        "_path": "site-packages/uri_template-1.3.0.dist-info/METADATA",
+        "path_type": "hardlink",
+        "sha256": "3a8c53a915e5755c13b09faa29a4211fcff0c6ee188a169fc02cc092d89f46bc",
+        "sha256_in_prefix": "3a8c53a915e5755c13b09faa29a4211fcff0c6ee188a169fc02cc092d89f46bc",
+        "size_in_bytes": 8764
+      },
+      {
+        "_path": "site-packages/uri_template-1.3.0.dist-info/RECORD",
+        "path_type": "hardlink",
+        "sha256": "6b09bc831f5d5c35da34c01d89fdb1b174bf189d8f3cd16e0c63db705eea4dd9",
+        "sha256_in_prefix": "6b09bc831f5d5c35da34c01d89fdb1b174bf189d8f3cd16e0c63db705eea4dd9",
+        "size_in_bytes": 1462
+      },
+      {
+        "_path": "site-packages/uri_template-1.3.0.dist-info/REQUESTED",
+        "path_type": "hardlink",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256_in_prefix": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_in_bytes": 0
+      },
+      {
+        "_path": "site-packages/uri_template-1.3.0.dist-info/WHEEL",
+        "path_type": "hardlink",
+        "sha256": "a6472d658cd44b8018567e9d27eef7ebb389662bc5d9ef1103d6ff6418e27f5f",
+        "sha256_in_prefix": "a6472d658cd44b8018567e9d27eef7ebb389662bc5d9ef1103d6ff6418e27f5f",
+        "size_in_bytes": 92
+      },
+      {
+        "_path": "site-packages/uri_template-1.3.0.dist-info/direct_url.json",
+        "path_type": "hardlink",
+        "sha256": "e4a3e946657ee5a8f45145743740e4178fcd30a56fac86f3e430c5d221834c8d",
+        "sha256_in_prefix": "e4a3e946657ee5a8f45145743740e4178fcd30a56fac86f3e430c5d221834c8d",
+        "size_in_bytes": 113
+      },
+      {
+        "_path": "site-packages/uri_template-1.3.0.dist-info/top_level.txt",
+        "path_type": "hardlink",
+        "sha256": "80ac4661427d85dd7b8e120627c4fa9fe4499ac2eb4d79e5e2750b3a8df737b6",
+        "sha256_in_prefix": "80ac4661427d85dd7b8e120627c4fa9fe4499ac2eb4d79e5e2750b3a8df737b6",
+        "size_in_bytes": 13
+      },
+      {
+        "_path": "site-packages/uri_template/__init__.py",
+        "path_type": "hardlink",
+        "sha256": "4a43b438db4bee3f37217e6723fcfac3897ba589b22724dbe84d87f8b11f115d",
+        "sha256_in_prefix": "4a43b438db4bee3f37217e6723fcfac3897ba589b22724dbe84d87f8b11f115d",
+        "size_in_bytes": 938
+      },
+      {
+        "_path": "site-packages/uri_template/charset.py",
+        "path_type": "hardlink",
+        "sha256": "e192605d97861e3c4772d3ed752f3286e613a9dd512b100cbe94c0769a1567e7",
+        "sha256_in_prefix": "e192605d97861e3c4772d3ed752f3286e613a9dd512b100cbe94c0769a1567e7",
+        "size_in_bytes": 468
+      },
+      {
+        "_path": "site-packages/uri_template/expansions.py",
+        "path_type": "hardlink",
+        "sha256": "81f5ad86652ddc4ab3f9a59fd5412e9b0f8336dab6f132cc76cc19e64f50ffaa",
+        "sha256_in_prefix": "81f5ad86652ddc4ab3f9a59fd5412e9b0f8336dab6f132cc76cc19e64f50ffaa",
+        "size_in_bytes": 17273
+      },
+      {
+        "_path": "site-packages/uri_template/py.typed",
+        "path_type": "hardlink",
+        "sha256": "95699d8cea905f97b39b4b320eb27d030c0249dd8c54eb8bde194e1a7e1006fe",
+        "sha256_in_prefix": "95699d8cea905f97b39b4b320eb27d030c0249dd8c54eb8bde194e1a7e1006fe",
+        "size_in_bytes": 60
+      },
+      {
+        "_path": "site-packages/uri_template/uritemplate.py",
+        "path_type": "hardlink",
+        "sha256": "1160b8d6cf6ee1a34fddc28de67085fd981282931ae77a75822fbdbff91e2f9d",
+        "sha256_in_prefix": "1160b8d6cf6ee1a34fddc28de67085fd981282931ae77a75822fbdbff91e2f9d",
+        "size_in_bytes": 5255
+      },
+      {
+        "_path": "site-packages/uri_template/variable.py",
+        "path_type": "hardlink",
+        "sha256": "52db3f7ce050468e5fa5c9128c5570d54d672b3ffba95d21ebf251f8e7da35c6",
+        "sha256_in_prefix": "52db3f7ce050468e5fa5c9128c5570d54d672b3ffba95d21ebf251f8e7da35c6",
+        "size_in_bytes": 3210
+      },
+      {
+        "_path": "lib/python3.10/site-packages/uri_template/__pycache__/__init__.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/uri_template/__pycache__/charset.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/uri_template/__pycache__/expansions.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/uri_template/__pycache__/uritemplate.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/uri_template/__pycache__/variable.cpython-310.pyc",
+        "path_type": "pyc_file"
+      }
+    ],
+    "paths_version": 1
+  },
+  "requested_spec": "None",
+  "sha256": "b76904b53721dc88a46352324c79d2b077c2f74a9f7208ad2c4249892669ae94",
+  "size": 23999,
+  "subdir": "noarch",
+  "timestamp": 1688655976000,
+  "url": "https://conda.anaconda.org/conda-forge/noarch/uri-template-1.3.0-pyhd8ed1ab_0.conda",
+  "version": "1.3.0"
+}

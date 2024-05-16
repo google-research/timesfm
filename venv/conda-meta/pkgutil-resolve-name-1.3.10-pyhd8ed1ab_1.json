@@ -1,0 +1,104 @@
+{
+  "build": "pyhd8ed1ab_1",
+  "build_number": 1,
+  "channel": "https://conda.anaconda.org/conda-forge/noarch",
+  "constrains": [],
+  "depends": [
+    "python >=3.6"
+  ],
+  "extracted_package_dir": "/opt/conda/pkgs/pkgutil-resolve-name-1.3.10-pyhd8ed1ab_1",
+  "files": [
+    "lib/python3.10/site-packages/pkgutil_resolve_name-1.3.10.dist-info/INSTALLER",
+    "lib/python3.10/site-packages/pkgutil_resolve_name-1.3.10.dist-info/LICENSE",
+    "lib/python3.10/site-packages/pkgutil_resolve_name-1.3.10.dist-info/METADATA",
+    "lib/python3.10/site-packages/pkgutil_resolve_name-1.3.10.dist-info/RECORD",
+    "lib/python3.10/site-packages/pkgutil_resolve_name-1.3.10.dist-info/REQUESTED",
+    "lib/python3.10/site-packages/pkgutil_resolve_name-1.3.10.dist-info/WHEEL",
+    "lib/python3.10/site-packages/pkgutil_resolve_name-1.3.10.dist-info/direct_url.json",
+    "lib/python3.10/site-packages/pkgutil_resolve_name.py",
+    "lib/python3.10/site-packages/__pycache__/pkgutil_resolve_name.cpython-310.pyc"
+  ],
+  "fn": "pkgutil-resolve-name-1.3.10-pyhd8ed1ab_1.conda",
+  "license": "MIT AND PSF-2.0",
+  "link": {
+    "source": "/opt/conda/pkgs/pkgutil-resolve-name-1.3.10-pyhd8ed1ab_1",
+    "type": 1
+  },
+  "md5": "405678b942f2481cecdb3e010f4925d9",
+  "name": "pkgutil-resolve-name",
+  "noarch": "python",
+  "package_tarball_full_path": "/opt/conda/pkgs/pkgutil-resolve-name-1.3.10-pyhd8ed1ab_1.conda",
+  "package_type": "noarch_python",
+  "paths_data": {
+    "paths": [
+      {
+        "_path": "site-packages/pkgutil_resolve_name-1.3.10.dist-info/INSTALLER",
+        "path_type": "hardlink",
+        "sha256": "d0edee15f91b406f3f99726e44eb990be6e34fd0345b52b910c568e0eef6a2a8",
+        "sha256_in_prefix": "d0edee15f91b406f3f99726e44eb990be6e34fd0345b52b910c568e0eef6a2a8",
+        "size_in_bytes": 5
+      },
+      {
+        "_path": "site-packages/pkgutil_resolve_name-1.3.10.dist-info/LICENSE",
+        "path_type": "hardlink",
+        "sha256": "bf89267349245330e66b38d209e292caefe8ca9469377a153ca70bd459a17e78",
+        "sha256_in_prefix": "bf89267349245330e66b38d209e292caefe8ca9469377a153ca70bd459a17e78",
+        "size_in_bytes": 3790
+      },
+      {
+        "_path": "site-packages/pkgutil_resolve_name-1.3.10.dist-info/METADATA",
+        "path_type": "hardlink",
+        "sha256": "0fcfa9830d5a154f474c89239681cb2a770a5ac0863581588739a7eaa9a30ded",
+        "sha256_in_prefix": "0fcfa9830d5a154f474c89239681cb2a770a5ac0863581588739a7eaa9a30ded",
+        "size_in_bytes": 624
+      },
+      {
+        "_path": "site-packages/pkgutil_resolve_name-1.3.10.dist-info/RECORD",
+        "path_type": "hardlink",
+        "sha256": "bc12063ad93f6a6d43c44fe6d8398b83acbbdf93adb41a81265c4c0ac6f19785",
+        "sha256_in_prefix": "bc12063ad93f6a6d43c44fe6d8398b83acbbdf93adb41a81265c4c0ac6f19785",
+        "size_in_bytes": 800
+      },
+      {
+        "_path": "site-packages/pkgutil_resolve_name-1.3.10.dist-info/REQUESTED",
+        "path_type": "hardlink",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256_in_prefix": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_in_bytes": 0
+      },
+      {
+        "_path": "site-packages/pkgutil_resolve_name-1.3.10.dist-info/WHEEL",
+        "path_type": "hardlink",
+        "sha256": "1196c6921ec87b83e865f450f08d19b8ff5592537f4ef719e83484e546abe33e",
+        "sha256_in_prefix": "1196c6921ec87b83e865f450f08d19b8ff5592537f4ef719e83484e546abe33e",
+        "size_in_bytes": 81
+      },
+      {
+        "_path": "site-packages/pkgutil_resolve_name-1.3.10.dist-info/direct_url.json",
+        "path_type": "hardlink",
+        "sha256": "c203968abe85e9a399aade87092f9ee64e5c34b2a6c49b23f575280ad8a11731",
+        "sha256_in_prefix": "c203968abe85e9a399aade87092f9ee64e5c34b2a6c49b23f575280ad8a11731",
+        "size_in_bytes": 116
+      },
+      {
+        "_path": "site-packages/pkgutil_resolve_name.py",
+        "path_type": "hardlink",
+        "sha256": "bc7d5228cb668ef88627600852f655c98435d5fb2f7d17615a1879ad060a61bc",
+        "sha256_in_prefix": "bc7d5228cb668ef88627600852f655c98435d5fb2f7d17615a1879ad060a61bc",
+        "size_in_bytes": 4391
+      },
+      {
+        "_path": "lib/python3.10/site-packages/__pycache__/pkgutil_resolve_name.cpython-310.pyc",
+        "path_type": "pyc_file"
+      }
+    ],
+    "paths_version": 1
+  },
+  "requested_spec": "None",
+  "sha256": "fecf95377134b0e8944762d92ecf7b0149c07d8186fb5db583125a2705c7ea0a",
+  "size": 10778,
+  "subdir": "noarch",
+  "timestamp": 1694617398000,
+  "url": "https://conda.anaconda.org/conda-forge/noarch/pkgutil-resolve-name-1.3.10-pyhd8ed1ab_1.conda",
+  "version": "1.3.10"
+}

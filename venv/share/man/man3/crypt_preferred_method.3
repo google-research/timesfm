@@ -1,0 +1,66 @@
+.\" Written by Björn Esser <besser82 at fedoraproject.org> in 2018.
+.\"
+.\" To the extent possible under law, the authors have waived
+.\" all copyright and related or neighboring rights to this work.
+.\" See https://creativecommons.org/publicdomain/zero/1.0/ for further
+.\" details.
+.\"
+.Dd November 16, 2018
+.Dt CRYPT_PREFERRED_METHOD 3
+.Os "libxcrypt"
+.Sh NAME
+.Nm crypt_preferred_method
+.Nd get the prefix of the preferred hash method
+.Sh LIBRARY
+.Lb libcrypt
+.Sh SYNOPSIS
+.In crypt.h
+.Ft const char*
+.Fo crypt_preferred_method
+.Fa "void"
+.Fc
+.Sh DESCRIPTION
+.Nm
+is a convenience function to get the prefix of the preferred hash
+method.  If a preferred method is available, it is the same as the
+one also used by the
+.Nm crypt_gensalt functions ,
+if their given
+.Ar prefix
+parameter is NULL.
+.Sh RETURN VALUES
+The string returned equals the prefix of the preferred hash method.
+If no preferred hash method is available it is NULL.  It
+.Em is
+safe to pass the string returned by
+.Nm crypt_preferred_method
+directly to
+.Nm crypt_gensalt
+without prior string-sanitizing nor NULL-pointer checks.
+.Sh FEATURE TEST MACROS
+.In crypt.h
+will define the macro
+.Dv CRYPT_PREFERRED_METHOD_AVAILABLE
+if
+.Nm
+is available in the current version of libxcrypt.
+.Sh PORTABILITY NOTES
+The function
+.Nm
+is not part of any standard.
+It was added to libxcrypt in version 4.4.0.
+.Sh ATTRIBUTES
+For an explanation of the terms used in this section, see
+.Xr attributes 7 .
+.TS
+allbox;
+lb lb lb
+l l l.
+Interface	Attribute	Value
+T{
+.Nm
+T}	Thread safety	MT-Safe
+.TE
+.sp
+.Sh SEE ALSO
+.Xr crypt_gensalt 3

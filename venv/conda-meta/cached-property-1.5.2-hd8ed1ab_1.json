@@ -1,0 +1,33 @@
+{
+  "build": "hd8ed1ab_1",
+  "build_number": 1,
+  "channel": "https://conda.anaconda.org/conda-forge/noarch",
+  "constrains": [],
+  "depends": [
+    "cached_property >=1.5.2,<1.5.3.0a0"
+  ],
+  "extracted_package_dir": "/opt/conda/pkgs/cached-property-1.5.2-hd8ed1ab_1",
+  "files": [],
+  "fn": "cached-property-1.5.2-hd8ed1ab_1.tar.bz2",
+  "license": "BSD-3-Clause",
+  "link": {
+    "source": "/opt/conda/pkgs/cached-property-1.5.2-hd8ed1ab_1",
+    "type": 1
+  },
+  "md5": "9b347a7ec10940d3f7941ff6c460b551",
+  "name": "cached-property",
+  "noarch": "generic",
+  "package_tarball_full_path": "/opt/conda/pkgs/cached-property-1.5.2-hd8ed1ab_1.tar.bz2",
+  "package_type": "noarch_generic",
+  "paths_data": {
+    "paths": [],
+    "paths_version": 1
+  },
+  "requested_spec": "None",
+  "sha256": "561e6660f26c35d137ee150187d89767c988413c978e1b712d53f27ddf70ea17",
+  "size": 4134,
+  "subdir": "noarch",
+  "timestamp": 1615209571000,
+  "url": "https://conda.anaconda.org/conda-forge/noarch/cached-property-1.5.2-hd8ed1ab_1.tar.bz2",
+  "version": "1.5.2"
+}

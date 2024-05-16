@@ -1,0 +1,217 @@
+.\" Man page generated from reStructuredText.
+.
+.TH "KERBEROS" "7" " " "1.21.2" "MIT Kerberos"
+.SH NAME
+kerberos \- Overview of using Kerberos
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.SH DESCRIPTION
+.sp
+The Kerberos system authenticates individual users in a network
+environment.  After authenticating yourself to Kerberos, you can use
+Kerberos\-enabled programs without having to present passwords or
+certificates to those programs.
+.sp
+If you receive the following response from kinit(1):
+.sp
+kinit: Client not found in Kerberos database while getting initial
+credentials
+.sp
+you haven\(aqt been registered as a Kerberos user.  See your system
+administrator.
+.sp
+A Kerberos name usually contains three parts.  The first is the
+\fBprimary\fP, which is usually a user\(aqs or service\(aqs name.  The second
+is the \fBinstance\fP, which in the case of a user is usually null.
+Some users may have privileged instances, however, such as \fBroot\fP or
+\fBadmin\fP\&.  In the case of a service, the instance is the fully
+qualified name of the machine on which it runs; i.e. there can be an
+ssh service running on the machine ABC (\fI\%ssh/ABC@REALM\fP), which is
+different from the ssh service running on the machine XYZ
+(\fI\%ssh/XYZ@REALM\fP).  The third part of a Kerberos name is the \fBrealm\fP\&.
+The realm corresponds to the Kerberos service providing authentication
+for the principal.  Realms are conventionally all\-uppercase, and often
+match the end of hostnames in the realm (for instance, host01.example.com
+might be in realm EXAMPLE.COM).
+.sp
+When writing a Kerberos name, the principal name is separated from the
+instance (if not null) by a slash, and the realm (if not the local
+realm) follows, preceded by an "@" sign.  The following are examples
+of valid Kerberos names:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+david
+jennifer/admin
+joeuser@BLEEP.COM
+cbrown/root@FUBAR.ORG
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+When you authenticate yourself with Kerberos you get an initial
+Kerberos \fBticket\fP\&.  (A Kerberos ticket is an encrypted protocol
+message that provides authentication.)  Kerberos uses this ticket for
+network utilities such as ssh.  The ticket transactions are done
+transparently, so you don\(aqt have to worry about their management.
+.sp
+Note, however, that tickets expire.  Administrators may configure more
+privileged tickets, such as those with service or instance of \fBroot\fP
+or \fBadmin\fP, to expire in a few minutes, while tickets that carry
+more ordinary privileges may be good for several hours or a day.  If
+your login session extends beyond the time limit, you will have to
+re\-authenticate yourself to Kerberos to get new tickets using the
+kinit(1) command.
+.sp
+Some tickets are \fBrenewable\fP beyond their initial lifetime.  This
+means that \fBkinit \-R\fP can extend their lifetime without requiring
+you to re\-authenticate.
+.sp
+If you wish to delete your local tickets, use the kdestroy(1)
+command.
+.sp
+Kerberos tickets can be forwarded.  In order to forward tickets, you
+must request \fBforwardable\fP tickets when you kinit.  Once you have
+forwardable tickets, most Kerberos programs have a command line option
+to forward them to the remote host.  This can be useful for, e.g.,
+running kinit on your local machine and then sshing into another to do
+work.  Note that this should not be done on untrusted machines since
+they will then have your tickets.
+.SH ENVIRONMENT VARIABLES
+.sp
+Several environment variables affect the operation of Kerberos\-enabled
+programs.  These include:
+.INDENT 0.0
+.TP
+\fBKRB5CCNAME\fP
+Default name for the credentials cache file, in the form
+\fITYPE\fP:\fIresidual\fP\&.  The type of the default cache may determine
+the availability of a cache collection.  \fBFILE\fP is not a
+collection type; \fBKEYRING\fP, \fBDIR\fP, and \fBKCM\fP are.
+.sp
+If not set, the value of \fBdefault_ccache_name\fP from
+configuration files (see \fBKRB5_CONFIG\fP) will be used.  If that
+is also not set, the default \fItype\fP is \fBFILE\fP, and the
+\fIresidual\fP is the path /tmp/krb5cc_*uid*, where \fIuid\fP is the
+decimal user ID of the user.
+.TP
+\fBKRB5_KTNAME\fP
+Specifies the location of the default keytab file, in the form
+\fITYPE\fP:\fIresidual\fP\&.  If no \fItype\fP is present, the \fBFILE\fP type is
+assumed and \fIresidual\fP is the pathname of the keytab file.  If
+unset, \fBFILE:/etc/krb5.keytab\fP will be used.
+.TP
+\fBKRB5_CONFIG\fP
+Specifies the location of the Kerberos configuration file.  The
+default is \fB/workspaces/timesfm/venv/etc\fP\fB/krb5.conf\fP\&.  Multiple filenames can
+be specified, separated by a colon; all files which are present
+will be read.
+.TP
+\fBKRB5_KDC_PROFILE\fP
+Specifies the location of the KDC configuration file, which
+contains additional configuration directives for the Key
+Distribution Center daemon and associated programs.  The default
+is \fB/workspaces/timesfm/venv/var\fP\fB/krb5kdc\fP\fB/kdc.conf\fP\&.
+.TP
+\fBKRB5RCACHENAME\fP
+(New in release 1.18) Specifies the location of the default replay
+cache, in the form \fItype\fP:\fIresidual\fP\&.  The \fBfile2\fP type with a
+pathname residual specifies a replay cache file in the version\-2
+format in the specified location.  The \fBnone\fP type (residual is
+ignored) disables the replay cache.  The \fBdfl\fP type (residual is
+ignored) indicates the default, which uses a file2 replay cache in
+a temporary directory.  The default is \fBdfl:\fP\&.
+.TP
+\fBKRB5RCACHETYPE\fP
+Specifies the type of the default replay cache, if
+\fBKRB5RCACHENAME\fP is unspecified.  No residual can be specified,
+so \fBnone\fP and \fBdfl\fP are the only useful types.
+.TP
+\fBKRB5RCACHEDIR\fP
+Specifies the directory used by the \fBdfl\fP replay cache type.
+The default is the value of the \fBTMPDIR\fP environment variable,
+or \fB/var/tmp\fP if \fBTMPDIR\fP is not set.
+.TP
+\fBKRB5_TRACE\fP
+Specifies a filename to write trace log output to.  Trace logs can
+help illuminate decisions made internally by the Kerberos
+libraries.  For example, \fBenv KRB5_TRACE=/dev/stderr kinit\fP
+would send tracing information for kinit(1) to
+\fB/dev/stderr\fP\&.  The default is not to write trace log output
+anywhere.
+.TP
+\fBKRB5_CLIENT_KTNAME\fP
+Default client keytab file name.  If unset, \fBFILE:/opt/conda/var/krb5/user/%{euid}/client.keytab\fP will be
+used).
+.TP
+\fBKPROP_PORT\fP
+kprop(8) port to use.  Defaults to 754.
+.TP
+\fBGSS_MECH_CONFIG\fP
+Specifies a filename containing GSSAPI mechanism module
+configuration.  The default is to read \fB/workspaces/timesfm/venv/etc\fP\fB/gss/mech\fP
+and files with a \fB\&.conf\fP suffix within the directory
+\fB/workspaces/timesfm/venv/etc\fP\fB/gss/mech.d\fP\&.
+.UNINDENT
+.sp
+Most environment variables are disabled for certain programs, such as
+login system programs and setuid programs, which are designed to be
+secure when run within an untrusted process environment.
+.SH SEE ALSO
+.sp
+kdestroy(1), kinit(1), klist(1),
+kswitch(1), kpasswd(1), ksu(1),
+krb5.conf(5), kdc.conf(5), kadmin(1),
+kadmind(8), kdb5_util(8), krb5kdc(8)
+.SH BUGS
+.SH AUTHORS
+.nf
+Steve Miller, MIT Project Athena/Digital Equipment Corporation
+Clifford Neuman, MIT Project Athena
+Greg Hudson, MIT Kerberos Consortium
+Robbie Harwood, Red Hat, Inc.
+.fi
+.sp
+.SH HISTORY
+.sp
+The MIT Kerberos 5 implementation was developed at MIT, with
+contributions from many outside parties.  It is currently maintained
+by the MIT Kerberos Consortium.
+.SH RESTRICTIONS
+.sp
+Copyright 1985, 1986, 1989\-1996, 2002, 2011, 2018 Masachusetts
+Institute of Technology
+.SH AUTHOR
+MIT
+.SH COPYRIGHT
+1985-2023, MIT
+.\" Generated by docutils manpage writer.
+.

@@ -1,0 +1,207 @@
+{
+  "build": "pyhd8ed1ab_0",
+  "build_number": 0,
+  "channel": "https://conda.anaconda.org/conda-forge/noarch",
+  "constrains": [],
+  "depends": [
+    "python >=3.8",
+    "terminado >=0.8.3"
+  ],
+  "extracted_package_dir": "/opt/conda/pkgs/jupyter_server_terminals-0.5.3-pyhd8ed1ab_0",
+  "files": [
+    "etc/jupyter/jupyter_server_config.d/jupyter_server_terminals.json",
+    "lib/python3.10/site-packages/jupyter_server_terminals-0.5.3.dist-info/INSTALLER",
+    "lib/python3.10/site-packages/jupyter_server_terminals-0.5.3.dist-info/METADATA",
+    "lib/python3.10/site-packages/jupyter_server_terminals-0.5.3.dist-info/RECORD",
+    "lib/python3.10/site-packages/jupyter_server_terminals-0.5.3.dist-info/REQUESTED",
+    "lib/python3.10/site-packages/jupyter_server_terminals-0.5.3.dist-info/WHEEL",
+    "lib/python3.10/site-packages/jupyter_server_terminals-0.5.3.dist-info/direct_url.json",
+    "lib/python3.10/site-packages/jupyter_server_terminals-0.5.3.dist-info/licenses/LICENSE",
+    "lib/python3.10/site-packages/jupyter_server_terminals/__init__.py",
+    "lib/python3.10/site-packages/jupyter_server_terminals/_version.py",
+    "lib/python3.10/site-packages/jupyter_server_terminals/api_handlers.py",
+    "lib/python3.10/site-packages/jupyter_server_terminals/app.py",
+    "lib/python3.10/site-packages/jupyter_server_terminals/base.py",
+    "lib/python3.10/site-packages/jupyter_server_terminals/handlers.py",
+    "lib/python3.10/site-packages/jupyter_server_terminals/py.typed",
+    "lib/python3.10/site-packages/jupyter_server_terminals/rest-api.yml",
+    "lib/python3.10/site-packages/jupyter_server_terminals/terminalmanager.py",
+    "lib/python3.10/site-packages/jupyter_server_terminals/__pycache__/__init__.cpython-310.pyc",
+    "lib/python3.10/site-packages/jupyter_server_terminals/__pycache__/_version.cpython-310.pyc",
+    "lib/python3.10/site-packages/jupyter_server_terminals/__pycache__/api_handlers.cpython-310.pyc",
+    "lib/python3.10/site-packages/jupyter_server_terminals/__pycache__/app.cpython-310.pyc",
+    "lib/python3.10/site-packages/jupyter_server_terminals/__pycache__/base.cpython-310.pyc",
+    "lib/python3.10/site-packages/jupyter_server_terminals/__pycache__/handlers.cpython-310.pyc",
+    "lib/python3.10/site-packages/jupyter_server_terminals/__pycache__/terminalmanager.cpython-310.pyc"
+  ],
+  "fn": "jupyter_server_terminals-0.5.3-pyhd8ed1ab_0.conda",
+  "license": "BSD-3-Clause",
+  "link": {
+    "source": "/opt/conda/pkgs/jupyter_server_terminals-0.5.3-pyhd8ed1ab_0",
+    "type": 1
+  },
+  "md5": "219b3833aa8ed91d47d1be6ca03f30be",
+  "name": "jupyter_server_terminals",
+  "noarch": "python",
+  "package_tarball_full_path": "/opt/conda/pkgs/jupyter_server_terminals-0.5.3-pyhd8ed1ab_0.conda",
+  "package_type": "noarch_python",
+  "paths_data": {
+    "paths": [
+      {
+        "_path": "etc/jupyter/jupyter_server_config.d/jupyter_server_terminals.json",
+        "path_type": "hardlink",
+        "sha256": "cbc58f0180b9f9088e6fbd5009862a2ce2df6ba22a42f1283bdc647293c22573",
+        "sha256_in_prefix": "cbc58f0180b9f9088e6fbd5009862a2ce2df6ba22a42f1283bdc647293c22573",
+        "size_in_bytes": 99
+      },
+      {
+        "_path": "site-packages/jupyter_server_terminals-0.5.3.dist-info/INSTALLER",
+        "path_type": "hardlink",
+        "sha256": "d0edee15f91b406f3f99726e44eb990be6e34fd0345b52b910c568e0eef6a2a8",
+        "sha256_in_prefix": "d0edee15f91b406f3f99726e44eb990be6e34fd0345b52b910c568e0eef6a2a8",
+        "size_in_bytes": 5
+      },
+      {
+        "_path": "site-packages/jupyter_server_terminals-0.5.3.dist-info/METADATA",
+        "path_type": "hardlink",
+        "sha256": "c6253a479e35d331f807d405b3ec0688246b0aef88624647139fee6fd8bc2f2d",
+        "sha256_in_prefix": "c6253a479e35d331f807d405b3ec0688246b0aef88624647139fee6fd8bc2f2d",
+        "size_in_bytes": 5643
+      },
+      {
+        "_path": "site-packages/jupyter_server_terminals-0.5.3.dist-info/RECORD",
+        "path_type": "hardlink",
+        "sha256": "686ce9dcde21aa901c47da2e796bfe1011e0743c702b6c8233655e51e1eb7822",
+        "sha256_in_prefix": "686ce9dcde21aa901c47da2e796bfe1011e0743c702b6c8233655e51e1eb7822",
+        "size_in_bytes": 2124
+      },
+      {
+        "_path": "site-packages/jupyter_server_terminals-0.5.3.dist-info/REQUESTED",
+        "path_type": "hardlink",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256_in_prefix": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_in_bytes": 0
+      },
+      {
+        "_path": "site-packages/jupyter_server_terminals-0.5.3.dist-info/WHEEL",
+        "path_type": "hardlink",
+        "sha256": "4c93e729db6b4ae7bbc59fc0546929f585dcbc3ae86ec8c176cd5dbb7371e9d7",
+        "sha256_in_prefix": "4c93e729db6b4ae7bbc59fc0546929f585dcbc3ae86ec8c176cd5dbb7371e9d7",
+        "size_in_bytes": 87
+      },
+      {
+        "_path": "site-packages/jupyter_server_terminals-0.5.3.dist-info/direct_url.json",
+        "path_type": "hardlink",
+        "sha256": "47778da99a0d2bce456d416c7f8a6c74c7d6141b169520a0faeb6ce594ddf2df",
+        "sha256_in_prefix": "47778da99a0d2bce456d416c7f8a6c74c7d6141b169520a0faeb6ce594ddf2df",
+        "size_in_bytes": 120
+      },
+      {
+        "_path": "site-packages/jupyter_server_terminals-0.5.3.dist-info/licenses/LICENSE",
+        "path_type": "hardlink",
+        "sha256": "e9789324adf7afb32b1bfeb2ccb811e64be6d1969b0280d355a10fee8f59696e",
+        "sha256_in_prefix": "e9789324adf7afb32b1bfeb2ccb811e64be6d1969b0280d355a10fee8f59696e",
+        "size_in_bytes": 1536
+      },
+      {
+        "_path": "site-packages/jupyter_server_terminals/__init__.py",
+        "path_type": "hardlink",
+        "sha256": "ccbd5421f2f03f31f6016f7f829404a6acacbf4d67551aeb0a437103230c47ed",
+        "sha256_in_prefix": "ccbd5421f2f03f31f6016f7f829404a6acacbf4d67551aeb0a437103230c47ed",
+        "size_in_bytes": 699
+      },
+      {
+        "_path": "site-packages/jupyter_server_terminals/_version.py",
+        "path_type": "hardlink",
+        "sha256": "d3dfc2c899e794944faebff5d435c0d0961aadb4b18541ac548b624849930849",
+        "sha256_in_prefix": "d3dfc2c899e794944faebff5d435c0d0961aadb4b18541ac548b624849930849",
+        "size_in_bytes": 71
+      },
+      {
+        "_path": "site-packages/jupyter_server_terminals/api_handlers.py",
+        "path_type": "hardlink",
+        "sha256": "6f1e7295d24ea27eb036c4a6364d020343f5d7758708208bd9716a29da79b7a5",
+        "sha256_in_prefix": "6f1e7295d24ea27eb036c4a6364d020343f5d7758708208bd9716a29da79b7a5",
+        "size_in_bytes": 2846
+      },
+      {
+        "_path": "site-packages/jupyter_server_terminals/app.py",
+        "path_type": "hardlink",
+        "sha256": "a073fc952c3c89a9fc01a87d749cba2289a45ae041e6f810ddf748369f12ad2c",
+        "sha256_in_prefix": "a073fc952c3c89a9fc01a87d749cba2289a45ae041e6f810ddf748369f12ad2c",
+        "size_in_bytes": 5240
+      },
+      {
+        "_path": "site-packages/jupyter_server_terminals/base.py",
+        "path_type": "hardlink",
+        "sha256": "ae59d8fdc02e59d8d9b4f79155d12b62b0e755f415d32da9430b947039fa6a22",
+        "sha256_in_prefix": "ae59d8fdc02e59d8d9b4f79155d12b62b0e755f415d32da9430b947039fa6a22",
+        "size_in_bytes": 485
+      },
+      {
+        "_path": "site-packages/jupyter_server_terminals/handlers.py",
+        "path_type": "hardlink",
+        "sha256": "b04192a7556006b6ce5148f3560255dd0eacf055720546a61574af9460c05871",
+        "sha256_in_prefix": "b04192a7556006b6ce5148f3560255dd0eacf055720546a61574af9460c05871",
+        "size_in_bytes": 2887
+      },
+      {
+        "_path": "site-packages/jupyter_server_terminals/py.typed",
+        "path_type": "hardlink",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256_in_prefix": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_in_bytes": 0
+      },
+      {
+        "_path": "site-packages/jupyter_server_terminals/rest-api.yml",
+        "path_type": "hardlink",
+        "sha256": "16ca09770bc1b116c3858a28323f2852f1a7cdc6326ddf4a0178597c3d787ac0",
+        "sha256_in_prefix": "16ca09770bc1b116c3858a28323f2852f1a7cdc6326ddf4a0178597c3d787ac0",
+        "size_in_bytes": 3045
+      },
+      {
+        "_path": "site-packages/jupyter_server_terminals/terminalmanager.py",
+        "path_type": "hardlink",
+        "sha256": "7dd971615af6b18b8438f44679bf4551f837d7a2fcad2973c7232cd4ea051f50",
+        "sha256_in_prefix": "7dd971615af6b18b8438f44679bf4551f837d7a2fcad2973c7232cd4ea051f50",
+        "size_in_bytes": 6892
+      },
+      {
+        "_path": "lib/python3.10/site-packages/jupyter_server_terminals/__pycache__/__init__.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/jupyter_server_terminals/__pycache__/_version.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/jupyter_server_terminals/__pycache__/api_handlers.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/jupyter_server_terminals/__pycache__/app.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/jupyter_server_terminals/__pycache__/base.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/jupyter_server_terminals/__pycache__/handlers.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/jupyter_server_terminals/__pycache__/terminalmanager.cpython-310.pyc",
+        "path_type": "pyc_file"
+      }
+    ],
+    "paths_version": 1
+  },
+  "requested_spec": "None",
+  "sha256": "038efbc7e4b2e72d49ed193cfb2bbbe9fbab2459786ce9350301f466a32567db",
+  "size": 19818,
+  "subdir": "noarch",
+  "timestamp": 1710262791000,
+  "url": "https://conda.anaconda.org/conda-forge/noarch/jupyter_server_terminals-0.5.3-pyhd8ed1ab_0.conda",
+  "version": "0.5.3"
+}

@@ -1,0 +1,138 @@
+.\"
+.\" Copyright (C) 2006 Red Hat, Inc. All Rights Reserved.
+.\" Written by David Howells (dhowells@redhat.com)
+.\"
+.\" This program is free software; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License
+.\" as published by the Free Software Foundation; either version
+.\" 2 of the License, or (at your option) any later version.
+.\"
+.TH KEYCTL_SEARCH 3 "4 May 2006" Linux "Linux Key Management Calls"
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH NAME
+keyctl_search \- search a keyring for a key
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH SYNOPSIS
+.nf
+.B #include <keyutils.h>
+.sp
+.BI "long keyctl_search(key_serial_t " keyring ", const char *" type ,
+.BI "const char *" description ", key_serial_t " destination ");"
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH DESCRIPTION
+.BR keyctl_search ()
+recursively searches the
+.I keyring
+for a key of the specified
+.I type
+and
+.IR description .
+.P
+If found, the key will be attached to the
+.I destination
+keyring (if given), and its serial number will be returned.
+.P
+The source keyring must grant
+.B search
+permission to the caller, and for a key to be found, it must also grant
+.B search
+permission to the caller.  Child keyrings will be only be recursively searched
+if they grant
+.B search
+permission to the caller as well.
+.P
+If the destination keyring is
+.BR zero ,
+no attempt will be made to forge a link to the key, and just the serial number
+will be returned.
+.P
+If the destination keyring is given, then the link may only be formed if the
+found key grants the caller
+.B link
+permission and the destination keyring grants the caller
+.B write
+permission.
+.P
+If the search is successful, and if the destination keyring already contains a
+link to a key that matches the specified
+.IR type " and " description ,
+then that link will be replaced by a link to the found key.
+.P
+The source keyring and destination keyring serial numbers may be those of
+valid keyrings to which the caller has appropriate permission, or they may be
+special keyring IDs:
+.TP
+.B KEY_SPEC_THREAD_KEYRING
+This specifies the caller's thread-specific keyring.
+.TP
+.B KEY_SPEC_PROCESS_KEYRING
+This specifies the caller's process-specific keyring.
+.TP
+.B KEY_SPEC_SESSION_KEYRING
+This specifies the caller's session-specific keyring.
+.TP
+.B KEY_SPEC_USER_KEYRING
+This specifies the caller's UID-specific keyring.
+.TP
+.B KEY_SPEC_USER_SESSION_KEYRING
+This specifies the caller's UID-session keyring.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH RETURN VALUE
+On success
+.BR keyctl_search ()
+returns the serial number of the key it found.  On error, the value
+.B -1
+will be returned and
+.I errno
+will have been set to an appropriate error.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH ERRORS
+.TP
+.B ENOKEY
+One of the keyrings doesn't exist, no key was found by the search, or the only
+key found by the search was a negative key.
+.TP
+.B ENOTDIR
+One of the keyrings is a valid key that isn't a keyring.
+.TP
+.B EKEYEXPIRED
+One of the keyrings has expired, or the only key found was expired.
+.TP
+.B EKEYREVOKED
+One of the keyrings has been revoked, or the only key found was revoked.
+.TP
+.B ENOMEM
+Insufficient memory to expand the destination keyring.
+.TP
+.B EDQUOT
+The key quota for this user would be exceeded by creating a link to the found
+key in the destination keyring.
+.TP
+.B EACCES
+The source keyring didn't grant
+.B search
+permission, the destination keyring didn't grant
+.B write
+permission or the found key didn't grant
+.B link
+permission to the caller.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH LINKING
+Although this is a Linux system call, it is not present in
+.I libc
+but can be found rather in
+.IR libkeyutils .
+When linking,
+.B \-lkeyutils
+should be specified to the linker.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH SEE ALSO
+.ad l
+.nh
+.BR keyctl (1),
+.BR add_key (2),
+.BR keyctl (2),
+.BR request_key (2),
+.BR keyctl (3),
+.BR keyrings (7),
+.BR keyutils (7)

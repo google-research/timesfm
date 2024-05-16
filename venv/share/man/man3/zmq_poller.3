@@ -1,0 +1,368 @@
+'\" t
+.\"     Title: zmq_poller
+.\"    Author: [see the "AUTHORS" section]
+.\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
+.\"      Date: 10/09/2023
+.\"    Manual: 0MQ Manual
+.\"    Source: 0MQ 4.3.5
+.\"  Language: English
+.\"
+.TH "ZMQ_POLLER" "3" "10/09/2023" "0MQ 4\&.3\&.5" "0MQ Manual"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+zmq_poller \- input/output multiplexing
+.SH "SYNOPSIS"
+.sp
+\fBvoid *zmq_poller_new (void);\fR
+.sp
+\fBint zmq_poller_destroy (void \fR\fB\fR\fB*\fR\fB\fB*poller_p\fR\fR\fB);\fR
+.sp
+\fBint zmq_poller_size (void \fR\fB\fI*poller\fR\fR\fB);\fR
+.sp
+\fBint zmq_poller_add (void \fR\fB\fI*poller\fR\fR\fB, void \fR\fB\fI*socket\fR\fR\fB, void \fR\fB\fI*user_data\fR\fR\fB, short \fR\fB\fIevents\fR\fR\fB);\fR
+.sp
+\fBint zmq_poller_modify (void \fR\fB\fI*poller\fR\fR\fB, void \fR\fB\fI*socket\fR\fR\fB, short \fR\fB\fIevents\fR\fR\fB);\fR
+.sp
+\fBint zmq_poller_remove (void \fR\fB\fI*poller\fR\fR\fB, void \fR\fB\fI*socket\fR\fR\fB);\fR
+.sp
+\fBint zmq_poller_add_fd (void \fR\fB\fI*poller\fR\fR\fB, int \fR\fB\fIfd\fR\fR\fB, void \fR\fB\fI*user_data\fR\fR\fB, short \fR\fB\fIevents\fR\fR\fB);\fR
+.sp
+\fBint zmq_poller_modify_fd (void \fR\fB\fI*poller\fR\fR\fB, int \fR\fB\fIfd\fR\fR\fB, short \fR\fB\fIevents\fR\fR\fB);\fR
+.sp
+\fBint zmq_poller_remove_fd (void \fR\fB\fI*poller\fR\fR\fB, int \fR\fB\fIfd\fR\fR\fB);\fR
+.sp
+\fBint zmq_poller_wait (void \fR\fB\fI*poller\fR\fR\fB, zmq_poller_event_t \fR\fB\fI*event\fR\fR\fB, long \fR\fB\fItimeout\fR\fR\fB);\fR
+.sp
+\fBint zmq_poller_wait_all (void \fR\fB\fI*poller\fR\fR\fB, zmq_poller_event_t \fR\fB\fI*events\fR\fR\fB, int \fR\fB\fIn_events\fR\fR\fB, long \fR\fB\fItimeout\fR\fR\fB);\fR
+.sp
+\fBint zmq_poller_fd (void \fR\fB\fI*poller\fR\fR\fB, zmq_fd_t \fR\fB\fI*fd\fR\fR\fB);\fR
+.SH "DESCRIPTION"
+.sp
+The \fIzmq_poller\fR*_ functions provide a mechanism for applications to multiplex input/output events in a level\-triggered fashion over a set of sockets\&.
+.sp
+\fIzmq_poller_new\fR and \fIzmq_poller_destroy\fR manage the lifetime of a poller instance\&. \fIzmq_poller_new\fR creates and returns a new poller instance, while \fIzmq_poller_destroy\fR destroys it\&. A pointer to a valid poller must be passed as the \fIpoller_p\fR argument of \fIzmq_poller_destroy\fR\&. In particular, \fIzmq_poller_destroy\fR may not be called multiple times for the same poller instance\&. \fIzmq_poller_destroy\fR sets the passed pointer to NULL in case of a successful execution\&. \fIzmq_poller_destroy\fR implicitly unregisters all registered sockets and file descriptors\&.
+.sp
+\fIzmq_poller_size\fR queries the number of sockets or file descriptors registered with a poller\&. The initial size of a poller is 0, a successful add operation increases the size by 1 and a successful remove operation decreases the size by 1\&. The size is unaffected by the events specified\&.
+.sp
+\fIzmq_poller_add\fR, \fIzmq_poller_modify\fR and \fIzmq_poller_remove\fR manage the 0MQ sockets registered with a poller\&.
+.sp
+\fIzmq_poller_add\fR registers a new \fIsocket\fR with a given \fIpoller\fR\&. Both \fIpoller\fR and \fIsocket\fR must point to valid 0MQ objects\&. The \fIevents\fR parameter specifies which event types the client wants to subscribe to\&. It is legal to specify no events (i\&.e\&. 0), and activate them later with \fIzmq_poller_modify\fR\&. In addition, \fIuser_data\fR may be specified, which is not used by the poller, but passed back to the caller when an event was signalled in a call to \fIzmq_poller_wait\fR or \fIzmq_poller_wait_all\fR\&. \fIuser_data\fR may be NULL\&. If it is not NULL, it must be a valid pointer\&. Otherwise, behaviour is undefined\&. You must only add a socket to a single poller instance once (unless \fIzmq_poller_remove\fR has been called for that socket before)\&. You may add a socket to multiple poller instances, if the socket itself is explicitly thread\-safe (Server, Client, \&...)\&. If the socket is not, you may invoke undefined behavior\&.
+.sp
+\fIzmq_poller_modify\fR modifies the subscribed events for a socket\&. It is legal to specify no events (i\&.e\&. 0) to disable events temporarily, and reactivate them later with another call to \fIzmq_poller_modify\fR\&.
+.sp
+\fIzmq_poller_remove\fR removes a socket registration completely\&. \fIzmq_poller_remove\fR must be called before a socket is closed with \fIzmq_close\fR\&.
+.sp
+Note that it is not necessary to call \fIzmq_poller_remove\fR for any socket before calling \fIzmq_poller_destroy\fR\&.
+.sp
+Also note that calling \fIzmq_poller_remove\fR is not equivalent to calling \fIzmq_poller_modify\fR with no events\&. \fIzmq_poller_modify\fR does not free resources associated with the socket registration, and requires that the \fIsocket\fR remains valid\&.
+.sp
+\fIzmq_poller_add_fd\fR, \fIzmq_poller_modify_fd\fR and \fIzmq_poller_remove_fd\fR are analogous to the previous functions but manage regular file descriptors registered with a poller\&. On Windows, these functions can only be used with WinSock sockets\&.
+.sp
+In the following, 0MQ sockets added with \fIzmq_poller_add\fR and file descriptors added with \fIzmq_poller_add_fd\fR are referred to as \fIregistered objects\fR\&.
+.sp
+The \fBzmq_poller_event_t\fR structure is defined as follows:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+typedef struct
+{
+    void *socket;
+    zmq_fd_t fd;
+    void *user_data;
+    short events;
+} zmq_poller_event_t;
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+For each registered object, \fIzmq_poller_wait_all()\fR shall examine the registered objects for the event(s) currently registered\&.
+.sp
+If none of the registered events have occurred, \fIzmq_poller_wait_all\fR shall wait \fItimeout\fR milliseconds for an event to occur on any of the registered objects\&. If the value of \fItimeout\fR is 0, \fIzmq_poller_wait_all\fR shall return immediately\&. If the value of \fItimeout\fR is \-1, \fIzmq_poller_wait_all\fR shall block indefinitely until one event has occurred on any of the registered objects\&.
+.sp
+The \fIevents\fR argument \fIzmq_poller_wait_all\fR must be a pointer to an array of at least \fIn_events\fR elements\&. Behaviour is undefined if \fIevents\fR does not point to an array of at least \fIn_events\fR elements\&.
+.sp
+\fIzmq_poller_wait_all\fR returns at most \fIn_events\fR events\&. If more than \fIn_events\fR events were signalled, only an unspecified subset of the signalled events is returned through \fIevents\fR\&.
+.sp
+A caller is advised to ensure that \fIn_events\fR is equal to the number of registered objects\&. Otherwise, a livelock situation may result: If more than \fIn_events\fR registered objects have an active event on each call to \fIzmq_poller_wait_all\fR, it might happen that the same subset of registered objects is always returned, and the caller never notices the events on the others\&. The number of objects registered can be queried with \fIzmq_poller_size\fR\&.
+.sp
+\fIzmq_poller_wait_all\fR returns the number of valid elements\&. The valid elements are placed in positions \fI0\fR to \fIn_events \- 1\fR in the \fIevents\fR array\&. All members of a valid element are set to valid values by \fIzmq_poller_wait_all\fR\&. For socket events \fIsocket\fR is non\-null and \fIfd\fR is an operating system specific value for an invalid socket (\-1 or INVALID_SOCKET)\&. For fd events \fIsocket\fR is NULL and \fIfd\fR is a valid file descriptor\&. The client does therefore not need to initialize the contents of the events array before a call to \fIzmq_poller_wait_all\fR\&. It is unspecified whether the the remaining elements of \fIevents\fR are written to by \fIzmq_poller_wait_all\fR\&.
+.sp
+\fIzmq_poller_fd\fR queries the file descriptor associated with the zmq_poller, and stores it in the address pointer to by \fIfd\fR\&. The zmq_poller is only guaranteed to have a file descriptor if at least one thread\-safe socket is currently registered\&.
+.sp
+Note that closing a socket that is registered in a poller leads to undefined behavior\&. The socket must be unregistered first\&.
+.SH "EVENT TYPES"
+.sp
+The \fIevents\fR parameter of \fIzmq_poller_add\fR and \fIzmq_poller_modify\fR, and the \fIevents\fR member of the zmq_poller_event_t structure are bit masks constructed by OR\(cqing a combination of the following event flags:
+.PP
+\fBZMQ_POLLIN\fR
+.RS 4
+For 0MQ sockets, at least one message may be received from the
+\fIsocket\fR
+without blocking\&. For standard sockets this is equivalent to the
+\fIPOLLIN\fR
+flag of the
+\fIpoll()\fR
+system call and generally means that at least one byte of data may be read from
+\fIfd\fR
+without blocking\&.
+.RE
+.PP
+\fBZMQ_POLLOUT\fR
+.RS 4
+For 0MQ sockets, at least one message may be sent to the
+\fIsocket\fR
+without blocking\&. For standard sockets this is equivalent to the
+\fIPOLLOUT\fR
+flag of the
+\fIpoll()\fR
+system call and generally means that at least one byte of data may be written to
+\fIfd\fR
+without blocking\&.
+.RE
+.PP
+\fBZMQ_POLLERR\fR
+.RS 4
+For 0MQ sockets this flag has no effect on the
+\fIzmq_poller_add\fR
+and
+\fIzmq_poller_modify\fR
+functions, and is never set in the
+\fIevents\fR
+member of the zmq_poller_event_t structure\&. For standard sockets, this flag is passed through
+\fIzmq_poller_wait_all\fR
+to the underlying
+\fIpoll()\fR
+system call and generally means that some sort of error condition is present on the socket specified by
+\fIfd\fR\&.
+.RE
+.PP
+\fBZMQ_POLLPRI\fR
+.RS 4
+For 0MQ sockets this flag has no effect on the
+\fIzmq_poller_add\fR
+and
+\fIzmq_poller_modify\fR
+functions, and is never set in the
+\fIevents\fR
+member of the zmq_poller_event_t structure\&. For standard sockets this means there is urgent data to read\&. Refer to the POLLPRI flag for more information\&. For a file descriptor, refer to your OS documentation: as an example, GPIO interrupts are signaled through a POLLPRI event\&. This flag has no effect on Windows\&.
+.RE
+.if n \{\
+.sp
+.\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBNote\fR
+.ps -1
+.br
+.sp
+The \fIzmq_poller\fR*_ functions may be implemented or emulated using operating system interfaces other than \fIpoll()\fR, and as such may be subject to the limits of those interfaces in ways not defined in this documentation\&.
+.sp .5v
+.RE
+.SH "THREAD SAFETY"
+.sp
+Like most other 0MQ objects, a poller is not thread\-safe\&. All operations must be called from the same thread\&. Otherwise, behaviour is undefined\&.
+.sp
+In addition to that, if you want to add a socket to multiple existing poller instances, the socket itself needs to be thread\-safe (Server, Client, \&...)\&. Otherwise, behaviour is undefined\&.
+.SH "RETURN VALUE"
+.sp
+\fIzmq_poller_new\fR returns a valid pointer to a poller, or NULL in case of a failure\&.
+.sp
+All functions that return an int, return \-1 in case of a failure\&. In that case, zmq_errno() can be used to query the type of the error as described below\&.
+.sp
+\fIzmq_poller_wait_all\fR returns the number of events signalled and returned in the events array\&. It never returns 0\&.
+.sp
+All other functions return 0 in case of a successful execution\&.
+.SH "ERRORS"
+.sp
+On \fIzmq_poller_new\fR:
+.PP
+\fBENOMEM\fR
+.RS 4
+A new poller could not be allocated successfully\&.
+.RE
+.sp
+On \fIzmq_poller_destroy\fR:
+.PP
+\fBEFAULT\fR
+.RS 4
+\fIpoller_p\fR
+did not point to a valid poller\&. Note that passing an invalid pointer (e\&.g\&. pointer to deallocated memory) may cause undefined behaviour (e\&.g\&. an access violation)\&.
+.RE
+.sp
+On \fIzmq_poller_size\fR:
+.PP
+\fBEFAULT\fR
+.RS 4
+\fIpoller\fR
+did not point to a valid poller\&. Note that passing an invalid pointer (e\&.g\&. pointer to deallocated memory) may cause undefined behaviour (e\&.g\&. an access violation)\&.
+.RE
+.sp
+On \fIzmq_poller_add\fR, \fIzmq_poller_modify\fR and \fIzmq_poller_remove\fR:
+.PP
+\fBEFAULT\fR
+.RS 4
+\fIpoller\fR
+did not point to a valid poller\&. Note that passing an invalid pointer (e\&.g\&. pointer to deallocated memory) may cause undefined behaviour (e\&.g\&. an access violation)\&.
+.RE
+.PP
+\fBENOTSOCK\fR
+.RS 4
+\fIsocket\fR
+did not point to a valid socket\&. Note that passing an invalid pointer (e\&.g\&. pointer to deallocated memory) may cause undefined behaviour (e\&.g\&. an access violation)\&.
+.RE
+.sp
+On \fIzmq_poller_add\fR:
+.PP
+\fBEMFILE\fR
+.RS 4
+TODO
+.RE
+.sp
+On \fIzmq_poller_add\fR or \fIzmq_poller_add_fd\fR:
+.PP
+\fBENOMEM\fR
+.RS 4
+Necessary resources could not be allocated\&.
+.RE
+.PP
+\fBEINVAL\fR
+.RS 4
+\fIsocket\fR
+resp\&.
+\fIfd\fR
+was already registered with the poller\&.
+.RE
+.sp
+On \fIzmq_poller_modify\fR, \fIzmq_poller_modify_fd\fR, \fIzmq_poller_remove\fR or \fIzmq_poller_remove_fd\fR:
+.PP
+\fBEINVAL\fR
+.RS 4
+\fIsocket\fR
+resp\&.
+\fIfd\fR
+was not registered with the poller\&.
+.RE
+.sp
+On \fIzmq_poller_add_fd\fR, \fIzmq_poller_modify_fd\fR and \fIzmq_poller_remove_fd\fR:
+.PP
+\fBEBADF\fR
+.RS 4
+The
+\fIfd\fR
+specified was the retired fd\&.
+.RE
+.sp
+On \fIzmq_poller_wait\fR and \fIzmq_poller_wait_all\fR:
+.PP
+\fBENOMEM\fR
+.RS 4
+Necessary resources could not be allocated\&.
+.RE
+.PP
+\fBETERM\fR
+.RS 4
+At least one of the registered objects is a
+\fIsocket\fR
+whose associated 0MQ
+\fIcontext\fR
+was terminated\&.
+.RE
+.PP
+\fBEFAULT\fR
+.RS 4
+The provided
+\fIevents\fR
+was NULL, or
+\fIpoller\fR
+did not point to a valid poller, or there are no registered objects or all event subscriptions are disabled and
+\fItimeout\fR
+was negative\&.
+.RE
+.PP
+\fBEINTR\fR
+.RS 4
+The operation was interrupted by delivery of a signal before any events were available\&.
+.RE
+.PP
+\fBEAGAIN\fR
+.RS 4
+No registered event was signalled before the timeout was reached\&.
+.RE
+.sp
+On \fIzmq_poller_fd\fR:
+.PP
+\fBEINVAL\fR
+.RS 4
+The poller has no associated file descriptor\&.
+.RE
+.PP
+\fBEFAULT\fR
+.RS 4
+The provided
+\fIpoller\fR
+did not point to a valid poller\&.
+.RE
+.SH "EXAMPLE"
+.PP
+\fBPolling indefinitely for input events on both a 0MQ socket and a standard socket.\fR. 
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+void *poller = zmq_poller_new ();
+
+/* First item refers to 0MQ socket \*(Aqsocket\*(Aq */
+zmq_poller_add (poller, socket, NULL, ZMQ_POLLIN);
+/* Second item refers to standard socket \*(Aqfd\*(Aq */
+zmq_poller_add_fd (poller, fd, NULL, ZMQ_POLLIN);
+
+zmq_poller_event_t events [2];
+/* Poll for events indefinitely */
+int rc = zmq_poller_wait_all (poller, events, 2, \-1);
+assert (rc >= 0);
+/* Returned events will be stored in \*(Aqevents\*(Aq */
+for (int i = 0; i < 2; ++i) {
+    if (events[i]\&.socket == socket && events[i]\&.events & ZMQ_POLLIN) {
+        // \&.\&.\&.
+    } else if (events[i]\&.fd == fd && events[i]\&.events & ZMQ_POLLIN)) {
+        // \&.\&.\&.
+    }
+}
+zmq_poller_destroy (&poller);
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+.SH "SEE ALSO"
+.sp
+\fBzmq_socket\fR(3) \fBzmq_send\fR(3) \fBzmq_recv\fR(3) \fBzmq\fR(7)
+.SH "AUTHORS"
+.sp
+This page was written by the 0MQ community\&. To make a change please read the 0MQ Contribution Policy at \m[blue]\fBhttp://www\&.zeromq\&.org/docs:contributing\fR\m[]\&.

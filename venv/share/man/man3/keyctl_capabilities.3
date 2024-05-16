@@ -1,0 +1,109 @@
+.\"
+.\" Copyright (C) 2019 Red Hat, Inc. All Rights Reserved.
+.\" Written by David Howells (dhowells@redhat.com)
+.\"
+.\" This program is free software; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License
+.\" as published by the Free Software Foundation; either version
+.\" 2 of the License, or (at your option) any later version.
+.\"
+.TH KEYCTL_CAPABILITIES 3 "30 May 2019" Linux "Linux Key Management Calls"
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH NAME
+keyctl_capabilities \- Query subsystem capabilities
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH SYNOPSIS
+.nf
+.B #include <keyutils.h>
+.sp
+.BI "long keyctl_capabilities(unsigned char *" buffer ", size_t " buflen ");"
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH DESCRIPTION
+.BR keyctl_capabilities ()
+queries the keyrings subsystem in the kernel to ask about its capabilities and
+fills in the array in the buffer with bits that indicate the presence or
+absence of specific features in the keyrings subsystem.
+.P
+The function returns the amount of data the kernel has available, irrespective
+of the amount of buffer space available.  If the buffer is shorter than the
+data, a short copy will be made; if the buffer is larger than the data, the
+excess space will be cleared.
+.P
+If this operation is not available in the kernel, the keyutils library will be
+emulate it as best it can and the capability bit that indicates if the kernel
+operation is available will be cleared.
+.P
+In
+.IR buffer[0] ,
+the following capabilities exist:
+.TP
+.B KEYCTL_CAPS0_CAPABILITIES
+This is set if the kernel supports this operation and cleared otherwise.  If
+it is cleared, the rest of the flags are emulated.
+.TP
+.B KEYCTL_CAPS0_PERSISTENT_KEYRINGS
+This is set if the kernel supports persistent keyrings and cleared otherwise.
+See
+.BR keyctl_get_persistent ( 3 ).
+.TP
+.B KEYCTL_CAPS0_DIFFIE_HELLMAN
+This is set if the kernel supports Diffie-Hellman calculation and cleared
+otherwise.  See
+.BR keyctl_dh_compute ( 3 ).
+.TP
+.B KEYCTL_CAPS0_PUBLIC_KEY
+This is set if the kernel supports public-key operations and cleared
+otherwise.  See
+.BR keyctl_pkey_query ( 3 ).
+.TP
+.B KEYCTL_CAPS0_BIG_KEY
+This is set if the kernel supports the big_key key type and cleared otherwise.
+.TP
+.B KEYCTL_CAPS0_INVALIDATE
+This is set if the kernel supports key invalidation and cleared otherwise.
+See
+.BR keyctl_invalidate ( 3 ).
+.TP
+.B KEYCTL_CAPS0_RESTRICT_KEYRING
+This is set if the kernel supports restrictions on keyrings and cleared
+otherwise.  See
+.BR keyctl_restrict_keyring ( 3 ).
+.TP
+.B KEYCTL_CAPS0_MOVE
+This is set if the kernel supports the move key operation and cleared
+otherwise.  See
+.BR keyctl_move ( 3 ).
+.P
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH RETURN VALUE
+On success
+.BR keyctl_capabilities ()
+returns the size of the data it has available, irrespective of the size of the
+buffer.  On error, the value
+.B -1
+will be returned and
+.I errno
+will have been set to an appropriate error.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH ERRORS
+.TP
+.B EFAULT
+The buffer cannot be written to.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH LINKING
+This is a library function that can be found in
+.IR libkeyutils .
+When linking,
+.B \-lkeyutils
+should be specified to the linker.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH SEE ALSO
+.ad l
+.nh
+.BR keyctl (1),
+.BR add_key (2),
+.BR keyctl (2),
+.BR request_key (2),
+.BR keyctl (3),
+.BR keyrings (7),
+.BR keyutils (7)

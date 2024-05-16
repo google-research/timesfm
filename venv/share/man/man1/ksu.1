@@ -1,0 +1,479 @@
+.\" Man page generated from reStructuredText.
+.
+.TH "KSU" "1" " " "1.21.2" "MIT Kerberos"
+.SH NAME
+ksu \- Kerberized super-user
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.SH SYNOPSIS
+.sp
+\fBksu\fP
+[ \fItarget_user\fP ]
+[ \fB\-n\fP \fItarget_principal_name\fP ]
+[ \fB\-c\fP \fIsource_cache_name\fP ]
+[ \fB\-k\fP ]
+[ \fB\-r\fP time ]
+[ \fB\-p\fP | \fB\-P\fP]
+[ \fB\-f\fP | \fB\-F\fP]
+[ \fB\-l\fP \fIlifetime\fP ]
+[ \fB\-z | Z\fP ]
+[ \fB\-q\fP ]
+[ \fB\-e\fP \fIcommand\fP [ args ...  ] ] [ \fB\-a\fP [ args ...  ] ]
+.SH REQUIREMENTS
+.sp
+Must have Kerberos version 5 installed to compile ksu.  Must have a
+Kerberos version 5 server running to use ksu.
+.SH DESCRIPTION
+.sp
+ksu is a Kerberized version of the su program that has two missions:
+one is to securely change the real and effective user ID to that of
+the target user, and the other is to create a new security context.
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+For the sake of clarity, all references to and attributes of
+the user invoking the program will start with "source"
+(e.g., "source user", "source cache", etc.).
+.sp
+Likewise, all references to and attributes of the target
+account will start with "target".
+.UNINDENT
+.UNINDENT
+.SH AUTHENTICATION
+.sp
+To fulfill the first mission, ksu operates in two phases:
+authentication and authorization.  Resolving the target principal name
+is the first step in authentication.  The user can either specify his
+principal name with the \fB\-n\fP option (e.g., \fB\-n jqpublic@USC.EDU\fP)
+or a default principal name will be assigned using a heuristic
+described in the OPTIONS section (see \fB\-n\fP option).  The target user
+name must be the first argument to ksu; if not specified root is the
+default.  If \fB\&.\fP is specified then the target user will be the
+source user (e.g., \fBksu .\fP).  If the source user is root or the
+target user is the source user, no authentication or authorization
+takes place.  Otherwise, ksu looks for an appropriate Kerberos ticket
+in the source cache.
+.sp
+The ticket can either be for the end\-server or a ticket granting
+ticket (TGT) for the target principal\(aqs realm.  If the ticket for the
+end\-server is already in the cache, it\(aqs decrypted and verified.  If
+it\(aqs not in the cache but the TGT is, the TGT is used to obtain the
+ticket for the end\-server.  The end\-server ticket is then verified.
+If neither ticket is in the cache, but ksu is compiled with the
+\fBGET_TGT_VIA_PASSWD\fP define, the user will be prompted for a
+Kerberos password which will then be used to get a TGT.  If the user
+is logged in remotely and does not have a secure channel, the password
+may be exposed.  If neither ticket is in the cache and
+\fBGET_TGT_VIA_PASSWD\fP is not defined, authentication fails.
+.SH AUTHORIZATION
+.sp
+This section describes authorization of the source user when ksu is
+invoked without the \fB\-e\fP option.  For a description of the \fB\-e\fP
+option, see the OPTIONS section.
+.sp
+Upon successful authentication, ksu checks whether the target
+principal is authorized to access the target account.  In the target
+user\(aqs home directory, ksu attempts to access two authorization files:
+\&.k5login(5) and .k5users.  In the .k5login file each line
+contains the name of a principal that is authorized to access the
+account.
+.sp
+For example:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+jqpublic@USC.EDU
+jqpublic/secure@USC.EDU
+jqpublic/admin@USC.EDU
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+The format of .k5users is the same, except the principal name may be
+followed by a list of commands that the principal is authorized to
+execute (see the \fB\-e\fP option in the OPTIONS section for details).
+.sp
+Thus if the target principal name is found in the .k5login file the
+source user is authorized to access the target account.  Otherwise ksu
+looks in the .k5users file.  If the target principal name is found
+without any trailing commands or followed only by \fB*\fP then the
+source user is authorized.  If either .k5login or .k5users exist but
+an appropriate entry for the target principal does not exist then
+access is denied.  If neither file exists then the principal will be
+granted access to the account according to the aname\->lname mapping
+rules.  Otherwise, authorization fails.
+.SH EXECUTION OF THE TARGET SHELL
+.sp
+Upon successful authentication and authorization, ksu proceeds in a
+similar fashion to su.  The environment is unmodified with the
+exception of USER, HOME and SHELL variables.  If the target user is
+not root, USER gets set to the target user name.  Otherwise USER
+remains unchanged.  Both HOME and SHELL are set to the target login\(aqs
+default values.  In addition, the environment variable \fBKRB5CCNAME\fP
+gets set to the name of the target cache.  The real and effective user
+ID are changed to that of the target user.  The target user\(aqs shell is
+then invoked (the shell name is specified in the password file).  Upon
+termination of the shell, ksu deletes the target cache (unless ksu is
+invoked with the \fB\-k\fP option).  This is implemented by first doing a
+fork and then an exec, instead of just exec, as done by su.
+.SH CREATING A NEW SECURITY CONTEXT
+.sp
+ksu can be used to create a new security context for the target
+program (either the target shell, or command specified via the \fB\-e\fP
+option).  The target program inherits a set of credentials from the
+source user.  By default, this set includes all of the credentials in
+the source cache plus any additional credentials obtained during
+authentication.  The source user is able to limit the credentials in
+this set by using \fB\-z\fP or \fB\-Z\fP option.  \fB\-z\fP restricts the copy
+of tickets from the source cache to the target cache to only the
+tickets where client == the target principal name.  The \fB\-Z\fP option
+provides the target user with a fresh target cache (no creds in the
+cache).  Note that for security reasons, when the source user is root
+and target user is non\-root, \fB\-z\fP option is the default mode of
+operation.
+.sp
+While no authentication takes place if the source user is root or is
+the same as the target user, additional tickets can still be obtained
+for the target cache.  If \fB\-n\fP is specified and no credentials can
+be copied to the target cache, the source user is prompted for a
+Kerberos password (unless \fB\-Z\fP specified or \fBGET_TGT_VIA_PASSWD\fP
+is undefined).  If successful, a TGT is obtained from the Kerberos
+server and stored in the target cache.  Otherwise, if a password is
+not provided (user hit return) ksu continues in a normal mode of
+operation (the target cache will not contain the desired TGT).  If the
+wrong password is typed in, ksu fails.
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+During authentication, only the tickets that could be
+obtained without providing a password are cached in the
+source cache.
+.UNINDENT
+.UNINDENT
+.SH OPTIONS
+.INDENT 0.0
+.TP
+\fB\-n\fP \fItarget_principal_name\fP
+Specify a Kerberos target principal name.  Used in authentication
+and authorization phases of ksu.
+.sp
+If ksu is invoked without \fB\-n\fP, a default principal name is
+assigned via the following heuristic:
+.INDENT 7.0
+.IP \(bu 2
+Case 1: source user is non\-root.
+.sp
+If the target user is the source user the default principal name
+is set to the default principal of the source cache.  If the
+cache does not exist then the default principal name is set to
+\fBtarget_user@local_realm\fP\&.  If the source and target users are
+different and neither \fB~target_user/.k5users\fP nor
+\fB~target_user/.k5login\fP exist then the default principal name
+is \fBtarget_user_login_name@local_realm\fP\&.  Otherwise, starting
+with the first principal listed below, ksu checks if the
+principal is authorized to access the target account and whether
+there is a legitimate ticket for that principal in the source
+cache.  If both conditions are met that principal becomes the
+default target principal, otherwise go to the next principal.
+.INDENT 2.0
+.IP a. 3
+default principal of the source cache
+.IP b. 3
+target_user@local_realm
+.IP c. 3
+source_user@local_realm
+.UNINDENT
+.sp
+If a\-c fails try any principal for which there is a ticket in
+the source cache and that is authorized to access the target
+account.  If that fails select the first principal that is
+authorized to access the target account from the above list.  If
+none are authorized and ksu is configured with
+\fBPRINC_LOOK_AHEAD\fP turned on, select the default principal as
+follows:
+.sp
+For each candidate in the above list, select an authorized
+principal that has the same realm name and first part of the
+principal name equal to the prefix of the candidate.  For
+example if candidate a) is \fBjqpublic@ISI.EDU\fP and
+\fBjqpublic/secure@ISI.EDU\fP is authorized to access the target
+account then the default principal is set to
+\fBjqpublic/secure@ISI.EDU\fP\&.
+.IP \(bu 2
+Case 2: source user is root.
+.sp
+If the target user is non\-root then the default principal name
+is \fBtarget_user@local_realm\fP\&.  Else, if the source cache
+exists the default principal name is set to the default
+principal of the source cache.  If the source cache does not
+exist, default principal name is set to \fBroot\e@local_realm\fP\&.
+.UNINDENT
+.UNINDENT
+.sp
+\fB\-c\fP \fIsource_cache_name\fP
+.INDENT 0.0
+.INDENT 3.5
+Specify source cache name (e.g., \fB\-c FILE:/tmp/my_cache\fP).  If
+\fB\-c\fP option is not used then the name is obtained from
+\fBKRB5CCNAME\fP environment variable.  If \fBKRB5CCNAME\fP is not
+defined the source cache name is set to \fBkrb5cc_<source uid>\fP\&.
+The target cache name is automatically set to \fBkrb5cc_<target
+uid>.(gen_sym())\fP, where gen_sym generates a new number such that
+the resulting cache does not already exist.  For example:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+krb5cc_1984.2
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+\fB\-k\fP
+Do not delete the target cache upon termination of the target
+shell or a command (\fB\-e\fP command).  Without \fB\-k\fP, ksu deletes
+the target cache.
+.TP
+\fB\-z\fP
+Restrict the copy of tickets from the source cache to the target
+cache to only the tickets where client == the target principal
+name.  Use the \fB\-n\fP option if you want the tickets for other then
+the default principal.  Note that the \fB\-z\fP option is mutually
+exclusive with the \fB\-Z\fP option.
+.TP
+\fB\-Z\fP
+Don\(aqt copy any tickets from the source cache to the target cache.
+Just create a fresh target cache, where the default principal name
+of the cache is initialized to the target principal name.  Note
+that the \fB\-Z\fP option is mutually exclusive with the \fB\-z\fP
+option.
+.TP
+\fB\-q\fP
+Suppress the printing of status messages.
+.UNINDENT
+.sp
+Ticket granting ticket options:
+.INDENT 0.0
+.TP
+\fB\-l\fP \fIlifetime\fP \fB\-r\fP \fItime\fP \fB\-p\fP \fB\-P\fP \fB\-f\fP \fB\-F\fP
+The ticket granting ticket options only apply to the case where
+there are no appropriate tickets in the cache to authenticate the
+source user.  In this case if ksu is configured to prompt users
+for a Kerberos password (\fBGET_TGT_VIA_PASSWD\fP is defined), the
+ticket granting ticket options that are specified will be used
+when getting a ticket granting ticket from the Kerberos server.
+.TP
+\fB\-l\fP \fIlifetime\fP
+(duration string.)  Specifies the lifetime to be requested
+for the ticket; if this option is not specified, the default ticket
+lifetime (12 hours) is used instead.
+.TP
+\fB\-r\fP \fItime\fP
+(duration string.)  Specifies that the \fBrenewable\fP option
+should be requested for the ticket, and specifies the desired
+total lifetime of the ticket.
+.TP
+\fB\-p\fP
+specifies that the \fBproxiable\fP option should be requested for
+the ticket.
+.TP
+\fB\-P\fP
+specifies that the \fBproxiable\fP option should not be requested
+for the ticket, even if the default configuration is to ask for
+proxiable tickets.
+.TP
+\fB\-f\fP
+option specifies that the \fBforwardable\fP option should be
+requested for the ticket.
+.TP
+\fB\-F\fP
+option specifies that the \fBforwardable\fP option should not be
+requested for the ticket, even if the default configuration is to
+ask for forwardable tickets.
+.TP
+\fB\-e\fP \fIcommand\fP [\fIargs\fP ...]
+ksu proceeds exactly the same as if it was invoked without the
+\fB\-e\fP option, except instead of executing the target shell, ksu
+executes the specified command. Example of usage:
+.INDENT 7.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+ksu bob \-e ls \-lag
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+The authorization algorithm for \fB\-e\fP is as follows:
+.sp
+If the source user is root or source user == target user, no
+authorization takes place and the command is executed.  If source
+user id != 0, and \fB~target_user/.k5users\fP file does not exist,
+authorization fails.  Otherwise, \fB~target_user/.k5users\fP file
+must have an appropriate entry for target principal to get
+authorized.
+.sp
+The .k5users file format:
+.sp
+A single principal entry on each line that may be followed by a
+list of commands that the principal is authorized to execute.  A
+principal name followed by a \fB*\fP means that the user is
+authorized to execute any command.  Thus, in the following
+example:
+.INDENT 7.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+jqpublic@USC.EDU ls mail /local/kerberos/klist
+jqpublic/secure@USC.EDU *
+jqpublic/admin@USC.EDU
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+\fBjqpublic@USC.EDU\fP is only authorized to execute \fBls\fP,
+\fBmail\fP and \fBklist\fP commands.  \fBjqpublic/secure@USC.EDU\fP is
+authorized to execute any command.  \fBjqpublic/admin@USC.EDU\fP is
+not authorized to execute any command.  Note, that
+\fBjqpublic/admin@USC.EDU\fP is authorized to execute the target
+shell (regular ksu, without the \fB\-e\fP option) but
+\fBjqpublic@USC.EDU\fP is not.
+.sp
+The commands listed after the principal name must be either a full
+path names or just the program name.  In the second case,
+\fBCMD_PATH\fP specifying the location of authorized programs must
+be defined at the compilation time of ksu.  Which command gets
+executed?
+.sp
+If the source user is root or the target user is the source user
+or the user is authorized to execute any command (\fB*\fP entry)
+then command can be either a full or a relative path leading to
+the target program.  Otherwise, the user must specify either a
+full path or just the program name.
+.TP
+\fB\-a\fP \fIargs\fP
+Specify arguments to be passed to the target shell.  Note that all
+flags and parameters following \-a will be passed to the shell,
+thus all options intended for ksu must precede \fB\-a\fP\&.
+.sp
+The \fB\-a\fP option can be used to simulate the \fB\-e\fP option if
+used as follows:
+.INDENT 7.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+\-a \-c [command [arguments]].
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+\fB\-c\fP is interpreted by the c\-shell to execute the command.
+.UNINDENT
+.SH INSTALLATION INSTRUCTIONS
+.sp
+ksu can be compiled with the following four flags:
+.INDENT 0.0
+.TP
+\fBGET_TGT_VIA_PASSWD\fP
+In case no appropriate tickets are found in the source cache, the
+user will be prompted for a Kerberos password.  The password is
+then used to get a ticket granting ticket from the Kerberos
+server.  The danger of configuring ksu with this macro is if the
+source user is logged in remotely and does not have a secure
+channel, the password may get exposed.
+.TP
+\fBPRINC_LOOK_AHEAD\fP
+During the resolution of the default principal name,
+\fBPRINC_LOOK_AHEAD\fP enables ksu to find principal names in
+the .k5users file as described in the OPTIONS section
+(see \fB\-n\fP option).
+.TP
+\fBCMD_PATH\fP
+Specifies a list of directories containing programs that users are
+authorized to execute (via .k5users file).
+.TP
+\fBHAVE_GETUSERSHELL\fP
+If the source user is non\-root, ksu insists that the target user\(aqs
+shell to be invoked is a "legal shell".  \fIgetusershell(3)\fP is
+called to obtain the names of "legal shells".  Note that the
+target user\(aqs shell is obtained from the passwd file.
+.UNINDENT
+.sp
+Sample configuration:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+KSU_OPTS = \-DGET_TGT_VIA_PASSWD \-DPRINC_LOOK_AHEAD \-DCMD_PATH=\(aq"/bin /usr/ucb /local/bin"
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+ksu should be owned by root and have the set user id bit turned on.
+.sp
+ksu attempts to get a ticket for the end server just as Kerberized
+telnet and rlogin.  Thus, there must be an entry for the server in the
+Kerberos database (e.g., \fBhost/nii.isi.edu@ISI.EDU\fP).  The keytab
+file must be in an appropriate location.
+.SH SIDE EFFECTS
+.sp
+ksu deletes all expired tickets from the source cache.
+.SH AUTHOR OF KSU
+.sp
+GENNADY (ARI) MEDVINSKY
+.SH ENVIRONMENT
+.sp
+See kerberos(7) for a description of Kerberos environment
+variables.
+.SH SEE ALSO
+.sp
+kerberos(7), kinit(1)
+.SH AUTHOR
+MIT
+.SH COPYRIGHT
+1985-2023, MIT
+.\" Generated by docutils manpage writer.
+.

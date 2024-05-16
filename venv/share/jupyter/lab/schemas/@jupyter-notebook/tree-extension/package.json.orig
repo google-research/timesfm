@@ -1,0 +1,71 @@
+{
+  "name": "@jupyter-notebook/tree-extension",
+  "version": "7.1.3",
+  "description": "Jupyter Notebook - Tree Extension",
+  "homepage": "https://github.com/jupyter/notebook",
+  "bugs": {
+    "url": "https://github.com/jupyter/notebook/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jupyter/notebook.git"
+  },
+  "license": "BSD-3-Clause",
+  "author": "Project Jupyter",
+  "sideEffects": [
+    "style/**/*.css",
+    "style/index.js"
+  ],
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "style": "style/index.css",
+  "directories": {
+    "lib": "lib/"
+  },
+  "files": [
+    "lib/*.d.ts",
+    "lib/*.js.map",
+    "lib/*.js",
+    "schema/*.json",
+    "style/**/*.css",
+    "style/index.js"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "build:prod": "tsc -b",
+    "clean": "rimraf lib && rimraf tsconfig.tsbuildinfo",
+    "docs": "typedoc src",
+    "watch": "tsc -b --watch"
+  },
+  "dependencies": {
+    "@jupyter-notebook/application": "^7.1.3",
+    "@jupyter-notebook/tree": "^7.1.3",
+    "@jupyterlab/application": "~4.1.5",
+    "@jupyterlab/apputils": "~4.2.5",
+    "@jupyterlab/coreutils": "~6.1.5",
+    "@jupyterlab/docmanager": "~4.1.5",
+    "@jupyterlab/filebrowser": "~4.1.5",
+    "@jupyterlab/mainmenu": "~4.1.5",
+    "@jupyterlab/services": "~7.1.5",
+    "@jupyterlab/settingeditor": "~4.1.5",
+    "@jupyterlab/settingregistry": "~4.1.5",
+    "@jupyterlab/statedb": "~4.1.5",
+    "@jupyterlab/translation": "~4.1.5",
+    "@jupyterlab/ui-components": "~4.1.5",
+    "@lumino/algorithm": "^2.0.1",
+    "@lumino/commands": "^2.2.0",
+    "@lumino/widgets": "^2.3.1"
+  },
+  "devDependencies": {
+    "rimraf": "^3.0.2",
+    "typescript": "~5.0.2"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "jupyterlab": {
+    "extension": true,
+    "schemaDir": "schema"
+  },
+  "styleModule": "style/index.js"
+}

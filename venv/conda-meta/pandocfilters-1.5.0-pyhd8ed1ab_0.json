@@ -1,0 +1,112 @@
+{
+  "build": "pyhd8ed1ab_0",
+  "build_number": 0,
+  "channel": "https://conda.anaconda.org/conda-forge/noarch",
+  "constrains": [],
+  "depends": [
+    "python !=3.0,!=3.1,!=3.2,!=3.3"
+  ],
+  "extracted_package_dir": "/opt/conda/pkgs/pandocfilters-1.5.0-pyhd8ed1ab_0",
+  "files": [
+    "lib/python3.10/site-packages/pandocfilters-1.5.0.dist-info/INSTALLER",
+    "lib/python3.10/site-packages/pandocfilters-1.5.0.dist-info/LICENSE",
+    "lib/python3.10/site-packages/pandocfilters-1.5.0.dist-info/METADATA",
+    "lib/python3.10/site-packages/pandocfilters-1.5.0.dist-info/RECORD",
+    "lib/python3.10/site-packages/pandocfilters-1.5.0.dist-info/REQUESTED",
+    "lib/python3.10/site-packages/pandocfilters-1.5.0.dist-info/WHEEL",
+    "lib/python3.10/site-packages/pandocfilters-1.5.0.dist-info/direct_url.json",
+    "lib/python3.10/site-packages/pandocfilters-1.5.0.dist-info/top_level.txt",
+    "lib/python3.10/site-packages/pandocfilters.py",
+    "lib/python3.10/site-packages/__pycache__/pandocfilters.cpython-310.pyc"
+  ],
+  "fn": "pandocfilters-1.5.0-pyhd8ed1ab_0.tar.bz2",
+  "license": "BSD-3-Clause",
+  "link": {
+    "source": "/opt/conda/pkgs/pandocfilters-1.5.0-pyhd8ed1ab_0",
+    "type": 1
+  },
+  "md5": "457c2c8c08e54905d6954e79cb5b5db9",
+  "name": "pandocfilters",
+  "noarch": "python",
+  "package_tarball_full_path": "/opt/conda/pkgs/pandocfilters-1.5.0-pyhd8ed1ab_0.tar.bz2",
+  "package_type": "noarch_python",
+  "paths_data": {
+    "paths": [
+      {
+        "_path": "site-packages/pandocfilters-1.5.0.dist-info/INSTALLER",
+        "path_type": "hardlink",
+        "sha256": "d0edee15f91b406f3f99726e44eb990be6e34fd0345b52b910c568e0eef6a2a8",
+        "sha256_in_prefix": "d0edee15f91b406f3f99726e44eb990be6e34fd0345b52b910c568e0eef6a2a8",
+        "size_in_bytes": 5
+      },
+      {
+        "_path": "site-packages/pandocfilters-1.5.0.dist-info/LICENSE",
+        "path_type": "hardlink",
+        "sha256": "56766ce9972a533fcf67330f1abbeb414e153c7e58c27dc54441bc0fafa81492",
+        "sha256_in_prefix": "56766ce9972a533fcf67330f1abbeb414e153c7e58c27dc54441bc0fafa81492",
+        "size_in_bytes": 1496
+      },
+      {
+        "_path": "site-packages/pandocfilters-1.5.0.dist-info/METADATA",
+        "path_type": "hardlink",
+        "sha256": "4f71274cef566625ea59aa5e341367ed3651d7c05db4df941f1f2ae540c7d7e8",
+        "sha256_in_prefix": "4f71274cef566625ea59aa5e341367ed3651d7c05db4df941f1f2ae540c7d7e8",
+        "size_in_bytes": 8998
+      },
+      {
+        "_path": "site-packages/pandocfilters-1.5.0.dist-info/RECORD",
+        "path_type": "hardlink",
+        "sha256": "f17ced9e3ba2bc818c1babf80ff10dc4b35f38f392dd38b55afab4e1b486d6bc",
+        "sha256_in_prefix": "f17ced9e3ba2bc818c1babf80ff10dc4b35f38f392dd38b55afab4e1b486d6bc",
+        "size_in_bytes": 830
+      },
+      {
+        "_path": "site-packages/pandocfilters-1.5.0.dist-info/REQUESTED",
+        "path_type": "hardlink",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256_in_prefix": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_in_bytes": 0
+      },
+      {
+        "_path": "site-packages/pandocfilters-1.5.0.dist-info/WHEEL",
+        "path_type": "hardlink",
+        "sha256": "5b367c7308e1f25d23b542cd8d8ab51e9afe582a824603ebfbe4d7e0fe48d56a",
+        "sha256_in_prefix": "5b367c7308e1f25d23b542cd8d8ab51e9afe582a824603ebfbe4d7e0fe48d56a",
+        "size_in_bytes": 110
+      },
+      {
+        "_path": "site-packages/pandocfilters-1.5.0.dist-info/direct_url.json",
+        "path_type": "hardlink",
+        "sha256": "19318a2f0832056ad6749847c760a5d018f53b836c6872e2d547208821b5e04c",
+        "sha256_in_prefix": "19318a2f0832056ad6749847c760a5d018f53b836c6872e2d547208821b5e04c",
+        "size_in_bytes": 109
+      },
+      {
+        "_path": "site-packages/pandocfilters-1.5.0.dist-info/top_level.txt",
+        "path_type": "hardlink",
+        "sha256": "87b8354e84563a696aadf8c4117127025462b410050e8abc988fab34e09263ff",
+        "sha256_in_prefix": "87b8354e84563a696aadf8c4117127025462b410050e8abc988fab34e09263ff",
+        "size_in_bytes": 14
+      },
+      {
+        "_path": "site-packages/pandocfilters.py",
+        "path_type": "hardlink",
+        "sha256": "f3218530ab93b7b14ca3f3d537883045d4ffab51391dcb168223d4d17e23b53a",
+        "sha256_in_prefix": "f3218530ab93b7b14ca3f3d537883045d4ffab51391dcb168223d4d17e23b53a",
+        "size_in_bytes": 9052
+      },
+      {
+        "_path": "lib/python3.10/site-packages/__pycache__/pandocfilters.cpython-310.pyc",
+        "path_type": "pyc_file"
+      }
+    ],
+    "paths_version": 1
+  },
+  "requested_spec": "None",
+  "sha256": "2bb9ba9857f4774b85900c2562f7e711d08dd48e2add9bee4e1612fbee27e16f",
+  "size": 11627,
+  "subdir": "noarch",
+  "timestamp": 1631603397000,
+  "url": "https://conda.anaconda.org/conda-forge/noarch/pandocfilters-1.5.0-pyhd8ed1ab_0.tar.bz2",
+  "version": "1.5.0"
+}

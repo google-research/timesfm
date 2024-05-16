@@ -1,0 +1,121 @@
+{
+  "build": "pyhd8ed1ab_0",
+  "build_number": 0,
+  "channel": "https://conda.anaconda.org/conda-forge/noarch",
+  "constrains": [],
+  "depends": [
+    "python >=3.8",
+    "typing_extensions >=4.0.0"
+  ],
+  "extracted_package_dir": "/opt/conda/pkgs/async-lru-2.0.4-pyhd8ed1ab_0",
+  "files": [
+    "lib/python3.10/site-packages/async_lru-2.0.4.dist-info/INSTALLER",
+    "lib/python3.10/site-packages/async_lru-2.0.4.dist-info/LICENSE",
+    "lib/python3.10/site-packages/async_lru-2.0.4.dist-info/METADATA",
+    "lib/python3.10/site-packages/async_lru-2.0.4.dist-info/RECORD",
+    "lib/python3.10/site-packages/async_lru-2.0.4.dist-info/REQUESTED",
+    "lib/python3.10/site-packages/async_lru-2.0.4.dist-info/WHEEL",
+    "lib/python3.10/site-packages/async_lru-2.0.4.dist-info/direct_url.json",
+    "lib/python3.10/site-packages/async_lru-2.0.4.dist-info/top_level.txt",
+    "lib/python3.10/site-packages/async_lru/__init__.py",
+    "lib/python3.10/site-packages/async_lru/py.typed",
+    "lib/python3.10/site-packages/async_lru/__pycache__/__init__.cpython-310.pyc"
+  ],
+  "fn": "async-lru-2.0.4-pyhd8ed1ab_0.conda",
+  "license": "MIT",
+  "link": {
+    "source": "/opt/conda/pkgs/async-lru-2.0.4-pyhd8ed1ab_0",
+    "type": 1
+  },
+  "md5": "3d081de3a6ea9f894bbb585e8e3a4dcb",
+  "name": "async-lru",
+  "noarch": "python",
+  "package_tarball_full_path": "/opt/conda/pkgs/async-lru-2.0.4-pyhd8ed1ab_0.conda",
+  "package_type": "noarch_python",
+  "paths_data": {
+    "paths": [
+      {
+        "_path": "site-packages/async_lru-2.0.4.dist-info/INSTALLER",
+        "path_type": "hardlink",
+        "sha256": "d0edee15f91b406f3f99726e44eb990be6e34fd0345b52b910c568e0eef6a2a8",
+        "sha256_in_prefix": "d0edee15f91b406f3f99726e44eb990be6e34fd0345b52b910c568e0eef6a2a8",
+        "size_in_bytes": 5
+      },
+      {
+        "_path": "site-packages/async_lru-2.0.4.dist-info/LICENSE",
+        "path_type": "hardlink",
+        "sha256": "ea65975679bc2093be925d520358e41096bd96fddedee3e929160a5faadcf573",
+        "sha256_in_prefix": "ea65975679bc2093be925d520358e41096bd96fddedee3e929160a5faadcf573",
+        "size_in_bytes": 1226
+      },
+      {
+        "_path": "site-packages/async_lru-2.0.4.dist-info/METADATA",
+        "path_type": "hardlink",
+        "sha256": "b8023761c8ae0d05d63064526f54e393a1beb78c73b61c5ed6a09d3bf1d2d4bf",
+        "sha256_in_prefix": "b8023761c8ae0d05d63064526f54e393a1beb78c73b61c5ed6a09d3bf1d2d4bf",
+        "size_in_bytes": 4503
+      },
+      {
+        "_path": "site-packages/async_lru-2.0.4.dist-info/RECORD",
+        "path_type": "hardlink",
+        "sha256": "4a2b55311889d8c0af94880d20c331b276a62ccf71f1a1729c08799f7e638a04",
+        "sha256_in_prefix": "4a2b55311889d8c0af94880d20c331b276a62ccf71f1a1729c08799f7e638a04",
+        "size_in_bytes": 881
+      },
+      {
+        "_path": "site-packages/async_lru-2.0.4.dist-info/REQUESTED",
+        "path_type": "hardlink",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256_in_prefix": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_in_bytes": 0
+      },
+      {
+        "_path": "site-packages/async_lru-2.0.4.dist-info/WHEEL",
+        "path_type": "hardlink",
+        "sha256": "02d046e925cbdca17fbf43712dfd1e87254e87472895df896c9617346a2b0ba4",
+        "sha256_in_prefix": "02d046e925cbdca17fbf43712dfd1e87254e87472895df896c9617346a2b0ba4",
+        "size_in_bytes": 92
+      },
+      {
+        "_path": "site-packages/async_lru-2.0.4.dist-info/direct_url.json",
+        "path_type": "hardlink",
+        "sha256": "1affdf4e35a3cd2aad5bbfb09fa006204de77f55805b04bc4e8b1dad35c89bdf",
+        "sha256_in_prefix": "1affdf4e35a3cd2aad5bbfb09fa006204de77f55805b04bc4e8b1dad35c89bdf",
+        "size_in_bytes": 105
+      },
+      {
+        "_path": "site-packages/async_lru-2.0.4.dist-info/top_level.txt",
+        "path_type": "hardlink",
+        "sha256": "9d4cbe176b6afe07f462c40a206a879a44bf5c9c54fdd42520db976480074ec9",
+        "sha256_in_prefix": "9d4cbe176b6afe07f462c40a206a879a44bf5c9c54fdd42520db976480074ec9",
+        "size_in_bytes": 10
+      },
+      {
+        "_path": "site-packages/async_lru/__init__.py",
+        "path_type": "hardlink",
+        "sha256": "01021d343d2a5f65a25140c6a1e1eca71ac9573bb43dce3347881af6b9ad8acb",
+        "sha256_in_prefix": "01021d343d2a5f65a25140c6a1e1eca71ac9573bb43dce3347881af6b9ad8acb",
+        "size_in_bytes": 9601
+      },
+      {
+        "_path": "site-packages/async_lru/py.typed",
+        "path_type": "hardlink",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256_in_prefix": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_in_bytes": 0
+      },
+      {
+        "_path": "lib/python3.10/site-packages/async_lru/__pycache__/__init__.cpython-310.pyc",
+        "path_type": "pyc_file"
+      }
+    ],
+    "paths_version": 1
+  },
+  "requested_spec": "None",
+  "sha256": "7ed83731979fe5b046c157730e50af0e24454468bbba1ed8fc1a3107db5d7518",
+  "size": 15342,
+  "subdir": "noarch",
+  "timestamp": 1690563152000,
+  "url": "https://conda.anaconda.org/conda-forge/noarch/async-lru-2.0.4-pyhd8ed1ab_0.conda",
+  "version": "2.0.4"
+}

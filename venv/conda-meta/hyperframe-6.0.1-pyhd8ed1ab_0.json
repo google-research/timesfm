@@ -1,0 +1,159 @@
+{
+  "build": "pyhd8ed1ab_0",
+  "build_number": 0,
+  "channel": "https://conda.anaconda.org/conda-forge/noarch",
+  "constrains": [],
+  "depends": [
+    "python >=3.6"
+  ],
+  "extracted_package_dir": "/opt/conda/pkgs/hyperframe-6.0.1-pyhd8ed1ab_0",
+  "files": [
+    "lib/python3.10/site-packages/hyperframe-6.0.1.dist-info/INSTALLER",
+    "lib/python3.10/site-packages/hyperframe-6.0.1.dist-info/LICENSE",
+    "lib/python3.10/site-packages/hyperframe-6.0.1.dist-info/METADATA",
+    "lib/python3.10/site-packages/hyperframe-6.0.1.dist-info/RECORD",
+    "lib/python3.10/site-packages/hyperframe-6.0.1.dist-info/REQUESTED",
+    "lib/python3.10/site-packages/hyperframe-6.0.1.dist-info/WHEEL",
+    "lib/python3.10/site-packages/hyperframe-6.0.1.dist-info/direct_url.json",
+    "lib/python3.10/site-packages/hyperframe-6.0.1.dist-info/top_level.txt",
+    "lib/python3.10/site-packages/hyperframe/__init__.py",
+    "lib/python3.10/site-packages/hyperframe/exceptions.py",
+    "lib/python3.10/site-packages/hyperframe/flags.py",
+    "lib/python3.10/site-packages/hyperframe/frame.py",
+    "lib/python3.10/site-packages/hyperframe/py.typed",
+    "lib/python3.10/site-packages/hyperframe/__pycache__/__init__.cpython-310.pyc",
+    "lib/python3.10/site-packages/hyperframe/__pycache__/exceptions.cpython-310.pyc",
+    "lib/python3.10/site-packages/hyperframe/__pycache__/flags.cpython-310.pyc",
+    "lib/python3.10/site-packages/hyperframe/__pycache__/frame.cpython-310.pyc"
+  ],
+  "fn": "hyperframe-6.0.1-pyhd8ed1ab_0.tar.bz2",
+  "license": "MIT",
+  "link": {
+    "source": "/opt/conda/pkgs/hyperframe-6.0.1-pyhd8ed1ab_0",
+    "type": 1
+  },
+  "md5": "9f765cbfab6870c8435b9eefecd7a1f4",
+  "name": "hyperframe",
+  "noarch": "python",
+  "package_tarball_full_path": "/opt/conda/pkgs/hyperframe-6.0.1-pyhd8ed1ab_0.tar.bz2",
+  "package_type": "noarch_python",
+  "paths_data": {
+    "paths": [
+      {
+        "_path": "site-packages/hyperframe-6.0.1.dist-info/INSTALLER",
+        "path_type": "hardlink",
+        "sha256": "d0edee15f91b406f3f99726e44eb990be6e34fd0345b52b910c568e0eef6a2a8",
+        "sha256_in_prefix": "d0edee15f91b406f3f99726e44eb990be6e34fd0345b52b910c568e0eef6a2a8",
+        "size_in_bytes": 5
+      },
+      {
+        "_path": "site-packages/hyperframe-6.0.1.dist-info/LICENSE",
+        "path_type": "hardlink",
+        "sha256": "763a9342a04df62046c9dc748a5287934eb0a5331c6863b3ca0aee20e18cb4ed",
+        "sha256_in_prefix": "763a9342a04df62046c9dc748a5287934eb0a5331c6863b3ca0aee20e18cb4ed",
+        "size_in_bytes": 1080
+      },
+      {
+        "_path": "site-packages/hyperframe-6.0.1.dist-info/METADATA",
+        "path_type": "hardlink",
+        "sha256": "5e7b0f472387d805750d383f4c07108cf8290c2d4f636ed1e942c4acbc66b972",
+        "sha256_in_prefix": "5e7b0f472387d805750d383f4c07108cf8290c2d4f636ed1e942c4acbc66b972",
+        "size_in_bytes": 2681
+      },
+      {
+        "_path": "site-packages/hyperframe-6.0.1.dist-info/RECORD",
+        "path_type": "hardlink",
+        "sha256": "9a118607c136b2ef5209d2e2e68f839500599282a281e11a15d8a5f6b61a78a2",
+        "sha256_in_prefix": "9a118607c136b2ef5209d2e2e68f839500599282a281e11a15d8a5f6b61a78a2",
+        "size_in_bytes": 1273
+      },
+      {
+        "_path": "site-packages/hyperframe-6.0.1.dist-info/REQUESTED",
+        "path_type": "hardlink",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256_in_prefix": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_in_bytes": 0
+      },
+      {
+        "_path": "site-packages/hyperframe-6.0.1.dist-info/WHEEL",
+        "path_type": "hardlink",
+        "sha256": "3aa464174798e461ecb0ca2b16395b4c8ab4ef6be91e917ad1f21003a952f710",
+        "sha256_in_prefix": "3aa464174798e461ecb0ca2b16395b4c8ab4ef6be91e917ad1f21003a952f710",
+        "size_in_bytes": 92
+      },
+      {
+        "_path": "site-packages/hyperframe-6.0.1.dist-info/direct_url.json",
+        "path_type": "hardlink",
+        "sha256": "dc2eb82b1b2f802b2f9491da2d39d455ceb64eb64715a55fdfe1431901189071",
+        "sha256_in_prefix": "dc2eb82b1b2f802b2f9491da2d39d455ceb64eb64715a55fdfe1431901189071",
+        "size_in_bytes": 106
+      },
+      {
+        "_path": "site-packages/hyperframe-6.0.1.dist-info/top_level.txt",
+        "path_type": "hardlink",
+        "sha256": "6885d6371cca17f8f013c972586e4f6aa9f944fecf0c161e82eada89afa81c91",
+        "sha256_in_prefix": "6885d6371cca17f8f013c972586e4f6aa9f944fecf0c161e82eada89afa81c91",
+        "size_in_bytes": 11
+      },
+      {
+        "_path": "site-packages/hyperframe/__init__.py",
+        "path_type": "hardlink",
+        "sha256": "3d4f98b3ed6e074f43cae4ca56ac070943a2e2cb20d5157fcab082a82cc8ada0",
+        "sha256_in_prefix": "3d4f98b3ed6e074f43cae4ca56ac070943a2e2cb20d5157fcab082a82cc8ada0",
+        "size_in_bytes": 136
+      },
+      {
+        "_path": "site-packages/hyperframe/exceptions.py",
+        "path_type": "hardlink",
+        "sha256": "1c4709548ee42ee4deba0b7ec861c6abea736f8a456c30270114e8162c0a9d36",
+        "sha256_in_prefix": "1c4709548ee42ee4deba0b7ec861c6abea736f8a456c30270114e8162c0a9d36",
+        "size_in_bytes": 1607
+      },
+      {
+        "_path": "site-packages/hyperframe/flags.py",
+        "path_type": "hardlink",
+        "sha256": "dbc84fe118f104bdc8e4ab3dfb1175db34dff46d1787c25afe224ba8373b3b8e",
+        "sha256_in_prefix": "dbc84fe118f104bdc8e4ab3dfb1175db34dff46d1787c25afe224ba8373b3b8e",
+        "size_in_bytes": 1386
+      },
+      {
+        "_path": "site-packages/hyperframe/frame.py",
+        "path_type": "hardlink",
+        "sha256": "e42ffbdf4e3bce7d2a3017a511a915729f6ebef5c921b2e4097ec87ff83d0489",
+        "sha256_in_prefix": "e42ffbdf4e3bce7d2a3017a511a915729f6ebef5c921b2e4097ec87ff83d0489",
+        "size_in_bytes": 31981
+      },
+      {
+        "_path": "site-packages/hyperframe/py.typed",
+        "path_type": "hardlink",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256_in_prefix": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_in_bytes": 0
+      },
+      {
+        "_path": "lib/python3.10/site-packages/hyperframe/__pycache__/__init__.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/hyperframe/__pycache__/exceptions.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/hyperframe/__pycache__/flags.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/hyperframe/__pycache__/frame.cpython-310.pyc",
+        "path_type": "pyc_file"
+      }
+    ],
+    "paths_version": 1
+  },
+  "requested_spec": "None",
+  "sha256": "e374a9d0f53149328134a8d86f5d72bca4c6dcebed3c0ecfa968c02996289330",
+  "size": 14646,
+  "subdir": "noarch",
+  "timestamp": 1619110249000,
+  "url": "https://conda.anaconda.org/conda-forge/noarch/hyperframe-6.0.1-pyhd8ed1ab_0.tar.bz2",
+  "version": "6.0.1"
+}

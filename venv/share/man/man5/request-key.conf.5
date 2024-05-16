@@ -1,0 +1,145 @@
+.\" -*- nroff -*-
+.\" Copyright (C) 2005 Red Hat, Inc. All Rights Reserved.
+.\" Written by David Howells (dhowells@redhat.com)
+.\"
+.\" This program is free software; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License
+.\" as published by the Free Software Foundation; either version
+.\" 2 of the License, or (at your option) any later version.
+.\"
+.TH REQUEST-KEY.CONF 5 "15 November 2011" Linux "Linux Key Management Utilities"
+.SH NAME
+request\-key.conf \- Instantiation handler configuration file
+.SH DESCRIPTION
+.P
+These files are used by the /sbin/request\-key program to determine which
+program it should run to instantiate a key.
+.P
+request\-key looks for the best match, reading all the following files:
+.IP
+	/etc/request\-key.d/*.conf
+.br
+	/etc/request\-key.conf
+.P
+If it doesn't find a match, it will return an error
+and the kernel will automatically negate the key.
+.P
+The best match is defined as the line with the shortest wildcard skips, ranking
+the columns in order left to right.  If two lines have the same length skips,
+then the first read is the one taken.
+.P
+In the files, any blank line or line beginning with a hash mark '#' is
+considered to be a comment and ignored.
+.P
+All other lines are assumed to be command lines with a number of white space
+separated fields:
+.P
+<op> <type> <description> <callout\-info> <prog> <arg1> <arg2> ...
+.P
+The first four fields are used to match the parameters passed to request\-key by
+the kernel. \fIop\fR is the operation type; currently the only supported
+operation is "create".
+.P
+\fItype\fR, \fIdescription\fR and \fIcallout\-info\fR match the three
+parameters passed to \fBkeyctl request2\fR or the \fBrequest_key()\fR system
+call.  Each of these may contain one asterisk '*' character as a wildcard
+anywhere within the string.
+.P
+Should a match be made, the program specified by <prog> will be exec'd. This
+must have a fully qualified path name. argv[0] will be set from the part of the
+program name that follows the last slash '/' character.
+.P
+If the program name is prefixed with a pipe bar character '|', then the program
+will be forked and exec'd attached to three pipes. The callout information will
+be piped to it on it's stdin and the intended payload data will be retrieved
+from its stdout. Anything sent to stderr will be posted in syslog. If the
+program exits 0, then /sbin/request\-key will attempt to instantiate the key
+with the data read from stdout. If it fails in any other way, then request\-key
+will attempt to execute the appropriate 'negate' operation command.
+.P
+The program arguments can be substituted with various macros. Only complete
+argument substitution is supported - macro substitutions can't be embedded. All
+macros begin with a percent character '%'. An argument beginning with two
+percent characters will have one of them discarded.
+.P
+The following macros are supported:
+.P
+.RS
+%o    Operation type
+.br
+%k    Key ID
+.br
+%t    Key type
+.br
+%d    Key description
+.br
+%c    Callout information
+.br
+%u    Key UID
+.br
+%g    Key GID
+.br
+%T    Requestor's thread keyring
+.br
+%P    Requestor's process keyring
+.br
+%S    Requestor's session keyring
+.RE
+.P
+There's another macro substitution too that permits the interpolation of the
+contents of a key:
+.P
+.RS
+%{<type>:<description>}
+.RE
+.P
+This performs a lookup for a key of the given type and description on the
+requestor's keyrings, and if found, substitutes the contents for the macro. If
+not found an error will be logged and the key under construction will be
+negated.
+.SH EXAMPLE
+.P
+A basic file will be installed in the /etc. This will contain two debugging
+lines that can be used to test the installation:
+.P
+.RS
+create user debug:* negate /bin/keyctl negate %k 30 %S
+.br
+create user debug:loop:* * |/bin/cat
+.br
+create user debug:* * /usr/share/keyutils/request\-key\-debug.sh %k %d %c %S
+.br
+negate * * * /bin/keyctl negate %k 30 %S
+.RE
+.P
+This is set up so that something like:
+.P
+.RS
+keyctl request2 user debug:xxxx negate
+.RE
+.P
+will create a negative user-defined key, something like:
+.P
+.RS
+keyctl request2 user debug:yyyy spoon
+.RE
+.P
+will create an instantiated user-defined key with "Debug spoon" as the payload,
+and something like:
+.P
+.RS
+keyctl request2 user debug:loop:zzzz abcdefghijkl
+.RE
+.P
+will create an instantiated user-defined key with the callout information as
+the payload.
+.SH FILES
+.ul
+/etc/request\-key.conf
+.ul 0
+.br
+.ul
+/etc/request\-key.d/*.conf
+.ul 0
+.SH SEE ALSO
+\fBkeyctl\fR(1), \fBrequest\-key.conf\fR(5)

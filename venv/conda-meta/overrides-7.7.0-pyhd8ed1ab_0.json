@@ -1,0 +1,186 @@
+{
+  "build": "pyhd8ed1ab_0",
+  "build_number": 0,
+  "channel": "https://conda.anaconda.org/conda-forge/noarch",
+  "constrains": [],
+  "depends": [
+    "python >=3.6",
+    "typing_utils"
+  ],
+  "extracted_package_dir": "/opt/conda/pkgs/overrides-7.7.0-pyhd8ed1ab_0",
+  "files": [
+    "lib/python3.10/site-packages/overrides-7.7.0.dist-info/INSTALLER",
+    "lib/python3.10/site-packages/overrides-7.7.0.dist-info/LICENSE",
+    "lib/python3.10/site-packages/overrides-7.7.0.dist-info/METADATA",
+    "lib/python3.10/site-packages/overrides-7.7.0.dist-info/RECORD",
+    "lib/python3.10/site-packages/overrides-7.7.0.dist-info/REQUESTED",
+    "lib/python3.10/site-packages/overrides-7.7.0.dist-info/WHEEL",
+    "lib/python3.10/site-packages/overrides-7.7.0.dist-info/direct_url.json",
+    "lib/python3.10/site-packages/overrides-7.7.0.dist-info/top_level.txt",
+    "lib/python3.10/site-packages/overrides/__init__.py",
+    "lib/python3.10/site-packages/overrides/enforce.py",
+    "lib/python3.10/site-packages/overrides/final.py",
+    "lib/python3.10/site-packages/overrides/overrides.py",
+    "lib/python3.10/site-packages/overrides/py.typed",
+    "lib/python3.10/site-packages/overrides/signature.py",
+    "lib/python3.10/site-packages/overrides/typing_utils.py",
+    "lib/python3.10/site-packages/overrides/__pycache__/__init__.cpython-310.pyc",
+    "lib/python3.10/site-packages/overrides/__pycache__/enforce.cpython-310.pyc",
+    "lib/python3.10/site-packages/overrides/__pycache__/final.cpython-310.pyc",
+    "lib/python3.10/site-packages/overrides/__pycache__/overrides.cpython-310.pyc",
+    "lib/python3.10/site-packages/overrides/__pycache__/signature.cpython-310.pyc",
+    "lib/python3.10/site-packages/overrides/__pycache__/typing_utils.cpython-310.pyc"
+  ],
+  "fn": "overrides-7.7.0-pyhd8ed1ab_0.conda",
+  "license": "Apache-2.0",
+  "link": {
+    "source": "/opt/conda/pkgs/overrides-7.7.0-pyhd8ed1ab_0",
+    "type": 1
+  },
+  "md5": "24fba5a9d161ad8103d4e84c0e1a3ed4",
+  "name": "overrides",
+  "noarch": "python",
+  "package_tarball_full_path": "/opt/conda/pkgs/overrides-7.7.0-pyhd8ed1ab_0.conda",
+  "package_type": "noarch_python",
+  "paths_data": {
+    "paths": [
+      {
+        "_path": "site-packages/overrides-7.7.0.dist-info/INSTALLER",
+        "path_type": "hardlink",
+        "sha256": "d0edee15f91b406f3f99726e44eb990be6e34fd0345b52b910c568e0eef6a2a8",
+        "sha256_in_prefix": "d0edee15f91b406f3f99726e44eb990be6e34fd0345b52b910c568e0eef6a2a8",
+        "size_in_bytes": 5
+      },
+      {
+        "_path": "site-packages/overrides-7.7.0.dist-info/LICENSE",
+        "path_type": "hardlink",
+        "sha256": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08",
+        "sha256_in_prefix": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08",
+        "size_in_bytes": 11358
+      },
+      {
+        "_path": "site-packages/overrides-7.7.0.dist-info/METADATA",
+        "path_type": "hardlink",
+        "sha256": "61d68bbcd7b0d28bd9f8b818cd6f1fcc4e437dd6c54ae603ad4db3f986c28245",
+        "sha256_in_prefix": "61d68bbcd7b0d28bd9f8b818cd6f1fcc4e437dd6c54ae603ad4db3f986c28245",
+        "size_in_bytes": 5756
+      },
+      {
+        "_path": "site-packages/overrides-7.7.0.dist-info/RECORD",
+        "path_type": "hardlink",
+        "sha256": "d5f55d959d5f63777f3dd79a0a5dab857887e0ddac113015e5ad4e833d417906",
+        "sha256_in_prefix": "d5f55d959d5f63777f3dd79a0a5dab857887e0ddac113015e5ad4e833d417906",
+        "size_in_bytes": 1532
+      },
+      {
+        "_path": "site-packages/overrides-7.7.0.dist-info/REQUESTED",
+        "path_type": "hardlink",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256_in_prefix": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_in_bytes": 0
+      },
+      {
+        "_path": "site-packages/overrides-7.7.0.dist-info/WHEEL",
+        "path_type": "hardlink",
+        "sha256": "a2241587fe4f9d033413780f762cf4f5608d9b08870cc6867abfde96a0777283",
+        "sha256_in_prefix": "a2241587fe4f9d033413780f762cf4f5608d9b08870cc6867abfde96a0777283",
+        "size_in_bytes": 92
+      },
+      {
+        "_path": "site-packages/overrides-7.7.0.dist-info/direct_url.json",
+        "path_type": "hardlink",
+        "sha256": "f04a55080bfeb33d1424911801dcaa347038aaea9c70c127ed969067a1c36a09",
+        "sha256_in_prefix": "f04a55080bfeb33d1424911801dcaa347038aaea9c70c127ed969067a1c36a09",
+        "size_in_bytes": 105
+      },
+      {
+        "_path": "site-packages/overrides-7.7.0.dist-info/top_level.txt",
+        "path_type": "hardlink",
+        "sha256": "d3abf76af894decb513f3a1e9eb2762bf273dcc6b747d150604fb9e1e4ce5d89",
+        "sha256_in_prefix": "d3abf76af894decb513f3a1e9eb2762bf273dcc6b747d150604fb9e1e4ce5d89",
+        "size_in_bytes": 10
+      },
+      {
+        "_path": "site-packages/overrides/__init__.py",
+        "path_type": "hardlink",
+        "sha256": "85278ca8c5c891feb361013c3f7f6b56655b22ae4ff8646fab23d67ac3b40b50",
+        "sha256_in_prefix": "85278ca8c5c891feb361013c3f7f6b56655b22ae4ff8646fab23d67ac3b40b50",
+        "size_in_bytes": 333
+      },
+      {
+        "_path": "site-packages/overrides/enforce.py",
+        "path_type": "hardlink",
+        "sha256": "8734e6a3b56729d16f40a67450b38bf6b17eb8f1069980741b0f66ae4b673b43",
+        "sha256_in_prefix": "8734e6a3b56729d16f40a67450b38bf6b17eb8f1069980741b0f66ae4b673b43",
+        "size_in_bytes": 2349
+      },
+      {
+        "_path": "site-packages/overrides/final.py",
+        "path_type": "hardlink",
+        "sha256": "ca42b57973cab51f92ba364e56771210eb4be9e51a27f9ee96d321669dceb0ed",
+        "sha256_in_prefix": "ca42b57973cab51f92ba364e56771210eb4be9e51a27f9ee96d321669dceb0ed",
+        "size_in_bytes": 1511
+      },
+      {
+        "_path": "site-packages/overrides/overrides.py",
+        "path_type": "hardlink",
+        "sha256": "066b7b37c34666accd50f6d9d65f35330ef968c3d5d763b5cd9f4974852e7ac7",
+        "sha256_in_prefix": "066b7b37c34666accd50f6d9d65f35330ef968c3d5d763b5cd9f4974852e7ac7",
+        "size_in_bytes": 7505
+      },
+      {
+        "_path": "site-packages/overrides/py.typed",
+        "path_type": "hardlink",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256_in_prefix": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_in_bytes": 0
+      },
+      {
+        "_path": "site-packages/overrides/signature.py",
+        "path_type": "hardlink",
+        "sha256": "bdf1a2166e99914c4b83a4182da31e1ee94d20b7363b9c6dcf1cd1d6be36e008",
+        "sha256_in_prefix": "bdf1a2166e99914c4b83a4182da31e1ee94d20b7363b9c6dcf1cd1d6be36e008",
+        "size_in_bytes": 11785
+      },
+      {
+        "_path": "site-packages/overrides/typing_utils.py",
+        "path_type": "hardlink",
+        "sha256": "08fae78ad3428b2b0bb38f380184467ccfaad8c7e3e94cf7d97b0b01a81ed9a2",
+        "sha256_in_prefix": "08fae78ad3428b2b0bb38f380184467ccfaad8c7e3e94cf7d97b0b01a81ed9a2",
+        "size_in_bytes": 14240
+      },
+      {
+        "_path": "lib/python3.10/site-packages/overrides/__pycache__/__init__.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/overrides/__pycache__/enforce.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/overrides/__pycache__/final.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/overrides/__pycache__/overrides.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/overrides/__pycache__/signature.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/overrides/__pycache__/typing_utils.cpython-310.pyc",
+        "path_type": "pyc_file"
+      }
+    ],
+    "paths_version": 1
+  },
+  "requested_spec": "None",
+  "sha256": "5e238e5e646414d517a13f6786c7227206ace58271e3ef63f6adca4d6a4c2839",
+  "size": 30232,
+  "subdir": "noarch",
+  "timestamp": 1706394723000,
+  "url": "https://conda.anaconda.org/conda-forge/noarch/overrides-7.7.0-pyhd8ed1ab_0.conda",
+  "version": "7.7.0"
+}

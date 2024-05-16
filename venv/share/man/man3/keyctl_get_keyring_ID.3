@@ -1,0 +1,96 @@
+.\"
+.\" Copyright (C) 2006 Red Hat, Inc. All Rights Reserved.
+.\" Written by David Howells (dhowells@redhat.com)
+.\"
+.\" This program is free software; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License
+.\" as published by the Free Software Foundation; either version
+.\" 2 of the License, or (at your option) any later version.
+.\"
+.TH KEYCTL_GET_KEYRING_ID 3 "4 May 2006" Linux "Linux Key Management Calls"
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH NAME
+keyctl_get_keyring_ID \- get the ID of a special keyring
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH SYNOPSIS
+.nf
+.B #include <keyutils.h>
+.sp
+.BI "key_serial_t keyctl_get_keyring_ID(key_serial_t " key ","
+.BI " int " create ");"
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH DESCRIPTION
+.BR keyctl_get_keyring_ID ()
+maps a special
+.I key
+or keyring ID to the serial number of the key actually representing that
+feature.  The serial number will be returned if that key exists.
+.P
+If the key or keyring does not yet exist, then if
+.I create
+is non-zero, the key or keyring will be created if it is appropriate to do so.
+.P
+The following special key IDs may be specified as
+.IR key :
+.TP
+.B KEY_SPEC_THREAD_KEYRING
+This specifies the caller's thread-specific keyring.
+.TP
+.B KEY_SPEC_PROCESS_KEYRING
+This specifies the caller's process-specific keyring.
+.TP
+.B KEY_SPEC_SESSION_KEYRING
+This specifies the caller's session-specific keyring.
+.TP
+.B KEY_SPEC_USER_KEYRING
+This specifies the caller's UID-specific keyring.
+.TP
+.B KEY_SPEC_USER_SESSION_KEYRING
+This specifies the caller's UID-session keyring.
+.TP
+.B KEY_SPEC_REQKEY_AUTH_KEY
+This specifies the authorisation key created by
+.BR request_key ()
+and passed to the process it spawns to generate a key.
+.P
+If a valid keyring ID is passed in, then this will simply be returned if the
+key exists; an error will be issued if it doesn't exist.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH RETURN VALUE
+On success
+.BR keyctl_get_keyring_ID ()
+returns the serial number of the key it found.  On error, the value
+.B -1
+will be returned and
+.I errno
+will have been set to an appropriate error.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH ERRORS
+.TP
+.B ENOKEY
+No matching key was found.
+.TP
+.B ENOMEM
+Insufficient memory to create a key.
+.TP
+.B EDQUOT
+The key quota for this user would be exceeded by creating this key or linking
+it to the keyring.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH LINKING
+This is a library function that can be found in
+.IR libkeyutils .
+When linking,
+.B \-lkeyutils
+should be specified to the linker.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH SEE ALSO
+.ad l
+.nh
+.BR keyctl (1),
+.BR add_key (2),
+.BR keyctl (2),
+.BR request_key (2),
+.BR keyctl (3),
+.BR keyrings (7),
+.BR keyutils (7)

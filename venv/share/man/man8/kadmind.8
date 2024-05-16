@@ -1,0 +1,153 @@
+.\" Man page generated from reStructuredText.
+.
+.TH "KADMIND" "8" " " "1.21.2" "MIT Kerberos"
+.SH NAME
+kadmind \- KADM5 administration server
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.SH SYNOPSIS
+.sp
+\fBkadmind\fP
+[\fB\-x\fP \fIdb_args\fP]
+[\fB\-r\fP \fIrealm\fP]
+[\fB\-m\fP]
+[\fB\-nofork\fP]
+[\fB\-proponly\fP]
+[\fB\-port\fP \fIport\-number\fP]
+[\fB\-P\fP \fIpid_file\fP]
+[\fB\-p\fP \fIkdb5_util_path\fP]
+[\fB\-K\fP \fIkprop_path\fP]
+[\fB\-k\fP \fIkprop_port\fP]
+[\fB\-F\fP \fIdump_file\fP]
+.SH DESCRIPTION
+.sp
+kadmind starts the Kerberos administration server.  kadmind typically
+runs on the primary Kerberos server, which stores the KDC database.
+If the KDC database uses the LDAP module, the administration server
+and the KDC server need not run on the same machine.  kadmind accepts
+remote requests from programs such as kadmin(1) and
+kpasswd(1) to administer the information in these database.
+.sp
+kadmind requires a number of configuration files to be set up in order
+for it to work:
+.INDENT 0.0
+.TP
+.B kdc.conf(5)
+The KDC configuration file contains configuration information for
+the KDC and admin servers.  kadmind uses settings in this file to
+locate the Kerberos database, and is also affected by the
+\fBacl_file\fP, \fBdict_file\fP, \fBkadmind_port\fP, and iprop\-related
+settings.
+.TP
+.B kadm5.acl(5)
+kadmind\(aqs ACL (access control list) tells it which principals are
+allowed to perform administration actions.  The pathname to the
+ACL file can be specified with the \fBacl_file\fP kdc.conf(5)
+variable; by default, it is \fB/workspaces/timesfm/venv/var\fP\fB/krb5kdc\fP\fB/kadm5.acl\fP\&.
+.UNINDENT
+.sp
+After the server begins running, it puts itself in the background and
+disassociates itself from its controlling terminal.
+.sp
+kadmind can be configured for incremental database propagation.
+Incremental propagation allows replica KDC servers to receive
+principal and policy updates incrementally instead of receiving full
+dumps of the database.  This facility can be enabled in the
+kdc.conf(5) file with the \fBiprop_enable\fP option.  Incremental
+propagation requires the principal \fBkiprop/PRIMARY\e@REALM\fP (where
+PRIMARY is the primary KDC\(aqs canonical host name, and REALM the realm
+name).  In release 1.13, this principal is automatically created and
+registered into the datebase.
+.SH OPTIONS
+.INDENT 0.0
+.TP
+\fB\-r\fP \fIrealm\fP
+specifies the realm that kadmind will serve; if it is not
+specified, the default realm of the host is used.
+.TP
+\fB\-m\fP
+causes the master database password to be fetched from the
+keyboard (before the server puts itself in the background, if not
+invoked with the \fB\-nofork\fP option) rather than from a file on
+disk.
+.TP
+\fB\-nofork\fP
+causes the server to remain in the foreground and remain
+associated to the terminal.
+.TP
+\fB\-proponly\fP
+causes the server to only listen and respond to Kerberos replica
+incremental propagation polling requests.  This option can be used
+to set up a hierarchical propagation topology where a replica KDC
+provides incremental updates to other Kerberos replicas.
+.TP
+\fB\-port\fP \fIport\-number\fP
+specifies the port on which the administration server listens for
+connections.  The default port is determined by the
+\fBkadmind_port\fP configuration variable in kdc.conf(5)\&.
+.TP
+\fB\-P\fP \fIpid_file\fP
+specifies the file to which the PID of kadmind process should be
+written after it starts up.  This file can be used to identify
+whether kadmind is still running and to allow init scripts to stop
+the correct process.
+.TP
+\fB\-p\fP \fIkdb5_util_path\fP
+specifies the path to the kdb5_util command to use when dumping the
+KDB in response to full resync requests when iprop is enabled.
+.TP
+\fB\-K\fP \fIkprop_path\fP
+specifies the path to the kprop command to use to send full dumps
+to replicas in response to full resync requests.
+.TP
+\fB\-k\fP \fIkprop_port\fP
+specifies the port by which the kprop process that is spawned by
+kadmind connects to the replica kpropd, in order to transfer the
+dump file during an iprop full resync request.
+.TP
+\fB\-F\fP \fIdump_file\fP
+specifies the file path to be used for dumping the KDB in response
+to full resync requests when iprop is enabled.
+.TP
+\fB\-x\fP \fIdb_args\fP
+specifies database\-specific arguments.  See Database Options in kadmin(1) for supported arguments.
+.UNINDENT
+.SH ENVIRONMENT
+.sp
+See kerberos(7) for a description of Kerberos environment
+variables.
+.SH SEE ALSO
+.sp
+kpasswd(1), kadmin(1), kdb5_util(8),
+kdb5_ldap_util(8), kadm5.acl(5), kerberos(7)
+.SH AUTHOR
+MIT
+.SH COPYRIGHT
+1985-2023, MIT
+.\" Generated by docutils manpage writer.
+.

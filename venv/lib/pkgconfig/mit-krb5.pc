@@ -1,0 +1,15 @@
+prefix=/workspaces/timesfm/venv
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+defccname=FILE:/tmp/krb5cc_%{uid}
+defktname=FILE:/etc/krb5.keytab
+defcktname=FILE:/opt/conda/var/krb5/user/%{euid}/client.keytab
+
+Name: mit-krb5
+Description: An implementation of Kerberos network authentication
+Version: 1.21.2
+Cflags: -I${includedir}
+Libs: -L${libdir} -lkrb5 -lk5crypto -lcom_err
+Libs.private: -lkrb5support

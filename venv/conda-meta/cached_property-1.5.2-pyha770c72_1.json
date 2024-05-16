@@ -1,0 +1,120 @@
+{
+  "build": "pyha770c72_1",
+  "build_number": 1,
+  "channel": "https://conda.anaconda.org/conda-forge/noarch",
+  "constrains": [],
+  "depends": [
+    "python >=3.6"
+  ],
+  "extracted_package_dir": "/opt/conda/pkgs/cached_property-1.5.2-pyha770c72_1",
+  "files": [
+    "lib/python3.10/site-packages/cached_property-1.5.2.dist-info/AUTHORS.rst",
+    "lib/python3.10/site-packages/cached_property-1.5.2.dist-info/INSTALLER",
+    "lib/python3.10/site-packages/cached_property-1.5.2.dist-info/LICENSE",
+    "lib/python3.10/site-packages/cached_property-1.5.2.dist-info/METADATA",
+    "lib/python3.10/site-packages/cached_property-1.5.2.dist-info/RECORD",
+    "lib/python3.10/site-packages/cached_property-1.5.2.dist-info/REQUESTED",
+    "lib/python3.10/site-packages/cached_property-1.5.2.dist-info/WHEEL",
+    "lib/python3.10/site-packages/cached_property-1.5.2.dist-info/direct_url.json",
+    "lib/python3.10/site-packages/cached_property-1.5.2.dist-info/top_level.txt",
+    "lib/python3.10/site-packages/cached_property.py",
+    "lib/python3.10/site-packages/__pycache__/cached_property.cpython-310.pyc"
+  ],
+  "fn": "cached_property-1.5.2-pyha770c72_1.tar.bz2",
+  "license": "BSD-3-Clause",
+  "link": {
+    "source": "/opt/conda/pkgs/cached_property-1.5.2-pyha770c72_1",
+    "type": 1
+  },
+  "md5": "576d629e47797577ab0f1b351297ef4a",
+  "name": "cached_property",
+  "noarch": "python",
+  "package_tarball_full_path": "/opt/conda/pkgs/cached_property-1.5.2-pyha770c72_1.tar.bz2",
+  "package_type": "noarch_python",
+  "paths_data": {
+    "paths": [
+      {
+        "_path": "site-packages/cached_property-1.5.2.dist-info/AUTHORS.rst",
+        "path_type": "hardlink",
+        "sha256": "542e4982399b2361c437e597f00b443e7d8806aa0f507ed6bb76055af0491939",
+        "sha256_in_prefix": "542e4982399b2361c437e597f00b443e7d8806aa0f507ed6bb76055af0491939",
+        "size_in_bytes": 414
+      },
+      {
+        "_path": "site-packages/cached_property-1.5.2.dist-info/INSTALLER",
+        "path_type": "hardlink",
+        "sha256": "d0edee15f91b406f3f99726e44eb990be6e34fd0345b52b910c568e0eef6a2a8",
+        "sha256_in_prefix": "d0edee15f91b406f3f99726e44eb990be6e34fd0345b52b910c568e0eef6a2a8",
+        "size_in_bytes": 5
+      },
+      {
+        "_path": "site-packages/cached_property-1.5.2.dist-info/LICENSE",
+        "path_type": "hardlink",
+        "sha256": "ba4756c8039b25b66e3c456cc5bf635aa528cf459b97ee1499d06684ccd89b9a",
+        "sha256_in_prefix": "ba4756c8039b25b66e3c456cc5bf635aa528cf459b97ee1499d06684ccd89b9a",
+        "size_in_bytes": 1479
+      },
+      {
+        "_path": "site-packages/cached_property-1.5.2.dist-info/METADATA",
+        "path_type": "hardlink",
+        "sha256": "e8532d9410824acbc9fa5f3d84f764b580b7ca0bb5ab0a48422b52843f94f058",
+        "sha256_in_prefix": "e8532d9410824acbc9fa5f3d84f764b580b7ca0bb5ab0a48422b52843f94f058",
+        "size_in_bytes": 11266
+      },
+      {
+        "_path": "site-packages/cached_property-1.5.2.dist-info/RECORD",
+        "path_type": "hardlink",
+        "sha256": "0a73bf64c1e04a381f3212b628cbc6b6c7fbd69e7b3b96dcc69628ca37e426ea",
+        "sha256_in_prefix": "0a73bf64c1e04a381f3212b628cbc6b6c7fbd69e7b3b96dcc69628ca37e426ea",
+        "size_in_bytes": 951
+      },
+      {
+        "_path": "site-packages/cached_property-1.5.2.dist-info/REQUESTED",
+        "path_type": "hardlink",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256_in_prefix": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_in_bytes": 0
+      },
+      {
+        "_path": "site-packages/cached_property-1.5.2.dist-info/WHEEL",
+        "path_type": "hardlink",
+        "sha256": "67e9f2629c2b712ab17ddbb1e4c6e7fc3439db988fec9d831b72601af398c934",
+        "sha256_in_prefix": "67e9f2629c2b712ab17ddbb1e4c6e7fc3439db988fec9d831b72601af398c934",
+        "size_in_bytes": 110
+      },
+      {
+        "_path": "site-packages/cached_property-1.5.2.dist-info/direct_url.json",
+        "path_type": "hardlink",
+        "sha256": "2ac3e421e5902c2ff41ce08248b748facd9f1d110c0f3b1e43b135704659343a",
+        "sha256_in_prefix": "2ac3e421e5902c2ff41ce08248b748facd9f1d110c0f3b1e43b135704659343a",
+        "size_in_bytes": 111
+      },
+      {
+        "_path": "site-packages/cached_property-1.5.2.dist-info/top_level.txt",
+        "path_type": "hardlink",
+        "sha256": "3ecb7ddd74367a78653d57c22297382afdfc7fa257118ba48bdea193287ed491",
+        "sha256_in_prefix": "3ecb7ddd74367a78653d57c22297382afdfc7fa257118ba48bdea193287ed491",
+        "size_in_bytes": 16
+      },
+      {
+        "_path": "site-packages/cached_property.py",
+        "path_type": "hardlink",
+        "sha256": "904479dca72eb7b6a0583e6452ae893df4dab7a506ff2141d0f270d8a511ff66",
+        "sha256_in_prefix": "904479dca72eb7b6a0583e6452ae893df4dab7a506ff2141d0f270d8a511ff66",
+        "size_in_bytes": 4324
+      },
+      {
+        "_path": "lib/python3.10/site-packages/__pycache__/cached_property.cpython-310.pyc",
+        "path_type": "pyc_file"
+      }
+    ],
+    "paths_version": 1
+  },
+  "requested_spec": "None",
+  "sha256": "6dbf7a5070cc43d90a1e4c2ec0c541c69d8e30a0e25f50ce9f6e4a432e42c5d7",
+  "size": 11065,
+  "subdir": "noarch",
+  "timestamp": 1615209567000,
+  "url": "https://conda.anaconda.org/conda-forge/noarch/cached_property-1.5.2-pyha770c72_1.tar.bz2",
+  "version": "1.5.2"
+}

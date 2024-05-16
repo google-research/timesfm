@@ -1,0 +1,231 @@
+{
+  "build": "pyhd8ed1ab_0",
+  "build_number": 0,
+  "channel": "https://conda.anaconda.org/conda-forge/noarch",
+  "constrains": [],
+  "depends": [
+    "python >=3.8",
+    "python-dateutil >=2.7.0",
+    "types-python-dateutil >=2.8.10"
+  ],
+  "extracted_package_dir": "/opt/conda/pkgs/arrow-1.3.0-pyhd8ed1ab_0",
+  "files": [
+    "lib/python3.10/site-packages/arrow-1.3.0.dist-info/INSTALLER",
+    "lib/python3.10/site-packages/arrow-1.3.0.dist-info/LICENSE",
+    "lib/python3.10/site-packages/arrow-1.3.0.dist-info/METADATA",
+    "lib/python3.10/site-packages/arrow-1.3.0.dist-info/RECORD",
+    "lib/python3.10/site-packages/arrow-1.3.0.dist-info/REQUESTED",
+    "lib/python3.10/site-packages/arrow-1.3.0.dist-info/WHEEL",
+    "lib/python3.10/site-packages/arrow-1.3.0.dist-info/direct_url.json",
+    "lib/python3.10/site-packages/arrow/__init__.py",
+    "lib/python3.10/site-packages/arrow/_version.py",
+    "lib/python3.10/site-packages/arrow/api.py",
+    "lib/python3.10/site-packages/arrow/arrow.py",
+    "lib/python3.10/site-packages/arrow/constants.py",
+    "lib/python3.10/site-packages/arrow/factory.py",
+    "lib/python3.10/site-packages/arrow/formatter.py",
+    "lib/python3.10/site-packages/arrow/locales.py",
+    "lib/python3.10/site-packages/arrow/parser.py",
+    "lib/python3.10/site-packages/arrow/py.typed",
+    "lib/python3.10/site-packages/arrow/util.py",
+    "lib/python3.10/site-packages/arrow/__pycache__/__init__.cpython-310.pyc",
+    "lib/python3.10/site-packages/arrow/__pycache__/_version.cpython-310.pyc",
+    "lib/python3.10/site-packages/arrow/__pycache__/api.cpython-310.pyc",
+    "lib/python3.10/site-packages/arrow/__pycache__/arrow.cpython-310.pyc",
+    "lib/python3.10/site-packages/arrow/__pycache__/constants.cpython-310.pyc",
+    "lib/python3.10/site-packages/arrow/__pycache__/factory.cpython-310.pyc",
+    "lib/python3.10/site-packages/arrow/__pycache__/formatter.cpython-310.pyc",
+    "lib/python3.10/site-packages/arrow/__pycache__/locales.cpython-310.pyc",
+    "lib/python3.10/site-packages/arrow/__pycache__/parser.cpython-310.pyc",
+    "lib/python3.10/site-packages/arrow/__pycache__/util.cpython-310.pyc"
+  ],
+  "fn": "arrow-1.3.0-pyhd8ed1ab_0.conda",
+  "license": "Apache-2.0",
+  "link": {
+    "source": "/opt/conda/pkgs/arrow-1.3.0-pyhd8ed1ab_0",
+    "type": 1
+  },
+  "md5": "b77d8c2313158e6e461ca0efb1c2c508",
+  "name": "arrow",
+  "noarch": "python",
+  "package_tarball_full_path": "/opt/conda/pkgs/arrow-1.3.0-pyhd8ed1ab_0.conda",
+  "package_type": "noarch_python",
+  "paths_data": {
+    "paths": [
+      {
+        "_path": "site-packages/arrow-1.3.0.dist-info/INSTALLER",
+        "path_type": "hardlink",
+        "sha256": "d0edee15f91b406f3f99726e44eb990be6e34fd0345b52b910c568e0eef6a2a8",
+        "sha256_in_prefix": "d0edee15f91b406f3f99726e44eb990be6e34fd0345b52b910c568e0eef6a2a8",
+        "size_in_bytes": 5
+      },
+      {
+        "_path": "site-packages/arrow-1.3.0.dist-info/LICENSE",
+        "path_type": "hardlink",
+        "sha256": "b481f87296cb0abdb13fd8cbb94b14c328be880ec9e68547a61b84dacffd067a",
+        "sha256_in_prefix": "b481f87296cb0abdb13fd8cbb94b14c328be880ec9e68547a61b84dacffd067a",
+        "size_in_bytes": 11341
+      },
+      {
+        "_path": "site-packages/arrow-1.3.0.dist-info/METADATA",
+        "path_type": "hardlink",
+        "sha256": "3fb821e86b7aa48a812c13f9efb3a84d95858519803a93328b0a6e3447a495a7",
+        "sha256_in_prefix": "3fb821e86b7aa48a812c13f9efb3a84d95858519803a93328b0a6e3447a495a7",
+        "size_in_bytes": 7534
+      },
+      {
+        "_path": "site-packages/arrow-1.3.0.dist-info/RECORD",
+        "path_type": "hardlink",
+        "sha256": "3c22a698c5abf65a90c65d0044e97cbc0ffb0d17c01d1060a982ab9d9d0bd2c9",
+        "sha256_in_prefix": "3c22a698c5abf65a90c65d0044e97cbc0ffb0d17c01d1060a982ab9d9d0bd2c9",
+        "size_in_bytes": 1810
+      },
+      {
+        "_path": "site-packages/arrow-1.3.0.dist-info/REQUESTED",
+        "path_type": "hardlink",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256_in_prefix": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_in_bytes": 0
+      },
+      {
+        "_path": "site-packages/arrow-1.3.0.dist-info/WHEEL",
+        "path_type": "hardlink",
+        "sha256": "1196c6921ec87b83e865f450f08d19b8ff5592537f4ef719e83484e546abe33e",
+        "sha256_in_prefix": "1196c6921ec87b83e865f450f08d19b8ff5592537f4ef719e83484e546abe33e",
+        "size_in_bytes": 81
+      },
+      {
+        "_path": "site-packages/arrow-1.3.0.dist-info/direct_url.json",
+        "path_type": "hardlink",
+        "sha256": "fbc3af11c11dece2ca2441e64ba5a5a837964a94061f4180e1736312d99d18b7",
+        "sha256_in_prefix": "fbc3af11c11dece2ca2441e64ba5a5a837964a94061f4180e1736312d99d18b7",
+        "size_in_bytes": 101
+      },
+      {
+        "_path": "site-packages/arrow/__init__.py",
+        "path_type": "hardlink",
+        "sha256": "1f1b12246979e86a1e1c1fff368fa4746982fd67acfd3b5fd2884ecbb3a81628",
+        "sha256_in_prefix": "1f1b12246979e86a1e1c1fff368fa4746982fd67acfd3b5fd2884ecbb3a81628",
+        "size_in_bytes": 872
+      },
+      {
+        "_path": "site-packages/arrow/_version.py",
+        "path_type": "hardlink",
+        "sha256": "179996d3ba52c86aea0cd636121afe5290f3a41b4df85b185344066567fa3c91",
+        "sha256_in_prefix": "179996d3ba52c86aea0cd636121afe5290f3a41b4df85b185344066567fa3c91",
+        "size_in_bytes": 22
+      },
+      {
+        "_path": "site-packages/arrow/api.py",
+        "path_type": "hardlink",
+        "sha256": "ead76aac6d0d8eb28edb6fde5875386b9c5eadf47a22b64f63ecb29c6a67bd33",
+        "sha256_in_prefix": "ead76aac6d0d8eb28edb6fde5875386b9c5eadf47a22b64f63ecb29c6a67bd33",
+        "size_in_bytes": 2755
+      },
+      {
+        "_path": "site-packages/arrow/arrow.py",
+        "path_type": "hardlink",
+        "sha256": "9bd5ef367a50d5a4c76565cfb9ddd6dbe40c7e29605979d40a7b99227c1fdbb8",
+        "sha256_in_prefix": "9bd5ef367a50d5a4c76565cfb9ddd6dbe40c7e29605979d40a7b99227c1fdbb8",
+        "size_in_bytes": 63517
+      },
+      {
+        "_path": "site-packages/arrow/constants.py",
+        "path_type": "hardlink",
+        "sha256": "cb7b1c816831885b908380de1658667b1cb5040ecaf0b14d672a8af9558f409b",
+        "sha256_in_prefix": "cb7b1c816831885b908380de1658667b1cb5040ecaf0b14d672a8af9558f409b",
+        "size_in_bytes": 3238
+      },
+      {
+        "_path": "site-packages/arrow/factory.py",
+        "path_type": "hardlink",
+        "sha256": "aa20d2a247dc5562618896c890e714d4e861e0dd0f74ac6086c27306723c014a",
+        "sha256_in_prefix": "aa20d2a247dc5562618896c890e714d4e861e0dd0f74ac6086c27306723c014a",
+        "size_in_bytes": 11432
+      },
+      {
+        "_path": "site-packages/arrow/formatter.py",
+        "path_type": "hardlink",
+        "sha256": "d03d3e023059c2e6b2f77d762af63452769505f0198febc422a59c1b4ff76434",
+        "sha256_in_prefix": "d03d3e023059c2e6b2f77d762af63452769505f0198febc422a59c1b4ff76434",
+        "size_in_bytes": 5267
+      },
+      {
+        "_path": "site-packages/arrow/locales.py",
+        "path_type": "hardlink",
+        "sha256": "ea0e711eae549080193c5f0dd8fbf337fc6852fb1f35c3e135f270d13522f2dc",
+        "sha256_in_prefix": "ea0e711eae549080193c5f0dd8fbf337fc6852fb1f35c3e135f270d13522f2dc",
+        "size_in_bytes": 156894
+      },
+      {
+        "_path": "site-packages/arrow/parser.py",
+        "path_type": "hardlink",
+        "sha256": "14ee8d5a9ce3bd972c32121c93aa5dee129ed628e5294644f65fce165cac932c",
+        "sha256_in_prefix": "14ee8d5a9ce3bd972c32121c93aa5dee129ed628e5294644f65fce165cac932c",
+        "size_in_bytes": 25790
+      },
+      {
+        "_path": "site-packages/arrow/py.typed",
+        "path_type": "hardlink",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256_in_prefix": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_in_bytes": 0
+      },
+      {
+        "_path": "site-packages/arrow/util.py",
+        "path_type": "hardlink",
+        "sha256": "c670debea47235e6166e5df1fa7fd3ca8e1c3a01dc7606f1144085b09d57a047",
+        "sha256_in_prefix": "c670debea47235e6166e5df1fa7fd3ca8e1c3a01dc7606f1144085b09d57a047",
+        "size_in_bytes": 3679
+      },
+      {
+        "_path": "lib/python3.10/site-packages/arrow/__pycache__/__init__.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/arrow/__pycache__/_version.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/arrow/__pycache__/api.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/arrow/__pycache__/arrow.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/arrow/__pycache__/constants.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/arrow/__pycache__/factory.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/arrow/__pycache__/formatter.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/arrow/__pycache__/locales.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/arrow/__pycache__/parser.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/arrow/__pycache__/util.cpython-310.pyc",
+        "path_type": "pyc_file"
+      }
+    ],
+    "paths_version": 1
+  },
+  "requested_spec": "None",
+  "sha256": "ff49825c7f9e29e09afa6284300810e7a8640d621740efb47c4541f4dc4969db",
+  "size": 100096,
+  "subdir": "noarch",
+  "timestamp": 1696129131000,
+  "url": "https://conda.anaconda.org/conda-forge/noarch/arrow-1.3.0-pyhd8ed1ab_0.conda",
+  "version": "1.3.0"
+}

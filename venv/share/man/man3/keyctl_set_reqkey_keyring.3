@@ -1,0 +1,101 @@
+.\"
+.\" Copyright (C) 2006 Red Hat, Inc. All Rights Reserved.
+.\" Written by David Howells (dhowells@redhat.com)
+.\"
+.\" This program is free software; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License
+.\" as published by the Free Software Foundation; either version
+.\" 2 of the License, or (at your option) any later version.
+.\"
+.TH KEYCTL_SET_REQKEY_KEYRING 3 "4 May 2006" Linux "Linux Key Management Calls"
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH NAME
+keyctl_set_reqkey_keyring \- set the implicit destination keyring
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH SYNOPSIS
+.nf
+.B #include <keyutils.h>
+.sp
+.BI "long keyctl_set_reqkey_keyring(int " reqkey_defl ");"
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH DESCRIPTION
+.BR keyctl_set_reqkey_keyring ()
+sets the default destination for implicit key requests for the current thread
+and returns the old setting.
+.P
+After this operation has been issued, keys acquired by implicit key requests,
+such as might be performed by
+.BR open ()
+on an AFS or NFS filesystem, will be
+linked by default to the specified keyring by this function.
+.P
+The valid values of
+.I reqkey_defl
+are:
+.TP
+.B KEY_REQKEY_DEFL_NO_CHANGE
+This makes no change to the current setting.
+.TP
+.B KEY_REQKEY_DEFL_THREAD_KEYRING
+This makes the thread-specific keyring the default destination.
+.TP
+.B KEY_REQKEY_DEFL_PROCESS_KEYRING
+This makes the process-specific keyring the default destination.
+.TP
+.B KEY_REQKEY_DEFL_SESSION_KEYRING
+This makes the session keyring the default destination.
+.TP
+.B KEY_REQKEY_DEFL_USER_KEYRING
+This makes the UID-specific keyring the default destination.
+.TP
+.B KEY_REQKEY_DEFL_USER_SESSION_KEYRING
+This makes the UID-specific session keyring the default destination.
+.TP
+.B KEY_REQKEY_DEFL_DEFAULT
+This selects the default behaviour which is to use the thread-specific keyring
+if there is one, otherwise the process-specific keyring if there is one,
+otherwise the session keyring if there is one, otherwise the UID-specific
+session keyring.
+.P
+This setting is inherited across
+.BR fork ()
+and
+.BR exec ().
+
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH RETURN VALUE
+On success
+.BR keyctl_set_reqkey_keyring ()
+returns
+.BR 0 .
+On error, the value
+.B -1
+will be returned and
+.I errno
+will have been set to an appropriate error.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH ERRORS
+.TP
+.B EINVAL
+The value of
+.I reqkey_defl
+is invalid.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH LINKING
+This is a library function that can be found in
+.IR libkeyutils .
+When linking,
+.B \-lkeyutils
+should be specified to the linker.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH SEE ALSO
+.ad l
+.nh
+.BR keyctl (1),
+.BR add_key (2),
+.BR keyctl (2),
+.BR request_key (2),
+.BR keyctl (3),
+.BR keyutils (7),
+.BR keyrings (7),
+.BR request\-key (8)

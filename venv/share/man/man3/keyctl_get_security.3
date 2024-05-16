@@ -1,0 +1,102 @@
+.\"
+.\" Copyright (C) 2010 Red Hat, Inc. All Rights Reserved.
+.\" Written by David Howells (dhowells@redhat.com)
+.\"
+.\" This program is free software; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License
+.\" as published by the Free Software Foundation; either version
+.\" 2 of the License, or (at your option) any later version.
+.\"
+.TH KEYCTL_GET_SECURITY 3 "26 Feb 2010" Linux "Linux Key Management Calls"
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH NAME
+keyctl_get_security \- retrieve a key's security context
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH SYNOPSIS
+.nf
+.B #include <keyutils.h>
+.sp
+.BI "long keyctl_get_security(key_serial_t " key ", char *" buffer ,
+.BI "size_t " buflen ");"
+.sp
+.BI "long keyctl_get_security_alloc(key_serial_t " key ", char **" _buffer ");"
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH DESCRIPTION
+.BR keyctl_get_security ()
+retrieves the security context of a key as a NUL-terminated string.  This will
+be rendered in a form appropriate to the LSM in force - for instance, with
+SELinux, it may look like
+.IP
+.B "unconfined_u:unconfined_r:unconfined_t:s0\-s0:c0.c1023"
+.P
+The caller must have
+.B view
+permission on a key to be able to get its security context.
+.P
+.I buffer
+and
+.I buflen
+specify the buffer into which the string will be placed.  If the buffer is too
+small, the full size of the string will be returned, and no copy will take
+place.
+.P
+.BR keyctl_get_security_alloc ()
+is similar to
+.BR keyctl_get_security ()
+except that it allocates a buffer big enough to hold the string and copies the
+string into it.  If successful, A pointer to the buffer is placed in
+.IR *_buffer .
+The caller must free the buffer.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH RETURN VALUE
+On success
+.BR keyctl_get_security ()
+returns the amount of data placed into the buffer.  If the buffer was too
+small, then the size of buffer required will be returned, but no data will be
+transferred.  On error, the value
+.B -1
+will be returned and
+.I errno
+will have been set to an appropriate error.
+.P
+On success
+.BR keyctl_get_security_alloc ()
+returns the amount of data in the buffer, less the NUL terminator.  On error, the value
+.B -1
+will be returned and
+.I errno
+will have been set to an appropriate error.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH ERRORS
+.TP
+.B ENOKEY
+The key specified is invalid.
+.TP
+.B EKEYEXPIRED
+The key specified has expired.
+.TP
+.B EKEYREVOKED
+The key specified had been revoked.
+.TP
+.B EACCES
+The key exists, but is not
+.B viewable
+by the calling process.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH LINKING
+This is a library function that can be found in
+.IR libkeyutils .
+When linking,
+.B \-lkeyutils
+should be specified to the linker.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH SEE ALSO
+.ad l
+.nh
+.BR keyctl (1),
+.BR add_key (2),
+.BR keyctl (2),
+.BR request_key (2),
+.BR keyctl (3),
+.BR keyrings (7),
+.BR keyutils (7)

@@ -1,0 +1,96 @@
+'\" t
+.\"     Title: zmq_msg_gets
+.\"    Author: [see the "AUTHORS" section]
+.\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
+.\"      Date: 10/09/2023
+.\"    Manual: 0MQ Manual
+.\"    Source: 0MQ 4.3.5
+.\"  Language: English
+.\"
+.TH "ZMQ_MSG_GETS" "3" "10/09/2023" "0MQ 4\&.3\&.5" "0MQ Manual"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+zmq_msg_gets \- get message metadata property
+.SH "SYNOPSIS"
+.sp
+\fBconst char *zmq_msg_gets (zmq_msg_t \fR\fB\fI*message\fR\fR\fB, const char *\fR\fB\fIproperty\fR\fR\fB);\fR
+.SH "DESCRIPTION"
+.sp
+The \fIzmq_msg_gets()\fR function shall return the string value for the metadata property specified by the \fIproperty\fR argument for the message pointed to by the \fImessage\fR argument\&. Both the \fIproperty\fR argument and the \fIvalue\fR shall be NULL\-terminated UTF8\-encoded strings\&.
+.sp
+Metadata is defined on a per\-connection basis during the ZeroMQ connection handshake as specified in <rfc\&.zeromq\&.org/spec:37>\&. Applications can set metadata properties using \fBzmq_setsockopt\fR(3) option ZMQ_METADATA\&. Application metadata properties must be prefixed with \fIX\-\fR\&.
+.sp
+In addition to application metadata, the following ZMTP properties can be retrieved with the \fIzmq_msg_gets()\fR function:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Socket\-Type
+Routing\-Id
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Note: \fIIdentity\fR is a deprecated alias for \fIRouting\-Id\fR\&.
+.sp
+Additionally, when available for the underlying transport, the \fBPeer\-Address\fR property will return the IP address of the remote endpoint as returned by getnameinfo(2)\&.
+.sp
+The names of these properties are also defined in \fIzmq\&.h\fR as \fIZMQ_MSG_PROPERTY_SOCKET_TYPE\fR \fIZMQ_MSG_PROPERTY_ROUTING_ID\fR, and \fIZMQ_MSG_PROPERTY_PEER_ADDRESS\fR\&. Currently, these definitions are only available as a DRAFT API\&.
+.sp
+Other properties may be defined based on the underlying security mechanism, see ZAP authenticated connection sample below\&.
+.SH "RETURN VALUE"
+.sp
+The \fIzmq_msg_gets()\fR function shall return the string value for the property if successful\&. Otherwise it shall return NULL and set \fIerrno\fR to one of the values defined below\&. The caller shall not modify or free the returned value, which shall be owned by the message\&. The encoding of the property and value shall be UTF8\&.
+.SH "ERRORS"
+.PP
+\fBEINVAL\fR
+.RS 4
+The requested
+\fIproperty\fR
+is unknown\&.
+.RE
+.SH "EXAMPLE"
+.PP
+\fBGetting the ZAP authenticated user id for a message:\fR. 
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+zmq_msg_t msg;
+zmq_msg_init (&msg);
+rc = zmq_msg_recv (&msg, dealer, 0);
+assert (rc != \-1);
+const char *user_id = zmq_msg_gets (&msg, ZMQ_MSG_PROPERTY_USER_ID);
+zmq_msg_close (&msg);
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+.SH "SEE ALSO"
+.sp
+\fBzmq\fR(7) \fBzmq_setsockopt\fR(3)
+.SH "AUTHORS"
+.sp
+This page was written by the 0MQ community\&. To make a change please read the 0MQ Contribution Policy at \m[blue]\fBhttp://www\&.zeromq\&.org/docs:contributing\fR\m[]\&.

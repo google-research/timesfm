@@ -1,0 +1,219 @@
+{
+  "build": "hd590300_5",
+  "build_number": 5,
+  "channel": "https://conda.anaconda.org/conda-forge/linux-64",
+  "constrains": [],
+  "depends": [
+    "libgcc-ng >=12"
+  ],
+  "extracted_package_dir": "/opt/conda/pkgs/bzip2-1.0.8-hd590300_5",
+  "files": [
+    "bin/bunzip2",
+    "bin/bzcat",
+    "bin/bzcmp",
+    "bin/bzdiff",
+    "bin/bzegrep",
+    "bin/bzfgrep",
+    "bin/bzgrep",
+    "bin/bzip2",
+    "bin/bzip2recover",
+    "bin/bzless",
+    "bin/bzmore",
+    "include/bzlib.h",
+    "lib/libbz2.a",
+    "lib/libbz2.so",
+    "lib/libbz2.so.1.0",
+    "lib/libbz2.so.1.0.8",
+    "man/man1/bzcmp.1",
+    "man/man1/bzdiff.1",
+    "man/man1/bzegrep.1",
+    "man/man1/bzfgrep.1",
+    "man/man1/bzgrep.1",
+    "man/man1/bzip2.1",
+    "man/man1/bzless.1",
+    "man/man1/bzmore.1"
+  ],
+  "fn": "bzip2-1.0.8-hd590300_5.conda",
+  "license": "bzip2-1.0.6",
+  "link": {
+    "source": "/opt/conda/pkgs/bzip2-1.0.8-hd590300_5",
+    "type": 1
+  },
+  "md5": "69b8b6202a07720f448be700e300ccf4",
+  "name": "bzip2",
+  "package_tarball_full_path": "/opt/conda/pkgs/bzip2-1.0.8-hd590300_5.conda",
+  "paths_data": {
+    "paths": [
+      {
+        "_path": "bin/bunzip2",
+        "path_type": "hardlink",
+        "sha256": "8ed2af80ad046e203fc48298ac371ce8839ab0c9b6794d6414e567f1349f140a",
+        "sha256_in_prefix": "8ed2af80ad046e203fc48298ac371ce8839ab0c9b6794d6414e567f1349f140a",
+        "size_in_bytes": 300936
+      },
+      {
+        "_path": "bin/bzcat",
+        "path_type": "hardlink",
+        "sha256": "8ed2af80ad046e203fc48298ac371ce8839ab0c9b6794d6414e567f1349f140a",
+        "sha256_in_prefix": "8ed2af80ad046e203fc48298ac371ce8839ab0c9b6794d6414e567f1349f140a",
+        "size_in_bytes": 300936
+      },
+      {
+        "_path": "bin/bzcmp",
+        "path_type": "softlink",
+        "sha256": "1c1f96193cdf14b85ea65f140a7557a07ece8783a53ec5ba6b5c30644a9d3012",
+        "size_in_bytes": 2140
+      },
+      {
+        "_path": "bin/bzdiff",
+        "path_type": "hardlink",
+        "sha256": "1c1f96193cdf14b85ea65f140a7557a07ece8783a53ec5ba6b5c30644a9d3012",
+        "sha256_in_prefix": "1c1f96193cdf14b85ea65f140a7557a07ece8783a53ec5ba6b5c30644a9d3012",
+        "size_in_bytes": 2140
+      },
+      {
+        "_path": "bin/bzegrep",
+        "path_type": "softlink",
+        "sha256": "a8e368a31766c7862b8d0feeffe274c3bb43b969e3ccb4f9e77d13bfa447a5c9",
+        "size_in_bytes": 2054
+      },
+      {
+        "_path": "bin/bzfgrep",
+        "path_type": "softlink",
+        "sha256": "a8e368a31766c7862b8d0feeffe274c3bb43b969e3ccb4f9e77d13bfa447a5c9",
+        "size_in_bytes": 2054
+      },
+      {
+        "_path": "bin/bzgrep",
+        "path_type": "hardlink",
+        "sha256": "a8e368a31766c7862b8d0feeffe274c3bb43b969e3ccb4f9e77d13bfa447a5c9",
+        "sha256_in_prefix": "a8e368a31766c7862b8d0feeffe274c3bb43b969e3ccb4f9e77d13bfa447a5c9",
+        "size_in_bytes": 2054
+      },
+      {
+        "_path": "bin/bzip2",
+        "path_type": "hardlink",
+        "sha256": "8ed2af80ad046e203fc48298ac371ce8839ab0c9b6794d6414e567f1349f140a",
+        "sha256_in_prefix": "8ed2af80ad046e203fc48298ac371ce8839ab0c9b6794d6414e567f1349f140a",
+        "size_in_bytes": 300936
+      },
+      {
+        "_path": "bin/bzip2recover",
+        "path_type": "hardlink",
+        "sha256": "b8308aa457a0a1cac013d238b3e67207453b203e47caaf580426fb02b0a3a5a9",
+        "sha256_in_prefix": "b8308aa457a0a1cac013d238b3e67207453b203e47caaf580426fb02b0a3a5a9",
+        "size_in_bytes": 31344
+      },
+      {
+        "_path": "bin/bzless",
+        "path_type": "softlink",
+        "sha256": "836536d4c7469788c730355d59f8ae8d16ba07cb0754174878d99ed90f04448d",
+        "size_in_bytes": 1259
+      },
+      {
+        "_path": "bin/bzmore",
+        "path_type": "hardlink",
+        "sha256": "836536d4c7469788c730355d59f8ae8d16ba07cb0754174878d99ed90f04448d",
+        "sha256_in_prefix": "836536d4c7469788c730355d59f8ae8d16ba07cb0754174878d99ed90f04448d",
+        "size_in_bytes": 1259
+      },
+      {
+        "_path": "include/bzlib.h",
+        "path_type": "hardlink",
+        "sha256": "6ac62e811669598ee30c9e1c379b9e627f6ff17a5a3dc1e0b4fa8b8ea75e580d",
+        "sha256_in_prefix": "6ac62e811669598ee30c9e1c379b9e627f6ff17a5a3dc1e0b4fa8b8ea75e580d",
+        "size_in_bytes": 6240
+      },
+      {
+        "_path": "lib/libbz2.a",
+        "path_type": "hardlink",
+        "sha256": "22438c9fe6a4cf2c9c5268a12fc8806e241f2f8947e80c1dd0c182bdd85b57a3",
+        "sha256_in_prefix": "22438c9fe6a4cf2c9c5268a12fc8806e241f2f8947e80c1dd0c182bdd85b57a3",
+        "size_in_bytes": 267602
+      },
+      {
+        "_path": "lib/libbz2.so",
+        "path_type": "softlink",
+        "sha256": "60d52da8ca8608947c5d349f6fd15d4bc1050c87e101a90c24efbb7c741b3880",
+        "size_in_bytes": 230480
+      },
+      {
+        "_path": "lib/libbz2.so.1.0",
+        "path_type": "softlink",
+        "sha256": "60d52da8ca8608947c5d349f6fd15d4bc1050c87e101a90c24efbb7c741b3880",
+        "size_in_bytes": 230480
+      },
+      {
+        "_path": "lib/libbz2.so.1.0.8",
+        "path_type": "hardlink",
+        "sha256": "60d52da8ca8608947c5d349f6fd15d4bc1050c87e101a90c24efbb7c741b3880",
+        "sha256_in_prefix": "60d52da8ca8608947c5d349f6fd15d4bc1050c87e101a90c24efbb7c741b3880",
+        "size_in_bytes": 230480
+      },
+      {
+        "_path": "man/man1/bzcmp.1",
+        "path_type": "hardlink",
+        "sha256": "172cde42c47a6d50c244e39d993097dcd3882427d57303078643849cf10a81c4",
+        "sha256_in_prefix": "172cde42c47a6d50c244e39d993097dcd3882427d57303078643849cf10a81c4",
+        "size_in_bytes": 18
+      },
+      {
+        "_path": "man/man1/bzdiff.1",
+        "path_type": "hardlink",
+        "sha256": "32d1a7cd115430398e58537532584ef2ab76343c9f094dcd1253d9c4c0f705bf",
+        "sha256_in_prefix": "32d1a7cd115430398e58537532584ef2ab76343c9f094dcd1253d9c4c0f705bf",
+        "size_in_bytes": 897
+      },
+      {
+        "_path": "man/man1/bzegrep.1",
+        "path_type": "hardlink",
+        "sha256": "cf1c98d3fa055506c8af2f8bba4da9c17d367c6409c6ad83a2bc67ccb6630182",
+        "sha256_in_prefix": "cf1c98d3fa055506c8af2f8bba4da9c17d367c6409c6ad83a2bc67ccb6630182",
+        "size_in_bytes": 18
+      },
+      {
+        "_path": "man/man1/bzfgrep.1",
+        "path_type": "hardlink",
+        "sha256": "cf1c98d3fa055506c8af2f8bba4da9c17d367c6409c6ad83a2bc67ccb6630182",
+        "sha256_in_prefix": "cf1c98d3fa055506c8af2f8bba4da9c17d367c6409c6ad83a2bc67ccb6630182",
+        "size_in_bytes": 18
+      },
+      {
+        "_path": "man/man1/bzgrep.1",
+        "path_type": "hardlink",
+        "sha256": "924aa4a7c7c1467400181e4c0ee1b527db142b6399a717171f2351b72b5899df",
+        "sha256_in_prefix": "924aa4a7c7c1467400181e4c0ee1b527db142b6399a717171f2351b72b5899df",
+        "size_in_bytes": 1297
+      },
+      {
+        "_path": "man/man1/bzip2.1",
+        "path_type": "hardlink",
+        "sha256": "27b984bb2e8bbee2651d11cda87449cfc4138d2e479b9eaa77b8f60fa5d0bf5d",
+        "sha256_in_prefix": "27b984bb2e8bbee2651d11cda87449cfc4138d2e479b9eaa77b8f60fa5d0bf5d",
+        "size_in_bytes": 16266
+      },
+      {
+        "_path": "man/man1/bzless.1",
+        "path_type": "hardlink",
+        "sha256": "216898f9b8acf61eeb471ecf23e47c1452dfd648f7f38d7d3bf48627072dc52c",
+        "sha256_in_prefix": "216898f9b8acf61eeb471ecf23e47c1452dfd648f7f38d7d3bf48627072dc52c",
+        "size_in_bytes": 18
+      },
+      {
+        "_path": "man/man1/bzmore.1",
+        "path_type": "hardlink",
+        "sha256": "ccfcf3f995e11adae3035e287252091bb72d165da21e0c385a4965d17c9051c7",
+        "sha256_in_prefix": "ccfcf3f995e11adae3035e287252091bb72d165da21e0c385a4965d17c9051c7",
+        "size_in_bytes": 4310
+      }
+    ],
+    "paths_version": 1
+  },
+  "requested_spec": "None",
+  "sha256": "242c0c324507ee172c0e0dd2045814e746bb303d1eb78870d182ceb0abc726a8",
+  "size": 254228,
+  "subdir": "linux-64",
+  "timestamp": 1699279927000,
+  "url": "https://conda.anaconda.org/conda-forge/linux-64/bzip2-1.0.8-hd590300_5.conda",
+  "version": "1.0.8"
+}

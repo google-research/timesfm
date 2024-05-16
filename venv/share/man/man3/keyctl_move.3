@@ -1,0 +1,109 @@
+.\"
+.\" Copyright (C) 2019 Red Hat, Inc. All Rights Reserved.
+.\" Written by David Howells (dhowells@redhat.com)
+.\"
+.\" This program is free software; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License
+.\" as published by the Free Software Foundation; either version
+.\" 2 of the License, or (at your option) any later version.
+.\"
+.TH KEYCTL_MOVE 3 "29 May 2019" Linux "Linux Key Management Calls"
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH NAME
+keyctl_move \- Move a key between keyrings
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH SYNOPSIS
+.nf
+.B #include <keyutils.h>
+.sp
+.BI "long keyctl_move(key_serial_t " key ", key_serial_t " from_keyring ","
+.br
+.BI "                 key_serial_t " to_keyring ", unsigned int " flags ");"
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH DESCRIPTION
+.BR keyctl_move ()
+atomically unlinks
+.I key
+from
+.I from_keyring
+and links it into
+.I to_keyring
+in a single operation.  Depending on the flags set, a link to any matching key
+in to_keyring may get displaced.
+.P
+.I flags
+is a bitwise-OR of zero or more of the following flags:
+.P
+.TP
+.B KEYCTL_MOVE_EXCL
+If there's a matching key in to_keyring, don't displace it but rather return
+an error.
+.P
+The caller must have
+.B write
+permission on both keyring to be able create or remove links in them.
+.P
+The caller must have
+.B link
+permission on a key to be able to create a new link to it.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH RETURN VALUE
+On success
+.BR keyctl_move ()
+return
+.BR 0 .
+On error, the value
+.B -1
+will be returned and
+.I errno
+will have been set to an appropriate error.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH ERRORS
+.TP
+.B ENOKEY
+The key or one of the keyrings specified are invalid.
+.TP
+.B ENOKEY
+A key with the same type and description is present in to_keyring and
+KEYCTL_MOVE_EXCL is set.
+.TP
+.B EKEYEXPIRED
+The key or one of the keyrings specified have expired.
+.TP
+.B EKEYREVOKED
+The key or one of the keyrings specified have been revoked.
+.TP
+.B EACCES
+The key exists, but is not
+.B linkable
+by the calling process.
+.TP
+.B EACCES
+The keyrings exist, but are not
+.B writable
+by the calling process.
+.TP
+.B ENOMEM
+Insufficient memory to effect the changes.
+.TP
+.B EDQUOT
+Expanding to_keyring would exceed the keyring owner's quota.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH LINKING
+This is a library function that can be found in
+.IR libkeyutils .
+When linking,
+.B \-lkeyutils
+should be specified to the linker.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH SEE ALSO
+.ad l
+.nh
+.BR keyctl (1),
+.BR add_key (2),
+.BR keyctl (2),
+.BR request_key (2),
+.BR keyctl (3),
+.BR keyrings (7),
+.BR keyutils (7)
+

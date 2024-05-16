@@ -1,0 +1,177 @@
+'\" t
+.\"     Title: zmq_poll
+.\"    Author: [see the "AUTHORS" section]
+.\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
+.\"      Date: 10/09/2023
+.\"    Manual: 0MQ Manual
+.\"    Source: 0MQ 4.3.5
+.\"  Language: English
+.\"
+.TH "ZMQ_POLL" "3" "10/09/2023" "0MQ 4\&.3\&.5" "0MQ Manual"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+zmq_ppoll \- input/output multiplexing with signal mask
+.SH "SYNOPSIS"
+.sp
+\fBint zmq_ppoll (zmq_pollitem_t \fR\fB\fI*items\fR\fR\fB, int \fR\fB\fInitems\fR\fR\fB, long \fR\fB\fItimeout\fR\fR\fB, const sigset_t \fR\fB\fI*sigmask\fR\fR\fB);\fR
+.SH "DESCRIPTION"
+.sp
+The relationship between \fIzmq_poll()\fR and \fIzmq_ppoll()\fR is analogous to the relationship between poll(2) and ppoll(2) and between select(2) and pselect(2): \fIzmq_ppoll()\fR allows an application to safely wait until either a file descriptor becomes ready or until a signal is caught\&.
+.sp
+When using \fIzmq_ppoll()\fR with \fIsigmask\fR set to NULL, its behavior is identical to that of \fIzmq_poll()\fR\&. See \fBzmq_poll\fR(3) for more on this\&.
+.sp
+To make full use of \fIzmq_ppoll()\fR, a non\-NULL pointer to a signal mask must be constructed and passed to \fIsigmask\fR\&. See sigprocmask(2) for more details\&. When this is done, inside the actual \fIppoll()\fR (or \fIpselect()\fR, see note below) system call, an atomic operation consisting of three steps is performed: 1\&. The current signal mask is replaced by the one pointed to by \fIsigmask\fR\&. 2\&. The actual \fIpoll()\fR call is done\&. 3\&. The original signal mask is restored\&. Because these operations are done atomically, there is no opportunity for race conditions in between the calls changing the signal mask and the poll/select system call\&. This means that only during this (atomic) call, we can unblock certain signals, so that they can be handled \fBat that time only\fR, not outside of the call\&. This means that effectively, we extend our poller into a function that not only watches sockets for changes, but also watches the "POSIX signal socket" for incoming signals\&. At other times, these signals will be blocked, and we will not have to deal with interruptions in system calls at these other times\&.
+.if n \{\
+.sp
+.\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBNote\fR
+.ps -1
+.br
+.sp
+The \fIzmq_ppoll()\fR function may be implemented or emulated using operating system interfaces other than \fIppoll()\fR, and as such may be subject to the limits of those interfaces in ways not defined in this documentation\&.
+.sp .5v
+.RE
+.if n \{\
+.sp
+.\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBNote\fR
+.ps -1
+.br
+.sp
+There is no \fIppoll\fR or \fIpselect\fR on Windows, so \fIzmq_ppoll()\fR is not supported in Windows builds\&. It is still callable, but its \fIsigmask\fR has void pointer type (because \fIsigset_t\fR is also not available on Windows) and \fIzmq_ppoll()\fR will return with an error (see error section below)\&.
+.sp .5v
+.RE
+.SH "THREAD SAFETY"
+.sp
+The \fBzmq_pollitem_t\fR array must only be used by the thread which will/is calling \fIzmq_ppoll\fR\&.
+.sp
+If a socket is contained in multiple \fBzmq_pollitem_t\fR arrays, each owned by a different thread, the socket itself needs to be thead\-safe (Server, Client, \&...)\&. Otherwise, behaviour is undefined\&.
+.SH "RETURN VALUE"
+.sp
+Upon successful completion, the \fIzmq_ppoll()\fR function shall return the number of \fBzmq_pollitem_t\fR structures with events signaled in \fIrevents\fR or 0 if no events have been signaled\&. Upon failure, \fIzmq_ppoll()\fR shall return \-1 and set \fIerrno\fR to one of the values defined below\&.
+.SH "ERRORS"
+.PP
+\fBETERM\fR
+.RS 4
+At least one of the members of the
+\fIitems\fR
+array refers to a
+\fIsocket\fR
+whose associated 0MQ
+\fIcontext\fR
+was terminated\&.
+.RE
+.PP
+\fBEFAULT\fR
+.RS 4
+The provided
+\fIitems\fR
+was not valid (NULL)\&.
+.RE
+.PP
+\fBEINTR\fR
+.RS 4
+The operation was interrupted by delivery of a signal before any events were available\&.
+.RE
+.PP
+\fBEINTR\fR
+.RS 4
+The operation was interrupted by delivery of a signal before any events were available\&.
+.RE
+.PP
+\fBENOTSUP\fR
+.RS 4
+\fIzmq_ppoll()\fR
+was not activated in this build\&.
+.RE
+.SH "EXAMPLE"
+.PP
+\fBPolling indefinitely for input events on both a 0MQ socket and a standard socket.\fR. See the
+\fIexample section\fR
+of
+\fBzmq_poll\fR(3)\&. One only needs to replace the
+\fIzmq_poll\fR
+call with
+\fIzmq_ppoll\fR
+and add a
+\fINULL\fR
+argument for the
+\fIsigmask\fR
+parameter\&.
+.PP
+\fBHandle SIGTERM during zmq_ppoll (and block it otherwise).\fR. 
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+// simple global signal handler for SIGTERM
+static bool sigterm_received = false;
+void handle_sigterm (int signum) {
+    sigterm_received = true;
+}
+
+// set up signal mask and install handler for SIGTERM
+sigset_t sigmask, sigmask_without_sigterm;
+sigemptyset(&sigmask);
+sigaddset(&sigmask, SIGTERM);
+sigprocmask(SIG_BLOCK, &sigmask, &sigmask_without_sigterm);
+struct sigaction sa;
+memset(&sa, \*(Aq\e0\*(Aq, sizeof(sa));
+sa\&.sa_handler = handle_sigterm;
+
+// poll
+zmq_pollitem_t items [1];
+// Just one item, which refers to 0MQ socket \*(Aqsocket\*(Aq */
+items[0]\&.socket = socket;
+items[0]\&.events = ZMQ_POLLIN;
+// Poll for events indefinitely, but also exit on SIGTERM
+int rc = zmq_poll (items, 2, \-1, &sigmask_without_sigterm);
+if (rc < 0 && errno == EINTR && sigterm_received) {
+  // do your SIGTERM business
+} else {
+  // do your non\-SIGTERM error handling
+}
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+.SH "SEE ALSO"
+.sp
+\fBzmq_poll\fR(3) \fBzmq_socket\fR(3) \fBzmq_send\fR(3) \fBzmq_recv\fR(3) \fBzmq\fR(7)
+.sp
+Your operating system documentation for the \fIpoll()\fR system call\&.
+.SH "AUTHORS"
+.sp
+This page was written by the 0MQ community\&. To make a change please read the 0MQ Contribution Policy at \m[blue]\fBhttp://www\&.zeromq\&.org/docs:contributing\fR\m[]\&.

@@ -1,0 +1,474 @@
+.\" Written and revised by Solar Designer <solar at openwall.com> in 2000-2011.
+.\" Revised by Zack Weinberg <zackw at panix.com> in 2017.
+.\" Converted to mdoc format by Zack Weinberg in 2018.
+.\"
+.\" No copyright is claimed, and this man page is hereby placed in the public
+.\" domain.  In case this attempt to disclaim copyright and place the man page
+.\" in the public domain is deemed null and void, then the man page is
+.\" Copyright 2000-2011 Solar Designer, 2017, 2018 Zack Weinberg, and it is
+.\" hereby released to the general public under the following terms:
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted.
+.\"
+.\" There's ABSOLUTELY NO WARRANTY, express or implied.
+.\"
+.Dd October 11, 2017
+.Dt CRYPT 3
+.Os "Openwall Project"
+.Sh NAME
+.Nm crypt , crypt_r , crypt_rn , crypt_ra
+.Nd passphrase hashing
+.Sh LIBRARY
+.Lb libcrypt
+.Sh SYNOPSIS
+.In crypt.h
+.Ft "char *"
+.Fo crypt
+.Fa "const char *phrase"
+.Fa "const char *setting"
+.Fc
+.Ft "char *"
+.Fo crypt_r
+.Fa "const char *phrase"
+.Fa "const char *setting"
+.Fa "struct crypt_data *data"
+.Fc
+.Ft "char *"
+.Fo crypt_rn
+.Fa "const char *phrase"
+.Fa "const char *setting"
+.Fa "struct crypt_data *data"
+.Fa "int size"
+.Fc
+.Ft "char *"
+.Fo crypt_ra
+.Fa "const char *phrase"
+.Fa "const char *setting"
+.Fa "void **data"
+.Fa "int *size"
+.Fc
+.Sh DESCRIPTION
+The
+.Nm crypt ,
+.Nm crypt_r ,
+.Nm crypt_rn ,
+and
+.Nm crypt_ra
+functions irreversibly
+.Dq hash
+.Fa phrase
+for storage in the system password database
+.Pq Xr shadow 5
+using a cryptographic
+.Dq hashing method.
+The result of this operation is called a
+.Dq hashed passphrase
+or just a
+.Dq hash.
+Hashing methods are described in
+.Xr crypt 5 .
+.Pp
+.Fa setting
+controls which hashing method to use,
+and also supplies various parameters to the chosen method,
+most importantly a random
+.Dq salt
+which ensures that no two stored hashes are the same,
+even if the
+.Fa phrase
+strings are the same.
+.Pp
+The
+.Fa data
+argument to
+.Nm crypt_r
+is a structure of type
+.Vt "struct crypt_data" .
+It has at least these fields:
+.Bd -literal -offset indent
+struct crypt_data {
+    char output[CRYPT_OUTPUT_SIZE];
+    char setting[CRYPT_OUTPUT_SIZE];
+    char input[CRYPT_MAX_PASSPHRASE_SIZE];
+    char initialized;
+};
+.Ed
+.Pp
+Upon a successful return from
+.Nm crypt_r ,
+the hashed passphrase will be stored in
+.Fa output .
+Applications are encouraged, but not required, to use the
+.Fa input
+and
+.Fa setting
+fields to store the strings that they will pass as
+.Fa input phrase
+and
+.Fa setting
+to
+.Nm crypt_r .
+This will make it easier to erase all sensitive data
+after it is no longer needed.
+.Pp
+The
+.Fa initialized
+field must be set to zero before the first time a
+.Vt "struct crypt_data"
+object is first used in a call to
+.Fn crypt_r .
+We recommend zeroing the entire object,
+not just
+.Fa initialized
+and not just the documented fields,
+before the first use.
+(Of course, do this before storing anything in
+.Fa setting
+and
+.Fa input . )
+.Pp
+The
+.Fa data
+argument to
+.Nm crypt_rn
+should also point to a
+.Vt "struct crypt_data"
+object, and
+.Fa size
+should be the size of that object, cast to
+.Vt int .
+When used with
+.Nm crypt_rn ,
+the entire
+.Fa data
+object (except for the
+.Fa input
+and
+.Fa setting
+fields) must be zeroed before its first use;
+this is not just a recommendation, as it is for
+.Nm crypt_r .
+Otherwise, the fields of the object have the same uses that they do for
+.Nm crypt_r .
+.Pp
+On the first call to
+.Nm crypt_ra ,
+.Fa data
+should be the address of a
+.Vt "void *"
+variable set to NULL, and
+.Fa size
+should be the address of an
+.Vt int
+variable set to zero.
+.Nm crypt_ra
+will allocate and initialize a
+.Vt "struct crypt_data"
+object, using
+.Xr malloc 3 ,
+and write its address and size into the variables pointed to by
+.Fa data
+and
+.Fa size .
+These can be reused in subsequent calls.
+After the application is done hashing passphrases,
+it should deallocate the
+.Vt "struct crypt_data"
+object using
+.Xr free 3 .
+.Sh RETURN VALUES
+Upon successful completion,
+.Nm crypt ,
+.Nm crypt_r ,
+.Nm crypt_rn ,
+and
+.Nm crypt_ra
+return a pointer to a string which encodes both the hashed passphrase,
+and the settings that were used to encode it.
+This string is directly usable as
+.Fa setting
+in other calls to
+.Nm crypt ,
+.Nm crypt_r ,
+.Nm crypt_rn ,
+and
+.Nm crypt_ra ,
+and as
+.Fa prefix
+in calls to
+.Nm crypt_gensalt ,
+.Nm crypt_gensalt_rn ,
+and
+.Nm crypt_gensalt_ra .
+It will be entirely printable ASCII,
+and will not contain whitespace
+or the characters
+.Sq Li \&: ,
+.Sq Li \&; ,
+.Sq Li \&* ,
+.Sq Li \&! ,
+or
+.Sq Li \&\e .
+See
+.Xr crypt 5
+for more detail on the format of hashed passphrases.
+.Pp
+.Nm crypt
+places its result in a static storage area,
+which will be overwritten by subsequent calls to
+.Nm crypt .
+It is not safe to call
+.Nm crypt
+from multiple threads simultaneously.
+.Pp
+.Nm crypt_r ,
+.Nm crypt_rn ,
+and
+.Nm crypt_ra
+place their result in the
+.Fa output
+field of their
+.Fa data
+argument.
+It is safe to call them from multiple threads simultaneously,
+as long as a separate
+.Fa data
+object is used for each thread.
+.Pp
+Upon error,
+.Nm crypt_r ,
+.Nm crypt_rn ,
+and
+.Nm crypt_ra
+write an
+.Em invalid
+hashed passphrase to the
+.Fa output
+field of their
+.Fa data
+argument, and
+.Nm crypt
+writes an invalid hash to its static storage area.
+This string will be shorter than 13 characters,
+will begin with a
+.Sq Li \&* ,
+and will not compare equal to
+.Fa setting .
+.Pp
+Upon error,
+.Nm crypt_rn
+and
+.Nm crypt_ra
+return a null pointer.
+.Nm crypt_r
+and
+.Nm crypt
+may also return a null pointer,
+or they may return a pointer to the invalid hash,
+depending on how libcrypt was configured.
+(The option to return the invalid hash is for compatibility
+with old applications that assume that
+.Nm crypt
+cannot return a null pointer.
+See
+.Sx PORTABILITY NOTES
+below.)
+.Pp
+All four functions set
+.Va errno
+when they fail.
+.Sh ERRORS
+.Bl -tag -width Er
+.It Er EINVAL
+.Fa setting
+is invalid, or requests a hashing method that is not supported.
+.It Er ERANGE
+.Fa phrase
+is too long
+(more than
+.Dv CRYPT_MAX_PASSPHRASE_SIZE
+characters; some hashing methods may have lower limits).
+.br
+.Nm crypt_rn
+only:
+.Fa size
+is too small for the hashing method requested by
+.Fa setting .
+.It Er ENOMEM
+Failed to allocate internal scratch memory.
+.br
+.Nm crypt_ra
+only: failed to allocate memory for
+.Fa data .
+.It Er ENOSYS No or Er EOPNOTSUPP
+Hashing passphrases is not supported at all on this installation,
+or the hashing method requested by
+.Fa setting
+is not supported.
+These error codes are not used by this version of libcrypt,
+but may be encountered on other systems.
+.El
+.Sh PORTABILITY NOTES
+.Nm crypt
+is included in POSIX, but
+.Nm crypt_r ,
+.Nm crypt_rn ,
+and
+.Nm crypt_ra
+are not part of any standard.
+.Pp
+POSIX does not specify any hashing methods,
+and does not require hashed passphrases to be portable between systems.
+In practice, hashed passphrases are portable
+as long as both systems support the hashing method that was used.
+However, the set of supported hashing methods
+varies considerably from system to system.
+.Pp
+The behavior of
+.Nm crypt
+on errors isn't well standardized.
+Some implementations simply can't fail
+(except by crashing the program),
+others return a null pointer or a fixed string.
+Most implementations don't set
+.Va errno ,
+but some do.
+POSIX specifies returning a null pointer and setting
+.Va errno ,
+but it defines only one possible error,
+.Er ENOSYS ,
+in the case where
+.Nm crypt
+is not supported at all.
+Some older applications are not prepared to handle null pointers
+returned by
+.Nm crypt .
+The behavior described above for this implementation,
+setting
+.Va errno
+and returning an invalid hashed passphrase different from
+.Fa setting ,
+is chosen to make these applications fail closed when an error occurs.
+.Pp
+Due to historical restrictions
+on the export of cryptographic software from the USA,
+.Nm crypt
+is an optional POSIX component.
+Applications should therefore be prepared for
+.Nm crypt
+not to be available,
+or to always fail (setting
+.Va errno
+to
+.Er ENOSYS )
+at runtime.
+.Pp
+POSIX specifies that
+.Nm crypt
+is declared in
+.In unistd.h ,
+but only if the macro
+.Dv _XOPEN_CRYPT
+is defined and has a value greater than or equal to zero.
+Since libcrypt does not provide
+.In unistd.h ,
+it declares
+.Nm crypt ,
+.Nm crypt_r ,
+.Nm crypt_rn ,
+and
+.Nm crypt_ra
+in
+.In crypt.h
+instead.
+.Pp
+On a minority of systems (notably recent versions of Solaris),
+.Nm crypt
+uses a thread-specific static storage buffer,
+which makes it safe to call from multiple threads simultaneously,
+but does not prevent each call within a thread
+from overwriting the results of the previous one.
+.Sh BUGS
+Some implementations of
+.Nm crypt ,
+upon error,
+return an invalid hash that is stored in a read-only location
+or only initialized once,
+which means that it is only safe to erase the buffer pointed to by the
+.Nm crypt
+return value if an error did not occur.
+.Pp
+.Vt "struct crypt_data"
+may be quite large (32kB in this implementation of libcrypt;
+over 128kB in some other implementations).
+This is large enough that it may be unwise to allocate it on the stack.
+.Pp
+Some recently designed hashing methods need even more scratch memory,
+but the
+.Nm crypt_r
+interface makes it impossible to change the size of
+.Vt "struct crypt_data"
+without breaking binary compatibility.
+The
+.Nm crypt_rn
+interface could accommodate larger allocations for specific hashing methods,
+but the caller of
+.Nm crypt_rn
+has no way of knowing how much memory to allocate.
+.Nm crypt_ra
+does the allocation itself,
+but can only make a single call to
+.Xr malloc 3 .
+.Sh ATTRIBUTES
+For an explanation of the terms used in this section, see
+.Xr attributes 7 .
+.TS
+allbox;
+lb lb lb
+l l l.
+Interface	Attribute	Value
+T{
+.Nm crypt
+T}	Thread safety	MT-Unsafe race:crypt
+T{
+.Nm crypt_r ,
+.Nm crypt_rn ,
+.Nm crypt_ra
+T}	Thread safety	MT-Safe
+.TE
+.sp
+.Sh HISTORY
+A rotor-based
+.Nm crypt
+function appeared in
+.At v6 .
+The
+.Dq traditional
+DES-based
+.Nm crypt
+first appeared in
+.At v7 .
+.Pp
+.Nm crypt_r
+originates with the GNU C Library.
+There's also a
+.Nm crypt_r
+function on HP-UX and MKS Toolkit, but the prototypes and semantics
+differ.
+.Pp
+.Nm crypt_rn
+and
+.Nm crypt_ra
+originate with the Openwall project.
+.Sh SEE ALSO
+.Xr crypt_gensalt 3 ,
+.Xr getpass 3 ,
+.Xr getpwent 3 ,
+.Xr shadow 3 ,
+.Xr login 1 ,
+.Xr passwd 1 ,
+.Xr crypt 5 ,
+.Xr passwd 5 ,
+.Xr shadow 5 ,
+.Xr pam 8

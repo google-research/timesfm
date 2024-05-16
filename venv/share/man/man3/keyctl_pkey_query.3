@@ -1,0 +1,137 @@
+.\"
+.\" Copyright (C) 2018 Red Hat, Inc. All Rights Reserved.
+.\" Written by David Howells (dhowells@redhat.com)
+.\"
+.\" This program is free software; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public Licence
+.\" as published by the Free Software Foundation; either version
+.\" 2 of the Licence, or (at your option) any later version.
+.\"
+.TH KEYCTL_PKEY_QUERY 3 "8 Nov 2018" Linux "Linux Key Management Calls"
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH NAME
+keyctl_pkey_query \- Query public key parameters
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH SYNOPSIS
+.nf
+.B #include <keyutils.h>
+.sp
+.BI "long keyctl_pkey_query(key_serial_t " key ", const char *" info ,
+.BI "                       struct keyctl_pkey_query *" result ");"
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH DESCRIPTION
+.BR keyctl_pkey_query ()
+queries the public key parameters associated with a kernel
+key that supports these operations (typically
+.BR asymmetric -type).
+The caller must have
+.B search
+permission on the target key to be able to query its parameters.
+.PP
+When invoking the function,
+.I key
+indicates the key to be queried,
+.I info
+points to a comma-separated string of "key[=value]" parameters and
+.I result
+points to a buffer in which the result will be placed.
+.PP
+The parameters that can be used in the
+.I info
+parameter string are dependent on the type of key.  Parameters can specify such
+things as encoding types (such as "enc=pkcs1"); see asymmetric-key(7) for more
+information.
+.PP
+If successful, the result is written into the following struct:
+.PP
+.in +4n
+.EX
+struct keyctl_pkey_query {
+        unsigned int    supported_ops;
+        unsigned int    key_size;
+        unsigned short  max_data_size;
+        unsigned short  max_sig_size;
+        unsigned short  max_enc_size;
+        unsigned short  max_dec_size;
+};
+.EE
+.in
+.PP
+The
+.I supported_ops
+field contains a bitmask of the following constants:
+.PP
+.in +4n
+.TS
+lB l.
+KEYCTL_SUPPORTS_ENCRYPT
+KEYCTL_SUPPORTS_DECRYPT
+KEYCTL_SUPPORTS_SIGN
+KEYCTL_SUPPORTS_VERIFY
+.TE
+.in
+.PP
+indicating what operations are supported and thus which of the other
+.BR keyctl_pkey_* ()
+operations can be used with this key.
+.PP
+The
+.I key_size
+field indicates the number of bits in the key size and the
+.IR max_data_size ", " max_sig_size ", " max_enc_size " and " max_dec_size
+fields indicate the maximum sizes in bytes of a blob of data to be signed, a
+signature blob, a blob to be encrypted and a blob to be decrypted respectively.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH RETURN VALUE
+On success
+.BR keyctl_pkey_query ()
+returns
+.BR 0 .
+On error, the value
+.B -1
+will be returned and
+.I errno
+will have been set to an appropriate error.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH ERRORS
+.TP
+.B ENOKEY
+The key specified is invalid.
+.TP
+.B EKEYEXPIRED
+The key specified has expired.
+.TP
+.B EKEYREVOKED
+The key specified has been revoked.
+.TP
+.B EACCES
+The key exists, but is not
+.B searchable
+by the calling process.
+.TP
+.B ENOPKG
+Some facility needed to complete the requested operation is not available.
+This is most probably a requested or required digest or encryption algorithm.
+.TP
+.B EFAULT
+Bad address.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH LINKING
+This is a library function that can be found in
+.IR libkeyutils .
+When linking,
+.B \-lkeyutils
+should be specified to the linker.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH SEE ALSO
+.ad l
+.nh
+.BR keyctl (1),
+.BR add_key (2),
+.BR keyctl (2),
+.BR keyctl (3),
+.BR keyctl_pkey_encrypt (3),
+.BR keyctl_pkey_sign (3),
+.BR asymmetric-key (7),
+.BR keyrings (7),
+.BR keyutils (7)

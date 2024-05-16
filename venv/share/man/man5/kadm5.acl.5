@@ -1,0 +1,279 @@
+.\" Man page generated from reStructuredText.
+.
+.TH "KADM5.ACL" "5" " " "1.21.2" "MIT Kerberos"
+.SH NAME
+kadm5.acl \- Kerberos ACL file
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.SH DESCRIPTION
+.sp
+The Kerberos kadmind(8) daemon uses an Access Control List
+(ACL) file to manage access rights to the Kerberos database.
+For operations that affect principals, the ACL file also controls
+which principals can operate on which other principals.
+.sp
+The default location of the Kerberos ACL file is
+\fB/workspaces/timesfm/venv/var\fP\fB/krb5kdc\fP\fB/kadm5.acl\fP  unless this is overridden by the \fIacl_file\fP
+variable in kdc.conf(5)\&.
+.SH SYNTAX
+.sp
+Empty lines and lines starting with the sharp sign (\fB#\fP) are
+ignored.  Lines containing ACL entries have the format:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+principal  permissions  [target_principal  [restrictions] ]
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+Line order in the ACL file is important.  The first matching entry
+will control access for an actor principal on a target principal.
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \fIprincipal\fP
+(Partially or fully qualified Kerberos principal name.) Specifies
+the principal whose permissions are to be set.
+.sp
+Each component of the name may be wildcarded using the \fB*\fP
+character.
+.TP
+.B \fIpermissions\fP
+Specifies what operations may or may not be performed by a
+\fIprincipal\fP matching a particular entry.  This is a string of one or
+more of the following list of characters or their upper\-case
+counterparts.  If the character is \fIupper\-case\fP, then the operation
+is disallowed.  If the character is \fIlower\-case\fP, then the operation
+is permitted.
+.TS
+center;
+|l|l|.
+_
+T{
+a
+T}	T{
+[Dis]allows the addition of principals or policies
+T}
+_
+T{
+c
+T}	T{
+[Dis]allows the changing of passwords for principals
+T}
+_
+T{
+d
+T}	T{
+[Dis]allows the deletion of principals or policies
+T}
+_
+T{
+e
+T}	T{
+[Dis]allows the extraction of principal keys
+T}
+_
+T{
+i
+T}	T{
+[Dis]allows inquiries about principals or policies
+T}
+_
+T{
+l
+T}	T{
+[Dis]allows the listing of all principals or policies
+T}
+_
+T{
+m
+T}	T{
+[Dis]allows the modification of principals or policies
+T}
+_
+T{
+p
+T}	T{
+[Dis]allows the propagation of the principal database (used in incr_db_prop)
+T}
+_
+T{
+s
+T}	T{
+[Dis]allows the explicit setting of the key for a principal
+T}
+_
+T{
+x
+T}	T{
+Short for admcilsp. All privileges (except \fBe\fP)
+T}
+_
+T{
+*
+T}	T{
+Same as x.
+T}
+_
+.TE
+.UNINDENT
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+The \fBextract\fP privilege is not included in the wildcard
+privilege; it must be explicitly assigned.  This privilege
+allows the user to extract keys from the database, and must be
+handled with great care to avoid disclosure of important keys
+like those of the kadmin/* or krbtgt/* principals.  The
+\fBlockdown_keys\fP principal attribute can be used to prevent
+key extraction from specific principals regardless of the
+granted privilege.
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \fItarget_principal\fP
+(Optional. Partially or fully qualified Kerberos principal name.)
+Specifies the principal on which \fIpermissions\fP may be applied.
+Each component of the name may be wildcarded using the \fB*\fP
+character.
+.sp
+\fItarget_principal\fP can also include back\-references to \fIprincipal\fP,
+in which \fB*number\fP matches the corresponding wildcard in
+\fIprincipal\fP\&.
+.TP
+.B \fIrestrictions\fP
+(Optional) A string of flags. Allowed restrictions are:
+.INDENT 7.0
+.INDENT 3.5
+.INDENT 0.0
+.TP
+.B {+|\-}\fIflagname\fP
+flag is forced to the indicated value.  The permissible flags
+are the same as those for the \fBdefault_principal_flags\fP
+variable in kdc.conf(5)\&.
+.TP
+.B \fI\-clearpolicy\fP
+policy is forced to be empty.
+.TP
+.B \fI\-policy pol\fP
+policy is forced to be \fIpol\fP\&.
+.TP
+.B \-{\fIexpire, pwexpire, maxlife, maxrenewlife\fP} \fItime\fP
+(getdate string) associated value will be forced to
+MIN(\fItime\fP, requested value).
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.sp
+The above flags act as restrictions on any add or modify operation
+which is allowed due to that ACL line.
+.UNINDENT
+.sp
+\fBWARNING:\fP
+.INDENT 0.0
+.INDENT 3.5
+If the kadmind ACL file is modified, the kadmind daemon needs to be
+restarted for changes to take effect.
+.UNINDENT
+.UNINDENT
+.SH EXAMPLE
+.sp
+Here is an example of a kadm5.acl file:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+*/admin@ATHENA.MIT.EDU    *                               # line 1
+joeadmin@ATHENA.MIT.EDU   ADMCIL                          # line 2
+joeadmin/*@ATHENA.MIT.EDU i   */root@ATHENA.MIT.EDU       # line 3
+*/root@ATHENA.MIT.EDU     ci  *1@ATHENA.MIT.EDU           # line 4
+*/root@ATHENA.MIT.EDU     l   *                           # line 5
+sms@ATHENA.MIT.EDU        x   * \-maxlife 9h \-postdateable # line 6
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+(line 1) Any principal in the \fBATHENA.MIT.EDU\fP realm with an
+\fBadmin\fP instance has all administrative privileges except extracting
+keys.
+.sp
+(lines 1\-3) The user \fBjoeadmin\fP has all permissions except
+extracting keys with his \fBadmin\fP instance,
+\fBjoeadmin/admin@ATHENA.MIT.EDU\fP (matches line 1).  He has no
+permissions at all with his null instance, \fBjoeadmin@ATHENA.MIT.EDU\fP
+(matches line 2).  His \fBroot\fP and other non\-\fBadmin\fP, non\-null
+instances (e.g., \fBextra\fP or \fBdbadmin\fP) have inquire permissions
+with any principal that has the instance \fBroot\fP (matches line 3).
+.sp
+(line 4) Any \fBroot\fP principal in \fBATHENA.MIT.EDU\fP can inquire
+or change the password of their null instance, but not any other
+null instance.  (Here, \fB*1\fP denotes a back\-reference to the
+component matching the first wildcard in the actor principal.)
+.sp
+(line 5) Any \fBroot\fP principal in \fBATHENA.MIT.EDU\fP can generate
+the list of principals in the database, and the list of policies
+in the database.  This line is separate from line 4, because list
+permission can only be granted globally, not to specific target
+principals.
+.sp
+(line 6) Finally, the Service Management System principal
+\fBsms@ATHENA.MIT.EDU\fP has all permissions except extracting keys, but
+any principal that it creates or modifies will not be able to get
+postdateable tickets or tickets with a life of longer than 9 hours.
+.SH MODULE BEHAVIOR
+.sp
+The ACL file can coexist with other authorization modules in release
+1.16 and later, as configured in the kadm5_auth section of
+krb5.conf(5)\&.  The ACL file will positively authorize
+operations according to the rules above, but will never
+authoritatively deny an operation, so other modules can authorize
+operations in addition to those authorized by the ACL file.
+.sp
+To operate without an ACL file, set the \fIacl_file\fP variable in
+kdc.conf(5) to the empty string with \fBacl_file = ""\fP\&.
+.SH SEE ALSO
+.sp
+kdc.conf(5), kadmind(8)
+.SH AUTHOR
+MIT
+.SH COPYRIGHT
+1985-2023, MIT
+.\" Generated by docutils manpage writer.
+.

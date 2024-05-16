@@ -1,0 +1,29 @@
+{
+  "build": "conda_forge",
+  "build_number": 0,
+  "channel": "https://conda.anaconda.org/conda-forge/linux-64",
+  "constrains": [],
+  "depends": [],
+  "extracted_package_dir": "/opt/conda/pkgs/_libgcc_mutex-0.1-conda_forge",
+  "files": [],
+  "fn": "_libgcc_mutex-0.1-conda_forge.tar.bz2",
+  "license": "None",
+  "link": {
+    "source": "/opt/conda/pkgs/_libgcc_mutex-0.1-conda_forge",
+    "type": 1
+  },
+  "md5": "d7c89558ba9fa0495403155b64376d81",
+  "name": "_libgcc_mutex",
+  "package_tarball_full_path": "/opt/conda/pkgs/_libgcc_mutex-0.1-conda_forge.tar.bz2",
+  "paths_data": {
+    "paths": [],
+    "paths_version": 1
+  },
+  "requested_spec": "None",
+  "sha256": "fe51de6107f9edc7aa4f786a70f4a883943bc9d39b3bb7307c04c41410990726",
+  "size": 2562,
+  "subdir": "linux-64",
+  "timestamp": 1578324546000,
+  "url": "https://conda.anaconda.org/conda-forge/linux-64/_libgcc_mutex-0.1-conda_forge.tar.bz2",
+  "version": "0.1"
+}

@@ -1,0 +1,42 @@
+{
+  "build": "pyhd8ed1ab_0",
+  "build_number": 0,
+  "channel": "https://conda.anaconda.org/conda-forge/noarch",
+  "constrains": [],
+  "depends": [
+    "fqdn",
+    "idna",
+    "isoduration",
+    "jsonpointer >1.13",
+    "jsonschema >=4.22.0,<4.22.1.0a0",
+    "python",
+    "rfc3339-validator",
+    "rfc3986-validator >0.1.0",
+    "uri-template",
+    "webcolors >=1.11"
+  ],
+  "extracted_package_dir": "/opt/conda/pkgs/jsonschema-with-format-nongpl-4.22.0-pyhd8ed1ab_0",
+  "files": [],
+  "fn": "jsonschema-with-format-nongpl-4.22.0-pyhd8ed1ab_0.conda",
+  "license": "MIT",
+  "link": {
+    "source": "/opt/conda/pkgs/jsonschema-with-format-nongpl-4.22.0-pyhd8ed1ab_0",
+    "type": 1
+  },
+  "md5": "32ab666927ee17b9468c2c72bbd7ba1b",
+  "name": "jsonschema-with-format-nongpl",
+  "noarch": "python",
+  "package_tarball_full_path": "/opt/conda/pkgs/jsonschema-with-format-nongpl-4.22.0-pyhd8ed1ab_0.conda",
+  "package_type": "noarch_python",
+  "paths_data": {
+    "paths": [],
+    "paths_version": 1
+  },
+  "requested_spec": "None",
+  "sha256": "3c98d791bebd477597fe083b3cec35132ac974c61ba1e481dc6c29fac78b419d",
+  "size": 7441,
+  "subdir": "noarch",
+  "timestamp": 1714573279000,
+  "url": "https://conda.anaconda.org/conda-forge/noarch/jsonschema-with-format-nongpl-4.22.0-pyhd8ed1ab_0.conda",
+  "version": "4.22.0"
+}

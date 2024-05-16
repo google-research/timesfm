@@ -1,0 +1,105 @@
+.\"
+.\" Copyright (C) 2014 Red Hat, Inc. All Rights Reserved.
+.\" Written by David Howells (dhowells@redhat.com)
+.\"
+.\" This program is free software; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public Licence
+.\" as published by the Free Software Foundation; either version
+.\" 2 of the Licence, or (at your option) any later version.
+.\"
+.TH KEYUTILS 7 "21 Feb 2014" Linux "Kernel key management"
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH NAME
+keyutils \- in-kernel key management utilities
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH DESCRIPTION
+The
+.B keyutils
+package is a library and a set of utilities for accessing the kernel
+\fBkeyrings\fP facility.
+.P
+A header file is supplied to provide the definitions and declarations required
+to access the library:
+.P
+.RS
+.B #include <keyutils.h>
+.RE
+.P
+To link with the library, the following:
+.P
+.RS
+.B \-lkeyutils
+.RE
+.P
+should be specified to the linker.
+.P
+Three system calls are provided:
+.TP
+.BR add_key (2)
+Supply a new key to the kernel.
+.TP
+.BR request_key (2)
+Find an existing key for use, or, optionally, create one if one does not exist.
+.TP
+.BR keyctl (2)
+Control a key in various ways.  The library provides a variety of wrappers
+around this system call and those should be used rather than calling it
+directly.
+.P
+See the
+.BR add_key (2),
+.BR request_key (2),
+and
+.BR keyctl (2)
+manual pages for more information.
+.P
+The \fBkeyctl\fP() wrappers are listed on the
+.BR keyctl (3)
+manual page.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH UTILITIES
+.P
+A program is provided to interact with the kernel facility by a number of
+subcommands, e.g.:
+.P
+.RS
+.B keyctl add user foo bar @s
+.RE
+.P
+See the
+.BR keyctl (1)
+manual page for information on that.
+.P
+The kernel has the ability to upcall to userspace to fabricate new keys.  This
+can be triggered by \fBrequest_key\fP(), but userspace is better off using
+\fBadd_key\fP() instead if it possibly can.
+.P
+The upcalling mechanism is usually routed via the
+.BR request\-key (8)
+program.  What this does with any particular key is configurable in:
+.P
+.RS
+.I /etc/request\-key.conf
+.br
+.I /etc/request\-key.d/
+.RE
+.P
+See the
+.BR request\-key.conf (5)
+and the
+.BR request\-key (8)
+manual pages for more information.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH SEE ALSO
+.ad l
+.nh
+.BR keyctl (1),
+.BR keyctl (3),
+.BR keyrings (7),
+.BR persistent\-keyring (7),
+.BR process\-keyring (7),
+.BR session\-keyring (7),
+.BR thread\-keyring (7),
+.BR user\-keyring (7),
+.BR user\-session\-keyring (7),
+.BR pam_keyinit (8)

@@ -1,0 +1,133 @@
+.\"
+.\" Copyright (C) 2018 Red Hat, Inc. All Rights Reserved.
+.\" Written by David Howells (dhowells@redhat.com)
+.\"
+.\" This program is free software; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public Licence
+.\" as published by the Free Software Foundation; either version
+.\" 2 of the Licence, or (at your option) any later version.
+.\"
+.TH KEYCTL_PKEY_SIGN 3 "8 Nov 2018" Linux "Linux Public-Key Signatures"
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH NAME
+keyctl_pkey_sign, keyctl_pkey_verify \- Generate and verify signatures
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH SYNOPSIS
+.nf
+.B #include <keyutils.h>
+.sp
+.BI "long keyctl_pkey_sign(key_serial_t " key ", const char *" info ,
+.BI "                      const void *" data ", size_t " data_len ,
+.BI "                      void *" sig ", size_t " sig_len ");"
+.sp
+.BI "long keyctl_pkey_verify(key_serial_t " key ", const char *" info ,
+.BI "                        const void *" data ", size_t " data_len ,
+.BI "                        const void *" sig ", size_t " sig_len ");"
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH DESCRIPTION
+.BR keyctl_pkey_sign ()
+asks the kernel to use the crypto data attached to a key to generate a
+detached signature for a blob of data.  Note that this may involve calling out
+to cryptographic hardware.
+.PP
+.BR keyctl_pkey_verify ()
+asks the kernel to use the key to generate a verify the signature against the
+same blob of data.  This may also involve calling out to cryptographic
+hardware.
+.PP
+The caller must have
+.B search
+permission on a key to be able to perform either operation.
+.PP
+.PP
+When invoking the function,
+.I key
+indicates the key that will provide the cryptographic material and
+.I info
+points to a comma-separated string of "key[=value]" parameters that indicate
+things like encoding forms and passwords to unlock the key; see
+asymmetric-key(7) for more information.
+.PP
+.IR data " and " datalen
+indicate the address and size of the buffer of data to be signed and
+.IR sig " and " siglen
+indicate the address and size of the signature buffer.  The sign function
+draws data from the data buffer, generates a signature from it and places the
+output into the signature buffer.  The verify function also draws data from
+the data buffer, then decrypts the signature and compares the result.
+.PP
+Note that the data buffer is strictly limited in capacity, typically unable to
+hold more bits than the size of the key.  The caller is expected to have
+pre-digested the actual data and will thus pass the digest output to this
+function.  The name of the digest used should be passed as part of the info
+string as \fPhash=<name>\fR for use in constructing the signature metadata.
+.PP
+.BR keyctl_pkey_query (2)
+can be called to find out how large the buffers need to be and what the
+maximum size of the data can be for a specific signature encoding.
+.PP
+Note that not all asymmetric-type keys will support these operations; further,
+the operations available may depend on which components of the key material are
+available: typically encryption only requires the public key, but decryption
+requires the private key as well.  Which operations are supported on a
+particular key can also be determined using the query function.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH RETURN VALUE
+On success
+.BR keyctl_pkey_sign ()
+returns the amount of data written into the signature buffer.
+.BR keyctl_pkey_verify ()
+will return 0 in this case as it doesn't write to userspace.
+.PP
+On error the value
+.B -1
+will be returned and
+.I errno
+will have been set to an appropriate error.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH ERRORS
+.TP
+.B ENOKEY
+The key specified is invalid.
+.TP
+.B EKEYEXPIRED
+The key specified has expired.
+.TP
+.B EKEYREVOKED
+The key specified has been revoked.
+.TP
+.B EACCES
+The key exists, but is not
+.B searchable
+by the calling process.
+.TP
+.BR EINVAL ", " EBADMSG ", " EOVERFLOW
+Some part of the key material or signature data is bad.
+.TP
+.BR EKEYREJECTED
+Signature verification failed.
+.TP
+.B ENOPKG
+Some facility needed to complete the requested operation is not available.
+This is most probably a requested or required digest or encryption algorithm.
+.TP
+.B EFAULT
+Bad address.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH LINKING
+This is a library function that can be found in
+.IR libkeyutils .
+When linking,
+.B \-lkeyutils
+should be specified to the linker.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH SEE ALSO
+.ad l
+.nh
+.BR keyctl (1),
+.BR add_key (2),
+.BR keyctl (2),
+.BR keyctl (3),
+.BR keyctl_pkey_query (3),
+.BR keyrings (7),
+.BR keyutils (7)

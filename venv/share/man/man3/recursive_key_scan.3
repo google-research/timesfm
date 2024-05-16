@@ -1,0 +1,90 @@
+.\"
+.\" Copyright (C) 2011 Red Hat, Inc. All Rights Reserved.
+.\" Written by David Howells (dhowells@redhat.com)
+.\"
+.\" This program is free software; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public Licence
+.\" as published by the Free Software Foundation; either version
+.\" 2 of the Licence, or (at your option) any later version.
+.\"
+.TH RECURSIVE_KEY_SCAN 3 "10 Mar 2011" Linux "Linux Key Utility Calls"
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH NAME
+recursive_key_scan, recursive_session_key_scan \- apply a function to all keys in a keyring tree
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH SYNOPSIS
+.nf
+.B #include <keyutils.h>
+.sp
+.BI "typedef int (*" recursive_key_scanner_t ")(key_serial_t " parent ,
+.BI "    key_serial_t " key ", char *" desc ", int " desc_len ", void *" data ");"
+.sp
+.BI "long recursive_key_scan(key_serial_t " keyring ,
+.BI "    recursive_key_scanner_t " func ", void *" data ");"
+.br
+.BI "long recursive_session_key_scan(recursive_key_scanner_t " func ,
+.BI "    void *" data ");"
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH DESCRIPTION
+.BR recursive_key_scan ()
+performs a depth-first recursive scan of the specified
+.I keyring
+tree and applies
+.I func
+to every link found in the accessible keyrings in that tree.
+.I data
+is passed to each invocation of func.
+.P
+The return values of
+.I func
+are summed and returned as the overall return value.  Errors are ignored.
+Inaccessible keyrings are not scanned, but links to them are still passed to
+func.
+.P
+.BR recursive_session_key_scan ()
+works exactly like
+.BR recursive_key_scan ()
+with the caller's session keyring specified as the starting keyring.
+.P
+The callback function is called for each link found in all the keyrings in the
+nominated tree and so may be called multiple times for a particular key if that
+key has multiple links to it.
+.P
+The callback function is passed the following parameters:
+.TP
+.B parent
+The keyring containing the link or 0 for the initial key.
+.TP
+.BR key
+The key to which the link points.
+.TP
+.BR desc " and " desc_len
+A pointer to the raw description and its length as retrieved with
+.BR keyctl_describe_alloc ().
+These will be NULL and \-1 respectively if the description couldn't be
+retrieved and
+.I errno
+will retain the error from
+.BR keyctl_describe_alloc ().
+.TP
+.B data
+The data passed to the scanner function.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH RETURN VALUE
+These functions return the sum of the results of the callback functions they
+invoke.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH ERRORS
+Ignored.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH LINKING
+When linking,
+.B \-lkeyutils
+should be specified to the linker.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH SEE ALSO
+.ad l
+.nh
+.BR keyctl (3),
+.BR keyctl_describe_alloc (3),
+.BR keyrings (7)

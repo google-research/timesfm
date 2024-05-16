@@ -1,0 +1,267 @@
+.\" Written and revised by Solar Designer <solar at openwall.com> in 2000-2011.
+.\" Revised by Zack Weinberg <zackw at panix.com> in 2017.
+.\" Converted to mdoc format by Zack Weinberg in 2018.
+.\"
+.\" No copyright is claimed, and this man page is hereby placed in the public
+.\" domain.  In case this attempt to disclaim copyright and place the man page
+.\" in the public domain is deemed null and void, then the man page is
+.\" Copyright 2000-2011 Solar Designer, 2017 Zack Weinberg, and it is
+.\" hereby released to the general public under the following terms:
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted.
+.\"
+.\" There's ABSOLUTELY NO WARRANTY, express or implied.
+.\"
+.Dd October 11, 2017
+.Dt CRYPT_GENSALT 3
+.Os "Openwall Project"
+.Sh NAME
+.Nm crypt_gensalt , crypt_gensalt_rn , crypt_gensalt_ra
+.Nd encode settings for passphrase hashing
+.Sh LIBRARY
+.Lb libcrypt
+.Sh SYNOPSIS
+.In crypt.h
+.Ft "char *"
+.Fo crypt_gensalt
+.Fa "const char *prefix"
+.Fa "unsigned long count"
+.Fa "const char *rbytes"
+.Fa "int nrbytes"
+.Fc
+.Ft "char *"
+.Fo crypt_gensalt_rn
+.Fa "const char * prefix"
+.Fa "unsigned long count"
+.Fa "const char *rbytes"
+.Fa "int nrbytes"
+.Fa "char * output"
+.Fa "int output_size"
+.Fc
+.Ft "char *"
+.Fo crypt_gensalt_ra
+.Fa "const char *prefix"
+.Fa "unsigned long count"
+.Fa "const char *rbytes"
+.Fa "int nrbytes"
+.Fc
+.Sh DESCRIPTION
+The
+.Nm crypt_gensalt ,
+.Nm crypt_gensalt_rn ,
+and
+.Nm crypt_gensalt_ra
+functions compile a string for use as the
+.Fa setting
+argument to
+.Nm crypt ,
+.Nm crypt_r ,
+.Nm crypt_rn ,
+and
+.Nm crypt_ra .
+.Fa prefix
+selects the hashing method to use.
+.Fa count
+controls the CPU time cost of the hash;
+the valid range for
+.Fa count
+and the exact meaning of
+.Dq CPU time cost
+depends on the hashing method,
+but larger numbers correspond to more costly hashes.
+.Fa rbytes
+should point to
+.Fa nrbytes
+cryptographically random bytes for use as
+.Dq salt.
+.Pp
+If
+.Fa prefix
+is a null pointer, the best available hashing method will be selected.
+.Po Sy CAUTION :
+if
+.Fa prefix
+is an empty string,
+the
+.Dq traditional
+DES-based hashing method will be selected;
+this method is unacceptably weak by modern standards.
+.Pc
+If
+.Fa count
+is 0, a low default cost will be selected.
+If
+.Fa rbytes
+is a null pointer, an appropriate number of random bytes will be
+obtained from the operating system, and
+.Fa nrbytes
+is ignored.
+.Pp
+See
+.Xr crypt 5
+for other strings that can be used as
+.Fa prefix ,
+and valid values of
+.Fa count
+for each.
+.Sh RETURN VALUES
+.Nm crypt_gensalt ,
+.Nm crypt_gensalt_rn ,
+and
+.Nm crypt_gensalt_ra
+return a pointer to an encoded setting string.
+This string will be entirely printable ASCII,
+and will not contain whitespace or the characters
+.Sq Li \&: ,
+.Sq Li \&; ,
+.Sq Li \&* ,
+.Sq Li \&! ,
+or
+.Sq Li \&\e .
+See
+.Xr crypt 5
+for more detail on the format of this string.
+Upon error, they return a null pointer and set
+.Va errno
+to an appropriate error code.
+.Pp
+.Nm crypt_gensalt
+places its result in a static storage area,
+which will be overwritten by subsequent calls to
+.Nm crypt_gensalt .
+It is not safe to call
+.Nm crypt_gensalt
+from multiple threads simultaneously.
+However, it
+.Em is
+safe to pass the string returned by
+.Nm crypt_gensalt
+directly to
+.Nm crypt
+without copying it;
+each function has its own static storage area.
+.Pp
+.Nm crypt_gensalt_rn
+places its result in the supplied
+.Fa output
+buffer, which has
+.Fa output_size
+bytes of storage available.
+.Fa output_size
+should be greater than or equal to
+.Dv CRYPT_GENSALT_OUTPUT_SIZE .
+.Pp
+.Nm crypt_gensalt_ra
+allocates memory for its result using
+.Xr malloc 3 .
+It should be freed with
+.Xr free 3
+after use.
+.Pp
+Upon error, in addition to returning a null pointer,
+.Nm crypt_gensalt
+and
+.Nm crypt_gensalt_rn
+will write an invalid setting string
+to their output buffer, if there is enough space;
+this string will begin with a
+.Sq Li \&*
+and will not be equal to
+.Fa prefix .
+.Sh ERRORS
+.Bl -tag -width Er
+.It Er EINVAL
+.Fa prefix
+is invalid or not supported by this implementation;
+.Fa count
+is invalid for the requested
+.Fa prefix ;
+the input
+.Fa nrbytes
+is insufficient for the smallest valid salt with the requested
+.Fa prefix .
+.It Er ERANGE
+.Nm crypt_gensalt_rn
+only:
+.Fa output_size
+is too small to hold the compiled
+.Fa setting
+string.
+.It Er ENOMEM
+Failed to allocate internal scratch memory.
+.br
+.Nm crypt_gensalt_ra
+only:
+failed to allocate memory for the compiled
+.Fa setting
+string.
+.It Er ENOSYS , EACCES , EIO , No etc.\&
+Obtaining random bytes from the operating system failed.
+This can only happen when
+.Fa rbytes
+is a null pointer.
+.El
+.Sh FEATURE TEST MACROS
+The following macros are defined by
+.In crypt.h :
+.Bl -tag -width 6n
+.It Dv CRYPT_GENSALT_IMPLEMENTS_DEFAULT_PREFIX
+A null pointer can be specified as the
+.Fa prefix
+argument.
+.It Dv CRYPT_GENSALT_IMPLEMENTS_AUTO_ENTROPY
+A null pointer can be specified as the
+.Fa rbytes
+argument.
+.El
+.Sh PORTABILITY NOTES
+The functions
+.Nm crypt_gensalt ,
+.Nm crypt_gensalt_rn ,
+and
+.Nm crypt_gensalt_ra
+are not part of any standard.
+They originate with the Openwall project.
+A function with the name
+.Nm crypt_gensalt
+also exists on Solaris 10 and newer, but its prototype and semantics differ.
+.Pp
+The default prefix and auto entropy features are available since libxcrypt
+version 4.0.0.  Portable software can use feature test macros to find out
+whether null pointers can be used for the
+.Fa prefix
+and
+.Fa rbytes
+arguments.
+.Pp
+The set of supported hashing methods varies considerably from system
+to system.
+.Sh ATTRIBUTES
+For an explanation of the terms used in this section, see
+.Xr attributes 7 .
+.TS
+allbox;
+lb lb lb
+l l l.
+Interface	Attribute	Value
+T{
+.Nm crypt_gensalt
+T}	Thread safety	MT-Unsafe race:crypt_gensalt
+T{
+.Nm crypt_gensalt_rn ,
+.Nm crypt_gensalt_ra
+T}	Thread safety	MT-Safe
+.TE
+.sp
+.Sh SEE ALSO
+.Xr crypt 3 ,
+.Xr getpass 3 ,
+.Xr getpwent 3 ,
+.Xr shadow 3 ,
+.Xr login 1 ,
+.Xr passwd 1 ,
+.Xr crypt 5 ,
+.Xr passwd 5 ,
+.Xr shadow 5 ,
+.Xr pam 8

@@ -1,0 +1,114 @@
+.\"
+.\" Copyright (C) 2013 Red Hat, Inc. All Rights Reserved.
+.\" Written by David Howells (dhowells@redhat.com)
+.\"
+.\" This program is free software; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License
+.\" as published by the Free Software Foundation; either version
+.\" 2 of the License, or (at your option) any later version.
+.\"
+.TH KEYCTL_GET_PERSISTENT 3 "20 Feb 2014" Linux "Linux Key Management Calls"
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH NAME
+keyctl_get_persistent \- get the persistent keyring for a user
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH SYNOPSIS
+.nf
+.B #include <keyutils.h>
+.sp
+.BI "long keyctl_get_persistent(uid_t " uid ", key_serial_t " keyring ");"
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH DESCRIPTION
+.BR keyctl_get_persistent ()
+gets the persistent keyring for the specified user ID.  Unlike the session and
+user keyrings, this keyring will persist once all login sessions have been
+deleted and can thus be used to carry authentication tokens for processes that
+run without user interaction, such as programs started by cron.
+.P
+The persistent keyring will be created by the kernel if it does not yet exist.
+Each time this function is called, the persistent keyring will have its
+expiration timeout reset to the value in:
+.IP
+/proc/sys/kernel/keys/persistent_keyring_expiry
+.P
+(by default three days).  Should the timeout be reached, the persistent keyring
+will be removed and everything it pins can then be garbage collected.
+.P
+If
+.I uid
+is
+.B -1
+then the calling process's real user ID will be used.  If
+.I uid
+is not
+.B -1
+then error
+.B EPERM
+will be given if the user ID requested does not match either the caller's real
+or effective user IDs or if the calling process does not have
+.B SetUid
+capability.
+.P
+If successful, a link to the persistent keyring will be added into
+.IR keyring .
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH RETURN VALUE
+On success
+.BR keyctl_get_persistent ()
+returns the serial number of the persistent keyring.  On error, the value
+.B -1
+will be returned and
+.I errno
+will have been set to an appropriate error.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH ERRORS
+.TP
+.B EPERM
+Not permitted to access the persistent keyring for the requested
+.IR uid .
+.TP
+.B ENOMEM
+Insufficient memory to create the persistent keyring or to extend
+.IR keyring .
+.TP
+.B ENOKEY
+.I keyring
+does not exist.
+.TP
+.B EKEYEXPIRED
+.I keyring
+has expired.
+.TP
+.B EKEYREVOKED
+.I keyring
+has been revoked.
+.TP
+.B EDQUOT
+The user does not have sufficient quota to extend
+.IR keyring .
+.TP
+.B EACCES
+.I keyring
+exists, but does not grant
+.B write
+permission to the calling process.
+
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH LINKING
+This is a library function that can be found in
+.IR libkeyutils .
+When linking,
+.B \-lkeyutils
+should be specified to the linker.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH SEE ALSO
+.ad l
+.nh
+.BR keyctl (1),
+.BR add_key (2),
+.BR keyctl (2),
+.BR request_key (2),
+.BR keyctl (3),
+.BR keyrings (7),
+.BR keyutils (7),
+.BR persistent\-keyring (7),

@@ -1,0 +1,171 @@
+{
+  "build": "pyh9f0ad1d_0",
+  "build_number": 0,
+  "channel": "https://conda.anaconda.org/conda-forge/noarch",
+  "constrains": [],
+  "depends": [
+    "python"
+  ],
+  "extracted_package_dir": "/opt/conda/pkgs/hpack-4.0.0-pyh9f0ad1d_0",
+  "files": [
+    "lib/python3.10/site-packages/hpack-4.0.0-py3.6.egg-info/PKG-INFO",
+    "lib/python3.10/site-packages/hpack-4.0.0-py3.6.egg-info/SOURCES.txt",
+    "lib/python3.10/site-packages/hpack-4.0.0-py3.6.egg-info/dependency_links.txt",
+    "lib/python3.10/site-packages/hpack-4.0.0-py3.6.egg-info/top_level.txt",
+    "lib/python3.10/site-packages/hpack/__init__.py",
+    "lib/python3.10/site-packages/hpack/exceptions.py",
+    "lib/python3.10/site-packages/hpack/hpack.py",
+    "lib/python3.10/site-packages/hpack/huffman.py",
+    "lib/python3.10/site-packages/hpack/huffman_constants.py",
+    "lib/python3.10/site-packages/hpack/huffman_table.py",
+    "lib/python3.10/site-packages/hpack/struct.py",
+    "lib/python3.10/site-packages/hpack/table.py",
+    "lib/python3.10/site-packages/hpack/__pycache__/__init__.cpython-310.pyc",
+    "lib/python3.10/site-packages/hpack/__pycache__/exceptions.cpython-310.pyc",
+    "lib/python3.10/site-packages/hpack/__pycache__/hpack.cpython-310.pyc",
+    "lib/python3.10/site-packages/hpack/__pycache__/huffman.cpython-310.pyc",
+    "lib/python3.10/site-packages/hpack/__pycache__/huffman_constants.cpython-310.pyc",
+    "lib/python3.10/site-packages/hpack/__pycache__/huffman_table.cpython-310.pyc",
+    "lib/python3.10/site-packages/hpack/__pycache__/struct.cpython-310.pyc",
+    "lib/python3.10/site-packages/hpack/__pycache__/table.cpython-310.pyc"
+  ],
+  "fn": "hpack-4.0.0-pyh9f0ad1d_0.tar.bz2",
+  "license": "MIT",
+  "link": {
+    "source": "/opt/conda/pkgs/hpack-4.0.0-pyh9f0ad1d_0",
+    "type": 1
+  },
+  "md5": "914d6646c4dbb1fd3ff539830a12fd71",
+  "name": "hpack",
+  "noarch": "python",
+  "package_tarball_full_path": "/opt/conda/pkgs/hpack-4.0.0-pyh9f0ad1d_0.tar.bz2",
+  "package_type": "noarch_python",
+  "paths_data": {
+    "paths": [
+      {
+        "_path": "site-packages/hpack-4.0.0-py3.6.egg-info/PKG-INFO",
+        "path_type": "hardlink",
+        "sha256": "0dd8afe4c86dae176e4b6bb8a1dce54a6ded7cadfbe08c88e8518dec7a98cc9b",
+        "sha256_in_prefix": "0dd8afe4c86dae176e4b6bb8a1dce54a6ded7cadfbe08c88e8518dec7a98cc9b",
+        "size_in_bytes": 2904
+      },
+      {
+        "_path": "site-packages/hpack-4.0.0-py3.6.egg-info/SOURCES.txt",
+        "path_type": "hardlink",
+        "sha256": "ed0b6c6ccb39c2cdf5a581db2817ebd09e502b004db656ca1d973f618dac9228",
+        "sha256_in_prefix": "ed0b6c6ccb39c2cdf5a581db2817ebd09e502b004db656ca1d973f618dac9228",
+        "size_in_bytes": 750
+      },
+      {
+        "_path": "site-packages/hpack-4.0.0-py3.6.egg-info/dependency_links.txt",
+        "path_type": "hardlink",
+        "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "sha256_in_prefix": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "size_in_bytes": 1
+      },
+      {
+        "_path": "site-packages/hpack-4.0.0-py3.6.egg-info/top_level.txt",
+        "path_type": "hardlink",
+        "sha256": "9f2ad92db428fb49c2ea8b7760eff5d3da645224ed2b5334c1425f2c7b9071e1",
+        "sha256_in_prefix": "9f2ad92db428fb49c2ea8b7760eff5d3da645224ed2b5334c1425f2c7b9071e1",
+        "size_in_bytes": 6
+      },
+      {
+        "_path": "site-packages/hpack/__init__.py",
+        "path_type": "hardlink",
+        "sha256": "d6fed17439aa39358e149e16ba5acc7701cd05f40d8cfd17465a70e4a1726b75",
+        "sha256_in_prefix": "d6fed17439aa39358e149e16ba5acc7701cd05f40d8cfd17465a70e4a1726b75",
+        "size_in_bytes": 568
+      },
+      {
+        "_path": "site-packages/hpack/exceptions.py",
+        "path_type": "hardlink",
+        "sha256": "46bc351647b909fabbd8ec2fc2b9d2e89b9c06fc37fdbc6ede8fee8ed01496b3",
+        "sha256_in_prefix": "46bc351647b909fabbd8ec2fc2b9d2e89b9c06fc37fdbc6ede8fee8ed01496b3",
+        "size_in_bytes": 974
+      },
+      {
+        "_path": "site-packages/hpack/hpack.py",
+        "path_type": "hardlink",
+        "sha256": "aa838f72ca8c744e83cea208a31b3e518fabbccccf9f8012b6a8457db1f3501c",
+        "sha256_in_prefix": "aa838f72ca8c744e83cea208a31b3e518fabbccccf9f8012b6a8457db1f3501c",
+        "size_in_bytes": 22683
+      },
+      {
+        "_path": "site-packages/hpack/huffman.py",
+        "path_type": "hardlink",
+        "sha256": "d1e7e0b25d048d1a11088d0fb97f06f722b83f8f1d98e483e697a931b9314936",
+        "sha256_in_prefix": "d1e7e0b25d048d1a11088d0fb97f06f722b83f8f1d98e483e697a931b9314936",
+        "size_in_bytes": 2443
+      },
+      {
+        "_path": "site-packages/hpack/huffman_constants.py",
+        "path_type": "hardlink",
+        "sha256": "8a7d696ea53a1e4b63170439825b6b5d955d2f753893f42cb46f6b2108015b33",
+        "sha256_in_prefix": "8a7d696ea53a1e4b63170439825b6b5d955d2f753893f42cb46f6b2108015b33",
+        "size_in_bytes": 4643
+      },
+      {
+        "_path": "site-packages/hpack/huffman_table.py",
+        "path_type": "hardlink",
+        "sha256": "e728a322e6b294878fc246e158c5ca7f7117b29797298ee16a4a6f3dd4912648",
+        "sha256_in_prefix": "e728a322e6b294878fc246e158c5ca7f7117b29797298ee16a4a6f3dd4912648",
+        "size_in_bytes": 168580
+      },
+      {
+        "_path": "site-packages/hpack/struct.py",
+        "path_type": "hardlink",
+        "sha256": "830ee8c66955cd7cb354457863abaf4b7c271ab274cce963a87fb12e926a5997",
+        "sha256_in_prefix": "830ee8c66955cd7cb354457863abaf4b7c271ab274cce963a87fb12e926a5997",
+        "size_in_bytes": 1050
+      },
+      {
+        "_path": "site-packages/hpack/table.py",
+        "path_type": "hardlink",
+        "sha256": "902f12c1e4c9207de307faa51098f4ebd8ce9046101b340787010bafe4671a43",
+        "sha256_in_prefix": "902f12c1e4c9207de307faa51098f4ebd8ce9046101b340787010bafe4671a43",
+        "size_in_bytes": 9635
+      },
+      {
+        "_path": "lib/python3.10/site-packages/hpack/__pycache__/__init__.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/hpack/__pycache__/exceptions.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/hpack/__pycache__/hpack.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/hpack/__pycache__/huffman.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/hpack/__pycache__/huffman_constants.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/hpack/__pycache__/huffman_table.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/hpack/__pycache__/struct.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/hpack/__pycache__/table.cpython-310.pyc",
+        "path_type": "pyc_file"
+      }
+    ],
+    "paths_version": 1
+  },
+  "requested_spec": "None",
+  "sha256": "5dec948932c4f740674b1afb551223ada0c55103f4c7bf86a110454da3d27cb8",
+  "size": 25341,
+  "subdir": "noarch",
+  "timestamp": 1598856368000,
+  "url": "https://conda.anaconda.org/conda-forge/noarch/hpack-4.0.0-pyh9f0ad1d_0.tar.bz2",
+  "version": "4.0.0"
+}

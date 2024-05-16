@@ -1,0 +1,12 @@
+kerberos	88/udp 		kdc		# Kerberos authentication--udp
+kerberos	88/tcp 		kdc		# Kerberos authentication--tcp
+kerberos_master	751/udp 			# Kerberos authentication
+kerberos_master	751/tcp 			# Kerberos authentication
+kerberos-adm	749/tcp				# Kerberos 5 admin/changepw
+kerberos-adm	749/udp				# Kerberos 5 admin/changepw
+kpop		1109/tcp			# Pop with Kerberos
+kshell		544/tcp		cmd		# and remote shell
+klogin		543/tcp				# Kerberos authenticated rlogin
+eklogin		2105/tcp			# Kerberos encrypted rlogin
+krb5_prop	754/tcp				# Kerberos replica propagation
+krb524		4444/tcp			# Kerberos 5 to 4 ticket xlator

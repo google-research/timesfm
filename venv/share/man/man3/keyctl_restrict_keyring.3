@@ -1,0 +1,82 @@
+.\"
+.\" Copyright (C) 2006 Red Hat, Inc. All Rights Reserved.
+.\" Copyright (C) 2017 Intel Corporation. All rights reserved.
+.\"
+.\" This program is free software; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License
+.\" as published by the Free Software Foundation; either version
+.\" 2 of the License, or (at your option) any later version.
+.\"
+.TH KEYCTL_RESTRICT_KEYRING 3 "28 Feb 2017" Linux "Linux Key Management Calls"
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH NAME
+keyctl_restrict_keyring \- restrict keys that may be linked to a keyring
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH SYNOPSIS
+.nf
+.B #include <keyutils.h>
+.sp
+.BI "long keyctl_restrict_keyring(key_serial_t " keyring ,
+.BI "const char *" type ", const char *" restriction ");"
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH DESCRIPTION
+.BR keyctl_restrict_keyring ()
+limits the linkage of keys to the given
+.I keyring
+using a provided key
+.I type
+and
+.I restriction
+scheme. The available options vary depending on the key type, and
+typically contain a restriction name possibly followed by key ids or
+other data relevant to the restriction. If the type and restriction are
+both
+.B NULL,
+the keyring will reject all links.
+.P
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH RETURN VALUE
+On success
+.BR keyctl_restrict_keyring ()
+returns
+.BR 0 .
+On error, the value
+.B -1
+will be returned and
+.I errno
+will have been set to an appropriate error.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH ERRORS
+.TP
+.B EDEADLK
+A restriction cycle was avoided. Two keyrings cannot restrict each other.
+.TP
+.B EEXIST
+The keyring is already restricted.
+.TP
+.B EINVAL
+The restriction string is invalid or too large.
+.TP
+.B ENOKEY
+The key type in the restriction is invalid or not available.
+.TP
+.B ENOTDIR
+The provided key id references an item that is not a keyring.
+.TP
+.B ENOENT
+The key type exists but does not support restrictions.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH LINKING
+This is a library function that can be found in
+.IR libkeyutils .
+When linking,
+.B \-lkeyutils
+should be specified to the linker.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH SEE ALSO
+.ad l
+.nh
+.BR keyctl (1),
+.BR keyctl (2),
+.BR keyctl (3),
+.BR keyutils (7)

@@ -1,0 +1,43 @@
+.\"
+.\" Original zdiff.1 for gzip: Jean-loup Gailly
+.\"
+.\" Modifications for XZ Utils: Lasse Collin
+.\"                             Andrew Dudman
+.\"
+.\" License: GNU GPLv2+
+.\"
+.\"*******************************************************************
+.\"
+.\" This file was generated with po4a. Translate the source file.
+.\"
+.\"*******************************************************************
+.TH XZDIFF 1 2021\-06\-04 Tukaani XZ\-Dienstprogramme
+.SH BEZEICHNUNG
+xzcmp, xzdiff, lzcmp, lzdiff \- komprimierte Dateien vergleichen
+.SH ÜBERSICHT
+\fBxzcmp\fP [\fIcmp\-Optionen\fP] \fIDatei1\fP [\fIDatei2\fP]
+.br
+\fBxzdiff\fP [\fIdiff\-Optionen\fP] \fIDatei1\fP [\fIDatei2\fP]
+.br
+\fBlzcmp\fP [\fIcmp\-Optionen\fP] \fIDatei1\fP [\fIDatei2\fP]
+.br
+\fBlzdiff\fP [\fIdiff\-Optionen\fP] \fIDatei1\fP [\fIDatei2\fP]
+.SH BESCHREIBUNG
+\fBxzcmp\fP and \fBxzdiff\fP invoke \fBcmp\fP(1)  or \fBdiff\fP(1)  on files compressed
+with \fBxz\fP(1), \fBlzma\fP(1), \fBgzip\fP(1), \fBbzip2\fP(1), \fBlzop\fP(1), or
+\fBzstd\fP(1).  All options specified are passed directly to \fBcmp\fP(1)  or
+\fBdiff\fP(1).  If only one file is specified, then the files compared are
+\fIfile1\fP (which must have a suffix of a supported compression format) and
+\fIfile1\fP from which the compression format suffix has been stripped.  If two
+files are specified, then they are uncompressed if necessary and fed to
+\fBcmp\fP(1)  or \fBdiff\fP(1).  The exit status from \fBcmp\fP(1)  or \fBdiff\fP(1)  is
+preserved unless a decompression error occurs; then exit status is 2.
+.PP
+Die Namen \fBlzcmp\fP und \fBlzdiff\fP dienen der Abwärtskompatibilität zu den
+LZMA\-Dienstprogrammen.
+.SH "SIEHE AUCH"
+\fBcmp\fP(1), \fBdiff\fP(1), \fBxz\fP(1), \fBgzip\fP(1), \fBbzip2\fP(1), \fBlzop\fP(1),
+\fBzstd\fP(1), \fBzdiff\fP(1)
+.SH FEHLER
+Die Meldungen der Programme \fBcmp\fP(1) oder \fBdiff\fP(1) können auf temporäre
+Dateinamen verweisen anstatt auf die tatsächlich angegebenen Dateinamen.

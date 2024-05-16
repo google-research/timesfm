@@ -1,0 +1,312 @@
+.\" Written and revised by Solar Designer <solar at openwall.com> in 2000-2011.
+.\" Revised by Zack Weinberg <zackw at panix.com> in 2017.
+.\" Converted to mdoc format by Zack Weinberg in 2018.
+.\"
+.\" No copyright is claimed, and this man page is hereby placed in the public
+.\" domain.  In case this attempt to disclaim copyright and place the man page
+.\" in the public domain is deemed null and void, then the man page is
+.\" Copyright 2000-2011 Solar Designer, 2017 Zack Weinberg, and it is
+.\" hereby released to the general public under the following terms:
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted.
+.\"
+.\" There's ABSOLUTELY NO WARRANTY, express or implied.
+.\"
+.Dd October 11, 2017
+.Dt CRYPT 5
+.Os "Openwall Project"
+.Sh NAME
+.Nm crypt
+.Nd storage format for hashed passphrases and available hashing methods
+.Sh DESCRIPTION
+The hashing methods implemented by
+.Xr crypt 3
+are designed only to process user passphrases for storage and authentication;
+they are not suitable for use as general-purpose cryptographic hashes.
+.Pp
+Passphrase hashing is not a replacement for strong passphrases.
+It is always possible
+for an attacker with access to the hashed passphrases
+to guess and check possible cleartext passphrases.
+However, with a strong hashing method,
+guessing will be too slow for the attacker
+to discover a strong passphrase.
+.Pp
+All of the hashing methods use a
+.Dq salt
+to perturb the hash function,
+so that the same passphrase may produce many possible hashes.
+Newer methods accept longer salt strings.
+The salt should be chosen at random for each user.
+Salt defeats a number of attacks:
+.Bl -enum
+.It
+It is not possible to hash a passphrase once
+and then test it against each account's stored hash;
+the hash calculation must be repeated for each account.
+.It
+It is not possible to tell whether two accounts use the same passphrase
+without successfully guessing one of the phrases.
+.It
+Tables of precalculated hashes of commonly used passphrases
+must have an entry for each possible salt,
+which makes them impractically large.
+.El
+.Pp
+All of the hashing methods are also deliberately engineered to be slow;
+they use many iterations of an underlying cryptographic primitive
+to increase the cost of each guess.
+The newer hashing methods allow the number of iterations to be adjusted,
+using the
+.Dq CPU time cost
+parameter to
+.Xr crypt_gensalt 3 .
+This makes it possible to keep the hash slow as hardware improves.
+.Sh FORMAT OF HASHED PASSPHRASES
+All of the hashing methods supported by
+.Xr crypt 3
+produce a hashed passphrase which consists of four components:
+.Ar prefix ,
+.Ar options ,
+.Ar salt ,
+and
+.Ar hash .
+The prefix controls which hashing method is to be used, and is the
+appropriate string to pass to
+.Xr crypt_gensalt 3
+to select that method.
+The contents of
+.Ar options ,
+.Ar salt ,
+and
+.Ar hash
+are up to the method.
+Depending on the method, the
+.Ar prefix
+and
+.Ar options
+components may be empty.
+.Pp
+The
+.Fa setting
+argument to
+.Xr crypt 3
+must begin with the first three components of a valid hashed passphrase,
+but anything after that is ignored.
+This makes authentication simple:
+hash the input passphrase using the stored passphrase as the setting,
+and then compare the result to the stored passphrase.
+.Pp
+Hashed passphrases are always entirely printable ASCII,
+and do not contain any whitespace
+or the characters
+.Sq Li \&: ,
+.Sq Li \&; ,
+.Sq Li \&* ,
+.Sq Li \&! ,
+or
+.Sq Li \&\e .
+(These characters are used as delimiters and special markers in the
+.Xr passwd 5
+and
+.Xr shadow 5
+files.)
+.Pp
+The syntax of each component of a hashed passphrase
+is up to the hashing method.
+.Sq Li \&$
+characters usually delimit components,
+and the salt and hash are usually encoded as numerals in base 64.
+The details of this base-64 encoding vary among hashing methods.
+The common
+.Dq base64
+encoding specified by RFC 4648 is usually
+.Em not
+used.
+.Sh AVAILABLE HASHING METHODS
+This is a list of
+.Em all
+the hashing methods supported by
+.Xr crypt 3 ,
+in decreasing order of strength.
+Many of the older methods
+are now considered too weak to use for new passphrases.
+The hashed passphrase format is expressed
+with extended regular expressions (see
+.Xr regex 7 )
+and does not show the division into prefix, options, salt, and hash.
+.de hash
+.Bl -tag -width 2n
+.It Sy Prefix
+.\" mandoc bug: .Qq comes out with curly quotes.
+.\" mandoc bug: .Li is hyperlinked to itself for no apparent reason.
+.Bf Li
+"\\$1"
+.Ef
+.if "\\$1"" (empty string)
+.It Sy Hashed passphrase format
+.\" mandoc bug: .Li is hyperlinked to itself for no apparent reason.
+.Bf -literal
+\&\\$2
+.Ef
+.It Sy Maximum passphrase length
+.ie "\\$3"unlimited" unlimited
+.el \\$3 characters
+.if "\\$4"7" (ignores 8th bit)
+.It Sy Hash size
+\\$6 bits
+.if !"\\$5"\\$6" \{\
+.It Sy Effective key size
+\&\\$5 bits
+.\}
+.It Sy Salt size
+\\$7 bits
+.It Sy CPU time cost parameter
+\\$8
+.El
+..
+.Ss yescrypt
+yescrypt is a scalable passphrase hashing scheme designed by Solar Designer,
+which is based on Colin Percival's scrypt.
+Recommended for new hashes.
+.hash "$y$" "\e$y\e$[./A-Za-z0-9]+\e$[./A-Za-z0-9]{,86}\e$[./A-Za-z0-9]{43}" unlimited 8 256 256 "up to 512 (128+ recommended)" "1 to 11 (logarithmic)"
+.Ss gost-yescrypt
+gost-yescrypt uses the output from the yescrypt hashing method in place of a
+hmac message.  Thus, the yescrypt crypto properties are superseded by the
+GOST R 34.11-2012 (Streebog) hash function with a 256 bit digest.
+This hashing method is useful in applications that need modern passphrase
+hashing methods, but require to rely on the cryptographic properties of GOST
+algorithms.
+The GOST R 34.11-2012 (Streebog) hash function has been published by the IETF
+as RFC 6986.
+Recommended for new hashes.
+.hash "$gy$" "\e$gy\e$[./A-Za-z0-9]+\e$[./A-Za-z0-9]{,86}\e$[./A-Za-z0-9]{43}" unlimited 8 256 256 "up to 512 (128+ recommended)" "1 to 11 (logarithmic)"
+.Ss scrypt
+scrypt is a password-based key derivation function created by Colin Percival,
+originally for the Tarsnap online backup service.
+The algorithm was specifically designed to make it costly to perform
+large-scale custom hardware attacks by requiring large amounts of memory.
+In 2016, the scrypt algorithm was published by IETF as RFC 7914.
+.hash "$7$" "\e$7\e$[./A-Za-z0-9]{11,97}\e$[./A-Za-z0-9]{43}" unlimited 8 256 256 "up to 512 (128+ recommended)" "6 to 11 (logarithmic)"
+.Ss bcrypt
+A hash based on the Blowfish block cipher,
+modified to have an extra-expensive key schedule.
+Originally developed by Niels Provos and David Mazieres for OpenBSD
+and also supported on recent versions of FreeBSD and NetBSD,
+on Solaris 10 and newer, and on several GNU/*/Linux distributions.
+.hash "$2b$" "\e$2[abxy]\e$[0-9]{2}\e$[./A-Za-z0-9]{53}" 72 8 184 184 128 "4 to 31 (logarithmic)"
+.Pp
+The alternative prefix "$2y$" is equivalent to "$2b$".
+It exists for historical reasons only.
+The alternative prefixes "$2a$" and "$2x$"
+provide bug-compatibility with crypt_blowfish 1.0.4 and earlier,
+which incorrectly processed characters with the 8th bit set.
+.Ss sha512crypt
+A hash based on SHA-2 with 512-bit output,
+originally developed by Ulrich Drepper for GNU libc.
+Supported on Linux but not common elsewhere.
+Acceptable for new hashes.
+The default CPU time cost parameter is 5000,
+which is too low for modern hardware.
+.hash "$6$" "\e$6\e$(rounds=[1-9][0-9]+\e$)?[^$:\(rsn]{1,16}\e$[./0-9A-Za-z]{86}" unlimited 8 512 512 "6 to 96" "1000 to 999,999,999"
+.Ss sha256crypt
+A hash based on SHA-2 with 256-bit output,
+originally developed by Ulrich Drepper for GNU libc.
+Supported on Linux but not common elsewhere.
+Acceptable for new hashes.
+The default CPU time cost parameter is 5000,
+which is too low for modern hardware.
+.hash "$5$" "\e$5\e$(rounds=[1-9][0-9]+\e$)?[^$:\(rsn]{1,16}\e$[./0-9A-Za-z]{43}" unlimited 8 256 256 "6 to 96" "1000 to 999,999,999"
+.Ss sha1crypt
+A hash based on HMAC-SHA1.
+Originally developed by Simon Gerraty for NetBSD.
+Not as weak as the DES-based hashes below,
+but SHA1 is so cheap on modern hardware
+that it should not be used for new hashes.
+.hash "$sha1" "\e$sha1\e$[1-9][0-9]+\e$[./0-9A-Za-z]{1,64}\e$[./0-9A-Za-z]{8,64}[./0-9A-Za-z]{32}" unlimited 8 160 160 "6 to 384" "4 to 4,294,967,295"
+.Ss SunMD5
+A hash based on the MD5 algorithm,
+with additional cleverness to make precomputation difficult,
+originally developed by Alec David Muffet for Solaris.
+Not adopted elsewhere, to our knowledge.
+Not as weak as the DES-based hashes below,
+but MD5 is so cheap on modern hardware
+that it should not be used for new hashes.
+.hash "$md5" "\e$md5(,rounds=[1-9][0-9]+)?\e$[./0-9A-Za-z]{8}\e${1,2}[./0-9A-Za-z]{22}" unlimited 8 128 128 48 "4096 to 4,294,963,199"
+.Ss md5crypt
+A hash based on the MD5 algorithm, originally developed by
+Poul-Henning Kamp for FreeBSD.
+Supported on most free Unixes and newer versions of Solaris.
+Not as weak as the DES-based hashes below,
+but MD5 is so cheap on modern hardware
+that it should not be used for new hashes.
+CPU time cost is not adjustable.
+.hash "$1$" "\e$1\e$[^$:\(rsn]{1,8}\e$[./0-9A-Za-z]{22}" unlimited 8 128 128 "6 to 48" 1000
+.Ss bsdicrypt (BSDI extended DES)
+A weak extension of traditional DES,
+which eliminates the length limit,
+increases the salt size,
+and makes the time cost tunable.
+It originates with BSDI
+and is also available on at least NetBSD, OpenBSD, and FreeBSD
+due to the use of David Burren's FreeSec library.
+It is better than bigcrypt and traditional DES,
+but still should not be used for new hashes.
+.hash _ "_[./0-9A-Za-z]{19}" unlimited 7 56 64 24 "1 to 16,777,215 (must be odd)"
+.Ss bigcrypt
+A weak extension of traditional DES,
+available on some System V-derived Unixes.
+All it does is raise the length limit from 8 to 128 characters,
+and it does this in a crude way that allows attackers to
+guess chunks of a long passphrase in parallel.
+It should not be used for new hashes.
+.hash "" "[./0-9A-Za-z]{13,178}" 128 7 "up to 896" "up to 1024" 12 25
+.Ss descrypt (Traditional DES)
+The original hashing method from Unix V7, based on the DES block cipher.
+Because DES is cheap on modern hardware,
+because there are only 4096 possible salts and 2**56 possible hashes,
+and because it truncates passphrases to 8 characters,
+it is feasible to discover
+.Em any
+passphrase hashed with this method.
+It should only be used if you absolutely have to generate hashes
+that will work on an old operating system that supports nothing else.
+.hash "" "[./0-9A-Za-z]{13}" 8 7 56 64 12 25
+.Ss NT
+The hashing method used for network authentication
+in some versions of the SMB/CIFS protocol.
+Available, for cross-compatibility's sake, on FreeBSD.
+Based on MD4.
+Has no salt or tunable cost parameter.
+Like traditional DES, it is so weak that
+.Em any
+passphrase hashed with this method is guessable.
+It should only be used if you absolutely have to generate hashes
+that will work on an old operating system that supports nothing else.
+.hash "$3$" "\e$3\e$\e$[0-9a-f]{32}" unlimited 8 256 256 0 1
+.Sh SEE ALSO
+.Xr crypt 3 ,
+.Xr crypt_gensalt 3 ,
+.Xr getpwent 3 ,
+.Xr passwd 5 ,
+.Xr shadow 5 ,
+.Xr pam 8
+.Rs
+.%A Niels Provos
+.%A David Mazieres
+.%T A Future-Adaptable Password Scheme
+.%B Proceedings of the 1999 USENIX Annual Technical Conference
+.%D June 1999
+.%U https://www.usenix.org/events/usenix99/provos.html
+.Re
+.Rs
+.%A Robert Morris
+.%A Ken Thompson
+.%T Password Security: A Case History
+.%J Communications of the ACM
+.%V 22
+.%N 11
+.%D 1979
+.%U http://wolfram.schneider.org/bsd/7thEdManVol2/password/password.pdf
+.Re

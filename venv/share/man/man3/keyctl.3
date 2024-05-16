@@ -1,0 +1,123 @@
+.\"
+.\" Copyright (C) 2010 Red Hat, Inc. All Rights Reserved.
+.\" Written by David Howells (dhowells@redhat.com)
+.\"
+.\" This program is free software; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public Licence
+.\" as published by the Free Software Foundation; either version
+.\" 2 of the Licence, or (at your option) any later version.
+.\"
+.TH KEYCTL 3 "21 Feb 2014" Linux "Linux Key Management Calls"
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH NAME
+keyctl_*() \- key management function wrappers
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH DESCRIPTION
+The
+.BR keyctl ()
+system call is a multiplexor for a number of key management functions.  These
+should be called via the wrappers in the libkeyutils library.
+.P
+The functions can be compiled in by including the \fBkeyutils\fR header file:
+.sp
+.RS
+.nf
+.B #include <keyutils.h>
+.RE
+.P
+and then telling the linker it should link in the library:
+.sp
+.RS
+.nf
+.B \-lkeyutils
+.RE
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH KEYCTL FUNCTIONS
+.BR keyctl_assume_authority (3)
+.br
+.BR keyctl_chown (3)
+.br
+.BR keyctl_capabilities (3)
+.br
+.BR keyctl_clear (3)
+.br
+.BR keyctl_describe (3)
+.br
+.BR keyctl_describe_alloc (3)
+.br
+.BR keyctl_dh_compute (3)
+.br
+.BR keyctl_dh_compute_alloc (3)
+.br
+.BR keyctl_get_keyring_ID (3)
+.br
+.BR keyctl_get_persistent (3)
+.br
+.BR keyctl_get_security (3)
+.br
+.BR keyctl_get_security_alloc (3)
+.br
+.BR keyctl_instantiate (3)
+.br
+.BR keyctl_instantiate_iov (3)
+.br
+.BR keyctl_invalidate (3)
+.br
+.BR keyctl_join_session_keyring (3)
+.br
+.BR keyctl_link (3)
+.br
+.BR keyctl_move (3)
+.br
+.BR keyctl_negate (3)
+.br
+.BR keyctl_pkey_dec (3)
+.br
+.BR keyctl_pkey_enc (3)
+.br
+.BR keyctl_pkey_query (3)
+.br
+.BR keyctl_pkey_sign (3)
+.br
+.BR keyctl_pkey_verify (3)
+.br
+.BR keyctl_read (3)
+.br
+.BR keyctl_read_alloc (3)
+.br
+.BR keyctl_reject (3)
+.br
+.BR keyctl_restrict_keyring (3)
+.br
+.BR keyctl_revoke (3)
+.br
+.BR keyctl_search (3)
+.br
+.BR keyctl_session_to_parent (3)
+.br
+.BR keyctl_set_reqkey_keyring (3)
+.br
+.BR keyctl_set_timeout (3)
+.br
+.BR keyctl_setperm (3)
+.br
+.BR keyctl_unlink (3)
+.br
+.BR keyctl_update (3)
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH UTILITY FUNCTIONS
+.BR find_key_by_type_and_name (3)
+.br
+.BR recursive_key_scan (3)
+.br
+.BR recursive_session_key_scan (3)
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH SEE ALSO
+.ad l
+.nh
+.BR keyctl (1),
+.BR add_key (2),
+.BR keyctl (2),
+.BR request_key (2),
+.BR keyrings (7),
+.BR keyutils (7)

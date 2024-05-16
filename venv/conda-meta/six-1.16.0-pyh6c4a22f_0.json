@@ -1,0 +1,112 @@
+{
+  "build": "pyh6c4a22f_0",
+  "build_number": 0,
+  "channel": "https://conda.anaconda.org/conda-forge/noarch",
+  "constrains": [],
+  "depends": [
+    "python"
+  ],
+  "extracted_package_dir": "/opt/conda/pkgs/six-1.16.0-pyh6c4a22f_0",
+  "files": [
+    "lib/python3.10/site-packages/six-1.16.0.dist-info/INSTALLER",
+    "lib/python3.10/site-packages/six-1.16.0.dist-info/LICENSE",
+    "lib/python3.10/site-packages/six-1.16.0.dist-info/METADATA",
+    "lib/python3.10/site-packages/six-1.16.0.dist-info/RECORD",
+    "lib/python3.10/site-packages/six-1.16.0.dist-info/REQUESTED",
+    "lib/python3.10/site-packages/six-1.16.0.dist-info/WHEEL",
+    "lib/python3.10/site-packages/six-1.16.0.dist-info/direct_url.json",
+    "lib/python3.10/site-packages/six-1.16.0.dist-info/top_level.txt",
+    "lib/python3.10/site-packages/six.py",
+    "lib/python3.10/site-packages/__pycache__/six.cpython-310.pyc"
+  ],
+  "fn": "six-1.16.0-pyh6c4a22f_0.tar.bz2",
+  "license": "MIT",
+  "link": {
+    "source": "/opt/conda/pkgs/six-1.16.0-pyh6c4a22f_0",
+    "type": 1
+  },
+  "md5": "e5f25f8dbc060e9a8d912e432202afc2",
+  "name": "six",
+  "noarch": "python",
+  "package_tarball_full_path": "/opt/conda/pkgs/six-1.16.0-pyh6c4a22f_0.tar.bz2",
+  "package_type": "noarch_python",
+  "paths_data": {
+    "paths": [
+      {
+        "_path": "site-packages/six-1.16.0.dist-info/INSTALLER",
+        "path_type": "hardlink",
+        "sha256": "d0edee15f91b406f3f99726e44eb990be6e34fd0345b52b910c568e0eef6a2a8",
+        "sha256_in_prefix": "d0edee15f91b406f3f99726e44eb990be6e34fd0345b52b910c568e0eef6a2a8",
+        "size_in_bytes": 5
+      },
+      {
+        "_path": "site-packages/six-1.16.0.dist-info/LICENSE",
+        "path_type": "hardlink",
+        "sha256": "8bb850c565aa389fdc16f3a46965ad23d82adff60f2393fc2762b63185e8e6c9",
+        "sha256_in_prefix": "8bb850c565aa389fdc16f3a46965ad23d82adff60f2393fc2762b63185e8e6c9",
+        "size_in_bytes": 1066
+      },
+      {
+        "_path": "site-packages/six-1.16.0.dist-info/METADATA",
+        "path_type": "hardlink",
+        "sha256": "5507062050801267d9725efb139ae23c2378bf64c8b1cfeab5a7278f12872682",
+        "sha256_in_prefix": "5507062050801267d9725efb139ae23c2378bf64c8b1cfeab5a7278f12872682",
+        "size_in_bytes": 1795
+      },
+      {
+        "_path": "site-packages/six-1.16.0.dist-info/RECORD",
+        "path_type": "hardlink",
+        "sha256": "d51a34f4b9058f54638147e941e2a9dde03778b84e8d338a903fd803f9c805e0",
+        "sha256_in_prefix": "d51a34f4b9058f54638147e941e2a9dde03778b84e8d338a903fd803f9c805e0",
+        "size_in_bytes": 737
+      },
+      {
+        "_path": "site-packages/six-1.16.0.dist-info/REQUESTED",
+        "path_type": "hardlink",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256_in_prefix": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_in_bytes": 0
+      },
+      {
+        "_path": "site-packages/six-1.16.0.dist-info/WHEEL",
+        "path_type": "hardlink",
+        "sha256": "67e9f2629c2b712ab17ddbb1e4c6e7fc3439db988fec9d831b72601af398c934",
+        "sha256_in_prefix": "67e9f2629c2b712ab17ddbb1e4c6e7fc3439db988fec9d831b72601af398c934",
+        "size_in_bytes": 110
+      },
+      {
+        "_path": "site-packages/six-1.16.0.dist-info/direct_url.json",
+        "path_type": "hardlink",
+        "sha256": "dd4cd82be94aeaa0028373f89248772d97cad21105750654c02b731594b4eb42",
+        "sha256_in_prefix": "dd4cd82be94aeaa0028373f89248772d97cad21105750654c02b731594b4eb42",
+        "size_in_bytes": 99
+      },
+      {
+        "_path": "site-packages/six-1.16.0.dist-info/top_level.txt",
+        "path_type": "hardlink",
+        "sha256": "fe2547fe2604b445e70fc9d819062960552f9145bdb043b51986e478a4806a2b",
+        "sha256_in_prefix": "fe2547fe2604b445e70fc9d819062960552f9145bdb043b51986e478a4806a2b",
+        "size_in_bytes": 4
+      },
+      {
+        "_path": "site-packages/six.py",
+        "path_type": "hardlink",
+        "sha256": "4ce39f422ee71467ccac8bed76beb05f8c321c7f0ceda9279ae2dfa3670106b3",
+        "sha256_in_prefix": "4ce39f422ee71467ccac8bed76beb05f8c321c7f0ceda9279ae2dfa3670106b3",
+        "size_in_bytes": 34549
+      },
+      {
+        "_path": "lib/python3.10/site-packages/__pycache__/six.cpython-310.pyc",
+        "path_type": "pyc_file"
+      }
+    ],
+    "paths_version": 1
+  },
+  "requested_spec": "None",
+  "sha256": "a85c38227b446f42c5b90d9b642f2c0567880c15d72492d8da074a59c8f91dd6",
+  "size": 14259,
+  "subdir": "noarch",
+  "timestamp": 1620240338000,
+  "url": "https://conda.anaconda.org/conda-forge/noarch/six-1.16.0-pyh6c4a22f_0.tar.bz2",
+  "version": "1.16.0"
+}

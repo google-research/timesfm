@@ -1,0 +1,34 @@
+.\"
+.\" Copyright (C) 2011 Red Hat, Inc. All Rights Reserved.
+.\" Written by David Howells (dhowells@redhat.com)
+.\"
+.\" This program is free software; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License
+.\" as published by the Free Software Foundation; either version
+.\" 2 of the License, or (at your option) any later version.
+.\"
+.TH KEY.DNS_RESOLVER 8 "04 Mar 2011" Linux "Linux Key Management Utilities"
+.SH NAME
+key.dns_resolver \- upcall for request\-key to handle dns_resolver keys
+.SH SYNOPSIS
+\fB/sbin/key.dns_resolver \fR<key>
+.br
+\fB/sbin/key.dns_resolver \fR\-D [\-v] [\-v] <keydesc> <calloutinfo>
+.SH DESCRIPTION
+This program is invoked by request\-key on behalf of the kernel when kernel
+services (such as NFS, CIFS and AFS) want to perform a hostname lookup and the
+kernel does not have the key cached.  It is not ordinarily intended to be
+called directly.
+.P
+It can be called in debugging mode to test its functionality by passing a
+\fB\-D\fR flag on the command line.  For this to work, the key description and
+the callout information must be supplied.  Verbosity can be increased by
+supplying one or more \fB\-v\fR flags.
+.SH ERRORS
+All errors will be logged to the syslog.
+.SH SEE ALSO
+.ad l
+.nh
+.BR request\-key.conf (5),
+.BR keyrings (7),
+.BR request\-key (8)

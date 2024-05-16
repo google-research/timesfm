@@ -1,0 +1,7 @@
+libdir=/workspaces/timesfm/venv/lib
+includedir=/workspaces/timesfm/venv/include
+
+Name: OpenSSL
+Description: Secure Sockets Layer and cryptography libraries and tools
+Version: 3.3.0
+Requires: libssl libcrypto

@@ -1,0 +1,1088 @@
+{
+  "build": "h166bdaf_0",
+  "build_number": 0,
+  "channel": "https://conda.anaconda.org/conda-forge/linux-64",
+  "constrains": [],
+  "depends": [
+    "libgcc-ng >=12"
+  ],
+  "extracted_package_dir": "/opt/conda/pkgs/xz-5.2.6-h166bdaf_0",
+  "files": [
+    "bin/lzcat",
+    "bin/lzcmp",
+    "bin/lzdiff",
+    "bin/lzegrep",
+    "bin/lzfgrep",
+    "bin/lzgrep",
+    "bin/lzless",
+    "bin/lzma",
+    "bin/lzmadec",
+    "bin/lzmainfo",
+    "bin/lzmore",
+    "bin/unlzma",
+    "bin/unxz",
+    "bin/xz",
+    "bin/xzcat",
+    "bin/xzcmp",
+    "bin/xzdec",
+    "bin/xzdiff",
+    "bin/xzegrep",
+    "bin/xzfgrep",
+    "bin/xzgrep",
+    "bin/xzless",
+    "bin/xzmore",
+    "include/lzma.h",
+    "include/lzma/base.h",
+    "include/lzma/bcj.h",
+    "include/lzma/block.h",
+    "include/lzma/check.h",
+    "include/lzma/container.h",
+    "include/lzma/delta.h",
+    "include/lzma/filter.h",
+    "include/lzma/hardware.h",
+    "include/lzma/index.h",
+    "include/lzma/index_hash.h",
+    "include/lzma/lzma12.h",
+    "include/lzma/stream_flags.h",
+    "include/lzma/version.h",
+    "include/lzma/vli.h",
+    "lib/liblzma.so",
+    "lib/liblzma.so.5",
+    "lib/liblzma.so.5.2.6",
+    "lib/pkgconfig/liblzma.pc",
+    "share/doc/xz/AUTHORS",
+    "share/doc/xz/COPYING",
+    "share/doc/xz/COPYING.GPLv2",
+    "share/doc/xz/NEWS",
+    "share/doc/xz/README",
+    "share/doc/xz/THANKS",
+    "share/doc/xz/TODO",
+    "share/doc/xz/examples/00_README.txt",
+    "share/doc/xz/examples/01_compress_easy.c",
+    "share/doc/xz/examples/02_decompress.c",
+    "share/doc/xz/examples/03_compress_custom.c",
+    "share/doc/xz/examples/04_compress_easy_mt.c",
+    "share/doc/xz/examples/Makefile",
+    "share/doc/xz/examples_old/xz_pipe_comp.c",
+    "share/doc/xz/examples_old/xz_pipe_decomp.c",
+    "share/doc/xz/faq.txt",
+    "share/doc/xz/history.txt",
+    "share/doc/xz/lzma-file-format.txt",
+    "share/doc/xz/xz-file-format.txt",
+    "share/locale/ca/LC_MESSAGES/xz.mo",
+    "share/locale/cs/LC_MESSAGES/xz.mo",
+    "share/locale/da/LC_MESSAGES/xz.mo",
+    "share/locale/de/LC_MESSAGES/xz.mo",
+    "share/locale/eo/LC_MESSAGES/xz.mo",
+    "share/locale/es/LC_MESSAGES/xz.mo",
+    "share/locale/fi/LC_MESSAGES/xz.mo",
+    "share/locale/fr/LC_MESSAGES/xz.mo",
+    "share/locale/hr/LC_MESSAGES/xz.mo",
+    "share/locale/hu/LC_MESSAGES/xz.mo",
+    "share/locale/it/LC_MESSAGES/xz.mo",
+    "share/locale/ko/LC_MESSAGES/xz.mo",
+    "share/locale/pl/LC_MESSAGES/xz.mo",
+    "share/locale/pt/LC_MESSAGES/xz.mo",
+    "share/locale/pt_BR/LC_MESSAGES/xz.mo",
+    "share/locale/ro/LC_MESSAGES/xz.mo",
+    "share/locale/sr/LC_MESSAGES/xz.mo",
+    "share/locale/sv/LC_MESSAGES/xz.mo",
+    "share/locale/uk/LC_MESSAGES/xz.mo",
+    "share/locale/vi/LC_MESSAGES/xz.mo",
+    "share/locale/zh_CN/LC_MESSAGES/xz.mo",
+    "share/locale/zh_TW/LC_MESSAGES/xz.mo",
+    "share/man/de/man1/lzcat.1",
+    "share/man/de/man1/lzcmp.1",
+    "share/man/de/man1/lzdiff.1",
+    "share/man/de/man1/lzless.1",
+    "share/man/de/man1/lzma.1",
+    "share/man/de/man1/lzmadec.1",
+    "share/man/de/man1/lzmore.1",
+    "share/man/de/man1/unlzma.1",
+    "share/man/de/man1/unxz.1",
+    "share/man/de/man1/xz.1",
+    "share/man/de/man1/xzcat.1",
+    "share/man/de/man1/xzcmp.1",
+    "share/man/de/man1/xzdec.1",
+    "share/man/de/man1/xzdiff.1",
+    "share/man/de/man1/xzless.1",
+    "share/man/de/man1/xzmore.1",
+    "share/man/fr_FR/man1/lzcat.1",
+    "share/man/fr_FR/man1/lzcmp.1",
+    "share/man/fr_FR/man1/lzdiff.1",
+    "share/man/fr_FR/man1/lzless.1",
+    "share/man/fr_FR/man1/lzma.1",
+    "share/man/fr_FR/man1/lzmadec.1",
+    "share/man/fr_FR/man1/lzmore.1",
+    "share/man/fr_FR/man1/unlzma.1",
+    "share/man/fr_FR/man1/unxz.1",
+    "share/man/fr_FR/man1/xz.1",
+    "share/man/fr_FR/man1/xzcat.1",
+    "share/man/fr_FR/man1/xzcmp.1",
+    "share/man/fr_FR/man1/xzdec.1",
+    "share/man/fr_FR/man1/xzdiff.1",
+    "share/man/fr_FR/man1/xzless.1",
+    "share/man/fr_FR/man1/xzmore.1",
+    "share/man/man1/lzcat.1",
+    "share/man/man1/lzcmp.1",
+    "share/man/man1/lzdiff.1",
+    "share/man/man1/lzegrep.1",
+    "share/man/man1/lzfgrep.1",
+    "share/man/man1/lzgrep.1",
+    "share/man/man1/lzless.1",
+    "share/man/man1/lzma.1",
+    "share/man/man1/lzmadec.1",
+    "share/man/man1/lzmainfo.1",
+    "share/man/man1/lzmore.1",
+    "share/man/man1/unlzma.1",
+    "share/man/man1/unxz.1",
+    "share/man/man1/xz.1",
+    "share/man/man1/xzcat.1",
+    "share/man/man1/xzcmp.1",
+    "share/man/man1/xzdec.1",
+    "share/man/man1/xzdiff.1",
+    "share/man/man1/xzegrep.1",
+    "share/man/man1/xzfgrep.1",
+    "share/man/man1/xzgrep.1",
+    "share/man/man1/xzless.1",
+    "share/man/man1/xzmore.1"
+  ],
+  "fn": "xz-5.2.6-h166bdaf_0.tar.bz2",
+  "license": "LGPL-2.1 and GPL-2.0",
+  "link": {
+    "source": "/opt/conda/pkgs/xz-5.2.6-h166bdaf_0",
+    "type": 1
+  },
+  "md5": "2161070d867d1b1204ea749c8eec4ef0",
+  "name": "xz",
+  "package_tarball_full_path": "/opt/conda/pkgs/xz-5.2.6-h166bdaf_0.tar.bz2",
+  "paths_data": {
+    "paths": [
+      {
+        "_path": "bin/lzcat",
+        "path_type": "softlink",
+        "sha256": "9748355fe7de9767ae87fe1592b8d50d08d0df8f27d52be58cd08b57a4afd1a7",
+        "size_in_bytes": 95336
+      },
+      {
+        "_path": "bin/lzcmp",
+        "path_type": "softlink",
+        "sha256": "b6526d09d24c97ac9cc7b046efc9056eb904410dbe1056928fc7dafbf179e832",
+        "size_in_bytes": 7307
+      },
+      {
+        "_path": "bin/lzdiff",
+        "path_type": "softlink",
+        "sha256": "b6526d09d24c97ac9cc7b046efc9056eb904410dbe1056928fc7dafbf179e832",
+        "size_in_bytes": 7307
+      },
+      {
+        "_path": "bin/lzegrep",
+        "path_type": "softlink",
+        "sha256": "d2cf18d6e564b8ddf2b6bb01f971d030e4bf35ac1855fc1d29e756a137ebc6cd",
+        "size_in_bytes": 10293
+      },
+      {
+        "_path": "bin/lzfgrep",
+        "path_type": "softlink",
+        "sha256": "d2cf18d6e564b8ddf2b6bb01f971d030e4bf35ac1855fc1d29e756a137ebc6cd",
+        "size_in_bytes": 10293
+      },
+      {
+        "_path": "bin/lzgrep",
+        "path_type": "softlink",
+        "sha256": "d2cf18d6e564b8ddf2b6bb01f971d030e4bf35ac1855fc1d29e756a137ebc6cd",
+        "size_in_bytes": 10293
+      },
+      {
+        "_path": "bin/lzless",
+        "path_type": "softlink",
+        "sha256": "02c071c8c565ca6e0ee6ff22d1737ec56248274f82d248fb31a1396573168be3",
+        "size_in_bytes": 1821
+      },
+      {
+        "_path": "bin/lzma",
+        "path_type": "softlink",
+        "sha256": "9748355fe7de9767ae87fe1592b8d50d08d0df8f27d52be58cd08b57a4afd1a7",
+        "size_in_bytes": 95336
+      },
+      {
+        "_path": "bin/lzmadec",
+        "path_type": "hardlink",
+        "sha256": "a1afbeeb7f6fc16fb6e8e1ddc278b41f551242266c45d87a37f8a813f34ef703",
+        "sha256_in_prefix": "a1afbeeb7f6fc16fb6e8e1ddc278b41f551242266c45d87a37f8a813f34ef703",
+        "size_in_bytes": 17368
+      },
+      {
+        "_path": "bin/lzmainfo",
+        "file_mode": "binary",
+        "path_type": "hardlink",
+        "prefix_placeholder": "/home/conda/feedstock_root/build_artifacts/xz_1660346640809/_h_env_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehol",
+        "sha256": "15c7682c6dfb57b0c51cc3b9ebc4e34b593de65caa466774fc6df8e8ff5dae05",
+        "sha256_in_prefix": "2ea285dd77f829b2fe9bc0e6a56a09a946d757d692e2f52d9f458727ea2ddb21",
+        "size_in_bytes": 17280
+      },
+      {
+        "_path": "bin/lzmore",
+        "path_type": "softlink",
+        "sha256": "1eb23d10501ef995cecabf23d22d52c276425dd455cf08fd66b9cc9172df4f75",
+        "size_in_bytes": 2198
+      },
+      {
+        "_path": "bin/unlzma",
+        "path_type": "softlink",
+        "sha256": "9748355fe7de9767ae87fe1592b8d50d08d0df8f27d52be58cd08b57a4afd1a7",
+        "size_in_bytes": 95336
+      },
+      {
+        "_path": "bin/unxz",
+        "path_type": "softlink",
+        "sha256": "9748355fe7de9767ae87fe1592b8d50d08d0df8f27d52be58cd08b57a4afd1a7",
+        "size_in_bytes": 95336
+      },
+      {
+        "_path": "bin/xz",
+        "file_mode": "binary",
+        "path_type": "hardlink",
+        "prefix_placeholder": "/home/conda/feedstock_root/build_artifacts/xz_1660346640809/_h_env_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehol",
+        "sha256": "9748355fe7de9767ae87fe1592b8d50d08d0df8f27d52be58cd08b57a4afd1a7",
+        "sha256_in_prefix": "ee1de3fc6a177fbb1c1dfb2929312ac95e2687146d8cf8a6b4538734e0b7d769",
+        "size_in_bytes": 95336
+      },
+      {
+        "_path": "bin/xzcat",
+        "path_type": "softlink",
+        "sha256": "9748355fe7de9767ae87fe1592b8d50d08d0df8f27d52be58cd08b57a4afd1a7",
+        "size_in_bytes": 95336
+      },
+      {
+        "_path": "bin/xzcmp",
+        "path_type": "softlink",
+        "sha256": "b6526d09d24c97ac9cc7b046efc9056eb904410dbe1056928fc7dafbf179e832",
+        "size_in_bytes": 7307
+      },
+      {
+        "_path": "bin/xzdec",
+        "path_type": "hardlink",
+        "sha256": "4456932ef5868f5060b1fcdd0e18e593940122b7bf0c1efe0e0594e7b6dc609c",
+        "sha256_in_prefix": "4456932ef5868f5060b1fcdd0e18e593940122b7bf0c1efe0e0594e7b6dc609c",
+        "size_in_bytes": 17368
+      },
+      {
+        "_path": "bin/xzdiff",
+        "path_type": "hardlink",
+        "sha256": "b6526d09d24c97ac9cc7b046efc9056eb904410dbe1056928fc7dafbf179e832",
+        "sha256_in_prefix": "b6526d09d24c97ac9cc7b046efc9056eb904410dbe1056928fc7dafbf179e832",
+        "size_in_bytes": 7307
+      },
+      {
+        "_path": "bin/xzegrep",
+        "path_type": "softlink",
+        "sha256": "d2cf18d6e564b8ddf2b6bb01f971d030e4bf35ac1855fc1d29e756a137ebc6cd",
+        "size_in_bytes": 10293
+      },
+      {
+        "_path": "bin/xzfgrep",
+        "path_type": "softlink",
+        "sha256": "d2cf18d6e564b8ddf2b6bb01f971d030e4bf35ac1855fc1d29e756a137ebc6cd",
+        "size_in_bytes": 10293
+      },
+      {
+        "_path": "bin/xzgrep",
+        "path_type": "hardlink",
+        "sha256": "d2cf18d6e564b8ddf2b6bb01f971d030e4bf35ac1855fc1d29e756a137ebc6cd",
+        "sha256_in_prefix": "d2cf18d6e564b8ddf2b6bb01f971d030e4bf35ac1855fc1d29e756a137ebc6cd",
+        "size_in_bytes": 10293
+      },
+      {
+        "_path": "bin/xzless",
+        "path_type": "hardlink",
+        "sha256": "02c071c8c565ca6e0ee6ff22d1737ec56248274f82d248fb31a1396573168be3",
+        "sha256_in_prefix": "02c071c8c565ca6e0ee6ff22d1737ec56248274f82d248fb31a1396573168be3",
+        "size_in_bytes": 1821
+      },
+      {
+        "_path": "bin/xzmore",
+        "path_type": "hardlink",
+        "sha256": "1eb23d10501ef995cecabf23d22d52c276425dd455cf08fd66b9cc9172df4f75",
+        "sha256_in_prefix": "1eb23d10501ef995cecabf23d22d52c276425dd455cf08fd66b9cc9172df4f75",
+        "size_in_bytes": 2198
+      },
+      {
+        "_path": "include/lzma.h",
+        "path_type": "hardlink",
+        "sha256": "d831a8daf0b288b4bc512ba09eef2d8a6c519f1be679ea1d6df7483726376070",
+        "sha256_in_prefix": "d831a8daf0b288b4bc512ba09eef2d8a6c519f1be679ea1d6df7483726376070",
+        "size_in_bytes": 9922
+      },
+      {
+        "_path": "include/lzma/base.h",
+        "path_type": "hardlink",
+        "sha256": "2e4b5ffe0e729ef43c35600936a570b3d7e692fdbeaf8c887646c87de7aef31a",
+        "sha256_in_prefix": "2e4b5ffe0e729ef43c35600936a570b3d7e692fdbeaf8c887646c87de7aef31a",
+        "size_in_bytes": 24859
+      },
+      {
+        "_path": "include/lzma/bcj.h",
+        "path_type": "hardlink",
+        "sha256": "485ee1ac185747b6e5324094aa462af194ba3a22a0206314e25f70423045e43d",
+        "sha256_in_prefix": "485ee1ac185747b6e5324094aa462af194ba3a22a0206314e25f70423045e43d",
+        "size_in_bytes": 2630
+      },
+      {
+        "_path": "include/lzma/block.h",
+        "path_type": "hardlink",
+        "sha256": "d62b1e56044a7be0991f1c421c8da1b3dba4b4b347583eac7d8a0f87300e3058",
+        "sha256_in_prefix": "d62b1e56044a7be0991f1c421c8da1b3dba4b4b347583eac7d8a0f87300e3058",
+        "size_in_bytes": 21929
+      },
+      {
+        "_path": "include/lzma/check.h",
+        "path_type": "hardlink",
+        "sha256": "79ef75b06fe389ccbc47ebeea1bb704157a58fe9710ddfbac8a62035359f9ae1",
+        "sha256_in_prefix": "79ef75b06fe389ccbc47ebeea1bb704157a58fe9710ddfbac8a62035359f9ae1",
+        "size_in_bytes": 4255
+      },
+      {
+        "_path": "include/lzma/container.h",
+        "path_type": "hardlink",
+        "sha256": "13fbba65515bed9d108e97cba3227604291545290fec3f11d9f5babcc6811404",
+        "sha256_in_prefix": "13fbba65515bed9d108e97cba3227604291545290fec3f11d9f5babcc6811404",
+        "size_in_bytes": 24844
+      },
+      {
+        "_path": "include/lzma/delta.h",
+        "path_type": "hardlink",
+        "sha256": "db9db049ab07363921bf19320174afbab16a1b4d401f797a5b2232dcb89b9d64",
+        "sha256_in_prefix": "db9db049ab07363921bf19320174afbab16a1b4d401f797a5b2232dcb89b9d64",
+        "size_in_bytes": 1865
+      },
+      {
+        "_path": "include/lzma/filter.h",
+        "path_type": "hardlink",
+        "sha256": "0c30f1e1271e4bd06e07934b31b76edddbb7d8616e2b8043b36771ade8eb294b",
+        "sha256_in_prefix": "0c30f1e1271e4bd06e07934b31b76edddbb7d8616e2b8043b36771ade8eb294b",
+        "size_in_bytes": 16520
+      },
+      {
+        "_path": "include/lzma/hardware.h",
+        "path_type": "hardlink",
+        "sha256": "7c9c7fdd29650a730e59281ea38e3826d94b518fa7e23573b9303ac8f3421083",
+        "sha256_in_prefix": "7c9c7fdd29650a730e59281ea38e3826d94b518fa7e23573b9303ac8f3421083",
+        "size_in_bytes": 2604
+      },
+      {
+        "_path": "include/lzma/index.h",
+        "path_type": "hardlink",
+        "sha256": "9eb7451f4d8de7d51a17585b7a86c3b4eb02d00d7e7fc1c390255e34231f3516",
+        "sha256_in_prefix": "9eb7451f4d8de7d51a17585b7a86c3b4eb02d00d7e7fc1c390255e34231f3516",
+        "size_in_bytes": 23491
+      },
+      {
+        "_path": "include/lzma/index_hash.h",
+        "path_type": "hardlink",
+        "sha256": "0840c2ae8dedc05a7ffe1597ead131532a8dc03521728d1d38e55da0fa769831",
+        "sha256_in_prefix": "0840c2ae8dedc05a7ffe1597ead131532a8dc03521728d1d38e55da0fa769831",
+        "size_in_bytes": 3914
+      },
+      {
+        "_path": "include/lzma/lzma12.h",
+        "path_type": "hardlink",
+        "sha256": "caf8948b9306d508026cc3bbadea579eb8e75a24c444fdbe9986a4cc01a7b362",
+        "sha256_in_prefix": "caf8948b9306d508026cc3bbadea579eb8e75a24c444fdbe9986a4cc01a7b362",
+        "size_in_bytes": 14744
+      },
+      {
+        "_path": "include/lzma/stream_flags.h",
+        "path_type": "hardlink",
+        "sha256": "beba70fa9d83dc6a7fcfae9b1f8d07b3b5acbbdc789f008e63da4206e2434acc",
+        "sha256_in_prefix": "beba70fa9d83dc6a7fcfae9b1f8d07b3b5acbbdc789f008e63da4206e2434acc",
+        "size_in_bytes": 8253
+      },
+      {
+        "_path": "include/lzma/version.h",
+        "path_type": "hardlink",
+        "sha256": "83038dff2305cfc1a7baf1330fc7c2b47de793d6347a3b1e433988c4db86e57c",
+        "sha256_in_prefix": "83038dff2305cfc1a7baf1330fc7c2b47de793d6347a3b1e433988c4db86e57c",
+        "size_in_bytes": 3497
+      },
+      {
+        "_path": "include/lzma/vli.h",
+        "path_type": "hardlink",
+        "sha256": "1efbbbfc93d109aff5bc6ec025437bbf8b99410975d97244781e9a163fe50f4d",
+        "sha256_in_prefix": "1efbbbfc93d109aff5bc6ec025437bbf8b99410975d97244781e9a163fe50f4d",
+        "size_in_bytes": 6622
+      },
+      {
+        "_path": "lib/liblzma.so",
+        "path_type": "softlink",
+        "sha256": "84d8a0f3f6af2f1ededfc0c2df9176098ab7b62f17ce7f5805502b411626072b",
+        "size_in_bytes": 180952
+      },
+      {
+        "_path": "lib/liblzma.so.5",
+        "path_type": "softlink",
+        "sha256": "84d8a0f3f6af2f1ededfc0c2df9176098ab7b62f17ce7f5805502b411626072b",
+        "size_in_bytes": 180952
+      },
+      {
+        "_path": "lib/liblzma.so.5.2.6",
+        "path_type": "hardlink",
+        "sha256": "84d8a0f3f6af2f1ededfc0c2df9176098ab7b62f17ce7f5805502b411626072b",
+        "sha256_in_prefix": "84d8a0f3f6af2f1ededfc0c2df9176098ab7b62f17ce7f5805502b411626072b",
+        "size_in_bytes": 180952
+      },
+      {
+        "_path": "lib/pkgconfig/liblzma.pc",
+        "file_mode": "text",
+        "path_type": "hardlink",
+        "prefix_placeholder": "/home/conda/feedstock_root/build_artifacts/xz_1660346640809/_h_env_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehol",
+        "sha256": "4f2b79672067a9b38ec13a20903b9333ff9c355751e65ddc31b4c5d0ce7d1c79",
+        "sha256_in_prefix": "365abdb943e883b347317c1952086ac6addeabce514c506dab9e5bd2bf621019",
+        "size_in_bytes": 1400
+      },
+      {
+        "_path": "share/doc/xz/AUTHORS",
+        "path_type": "hardlink",
+        "sha256": "c07ea89b85db044f5e4a28fcc18a1dd900541737fb5ef8a69df1e1eb603f5966",
+        "sha256_in_prefix": "c07ea89b85db044f5e4a28fcc18a1dd900541737fb5ef8a69df1e1eb603f5966",
+        "size_in_bytes": 1076
+      },
+      {
+        "_path": "share/doc/xz/COPYING",
+        "path_type": "hardlink",
+        "sha256": "bcb02973ef6e87ea73d331b3a80df7748407f17efdb784b61b47e0e610d3bb5c",
+        "sha256_in_prefix": "bcb02973ef6e87ea73d331b3a80df7748407f17efdb784b61b47e0e610d3bb5c",
+        "size_in_bytes": 2775
+      },
+      {
+        "_path": "share/doc/xz/COPYING.GPLv2",
+        "path_type": "hardlink",
+        "sha256": "8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643",
+        "sha256_in_prefix": "8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643",
+        "size_in_bytes": 18092
+      },
+      {
+        "_path": "share/doc/xz/NEWS",
+        "path_type": "hardlink",
+        "sha256": "0cb884673243bafca71dc7ec6608e558a93ac711f65205159215c42c0bcd2565",
+        "sha256_in_prefix": "0cb884673243bafca71dc7ec6608e558a93ac711f65205159215c42c0bcd2565",
+        "size_in_bytes": 35423
+      },
+      {
+        "_path": "share/doc/xz/README",
+        "path_type": "hardlink",
+        "sha256": "ecd806b395d20f9f4c0eea86ee9927bb986b75e8066cc92e145c629c367e9cc8",
+        "sha256_in_prefix": "ecd806b395d20f9f4c0eea86ee9927bb986b75e8066cc92e145c629c367e9cc8",
+        "size_in_bytes": 9936
+      },
+      {
+        "_path": "share/doc/xz/THANKS",
+        "path_type": "hardlink",
+        "sha256": "56bc8e54423b25587468618a31a95109adba8b98021d8247960ad98c6210bad7",
+        "sha256_in_prefix": "56bc8e54423b25587468618a31a95109adba8b98021d8247960ad98c6210bad7",
+        "size_in_bytes": 2916
+      },
+      {
+        "_path": "share/doc/xz/TODO",
+        "path_type": "hardlink",
+        "sha256": "2ce425810436c5299aa5e4a8b0186c0de15a496697b518481f606abb421e80a9",
+        "sha256_in_prefix": "2ce425810436c5299aa5e4a8b0186c0de15a496697b518481f606abb421e80a9",
+        "size_in_bytes": 4040
+      },
+      {
+        "_path": "share/doc/xz/examples/00_README.txt",
+        "path_type": "hardlink",
+        "sha256": "f0ddaa731c89d6028f55281229e56b89f32b8c477aba4f52367488f0f42651be",
+        "sha256_in_prefix": "f0ddaa731c89d6028f55281229e56b89f32b8c477aba4f52367488f0f42651be",
+        "size_in_bytes": 1037
+      },
+      {
+        "_path": "share/doc/xz/examples/01_compress_easy.c",
+        "path_type": "hardlink",
+        "sha256": "913af652f6eac0c728762ce5537d3ea175538573df6f34358ce522fc6087c40a",
+        "sha256_in_prefix": "913af652f6eac0c728762ce5537d3ea175538573df6f34358ce522fc6087c40a",
+        "size_in_bytes": 9533
+      },
+      {
+        "_path": "share/doc/xz/examples/02_decompress.c",
+        "path_type": "hardlink",
+        "sha256": "1c8733c08e1edbd727bb623eb23b5505b32a4306e310ee4f9048fc9bf4af8de2",
+        "sha256_in_prefix": "1c8733c08e1edbd727bb623eb23b5505b32a4306e310ee4f9048fc9bf4af8de2",
+        "size_in_bytes": 8913
+      },
+      {
+        "_path": "share/doc/xz/examples/03_compress_custom.c",
+        "path_type": "hardlink",
+        "sha256": "914afd1e3494d9942ef752123f9743fa9427d5a82ca3e593794b9a4d9e390f42",
+        "sha256_in_prefix": "914afd1e3494d9942ef752123f9743fa9427d5a82ca3e593794b9a4d9e390f42",
+        "size_in_bytes": 5025
+      },
+      {
+        "_path": "share/doc/xz/examples/04_compress_easy_mt.c",
+        "path_type": "hardlink",
+        "sha256": "80a5d7e1acd455ffb55bd1ca26f767789171293a231e6645ca991b83b954988c",
+        "sha256_in_prefix": "80a5d7e1acd455ffb55bd1ca26f767789171293a231e6645ca991b83b954988c",
+        "size_in_bytes": 5214
+      },
+      {
+        "_path": "share/doc/xz/examples/Makefile",
+        "path_type": "hardlink",
+        "sha256": "067ac8dbf5a9cab8c2a12b3fadda34c93656308f150a8a195bfcdb071ca043a7",
+        "sha256_in_prefix": "067ac8dbf5a9cab8c2a12b3fadda34c93656308f150a8a195bfcdb071ca043a7",
+        "size_in_bytes": 337
+      },
+      {
+        "_path": "share/doc/xz/examples_old/xz_pipe_comp.c",
+        "path_type": "hardlink",
+        "sha256": "fce7eefb9149c5f5a43869e07a4a576c1f2af4ca0aae6872bd7ca50ed8c85522",
+        "sha256_in_prefix": "fce7eefb9149c5f5a43869e07a4a576c1f2af4ca0aae6872bd7ca50ed8c85522",
+        "size_in_bytes": 3043
+      },
+      {
+        "_path": "share/doc/xz/examples_old/xz_pipe_decomp.c",
+        "path_type": "hardlink",
+        "sha256": "5d157c3c397fffc3b0489e49ef1d396fcfe6153f134ec5ea44ef0acc7fe474aa",
+        "sha256_in_prefix": "5d157c3c397fffc3b0489e49ef1d396fcfe6153f134ec5ea44ef0acc7fe474aa",
+        "size_in_bytes": 3130
+      },
+      {
+        "_path": "share/doc/xz/faq.txt",
+        "path_type": "hardlink",
+        "sha256": "eff832647a62f3b582e0255a8d450523074874d16bf3bdcbae76acbfe23fbb29",
+        "sha256_in_prefix": "eff832647a62f3b582e0255a8d450523074874d16bf3bdcbae76acbfe23fbb29",
+        "size_in_bytes": 9411
+      },
+      {
+        "_path": "share/doc/xz/history.txt",
+        "path_type": "hardlink",
+        "sha256": "9d6a0a72822734a0afb1816e07f0a7edab03339119bed4f393c1c7eec884eab6",
+        "sha256_in_prefix": "9d6a0a72822734a0afb1816e07f0a7edab03339119bed4f393c1c7eec884eab6",
+        "size_in_bytes": 7427
+      },
+      {
+        "_path": "share/doc/xz/lzma-file-format.txt",
+        "path_type": "hardlink",
+        "sha256": "beda7e9710f03003286d2e99c159e16e727e286e22da6a9bb311e493b80e2725",
+        "sha256_in_prefix": "beda7e9710f03003286d2e99c159e16e727e286e22da6a9bb311e493b80e2725",
+        "size_in_bytes": 6081
+      },
+      {
+        "_path": "share/doc/xz/xz-file-format.txt",
+        "path_type": "hardlink",
+        "sha256": "fada567e0ebd8b910d2c3210d13e74f3fcc8475d64e29e35db0fc05e3c6820f5",
+        "sha256_in_prefix": "fada567e0ebd8b910d2c3210d13e74f3fcc8475d64e29e35db0fc05e3c6820f5",
+        "size_in_bytes": 43305
+      },
+      {
+        "_path": "share/locale/ca/LC_MESSAGES/xz.mo",
+        "path_type": "hardlink",
+        "sha256": "8b8708a2eaf388b5ee952cfc7d164da04701d488bf1c734f6e0dfd9f37a0856a",
+        "sha256_in_prefix": "8b8708a2eaf388b5ee952cfc7d164da04701d488bf1c734f6e0dfd9f37a0856a",
+        "size_in_bytes": 26598
+      },
+      {
+        "_path": "share/locale/cs/LC_MESSAGES/xz.mo",
+        "path_type": "hardlink",
+        "sha256": "44be0d3073f342626a9fcb829148de534330aeb8e7ac9b696d034993766bbe3b",
+        "sha256_in_prefix": "44be0d3073f342626a9fcb829148de534330aeb8e7ac9b696d034993766bbe3b",
+        "size_in_bytes": 21904
+      },
+      {
+        "_path": "share/locale/da/LC_MESSAGES/xz.mo",
+        "path_type": "hardlink",
+        "sha256": "4323aea451336747c0050509d647d7b010d210571d726045662f5795c683d652",
+        "sha256_in_prefix": "4323aea451336747c0050509d647d7b010d210571d726045662f5795c683d652",
+        "size_in_bytes": 14353
+      },
+      {
+        "_path": "share/locale/de/LC_MESSAGES/xz.mo",
+        "path_type": "hardlink",
+        "sha256": "d311700e81b00076f204aaddfa77729b0758368d7347b638b5bbd3a88387d5be",
+        "sha256_in_prefix": "d311700e81b00076f204aaddfa77729b0758368d7347b638b5bbd3a88387d5be",
+        "size_in_bytes": 28028
+      },
+      {
+        "_path": "share/locale/eo/LC_MESSAGES/xz.mo",
+        "path_type": "hardlink",
+        "sha256": "7525b7258e53b952d7888f3f0d2bca80dc57ddab397772de0e71e21556608acf",
+        "sha256_in_prefix": "7525b7258e53b952d7888f3f0d2bca80dc57ddab397772de0e71e21556608acf",
+        "size_in_bytes": 25497
+      },
+      {
+        "_path": "share/locale/es/LC_MESSAGES/xz.mo",
+        "path_type": "hardlink",
+        "sha256": "00e705f2a9841fbd1e4bb3eb483069ef8974a082c426dd9da0b62bd8939d855f",
+        "sha256_in_prefix": "00e705f2a9841fbd1e4bb3eb483069ef8974a082c426dd9da0b62bd8939d855f",
+        "size_in_bytes": 26589
+      },
+      {
+        "_path": "share/locale/fi/LC_MESSAGES/xz.mo",
+        "path_type": "hardlink",
+        "sha256": "410ea492ce29d58a48500476fe96f96bc82215bfecd282a30a3ae0dd2588d171",
+        "sha256_in_prefix": "410ea492ce29d58a48500476fe96f96bc82215bfecd282a30a3ae0dd2588d171",
+        "size_in_bytes": 25641
+      },
+      {
+        "_path": "share/locale/fr/LC_MESSAGES/xz.mo",
+        "path_type": "hardlink",
+        "sha256": "1adb0494784ebb7d78f017c06a82211ae61d14d6bda10c22dec40e83d6458dec",
+        "sha256_in_prefix": "1adb0494784ebb7d78f017c06a82211ae61d14d6bda10c22dec40e83d6458dec",
+        "size_in_bytes": 26925
+      },
+      {
+        "_path": "share/locale/hr/LC_MESSAGES/xz.mo",
+        "path_type": "hardlink",
+        "sha256": "9eb305a699d40e3a45d053ede20df4ed71cf8cbb8a73d08a2c27e6bc015b1b0a",
+        "sha256_in_prefix": "9eb305a699d40e3a45d053ede20df4ed71cf8cbb8a73d08a2c27e6bc015b1b0a",
+        "size_in_bytes": 26302
+      },
+      {
+        "_path": "share/locale/hu/LC_MESSAGES/xz.mo",
+        "path_type": "hardlink",
+        "sha256": "3ba74bcf6f111f08aeddcb3611eb2b1894e8d7a053632bd73aeb2e96bb4dc0a2",
+        "sha256_in_prefix": "3ba74bcf6f111f08aeddcb3611eb2b1894e8d7a053632bd73aeb2e96bb4dc0a2",
+        "size_in_bytes": 26926
+      },
+      {
+        "_path": "share/locale/it/LC_MESSAGES/xz.mo",
+        "path_type": "hardlink",
+        "sha256": "59e62f7f2c73a34d2a05b6ed4cfca0fafe6d48d5250508130f495e8e04bdfb10",
+        "sha256_in_prefix": "59e62f7f2c73a34d2a05b6ed4cfca0fafe6d48d5250508130f495e8e04bdfb10",
+        "size_in_bytes": 26532
+      },
+      {
+        "_path": "share/locale/ko/LC_MESSAGES/xz.mo",
+        "path_type": "hardlink",
+        "sha256": "bfcc1c4a34eeb672c1e46b620a7374193364d5d4ec44ae95f52aa75deedc3f26",
+        "sha256_in_prefix": "bfcc1c4a34eeb672c1e46b620a7374193364d5d4ec44ae95f52aa75deedc3f26",
+        "size_in_bytes": 26855
+      },
+      {
+        "_path": "share/locale/pl/LC_MESSAGES/xz.mo",
+        "path_type": "hardlink",
+        "sha256": "bed59a7ade3bc8f52aa57ab3ee0835d36bfe5df5d2dde2bc792a688187a3f6cd",
+        "sha256_in_prefix": "bed59a7ade3bc8f52aa57ab3ee0835d36bfe5df5d2dde2bc792a688187a3f6cd",
+        "size_in_bytes": 26084
+      },
+      {
+        "_path": "share/locale/pt/LC_MESSAGES/xz.mo",
+        "path_type": "hardlink",
+        "sha256": "1213bf8d70d4c42c4a015a3bf0cfcbd522cec632f2dfd58e23205112f55423b0",
+        "sha256_in_prefix": "1213bf8d70d4c42c4a015a3bf0cfcbd522cec632f2dfd58e23205112f55423b0",
+        "size_in_bytes": 26401
+      },
+      {
+        "_path": "share/locale/pt_BR/LC_MESSAGES/xz.mo",
+        "path_type": "hardlink",
+        "sha256": "4513c57b9922ee4ea971f9520d22f6d68eb65d7664c9a7cce31548572d72753a",
+        "sha256_in_prefix": "4513c57b9922ee4ea971f9520d22f6d68eb65d7664c9a7cce31548572d72753a",
+        "size_in_bytes": 26451
+      },
+      {
+        "_path": "share/locale/ro/LC_MESSAGES/xz.mo",
+        "path_type": "hardlink",
+        "sha256": "9bb93d91ac2346ec4fb3c8ad34f9dd4fbe8b616e9daef4a27abe46af9efc01a4",
+        "sha256_in_prefix": "9bb93d91ac2346ec4fb3c8ad34f9dd4fbe8b616e9daef4a27abe46af9efc01a4",
+        "size_in_bytes": 27767
+      },
+      {
+        "_path": "share/locale/sr/LC_MESSAGES/xz.mo",
+        "path_type": "hardlink",
+        "sha256": "f2ae458346d7ba45cc00cd67d2e25fa367533569a93b92fbd08228ac33657576",
+        "sha256_in_prefix": "f2ae458346d7ba45cc00cd67d2e25fa367533569a93b92fbd08228ac33657576",
+        "size_in_bytes": 33256
+      },
+      {
+        "_path": "share/locale/sv/LC_MESSAGES/xz.mo",
+        "path_type": "hardlink",
+        "sha256": "df32e9b7eca1f6c9fd2f0c3035b0a385a016ab8c7e3ef9a83d784c5a4fd675fe",
+        "sha256_in_prefix": "df32e9b7eca1f6c9fd2f0c3035b0a385a016ab8c7e3ef9a83d784c5a4fd675fe",
+        "size_in_bytes": 25871
+      },
+      {
+        "_path": "share/locale/uk/LC_MESSAGES/xz.mo",
+        "path_type": "hardlink",
+        "sha256": "ece53b63f5fd1a968f383953696df338b3542fe91846345608e1cf14a4c28a01",
+        "sha256_in_prefix": "ece53b63f5fd1a968f383953696df338b3542fe91846345608e1cf14a4c28a01",
+        "size_in_bytes": 34694
+      },
+      {
+        "_path": "share/locale/vi/LC_MESSAGES/xz.mo",
+        "path_type": "hardlink",
+        "sha256": "1b198a6156ed626b6807c359ae9a71c832046787493d0930f697a0c56d058a14",
+        "sha256_in_prefix": "1b198a6156ed626b6807c359ae9a71c832046787493d0930f697a0c56d058a14",
+        "size_in_bytes": 27552
+      },
+      {
+        "_path": "share/locale/zh_CN/LC_MESSAGES/xz.mo",
+        "path_type": "hardlink",
+        "sha256": "9dfaa5080c5df00beb5fc89ef4220251b07d7c0fa24c80e6207f5382df07746f",
+        "sha256_in_prefix": "9dfaa5080c5df00beb5fc89ef4220251b07d7c0fa24c80e6207f5382df07746f",
+        "size_in_bytes": 24818
+      },
+      {
+        "_path": "share/locale/zh_TW/LC_MESSAGES/xz.mo",
+        "path_type": "hardlink",
+        "sha256": "647a4d571807e87e24216422fbdf90111a0109b0a6cff7f011312b8a45792286",
+        "sha256_in_prefix": "647a4d571807e87e24216422fbdf90111a0109b0a6cff7f011312b8a45792286",
+        "size_in_bytes": 23142
+      },
+      {
+        "_path": "share/man/de/man1/lzcat.1",
+        "path_type": "softlink",
+        "sha256": "cf2c45af21e95181c64d1d2ca472c2c49b837b344224ff59cac55cd1ca8ea92f",
+        "size_in_bytes": 78041
+      },
+      {
+        "_path": "share/man/de/man1/lzcmp.1",
+        "path_type": "softlink",
+        "sha256": "cc632902b17b1d87460e801f8f4dce37147c5e5afe866025cc53da666530afc7",
+        "size_in_bytes": 1949
+      },
+      {
+        "_path": "share/man/de/man1/lzdiff.1",
+        "path_type": "softlink",
+        "sha256": "cc632902b17b1d87460e801f8f4dce37147c5e5afe866025cc53da666530afc7",
+        "size_in_bytes": 1949
+      },
+      {
+        "_path": "share/man/de/man1/lzless.1",
+        "path_type": "softlink",
+        "sha256": "3bbb5787fa3e8cdcc6b8038e89bec24c46b6b5bbcdf1a2608c6e07ee0353658c",
+        "size_in_bytes": 1870
+      },
+      {
+        "_path": "share/man/de/man1/lzma.1",
+        "path_type": "softlink",
+        "sha256": "cf2c45af21e95181c64d1d2ca472c2c49b837b344224ff59cac55cd1ca8ea92f",
+        "size_in_bytes": 78041
+      },
+      {
+        "_path": "share/man/de/man1/lzmadec.1",
+        "path_type": "softlink",
+        "sha256": "eef54888b7ccc946c9accd666a78f4c2fa5f98c41faf73488139667db13a66b1",
+        "size_in_bytes": 3756
+      },
+      {
+        "_path": "share/man/de/man1/lzmore.1",
+        "path_type": "softlink",
+        "sha256": "e484edd83be36324516b7edb79ad6fa2e4745f0bc1eb23deb8530b5f63d44609",
+        "size_in_bytes": 1529
+      },
+      {
+        "_path": "share/man/de/man1/unlzma.1",
+        "path_type": "softlink",
+        "sha256": "cf2c45af21e95181c64d1d2ca472c2c49b837b344224ff59cac55cd1ca8ea92f",
+        "size_in_bytes": 78041
+      },
+      {
+        "_path": "share/man/de/man1/unxz.1",
+        "path_type": "softlink",
+        "sha256": "cf2c45af21e95181c64d1d2ca472c2c49b837b344224ff59cac55cd1ca8ea92f",
+        "size_in_bytes": 78041
+      },
+      {
+        "_path": "share/man/de/man1/xz.1",
+        "path_type": "hardlink",
+        "sha256": "cf2c45af21e95181c64d1d2ca472c2c49b837b344224ff59cac55cd1ca8ea92f",
+        "sha256_in_prefix": "cf2c45af21e95181c64d1d2ca472c2c49b837b344224ff59cac55cd1ca8ea92f",
+        "size_in_bytes": 78041
+      },
+      {
+        "_path": "share/man/de/man1/xzcat.1",
+        "path_type": "softlink",
+        "sha256": "cf2c45af21e95181c64d1d2ca472c2c49b837b344224ff59cac55cd1ca8ea92f",
+        "size_in_bytes": 78041
+      },
+      {
+        "_path": "share/man/de/man1/xzcmp.1",
+        "path_type": "softlink",
+        "sha256": "cc632902b17b1d87460e801f8f4dce37147c5e5afe866025cc53da666530afc7",
+        "size_in_bytes": 1949
+      },
+      {
+        "_path": "share/man/de/man1/xzdec.1",
+        "path_type": "hardlink",
+        "sha256": "eef54888b7ccc946c9accd666a78f4c2fa5f98c41faf73488139667db13a66b1",
+        "sha256_in_prefix": "eef54888b7ccc946c9accd666a78f4c2fa5f98c41faf73488139667db13a66b1",
+        "size_in_bytes": 3756
+      },
+      {
+        "_path": "share/man/de/man1/xzdiff.1",
+        "path_type": "hardlink",
+        "sha256": "cc632902b17b1d87460e801f8f4dce37147c5e5afe866025cc53da666530afc7",
+        "sha256_in_prefix": "cc632902b17b1d87460e801f8f4dce37147c5e5afe866025cc53da666530afc7",
+        "size_in_bytes": 1949
+      },
+      {
+        "_path": "share/man/de/man1/xzless.1",
+        "path_type": "hardlink",
+        "sha256": "3bbb5787fa3e8cdcc6b8038e89bec24c46b6b5bbcdf1a2608c6e07ee0353658c",
+        "sha256_in_prefix": "3bbb5787fa3e8cdcc6b8038e89bec24c46b6b5bbcdf1a2608c6e07ee0353658c",
+        "size_in_bytes": 1870
+      },
+      {
+        "_path": "share/man/de/man1/xzmore.1",
+        "path_type": "hardlink",
+        "sha256": "e484edd83be36324516b7edb79ad6fa2e4745f0bc1eb23deb8530b5f63d44609",
+        "sha256_in_prefix": "e484edd83be36324516b7edb79ad6fa2e4745f0bc1eb23deb8530b5f63d44609",
+        "size_in_bytes": 1529
+      },
+      {
+        "_path": "share/man/fr_FR/man1/lzcat.1",
+        "path_type": "softlink",
+        "sha256": "c855725477fbb34c99de4ab853c8adcfc37852185f55e8b8b917b2faac6aa433",
+        "size_in_bytes": 77737
+      },
+      {
+        "_path": "share/man/fr_FR/man1/lzcmp.1",
+        "path_type": "softlink",
+        "sha256": "06924063e7703c9e1a7c267a456b180f3ef98818fb83cf2e75ad7d9362481b35",
+        "size_in_bytes": 1937
+      },
+      {
+        "_path": "share/man/fr_FR/man1/lzdiff.1",
+        "path_type": "softlink",
+        "sha256": "06924063e7703c9e1a7c267a456b180f3ef98818fb83cf2e75ad7d9362481b35",
+        "size_in_bytes": 1937
+      },
+      {
+        "_path": "share/man/fr_FR/man1/lzless.1",
+        "path_type": "softlink",
+        "sha256": "a1de1f3460b1294fc77d95c52bffbbc4a211225b9cd6be2be82e20f5ddce77b8",
+        "size_in_bytes": 1831
+      },
+      {
+        "_path": "share/man/fr_FR/man1/lzma.1",
+        "path_type": "softlink",
+        "sha256": "c855725477fbb34c99de4ab853c8adcfc37852185f55e8b8b917b2faac6aa433",
+        "size_in_bytes": 77737
+      },
+      {
+        "_path": "share/man/fr_FR/man1/lzmadec.1",
+        "path_type": "softlink",
+        "sha256": "428523e127c82599caf67ff3b7b91d2b950f98f2e71ec8190f24e03929a0555c",
+        "size_in_bytes": 3562
+      },
+      {
+        "_path": "share/man/fr_FR/man1/lzmore.1",
+        "path_type": "softlink",
+        "sha256": "d5185c0e7a683162f17f1bd6aaad15bf77933fb288ed477ab9e80ec11176d0da",
+        "size_in_bytes": 1603
+      },
+      {
+        "_path": "share/man/fr_FR/man1/unlzma.1",
+        "path_type": "softlink",
+        "sha256": "c855725477fbb34c99de4ab853c8adcfc37852185f55e8b8b917b2faac6aa433",
+        "size_in_bytes": 77737
+      },
+      {
+        "_path": "share/man/fr_FR/man1/unxz.1",
+        "path_type": "softlink",
+        "sha256": "c855725477fbb34c99de4ab853c8adcfc37852185f55e8b8b917b2faac6aa433",
+        "size_in_bytes": 77737
+      },
+      {
+        "_path": "share/man/fr_FR/man1/xz.1",
+        "path_type": "hardlink",
+        "sha256": "c855725477fbb34c99de4ab853c8adcfc37852185f55e8b8b917b2faac6aa433",
+        "sha256_in_prefix": "c855725477fbb34c99de4ab853c8adcfc37852185f55e8b8b917b2faac6aa433",
+        "size_in_bytes": 77737
+      },
+      {
+        "_path": "share/man/fr_FR/man1/xzcat.1",
+        "path_type": "softlink",
+        "sha256": "c855725477fbb34c99de4ab853c8adcfc37852185f55e8b8b917b2faac6aa433",
+        "size_in_bytes": 77737
+      },
+      {
+        "_path": "share/man/fr_FR/man1/xzcmp.1",
+        "path_type": "softlink",
+        "sha256": "06924063e7703c9e1a7c267a456b180f3ef98818fb83cf2e75ad7d9362481b35",
+        "size_in_bytes": 1937
+      },
+      {
+        "_path": "share/man/fr_FR/man1/xzdec.1",
+        "path_type": "hardlink",
+        "sha256": "428523e127c82599caf67ff3b7b91d2b950f98f2e71ec8190f24e03929a0555c",
+        "sha256_in_prefix": "428523e127c82599caf67ff3b7b91d2b950f98f2e71ec8190f24e03929a0555c",
+        "size_in_bytes": 3562
+      },
+      {
+        "_path": "share/man/fr_FR/man1/xzdiff.1",
+        "path_type": "hardlink",
+        "sha256": "06924063e7703c9e1a7c267a456b180f3ef98818fb83cf2e75ad7d9362481b35",
+        "sha256_in_prefix": "06924063e7703c9e1a7c267a456b180f3ef98818fb83cf2e75ad7d9362481b35",
+        "size_in_bytes": 1937
+      },
+      {
+        "_path": "share/man/fr_FR/man1/xzless.1",
+        "path_type": "hardlink",
+        "sha256": "a1de1f3460b1294fc77d95c52bffbbc4a211225b9cd6be2be82e20f5ddce77b8",
+        "sha256_in_prefix": "a1de1f3460b1294fc77d95c52bffbbc4a211225b9cd6be2be82e20f5ddce77b8",
+        "size_in_bytes": 1831
+      },
+      {
+        "_path": "share/man/fr_FR/man1/xzmore.1",
+        "path_type": "hardlink",
+        "sha256": "d5185c0e7a683162f17f1bd6aaad15bf77933fb288ed477ab9e80ec11176d0da",
+        "sha256_in_prefix": "d5185c0e7a683162f17f1bd6aaad15bf77933fb288ed477ab9e80ec11176d0da",
+        "size_in_bytes": 1603
+      },
+      {
+        "_path": "share/man/man1/lzcat.1",
+        "path_type": "softlink",
+        "sha256": "f30f1ef1eb2248ffc6ddc9a3eabab159879b02d237329ec64279c1ad4ba18319",
+        "size_in_bytes": 65586
+      },
+      {
+        "_path": "share/man/man1/lzcmp.1",
+        "path_type": "softlink",
+        "sha256": "92d4741fa9175236861130b25b4aaf827c28c9e96dabc93bfc0cf3f47f799504",
+        "size_in_bytes": 1556
+      },
+      {
+        "_path": "share/man/man1/lzdiff.1",
+        "path_type": "softlink",
+        "sha256": "92d4741fa9175236861130b25b4aaf827c28c9e96dabc93bfc0cf3f47f799504",
+        "size_in_bytes": 1556
+      },
+      {
+        "_path": "share/man/man1/lzegrep.1",
+        "path_type": "softlink",
+        "sha256": "25dbf88e1daaf43e360f27f45df7fe0110748bef0ee5b00c5ec6b9d0a0a6b38e",
+        "size_in_bytes": 1777
+      },
+      {
+        "_path": "share/man/man1/lzfgrep.1",
+        "path_type": "softlink",
+        "sha256": "25dbf88e1daaf43e360f27f45df7fe0110748bef0ee5b00c5ec6b9d0a0a6b38e",
+        "size_in_bytes": 1777
+      },
+      {
+        "_path": "share/man/man1/lzgrep.1",
+        "path_type": "softlink",
+        "sha256": "25dbf88e1daaf43e360f27f45df7fe0110748bef0ee5b00c5ec6b9d0a0a6b38e",
+        "size_in_bytes": 1777
+      },
+      {
+        "_path": "share/man/man1/lzless.1",
+        "path_type": "softlink",
+        "sha256": "2db6570b6f62b6f0d46fecfc18ead93000abaec97399514b31e18edb7ab2fecb",
+        "size_in_bytes": 1360
+      },
+      {
+        "_path": "share/man/man1/lzma.1",
+        "path_type": "softlink",
+        "sha256": "f30f1ef1eb2248ffc6ddc9a3eabab159879b02d237329ec64279c1ad4ba18319",
+        "size_in_bytes": 65586
+      },
+      {
+        "_path": "share/man/man1/lzmadec.1",
+        "path_type": "softlink",
+        "sha256": "20e56b65af31a9488483f01659c681de022da370d36a427b232246e4eb39bb6f",
+        "size_in_bytes": 2838
+      },
+      {
+        "_path": "share/man/man1/lzmainfo.1",
+        "path_type": "hardlink",
+        "sha256": "0963a1fe3e0539f036aaa9adf5bb179df10f2abe5f7f470c87340a5619e5f500",
+        "sha256_in_prefix": "0963a1fe3e0539f036aaa9adf5bb179df10f2abe5f7f470c87340a5619e5f500",
+        "size_in_bytes": 1250
+      },
+      {
+        "_path": "share/man/man1/lzmore.1",
+        "path_type": "softlink",
+        "sha256": "551a2a7f6e2e5626b0cee4580a0107d81410afd742da25001c846b4fa7645b07",
+        "size_in_bytes": 1153
+      },
+      {
+        "_path": "share/man/man1/unlzma.1",
+        "path_type": "softlink",
+        "sha256": "f30f1ef1eb2248ffc6ddc9a3eabab159879b02d237329ec64279c1ad4ba18319",
+        "size_in_bytes": 65586
+      },
+      {
+        "_path": "share/man/man1/unxz.1",
+        "path_type": "softlink",
+        "sha256": "f30f1ef1eb2248ffc6ddc9a3eabab159879b02d237329ec64279c1ad4ba18319",
+        "size_in_bytes": 65586
+      },
+      {
+        "_path": "share/man/man1/xz.1",
+        "path_type": "hardlink",
+        "sha256": "f30f1ef1eb2248ffc6ddc9a3eabab159879b02d237329ec64279c1ad4ba18319",
+        "sha256_in_prefix": "f30f1ef1eb2248ffc6ddc9a3eabab159879b02d237329ec64279c1ad4ba18319",
+        "size_in_bytes": 65586
+      },
+      {
+        "_path": "share/man/man1/xzcat.1",
+        "path_type": "softlink",
+        "sha256": "f30f1ef1eb2248ffc6ddc9a3eabab159879b02d237329ec64279c1ad4ba18319",
+        "size_in_bytes": 65586
+      },
+      {
+        "_path": "share/man/man1/xzcmp.1",
+        "path_type": "softlink",
+        "sha256": "92d4741fa9175236861130b25b4aaf827c28c9e96dabc93bfc0cf3f47f799504",
+        "size_in_bytes": 1556
+      },
+      {
+        "_path": "share/man/man1/xzdec.1",
+        "path_type": "hardlink",
+        "sha256": "20e56b65af31a9488483f01659c681de022da370d36a427b232246e4eb39bb6f",
+        "sha256_in_prefix": "20e56b65af31a9488483f01659c681de022da370d36a427b232246e4eb39bb6f",
+        "size_in_bytes": 2838
+      },
+      {
+        "_path": "share/man/man1/xzdiff.1",
+        "path_type": "hardlink",
+        "sha256": "92d4741fa9175236861130b25b4aaf827c28c9e96dabc93bfc0cf3f47f799504",
+        "sha256_in_prefix": "92d4741fa9175236861130b25b4aaf827c28c9e96dabc93bfc0cf3f47f799504",
+        "size_in_bytes": 1556
+      },
+      {
+        "_path": "share/man/man1/xzegrep.1",
+        "path_type": "softlink",
+        "sha256": "25dbf88e1daaf43e360f27f45df7fe0110748bef0ee5b00c5ec6b9d0a0a6b38e",
+        "size_in_bytes": 1777
+      },
+      {
+        "_path": "share/man/man1/xzfgrep.1",
+        "path_type": "softlink",
+        "sha256": "25dbf88e1daaf43e360f27f45df7fe0110748bef0ee5b00c5ec6b9d0a0a6b38e",
+        "size_in_bytes": 1777
+      },
+      {
+        "_path": "share/man/man1/xzgrep.1",
+        "path_type": "hardlink",
+        "sha256": "25dbf88e1daaf43e360f27f45df7fe0110748bef0ee5b00c5ec6b9d0a0a6b38e",
+        "sha256_in_prefix": "25dbf88e1daaf43e360f27f45df7fe0110748bef0ee5b00c5ec6b9d0a0a6b38e",
+        "size_in_bytes": 1777
+      },
+      {
+        "_path": "share/man/man1/xzless.1",
+        "path_type": "hardlink",
+        "sha256": "2db6570b6f62b6f0d46fecfc18ead93000abaec97399514b31e18edb7ab2fecb",
+        "sha256_in_prefix": "2db6570b6f62b6f0d46fecfc18ead93000abaec97399514b31e18edb7ab2fecb",
+        "size_in_bytes": 1360
+      },
+      {
+        "_path": "share/man/man1/xzmore.1",
+        "path_type": "hardlink",
+        "sha256": "551a2a7f6e2e5626b0cee4580a0107d81410afd742da25001c846b4fa7645b07",
+        "sha256_in_prefix": "551a2a7f6e2e5626b0cee4580a0107d81410afd742da25001c846b4fa7645b07",
+        "size_in_bytes": 1153
+      }
+    ],
+    "paths_version": 1
+  },
+  "requested_spec": "None",
+  "sha256": "03a6d28ded42af8a347345f82f3eebdd6807a08526d47899a42d62d319609162",
+  "size": 418368,
+  "subdir": "linux-64",
+  "timestamp": 1660346797000,
+  "url": "https://conda.anaconda.org/conda-forge/linux-64/xz-5.2.6-h166bdaf_0.tar.bz2",
+  "version": "5.2.6"
+}

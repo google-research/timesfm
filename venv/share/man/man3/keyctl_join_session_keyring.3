@@ -1,0 +1,84 @@
+.\"
+.\" Copyright (C) 2006 Red Hat, Inc. All Rights Reserved.
+.\" Written by David Howells (dhowells@redhat.com)
+.\"
+.\" This program is free software; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License
+.\" as published by the Free Software Foundation; either version
+.\" 2 of the License, or (at your option) any later version.
+.\"
+.TH KEYCTL_JOIN_SESSION_KEYRING 3 "20 Feb 2014" Linux "Linux Key Management Calls"
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH NAME
+keyctl_join_session_keyring \- join a different session keyring
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH SYNOPSIS
+.nf
+.B #include <keyutils.h>
+.sp
+.BI "key_serial_t keyctl_join_session_keyring(const char *" name ");"
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH DESCRIPTION
+.BR keyctl_join_session_keyring ()
+changes the session keyring to which a process is subscribed.
+.P
+If
+.I name
+is
+.B NULL
+then a new anonymous keyring will be created, and the process will be
+subscribed to that.
+.P
+If
+.I name
+points to a string, then if a keyring of that name is available, the process
+will attempt to subscribe to that keyring, giving an error if that is not
+permitted; otherwise a new keyring of that name is created and attached as the
+session keyring.
+.P
+To attach to an extant named keyring, the keyring must have
+.B search
+permission available to the calling process.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH RETURN VALUE
+On success
+.BR keyctl_join_session_keyring ()
+returns the serial number of the key it found or created.  On error, the value
+.B -1
+will be returned and
+.I errno
+will have been set to an appropriate error.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH ERRORS
+.TP
+.B ENOMEM
+Insufficient memory to create a key.
+.TP
+.B EDQUOT
+The key quota for this user would be exceeded by creating this key or linking
+it to the keyring.
+.TP
+.B EACCES
+The named keyring exists, but is not
+.B searchable
+by the calling process.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH LINKING
+This is a library function that can be found in
+.IR libkeyutils .
+When linking,
+.B \-lkeyutils
+should be specified to the linker.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH SEE ALSO
+.ad l
+.nh
+.BR keyctl (1),
+.BR add_key (2),
+.BR keyctl (2),
+.BR request_key (2),
+.BR keyctl (3),
+.BR keyrings (7),
+.BR keyutils (7),
+.BR session\-keyring (7),
+.BR user\-session\-keyring (7)

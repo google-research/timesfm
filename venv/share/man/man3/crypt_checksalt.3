@@ -1,0 +1,106 @@
+.\" Written by Zack Weinberg <zackw at panix.com> in 2018.
+.\"
+.\" To the extent possible under law, the authors have waived
+.\" all copyright and related or neighboring rights to this work.
+.\" See https://creativecommons.org/publicdomain/zero/1.0/ for further
+.\" details.
+.\"
+.Dd November 8, 2018
+.Dt CRYPT_CHECKSALT 3
+.Os "libxcrypt"
+.Sh NAME
+.Nm crypt_checksalt
+.Nd validate a crypt setting string
+.Sh LIBRARY
+.Lb libcrypt
+.Sh SYNOPSIS
+.In crypt.h
+.Ft int
+.Fo crypt_checksalt
+.Fa "const char *setting"
+.Fc
+.Sh DESCRIPTION
+.Nm
+checks the
+.Ar setting
+string against the system configuration
+and reports whether the hashing method and parameters it specifies
+are acceptable.
+It is intended to be used by programs
+such as
+.Xr login 1
+to determine whether the user's passphrase should be re-hashed
+using the currently preferred hashing method.
+.Sh RETURN VALUES
+The return value is 0 if there is nothing wrong with this setting.
+Otherwise, it is one of the following constants:
+.Bl -tag -width 4n
+.It Dv CRYPT_SALT_OK
+.Ar setting
+is a fully correct setting string.
+This constant is guaranteed to equal 0.
+.It Dv CRYPT_SALT_INVALID
+.Ar setting
+is not a valid setting string; either it specifies a hashing method
+that is not known to this version of libxcrypt,
+or it specifies invalid parameters for the method.
+.It Dv CRYPT_SALT_METHOD_DISABLED (Not implemented, yet)
+.Ar setting
+specifies a hashing method that is no longer allowed to be used at all;
+.Nm crypt
+will fail if passed this
+.Ar setting .
+Manual intervention will be required to reactivate the user's account.
+.It Dv CRYPT_SALT_METHOD_LEGACY
+.Ar setting
+specifies a hashing method that is no longer considered strong enough
+for use with new passphrases.
+.Nm crypt
+will still authenticate a passphrase against this setting,
+but if authentication succeeds,
+the passphrase should be re-hashed using the currently preferred method.
+.It Dv CRYPT_SALT_TOO_CHEAP (Not implemented, yet)
+.Ar setting
+specifies cost parameters that are considered too cheap for use with
+new passphrases.
+.Nm crypt
+will still authenticate a passphrase against this setting,
+but if authentication succeeds,
+the passphrase should be re-hashed using the currently preferred method.
+.El
+.Sh FEATURE TEST MACROS
+.In crypt.h
+will define the macro
+.Dv CRYPT_CHECKSALT_AVAILABLE
+if
+.Nm
+is available in the current version of libxcrypt.
+.Sh BUGS
+Since full configurability is not yet implemented, the current
+implementation will only ever return
+.Nm CRYPT_SALT_OK (0)
+or
+.Nm CRYPT_SALT_INVALID
+when invoked.
+.Sh PORTABILITY NOTES
+The function
+.Nm
+is not part of any standard.
+It was added to libxcrypt in version 4.3.0.
+.Sh ATTRIBUTES
+For an explanation of the terms used in this section, see
+.Xr attributes 7 .
+.TS
+allbox;
+lb lb lb
+l l l.
+Interface	Attribute	Value
+T{
+.Nm
+T}	Thread safety	MT-Safe
+.TE
+.sp
+.Sh SEE ALSO
+.Xr crypt 3 ,
+.Xr crypt_gensalt 3 ,
+.Xr crypt 5

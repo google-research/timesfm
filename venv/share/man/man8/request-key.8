@@ -1,0 +1,61 @@
+.\"
+.\" Copyright (C) 2004 Red Hat, Inc. All Rights Reserved.
+.\" Written by David Howells (dhowells@redhat.com)
+.\"
+.\" This program is free software; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License
+.\" as published by the Free Software Foundation; either version
+.\" 2 of the License, or (at your option) any later version.
+.\"
+.TH REQUEST-KEY 8 "15 Nov 2011" Linux "Linux Key Management Utilities"
+.SH NAME
+request\-key \- handle key instantiation callback requests from the kernel
+.SH SYNOPSIS
+\fB/sbin/request\-key \fR<op> <key> <uid> <gid> <threadring> <processring>
+	<sessionring> [<info>]
+.SH DESCRIPTION
+This program is invoked by the kernel when the kernel is asked for a key that
+it doesn't have immediately available. The kernel creates a partially set up
+key and then calls out to this program to instantiate it. It is not intended
+to be called directly.
+.PP
+However, for debugging purposes, it can be given some options on the command
+line:
+.IP \fB-d\fP
+Turn on debugging mode.  In this mode, no attempts are made to access any keys
+and, if a handler program is selected, it won't be executed; instead, this
+program will print a message and exit 0.
+.IP \fB-D <description>\fP
+In debugging mode, use the proposed key description specified with this rather
+than the sample ("user;0;0;1f0000;debug:1234") built into the program.
+.IP \fB-l\fP
+Use configuration from the current directory.  The program will use
+.IR request-key.d/* " and " request-key.conf
+from the current directory rather than from
+.IR /etc .
+.IP \fB-n\fP
+Don't log to the system log.  Ordinarily, error messages and debugging messages
+will be copied to the system log - this will prevent that.
+.IP \fB-v\fP
+Turn on debugging output.  This may be specified multiple times to produce
+increasing levels of verbosity.
+.IP \fB--version\fP
+Print the program version and exit.
+.SH ERRORS
+All errors will be logged to the syslog.
+.SH FILES
+.ul
+/etc/request\-key.d/*.conf
+.ul 0
+Individual configuration files.
+.P
+.ul
+/etc/request\-key.conf
+.ul 0
+Fallback configuration file.
+.SH SEE ALSO
+.ad l
+.nh
+.BR keyctl (1),
+.BR request\-key.conf (5),
+.BR keyrings (7)

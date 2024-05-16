@@ -1,0 +1,130 @@
+.\"
+.\" Copyright (C) 2006 Red Hat, Inc. All Rights Reserved.
+.\" Written by David Howells (dhowells@redhat.com)
+.\"
+.\" This program is free software; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License
+.\" as published by the Free Software Foundation; either version
+.\" 2 of the License, or (at your option) any later version.
+.\"
+.TH KEYCTL_SETPERM 3 "4 May 2006" Linux "Linux Key Management Calls"
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH NAME
+keyctl_setperm \- change the permissions mask on a key
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH SYNOPSIS
+.nf
+.B #include <keyutils.h>
+.sp
+.BI "long keyctl_setperm(key_serial_t " key ", key_perm_t " perm ");"
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH DESCRIPTION
+.BR keyctl_setperm ()
+changes the permissions mask on a key.
+.P
+A process that does not have the
+.B SysAdmin
+capability may not change the permissions mask on a key that doesn't have the
+same UID as the caller.
+.P
+The caller must have
+.B setattr
+permission on a key to be able change its permissions mask.
+.P
+The permissions mask is a bitwise-OR of the following flags:
+.TP
+.B KEY_xxx_VIEW
+Grant permission to view the attributes of a key.
+.TP
+.B KEY_xxx_READ
+Grant permission to read the payload of a key or to list a keyring.
+.TP
+.B KEY_xxx_WRITE
+Grant permission to modify the payload of a key or to add or remove links
+to/from a keyring.
+.TP
+.B KEY_xxx_SEARCH
+Grant permission to find a key or to search a keyring.
+.TP
+.B KEY_xxx_LINK
+Grant permission to make links to a key.
+.TP
+.B KEY_xxx_SETATTR
+Grant permission to change the ownership and permissions attributes of a key.
+.TP
+.B KEY_xxx_ALL
+Grant all the above.
+.P
+The
+.RB ' xxx '
+in the above should be replaced by one of:
+.TP
+.B POS
+Grant the permission to a process that possesses the key (has it attached
+searchably to one of the process's keyrings).
+.TP
+.B USR
+Grant the permission to a process with the same UID as the key.
+.TP
+.B GRP
+Grant the permission to a process with the same GID as the key, or with a
+match for the key's GID amongst that process's Groups list.
+.TP
+.B OTH
+Grant the permission to any other process.
+.P
+Examples include:
+.BR KEY_POS_VIEW ", " KEY_USR_READ ", " KEY_GRP_SEARCH " and " KEY_OTH_ALL .
+.P
+User, group and other grants are exclusive: if a process qualifies in
+the 'user' category, it will not qualify in the 'groups' category; and if a
+process qualifies in either 'user' or 'groups' then it will not qualify in
+the 'other' category.
+.P
+Possessor grants are cumulative with the grants from the 'user', 'groups'
+and 'other' categories.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH RETURN VALUE
+On success
+.BR keyctl_setperm ()
+returns
+.B 0 .
+On error, the value
+.B -1
+will be returned and
+.I errno
+will have been set to an appropriate error.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH ERRORS
+.TP
+.B ENOKEY
+The specified key does not exist.
+.TP
+.B EKEYEXPIRED
+The specified key has expired.
+.TP
+.B EKEYREVOKED
+The specified key has been revoked.
+.TP
+.B EACCES
+The named key exists, but does not grant
+.B setattr
+permission to the calling process.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH LINKING
+This is a library function that can be found in
+.IR libkeyutils .
+When linking,
+.B \-lkeyutils
+should be specified to the linker.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH SEE ALSO
+.ad l
+.nh
+.BR keyctl (1),
+.BR add_key (2),
+.BR keyctl (2),
+.BR request_key (2),
+.BR keyctl (3),
+.BR keyrings (7),
+.BR keyutils (7)

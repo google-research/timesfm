@@ -1,0 +1,121 @@
+{
+  "build": "hd590300_0",
+  "build_number": 0,
+  "channel": "https://conda.anaconda.org/conda-forge/linux-64",
+  "constrains": [],
+  "depends": [
+    "libgcc-ng >=12"
+  ],
+  "extracted_package_dir": "/opt/conda/pkgs/libnsl-2.0.1-hd590300_0",
+  "files": [
+    "include/rpcsvc/yp.h",
+    "include/rpcsvc/yp.x",
+    "include/rpcsvc/yp_prot.h",
+    "include/rpcsvc/ypclnt.h",
+    "include/rpcsvc/yppasswd.h",
+    "include/rpcsvc/yppasswd.x",
+    "include/rpcsvc/ypupd.h",
+    "lib/libnsl.so",
+    "lib/libnsl.so.3",
+    "lib/libnsl.so.3.0.0",
+    "lib/pkgconfig/libnsl.pc"
+  ],
+  "fn": "libnsl-2.0.1-hd590300_0.conda",
+  "license": "LGPL-2.1-only",
+  "link": {
+    "source": "/opt/conda/pkgs/libnsl-2.0.1-hd590300_0",
+    "type": 1
+  },
+  "md5": "30fd6e37fe21f86f4bd26d6ee73eeec7",
+  "name": "libnsl",
+  "package_tarball_full_path": "/opt/conda/pkgs/libnsl-2.0.1-hd590300_0.conda",
+  "paths_data": {
+    "paths": [
+      {
+        "_path": "include/rpcsvc/yp.h",
+        "path_type": "hardlink",
+        "sha256": "6aa3592116c6f50394119bc78cdf4441d933c4d80c8b8c20239e93d39093d17e",
+        "sha256_in_prefix": "6aa3592116c6f50394119bc78cdf4441d933c4d80c8b8c20239e93d39093d17e",
+        "size_in_bytes": 7964
+      },
+      {
+        "_path": "include/rpcsvc/yp.x",
+        "path_type": "hardlink",
+        "sha256": "ec04b86f3a3ee11da1165027f3f4d61abfd4f5248efe00635a965c39a948a950",
+        "sha256_in_prefix": "ec04b86f3a3ee11da1165027f3f4d61abfd4f5248efe00635a965c39a948a950",
+        "size_in_bytes": 6981
+      },
+      {
+        "_path": "include/rpcsvc/yp_prot.h",
+        "path_type": "hardlink",
+        "sha256": "c27205582c8395de2a8694a46cd01284d5cc2917eb3f63282b795d757b210eee",
+        "sha256_in_prefix": "c27205582c8395de2a8694a46cd01284d5cc2917eb3f63282b795d757b210eee",
+        "size_in_bytes": 14920
+      },
+      {
+        "_path": "include/rpcsvc/ypclnt.h",
+        "path_type": "hardlink",
+        "sha256": "2e2cca7d104d804725be4a1f8519f17866ca233b032ae596465d473cd08a45df",
+        "sha256_in_prefix": "2e2cca7d104d804725be4a1f8519f17866ca233b032ae596465d473cd08a45df",
+        "size_in_bytes": 3481
+      },
+      {
+        "_path": "include/rpcsvc/yppasswd.h",
+        "path_type": "hardlink",
+        "sha256": "794105978dd6893fb5b4a9697ef11c923a88b31c4f59d4fc05e6c7d3b7f50bc8",
+        "sha256_in_prefix": "794105978dd6893fb5b4a9697ef11c923a88b31c4f59d4fc05e6c7d3b7f50bc8",
+        "size_in_bytes": 913
+      },
+      {
+        "_path": "include/rpcsvc/yppasswd.x",
+        "path_type": "hardlink",
+        "sha256": "b5d10d7e779000c473bf8bbcd2552078eda0263bfe6dac7275e0bbc779430d7b",
+        "sha256_in_prefix": "b5d10d7e779000c473bf8bbcd2552078eda0263bfe6dac7275e0bbc779430d7b",
+        "size_in_bytes": 2286
+      },
+      {
+        "_path": "include/rpcsvc/ypupd.h",
+        "path_type": "hardlink",
+        "sha256": "46537c2889bde21f40102f0efb10e35cc49f702c30204be0d32aebe2be90fe0c",
+        "sha256_in_prefix": "46537c2889bde21f40102f0efb10e35cc49f702c30204be0d32aebe2be90fe0c",
+        "size_in_bytes": 3027
+      },
+      {
+        "_path": "lib/libnsl.so",
+        "path_type": "softlink",
+        "sha256": "22aa15454d7b3d0ede7f4e6636c5324fe49dcdcb3261adc57e18bb1682208a34",
+        "size_in_bytes": 31616
+      },
+      {
+        "_path": "lib/libnsl.so.3",
+        "path_type": "softlink",
+        "sha256": "22aa15454d7b3d0ede7f4e6636c5324fe49dcdcb3261adc57e18bb1682208a34",
+        "size_in_bytes": 31616
+      },
+      {
+        "_path": "lib/libnsl.so.3.0.0",
+        "path_type": "hardlink",
+        "sha256": "22aa15454d7b3d0ede7f4e6636c5324fe49dcdcb3261adc57e18bb1682208a34",
+        "sha256_in_prefix": "22aa15454d7b3d0ede7f4e6636c5324fe49dcdcb3261adc57e18bb1682208a34",
+        "size_in_bytes": 31616
+      },
+      {
+        "_path": "lib/pkgconfig/libnsl.pc",
+        "file_mode": "text",
+        "path_type": "hardlink",
+        "prefix_placeholder": "/home/conda/feedstock_root/build_artifacts/libnsl_1697358834480/_h_env_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_plac",
+        "sha256": "528805f606da373e1aa5d4ca6f8372c0195761b44ea04256b7eb238304a7ef9d",
+        "sha256_in_prefix": "84a6bf34a76bb3d74509805cae36bba3c776c7d7cf5b3165dec5c2bc23701147",
+        "size_in_bytes": 533
+      }
+    ],
+    "paths_version": 1
+  },
+  "requested_spec": "None",
+  "sha256": "26d77a3bb4dceeedc2a41bd688564fe71bf2d149fdcf117049970bc02ff1add6",
+  "size": 33408,
+  "subdir": "linux-64",
+  "timestamp": 1697359010000,
+  "url": "https://conda.anaconda.org/conda-forge/linux-64/libnsl-2.0.1-hd590300_0.conda",
+  "version": "2.0.1"
+}

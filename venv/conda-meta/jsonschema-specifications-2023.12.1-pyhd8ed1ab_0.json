@@ -1,0 +1,305 @@
+{
+  "build": "pyhd8ed1ab_0",
+  "build_number": 0,
+  "channel": "https://conda.anaconda.org/conda-forge/noarch",
+  "constrains": [],
+  "depends": [
+    "importlib_resources >=1.4.0",
+    "python >=3.8",
+    "referencing >=0.31.0"
+  ],
+  "extracted_package_dir": "/opt/conda/pkgs/jsonschema-specifications-2023.12.1-pyhd8ed1ab_0",
+  "files": [
+    "lib/python3.10/site-packages/jsonschema_specifications-2023.12.1.dist-info/INSTALLER",
+    "lib/python3.10/site-packages/jsonschema_specifications-2023.12.1.dist-info/METADATA",
+    "lib/python3.10/site-packages/jsonschema_specifications-2023.12.1.dist-info/RECORD",
+    "lib/python3.10/site-packages/jsonschema_specifications-2023.12.1.dist-info/REQUESTED",
+    "lib/python3.10/site-packages/jsonschema_specifications-2023.12.1.dist-info/WHEEL",
+    "lib/python3.10/site-packages/jsonschema_specifications-2023.12.1.dist-info/direct_url.json",
+    "lib/python3.10/site-packages/jsonschema_specifications-2023.12.1.dist-info/licenses/COPYING",
+    "lib/python3.10/site-packages/jsonschema_specifications/__init__.py",
+    "lib/python3.10/site-packages/jsonschema_specifications/_core.py",
+    "lib/python3.10/site-packages/jsonschema_specifications/schemas/draft201909/metaschema.json",
+    "lib/python3.10/site-packages/jsonschema_specifications/schemas/draft201909/vocabularies/applicator",
+    "lib/python3.10/site-packages/jsonschema_specifications/schemas/draft201909/vocabularies/content",
+    "lib/python3.10/site-packages/jsonschema_specifications/schemas/draft201909/vocabularies/core",
+    "lib/python3.10/site-packages/jsonschema_specifications/schemas/draft201909/vocabularies/meta-data",
+    "lib/python3.10/site-packages/jsonschema_specifications/schemas/draft201909/vocabularies/validation",
+    "lib/python3.10/site-packages/jsonschema_specifications/schemas/draft202012/metaschema.json",
+    "lib/python3.10/site-packages/jsonschema_specifications/schemas/draft202012/vocabularies/applicator",
+    "lib/python3.10/site-packages/jsonschema_specifications/schemas/draft202012/vocabularies/content",
+    "lib/python3.10/site-packages/jsonschema_specifications/schemas/draft202012/vocabularies/core",
+    "lib/python3.10/site-packages/jsonschema_specifications/schemas/draft202012/vocabularies/format",
+    "lib/python3.10/site-packages/jsonschema_specifications/schemas/draft202012/vocabularies/format-annotation",
+    "lib/python3.10/site-packages/jsonschema_specifications/schemas/draft202012/vocabularies/format-assertion",
+    "lib/python3.10/site-packages/jsonschema_specifications/schemas/draft202012/vocabularies/meta-data",
+    "lib/python3.10/site-packages/jsonschema_specifications/schemas/draft202012/vocabularies/unevaluated",
+    "lib/python3.10/site-packages/jsonschema_specifications/schemas/draft202012/vocabularies/validation",
+    "lib/python3.10/site-packages/jsonschema_specifications/schemas/draft3/metaschema.json",
+    "lib/python3.10/site-packages/jsonschema_specifications/schemas/draft4/metaschema.json",
+    "lib/python3.10/site-packages/jsonschema_specifications/schemas/draft6/metaschema.json",
+    "lib/python3.10/site-packages/jsonschema_specifications/schemas/draft7/metaschema.json",
+    "lib/python3.10/site-packages/jsonschema_specifications/tests/__init__.py",
+    "lib/python3.10/site-packages/jsonschema_specifications/tests/test_jsonschema_specifications.py",
+    "lib/python3.10/site-packages/jsonschema_specifications/__pycache__/__init__.cpython-310.pyc",
+    "lib/python3.10/site-packages/jsonschema_specifications/__pycache__/_core.cpython-310.pyc",
+    "lib/python3.10/site-packages/jsonschema_specifications/tests/__pycache__/__init__.cpython-310.pyc",
+    "lib/python3.10/site-packages/jsonschema_specifications/tests/__pycache__/test_jsonschema_specifications.cpython-310.pyc"
+  ],
+  "fn": "jsonschema-specifications-2023.12.1-pyhd8ed1ab_0.conda",
+  "license": "MIT",
+  "link": {
+    "source": "/opt/conda/pkgs/jsonschema-specifications-2023.12.1-pyhd8ed1ab_0",
+    "type": 1
+  },
+  "md5": "a0e4efb5f35786a05af4809a2fb1f855",
+  "name": "jsonschema-specifications",
+  "noarch": "python",
+  "package_tarball_full_path": "/opt/conda/pkgs/jsonschema-specifications-2023.12.1-pyhd8ed1ab_0.conda",
+  "package_type": "noarch_python",
+  "paths_data": {
+    "paths": [
+      {
+        "_path": "site-packages/jsonschema_specifications-2023.12.1.dist-info/INSTALLER",
+        "path_type": "hardlink",
+        "sha256": "d0edee15f91b406f3f99726e44eb990be6e34fd0345b52b910c568e0eef6a2a8",
+        "sha256_in_prefix": "d0edee15f91b406f3f99726e44eb990be6e34fd0345b52b910c568e0eef6a2a8",
+        "size_in_bytes": 5
+      },
+      {
+        "_path": "site-packages/jsonschema_specifications-2023.12.1.dist-info/METADATA",
+        "path_type": "hardlink",
+        "sha256": "7e74f19a481a1e62d9d96189d5eac0f05496b509b1d70077b699da971050d82d",
+        "sha256_in_prefix": "7e74f19a481a1e62d9d96189d5eac0f05496b509b1d70077b699da971050d82d",
+        "size_in_bytes": 2977
+      },
+      {
+        "_path": "site-packages/jsonschema_specifications-2023.12.1.dist-info/RECORD",
+        "path_type": "hardlink",
+        "sha256": "a0af2dfa1c6f32b5288402cdf877f1d5785279eb9c0b8a1494d36c6fb7c9cb14",
+        "sha256_in_prefix": "a0af2dfa1c6f32b5288402cdf877f1d5785279eb9c0b8a1494d36c6fb7c9cb14",
+        "size_in_bytes": 3888
+      },
+      {
+        "_path": "site-packages/jsonschema_specifications-2023.12.1.dist-info/REQUESTED",
+        "path_type": "hardlink",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256_in_prefix": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_in_bytes": 0
+      },
+      {
+        "_path": "site-packages/jsonschema_specifications-2023.12.1.dist-info/WHEEL",
+        "path_type": "hardlink",
+        "sha256": "99161210bdc887a8396bf095308730885fffd007b8fe02d8874d5814dc22ab59",
+        "sha256_in_prefix": "99161210bdc887a8396bf095308730885fffd007b8fe02d8874d5814dc22ab59",
+        "size_in_bytes": 87
+      },
+      {
+        "_path": "site-packages/jsonschema_specifications-2023.12.1.dist-info/direct_url.json",
+        "path_type": "hardlink",
+        "sha256": "fd45dbc2661f77edd297f4d4961e5b57b69f9ca9c5e55d9eab278751a39b0c4d",
+        "sha256_in_prefix": "fd45dbc2661f77edd297f4d4961e5b57b69f9ca9c5e55d9eab278751a39b0c4d",
+        "size_in_bytes": 54
+      },
+      {
+        "_path": "site-packages/jsonschema_specifications-2023.12.1.dist-info/licenses/COPYING",
+        "path_type": "hardlink",
+        "sha256": "42dcd63495f87b4eb7c7757afa379bb55a53f94afd7a5f657d9adf57236e515c",
+        "sha256_in_prefix": "42dcd63495f87b4eb7c7757afa379bb55a53f94afd7a5f657d9adf57236e515c",
+        "size_in_bytes": 1057
+      },
+      {
+        "_path": "site-packages/jsonschema_specifications/__init__.py",
+        "path_type": "hardlink",
+        "sha256": "5e66003119cf6d1bffa22740bcd672a0eb6dc1802f05daabefba2e0c3df66571",
+        "sha256_in_prefix": "5e66003119cf6d1bffa22740bcd672a0eb6dc1802f05daabefba2e0c3df66571",
+        "size_in_bytes": 385
+      },
+      {
+        "_path": "site-packages/jsonschema_specifications/_core.py",
+        "path_type": "hardlink",
+        "sha256": "b4585cd42325789dc024e2bf6e3c4ea4541376bb140a51467c5c4f054fc279b3",
+        "sha256_in_prefix": "b4585cd42325789dc024e2bf6e3c4ea4541376bb140a51467c5c4f054fc279b3",
+        "size_in_bytes": 1140
+      },
+      {
+        "_path": "site-packages/jsonschema_specifications/schemas/draft201909/metaschema.json",
+        "path_type": "hardlink",
+        "sha256": "7b761b3e121f0a0ca1ea2a0b8e2cc856bcf801604b8268d71bacaa202bc0c13b",
+        "sha256_in_prefix": "7b761b3e121f0a0ca1ea2a0b8e2cc856bcf801604b8268d71bacaa202bc0c13b",
+        "size_in_bytes": 1785
+      },
+      {
+        "_path": "site-packages/jsonschema_specifications/schemas/draft201909/vocabularies/applicator",
+        "path_type": "hardlink",
+        "sha256": "6895100e99726fbb107058512bbec3ecfd4b24e8fd2facee3e505ee72b0d4c31",
+        "sha256_in_prefix": "6895100e99726fbb107058512bbec3ecfd4b24e8fd2facee3e505ee72b0d4c31",
+        "size_in_bytes": 1860
+      },
+      {
+        "_path": "site-packages/jsonschema_specifications/schemas/draft201909/vocabularies/content",
+        "path_type": "hardlink",
+        "sha256": "9b7d4f55a4e2fdb02c430068fdffabc732addce238da3f1df2690249c3353274",
+        "sha256_in_prefix": "9b7d4f55a4e2fdb02c430068fdffabc732addce238da3f1df2690249c3353274",
+        "size_in_bytes": 517
+      },
+      {
+        "_path": "site-packages/jsonschema_specifications/schemas/draft201909/vocabularies/core",
+        "path_type": "hardlink",
+        "sha256": "b5a2c4957f6495d0a5081f0409ebe8a14e4139acb203fc748471f8ede2af5b2c",
+        "sha256_in_prefix": "b5a2c4957f6495d0a5081f0409ebe8a14e4139acb203fc748471f8ede2af5b2c",
+        "size_in_bytes": 1531
+      },
+      {
+        "_path": "site-packages/jsonschema_specifications/schemas/draft201909/vocabularies/meta-data",
+        "path_type": "hardlink",
+        "sha256": "d47e2445dd6a82271a298d83cc6c6cb8d4ae1e15e0dc56becd37a163ecf01286",
+        "sha256_in_prefix": "d47e2445dd6a82271a298d83cc6c6cb8d4ae1e15e0dc56becd37a163ecf01286",
+        "size_in_bytes": 892
+      },
+      {
+        "_path": "site-packages/jsonschema_specifications/schemas/draft201909/vocabularies/validation",
+        "path_type": "hardlink",
+        "sha256": "1e526c1d335a734805fc82cf5798c12b960ad7da2517c66cda5a1b09359c3c1c",
+        "sha256_in_prefix": "1e526c1d335a734805fc82cf5798c12b960ad7da2517c66cda5a1b09359c3c1c",
+        "size_in_bytes": 2834
+      },
+      {
+        "_path": "site-packages/jsonschema_specifications/schemas/draft202012/metaschema.json",
+        "path_type": "hardlink",
+        "sha256": "41da76f5afb7ce062d248f762463a92f7ca47e4e0f905b224ba6afeef91ded0f",
+        "sha256_in_prefix": "41da76f5afb7ce062d248f762463a92f7ca47e4e0f905b224ba6afeef91ded0f",
+        "size_in_bytes": 2452
+      },
+      {
+        "_path": "site-packages/jsonschema_specifications/schemas/draft202012/vocabularies/applicator",
+        "path_type": "hardlink",
+        "sha256": "c4a6e4147b91fef7fea6dc058cb1bf93402f7414b76578a8b16aaf1dad6aacef",
+        "sha256_in_prefix": "c4a6e4147b91fef7fea6dc058cb1bf93402f7414b76578a8b16aaf1dad6aacef",
+        "size_in_bytes": 1659
+      },
+      {
+        "_path": "site-packages/jsonschema_specifications/schemas/draft202012/vocabularies/content",
+        "path_type": "hardlink",
+        "sha256": "08343747764e4a5814262793cf4d652057a7913863c5950d43297e8e1fdac5b6",
+        "sha256_in_prefix": "08343747764e4a5814262793cf4d652057a7913863c5950d43297e8e1fdac5b6",
+        "size_in_bytes": 519
+      },
+      {
+        "_path": "site-packages/jsonschema_specifications/schemas/draft202012/vocabularies/core",
+        "path_type": "hardlink",
+        "sha256": "c2d12a8e4dd11d336dfc83a3f663aa4c69f0b49b3beb094ffeb25b5316f4803d",
+        "sha256_in_prefix": "c2d12a8e4dd11d336dfc83a3f663aa4c69f0b49b3beb094ffeb25b5316f4803d",
+        "size_in_bytes": 1564
+      },
+      {
+        "_path": "site-packages/jsonschema_specifications/schemas/draft202012/vocabularies/format",
+        "path_type": "hardlink",
+        "sha256": "50ebbfe790611a849b8cc400a09c1d0e0fb6ab5c0d43a0f22201fd3625056bf4",
+        "sha256_in_prefix": "50ebbfe790611a849b8cc400a09c1d0e0fb6ab5c0d43a0f22201fd3625056bf4",
+        "size_in_bytes": 403
+      },
+      {
+        "_path": "site-packages/jsonschema_specifications/schemas/draft202012/vocabularies/format-annotation",
+        "path_type": "hardlink",
+        "sha256": "abc775adfefd89d22358170d9bf93f4ebd2349563bbbedd60f02bef7c812bcc0",
+        "sha256_in_prefix": "abc775adfefd89d22358170d9bf93f4ebd2349563bbbedd60f02bef7c812bcc0",
+        "size_in_bytes": 448
+      },
+      {
+        "_path": "site-packages/jsonschema_specifications/schemas/draft202012/vocabularies/format-assertion",
+        "path_type": "hardlink",
+        "sha256": "c52242b9a1bb786b26c3e82c7add428c31f9c96e575dce99e56ea5feaa6da20c",
+        "sha256_in_prefix": "c52242b9a1bb786b26c3e82c7add428c31f9c96e575dce99e56ea5feaa6da20c",
+        "size_in_bytes": 445
+      },
+      {
+        "_path": "site-packages/jsonschema_specifications/schemas/draft202012/vocabularies/meta-data",
+        "path_type": "hardlink",
+        "sha256": "8f76d6e14f41b9b92ef933b708cdc5144c8b5268651ad11918485fb1754f1c76",
+        "sha256_in_prefix": "8f76d6e14f41b9b92ef933b708cdc5144c8b5268651ad11918485fb1754f1c76",
+        "size_in_bytes": 892
+      },
+      {
+        "_path": "site-packages/jsonschema_specifications/schemas/draft202012/vocabularies/unevaluated",
+        "path_type": "hardlink",
+        "sha256": "2dbfbcb73994b670b0976492adee1fffb46c21682784d2f5a4ca561f9e2d0cb4",
+        "sha256_in_prefix": "2dbfbcb73994b670b0976492adee1fffb46c21682784d2f5a4ca561f9e2d0cb4",
+        "size_in_bytes": 506
+      },
+      {
+        "_path": "site-packages/jsonschema_specifications/schemas/draft202012/vocabularies/validation",
+        "path_type": "hardlink",
+        "sha256": "7010a31e541f32d2be721e2de348df75c9b36876a3ed304877fc0abda1d37a58",
+        "sha256_in_prefix": "7010a31e541f32d2be721e2de348df75c9b36876a3ed304877fc0abda1d37a58",
+        "size_in_bytes": 2834
+      },
+      {
+        "_path": "site-packages/jsonschema_specifications/schemas/draft3/metaschema.json",
+        "path_type": "hardlink",
+        "sha256": "2cf75f64436fb5be374a2eaa27ab8b7e1fd651c9b46daea6c67b02fd64e2458b",
+        "sha256_in_prefix": "2cf75f64436fb5be374a2eaa27ab8b7e1fd651c9b46daea6c67b02fd64e2458b",
+        "size_in_bytes": 2600
+      },
+      {
+        "_path": "site-packages/jsonschema_specifications/schemas/draft4/metaschema.json",
+        "path_type": "hardlink",
+        "sha256": "e1489d0b4755f02793302591d3fcb8f07b6893a82a94f24895f8e4edf11b82e2",
+        "sha256_in_prefix": "e1489d0b4755f02793302591d3fcb8f07b6893a82a94f24895f8e4edf11b82e2",
+        "size_in_bytes": 4357
+      },
+      {
+        "_path": "site-packages/jsonschema_specifications/schemas/draft6/metaschema.json",
+        "path_type": "hardlink",
+        "sha256": "c29dfce9f54835c3a06c03b3c5d5ec0eda77706568f9c4df7cfbc7566a51006d",
+        "sha256_in_prefix": "c29dfce9f54835c3a06c03b3c5d5ec0eda77706568f9c4df7cfbc7566a51006d",
+        "size_in_bytes": 4437
+      },
+      {
+        "_path": "site-packages/jsonschema_specifications/schemas/draft7/metaschema.json",
+        "path_type": "hardlink",
+        "sha256": "3d5392088261606c559b603f385329c9f1ab45b5d667eb990687453b055d405e",
+        "sha256_in_prefix": "3d5392088261606c559b603f385329c9f1ab45b5d667eb990687453b055d405e",
+        "size_in_bytes": 4819
+      },
+      {
+        "_path": "site-packages/jsonschema_specifications/tests/__init__.py",
+        "path_type": "hardlink",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256_in_prefix": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_in_bytes": 0
+      },
+      {
+        "_path": "site-packages/jsonschema_specifications/tests/test_jsonschema_specifications.py",
+        "path_type": "hardlink",
+        "sha256": "5a46d8456e80e85a19d2b8af4a17ea54b482b00887276c7c4f1a840894d73d36",
+        "sha256_in_prefix": "5a46d8456e80e85a19d2b8af4a17ea54b482b00887276c7c4f1a840894d73d36",
+        "size_in_bytes": 1106
+      },
+      {
+        "_path": "lib/python3.10/site-packages/jsonschema_specifications/__pycache__/__init__.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/jsonschema_specifications/__pycache__/_core.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/jsonschema_specifications/tests/__pycache__/__init__.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/jsonschema_specifications/tests/__pycache__/test_jsonschema_specifications.cpython-310.pyc",
+        "path_type": "pyc_file"
+      }
+    ],
+    "paths_version": 1
+  },
+  "requested_spec": "None",
+  "sha256": "a9630556ddc3121c0be32f4cbf792dd9102bd380d5cd81d57759d172cf0c2da2",
+  "size": 16431,
+  "subdir": "noarch",
+  "timestamp": 1703778502000,
+  "url": "https://conda.anaconda.org/conda-forge/noarch/jsonschema-specifications-2023.12.1-pyhd8ed1ab_0.conda",
+  "version": "2023.12.1"
+}

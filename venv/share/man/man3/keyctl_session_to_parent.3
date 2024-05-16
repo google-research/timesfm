@@ -1,0 +1,77 @@
+.\"
+.\" Copyright (C) 2010 Red Hat, Inc. All Rights Reserved.
+.\" Written by David Howells (dhowells@redhat.com)
+.\"
+.\" This program is free software; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License
+.\" as published by the Free Software Foundation; either version
+.\" 2 of the License, or (at your option) any later version.
+.\"
+.TH KEYCTL_SESSION_TO_PARENT 3 "20 Feb 2014" Linux "Linux Key Management Calls"
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH NAME
+keyctl_session_to_parent \- set the parent process's session keyring
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH SYNOPSIS
+.nf
+.B #include <keyutils.h>
+.sp
+.BI "long keyctl_session_to_parent();"
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH DESCRIPTION
+.BR keyctl_session_to_parent ()
+changes the session keyring to which the calling process's parent subscribes
+to be the that of the calling process.
+.P
+The keyring must have
+.B link
+permission available to the calling process, the parent process must have the
+same UIDs/GIDs as the calling process, and the LSM must not reject the
+replacement.  Furthermore, this may not be used to affect init or a kernel
+thread.
+.P
+Note that the replacement will not take immediate effect upon the parent
+process, but will rather be deferred to the next time it returns to userspace
+from kernel space.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH RETURN VALUE
+On success
+.BR keyctl_session_to_parent ()
+returns 0.  On error, the value
+.B -1
+will be returned and
+.I errno
+will have been set to an appropriate error.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH ERRORS
+.TP
+.B ENOMEM
+Insufficient memory to create a key.
+.TP
+.B EPERM
+The credentials of the parent don't match those of the caller.
+.TP
+.B EACCES
+The named keyring exists, but is not
+.B linkable
+by the calling process.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH LINKING
+This is a library function that can be found in
+.IR libkeyutils .
+When linking,
+.B \-lkeyutils
+should be specified to the linker.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH SEE ALSO
+.ad l
+.nh
+.BR keyctl (1),
+.BR add_key (2),
+.BR keyctl (2),
+.BR request_key (2),
+.BR keyctl (3),
+.BR keyrings (7),
+.BR keyutils (7),
+.BR session\-keyring (7),
+.BR user\-session-keyring (7)

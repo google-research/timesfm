@@ -1,0 +1,577 @@
+{
+  "build": "h36c2ea0_1",
+  "build_number": 1,
+  "channel": "https://conda.anaconda.org/conda-forge/linux-64",
+  "constrains": [],
+  "depends": [
+    "libgcc-ng >=7.5.0"
+  ],
+  "extracted_package_dir": "/opt/conda/pkgs/libsodium-1.0.18-h36c2ea0_1",
+  "files": [
+    "include/sodium.h",
+    "include/sodium/core.h",
+    "include/sodium/crypto_aead_aes256gcm.h",
+    "include/sodium/crypto_aead_chacha20poly1305.h",
+    "include/sodium/crypto_aead_xchacha20poly1305.h",
+    "include/sodium/crypto_auth.h",
+    "include/sodium/crypto_auth_hmacsha256.h",
+    "include/sodium/crypto_auth_hmacsha512.h",
+    "include/sodium/crypto_auth_hmacsha512256.h",
+    "include/sodium/crypto_box.h",
+    "include/sodium/crypto_box_curve25519xchacha20poly1305.h",
+    "include/sodium/crypto_box_curve25519xsalsa20poly1305.h",
+    "include/sodium/crypto_core_ed25519.h",
+    "include/sodium/crypto_core_hchacha20.h",
+    "include/sodium/crypto_core_hsalsa20.h",
+    "include/sodium/crypto_core_ristretto255.h",
+    "include/sodium/crypto_core_salsa20.h",
+    "include/sodium/crypto_core_salsa2012.h",
+    "include/sodium/crypto_core_salsa208.h",
+    "include/sodium/crypto_generichash.h",
+    "include/sodium/crypto_generichash_blake2b.h",
+    "include/sodium/crypto_hash.h",
+    "include/sodium/crypto_hash_sha256.h",
+    "include/sodium/crypto_hash_sha512.h",
+    "include/sodium/crypto_kdf.h",
+    "include/sodium/crypto_kdf_blake2b.h",
+    "include/sodium/crypto_kx.h",
+    "include/sodium/crypto_onetimeauth.h",
+    "include/sodium/crypto_onetimeauth_poly1305.h",
+    "include/sodium/crypto_pwhash.h",
+    "include/sodium/crypto_pwhash_argon2i.h",
+    "include/sodium/crypto_pwhash_argon2id.h",
+    "include/sodium/crypto_pwhash_scryptsalsa208sha256.h",
+    "include/sodium/crypto_scalarmult.h",
+    "include/sodium/crypto_scalarmult_curve25519.h",
+    "include/sodium/crypto_scalarmult_ed25519.h",
+    "include/sodium/crypto_scalarmult_ristretto255.h",
+    "include/sodium/crypto_secretbox.h",
+    "include/sodium/crypto_secretbox_xchacha20poly1305.h",
+    "include/sodium/crypto_secretbox_xsalsa20poly1305.h",
+    "include/sodium/crypto_secretstream_xchacha20poly1305.h",
+    "include/sodium/crypto_shorthash.h",
+    "include/sodium/crypto_shorthash_siphash24.h",
+    "include/sodium/crypto_sign.h",
+    "include/sodium/crypto_sign_ed25519.h",
+    "include/sodium/crypto_sign_edwards25519sha512batch.h",
+    "include/sodium/crypto_stream.h",
+    "include/sodium/crypto_stream_chacha20.h",
+    "include/sodium/crypto_stream_salsa20.h",
+    "include/sodium/crypto_stream_salsa2012.h",
+    "include/sodium/crypto_stream_salsa208.h",
+    "include/sodium/crypto_stream_xchacha20.h",
+    "include/sodium/crypto_stream_xsalsa20.h",
+    "include/sodium/crypto_verify_16.h",
+    "include/sodium/crypto_verify_32.h",
+    "include/sodium/crypto_verify_64.h",
+    "include/sodium/export.h",
+    "include/sodium/randombytes.h",
+    "include/sodium/randombytes_internal_random.h",
+    "include/sodium/randombytes_sysrandom.h",
+    "include/sodium/runtime.h",
+    "include/sodium/utils.h",
+    "include/sodium/version.h",
+    "lib/libsodium.a",
+    "lib/libsodium.so",
+    "lib/libsodium.so.23",
+    "lib/libsodium.so.23.3.0",
+    "lib/pkgconfig/libsodium.pc"
+  ],
+  "fn": "libsodium-1.0.18-h36c2ea0_1.tar.bz2",
+  "license": "ISC",
+  "link": {
+    "source": "/opt/conda/pkgs/libsodium-1.0.18-h36c2ea0_1",
+    "type": 1
+  },
+  "md5": "c3788462a6fbddafdb413a9f9053e58d",
+  "name": "libsodium",
+  "package_tarball_full_path": "/opt/conda/pkgs/libsodium-1.0.18-h36c2ea0_1.tar.bz2",
+  "paths_data": {
+    "paths": [
+      {
+        "_path": "include/sodium.h",
+        "path_type": "hardlink",
+        "sha256": "510bd520da2545bc9cfe3060230f4dffb345f1e96ccf25b53e4b8a3d73d1984b",
+        "sha256_in_prefix": "510bd520da2545bc9cfe3060230f4dffb345f1e96ccf25b53e4b8a3d73d1984b",
+        "size_in_bytes": 2529
+      },
+      {
+        "_path": "include/sodium/core.h",
+        "path_type": "hardlink",
+        "sha256": "692c9a03eb49591a3ccacbef293f473c619cc86ef5dd4776a6e2e4321426fb07",
+        "sha256_in_prefix": "692c9a03eb49591a3ccacbef293f473c619cc86ef5dd4776a6e2e4321426fb07",
+        "size_in_bytes": 391
+      },
+      {
+        "_path": "include/sodium/crypto_aead_aes256gcm.h",
+        "path_type": "hardlink",
+        "sha256": "b9d20e820519211b0cdbc37ccfad2195ccf1b0009965840ea87865054b7aab4e",
+        "sha256_in_prefix": "b9d20e820519211b0cdbc37ccfad2195ccf1b0009965840ea87865054b7aab4e",
+        "size_in_bytes": 7980
+      },
+      {
+        "_path": "include/sodium/crypto_aead_chacha20poly1305.h",
+        "path_type": "hardlink",
+        "sha256": "829054e89c68f98c660c5f5cc65318e2fda345a888a0c337534a338bc96ee757",
+        "sha256_in_prefix": "829054e89c68f98c660c5f5cc65318e2fda345a888a0c337534a338bc96ee757",
+        "size_in_bytes": 8782
+      },
+      {
+        "_path": "include/sodium/crypto_aead_xchacha20poly1305.h",
+        "path_type": "hardlink",
+        "sha256": "be76cd253ee5ba929156186ff6b21477dac7f5e8d23da881b5a7babc3c2eba39",
+        "sha256_in_prefix": "be76cd253ee5ba929156186ff6b21477dac7f5e8d23da881b5a7babc3c2eba39",
+        "size_in_bytes": 4848
+      },
+      {
+        "_path": "include/sodium/crypto_auth.h",
+        "path_type": "hardlink",
+        "sha256": "6728e121bde1e328687d7222fe29e0eb5f95fecc982f179f2788735369da8fa2",
+        "sha256_in_prefix": "6728e121bde1e328687d7222fe29e0eb5f95fecc982f179f2788735369da8fa2",
+        "size_in_bytes": 1143
+      },
+      {
+        "_path": "include/sodium/crypto_auth_hmacsha256.h",
+        "path_type": "hardlink",
+        "sha256": "c4de9221fb19f47478680839d3c5157363c8806c8c36b9a3ffa624a6500fff0c",
+        "sha256_in_prefix": "c4de9221fb19f47478680839d3c5157363c8806c8c36b9a3ffa624a6500fff0c",
+        "size_in_bytes": 2136
+      },
+      {
+        "_path": "include/sodium/crypto_auth_hmacsha512.h",
+        "path_type": "hardlink",
+        "sha256": "53415ff29ec0578a631a04794e0486ffee8b9d90b790eee593e35a7d32ff0ec1",
+        "sha256_in_prefix": "53415ff29ec0578a631a04794e0486ffee8b9d90b790eee593e35a7d32ff0ec1",
+        "size_in_bytes": 2123
+      },
+      {
+        "_path": "include/sodium/crypto_auth_hmacsha512256.h",
+        "path_type": "hardlink",
+        "sha256": "a30f9c02e3b60842200523c062e2da1a29c9cc61a3cae10203a468a70fd41816",
+        "sha256_in_prefix": "a30f9c02e3b60842200523c062e2da1a29c9cc61a3cae10203a468a70fd41816",
+        "size_in_bytes": 2133
+      },
+      {
+        "_path": "include/sodium/crypto_box.h",
+        "path_type": "hardlink",
+        "sha256": "400153ce5d5c5da3513738b3e5b34c39f99fb9839a5ba5a01684d7e6ecfe1026",
+        "sha256_in_prefix": "400153ce5d5c5da3513738b3e5b34c39f99fb9839a5ba5a01684d7e6ecfe1026",
+        "size_in_bytes": 6838
+      },
+      {
+        "_path": "include/sodium/crypto_box_curve25519xchacha20poly1305.h",
+        "path_type": "hardlink",
+        "sha256": "fd18828324c974159902e1fb21813b9c0be04da96ccb96f261bf989ddd7fd87a",
+        "sha256_in_prefix": "fd18828324c974159902e1fb21813b9c0be04da96ccb96f261bf989ddd7fd87a",
+        "size_in_bytes": 7957
+      },
+      {
+        "_path": "include/sodium/crypto_box_curve25519xsalsa20poly1305.h",
+        "path_type": "hardlink",
+        "sha256": "069ca8e79bcc8d316ef614f73383644b5490d22391283e1dfc9a9b3cdc6baf31",
+        "sha256_in_prefix": "069ca8e79bcc8d316ef614f73383644b5490d22391283e1dfc9a9b3cdc6baf31",
+        "size_in_bytes": 4697
+      },
+      {
+        "_path": "include/sodium/crypto_core_ed25519.h",
+        "path_type": "hardlink",
+        "sha256": "ac47a76c87f08a96f475b2e0b05a7a12a61ee7a99e0258cc63967c7fb585a3c6",
+        "sha256_in_prefix": "ac47a76c87f08a96f475b2e0b05a7a12a61ee7a99e0258cc63967c7fb585a3c6",
+        "size_in_bytes": 2898
+      },
+      {
+        "_path": "include/sodium/crypto_core_hchacha20.h",
+        "path_type": "hardlink",
+        "sha256": "d2a265946fab3fddb8ee4b7ee6b3fb34b6526efa6ba45c6609c7e395ed302fc1",
+        "sha256_in_prefix": "d2a265946fab3fddb8ee4b7ee6b3fb34b6526efa6ba45c6609c7e395ed302fc1",
+        "size_in_bytes": 816
+      },
+      {
+        "_path": "include/sodium/crypto_core_hsalsa20.h",
+        "path_type": "hardlink",
+        "sha256": "5f9d48c0cdfcb8ce86a0e65cfa490cac0e9cacbca4aa864926593c691f69be63",
+        "sha256_in_prefix": "5f9d48c0cdfcb8ce86a0e65cfa490cac0e9cacbca4aa864926593c691f69be63",
+        "size_in_bytes": 804
+      },
+      {
+        "_path": "include/sodium/crypto_core_ristretto255.h",
+        "path_type": "hardlink",
+        "sha256": "cd421515c472fff15b22f5aa27a42f97c0fa5d438c28b9ea7d5908077ffd2099",
+        "sha256_in_prefix": "cd421515c472fff15b22f5aa27a42f97c0fa5d438c28b9ea7d5908077ffd2099",
+        "size_in_bytes": 3140
+      },
+      {
+        "_path": "include/sodium/crypto_core_salsa20.h",
+        "path_type": "hardlink",
+        "sha256": "614992c472e5c2bad2ba8d90a4b6d9023db3774847e3541d5c87ad4cb59d69d0",
+        "sha256_in_prefix": "614992c472e5c2bad2ba8d90a4b6d9023db3774847e3541d5c87ad4cb59d69d0",
+        "size_in_bytes": 792
+      },
+      {
+        "_path": "include/sodium/crypto_core_salsa2012.h",
+        "path_type": "hardlink",
+        "sha256": "1fce6f1b2a28c7764ba7ed99fefabefa2cbca688ce86e2574cc08ae235c8c3fd",
+        "sha256_in_prefix": "1fce6f1b2a28c7764ba7ed99fefabefa2cbca688ce86e2574cc08ae235c8c3fd",
+        "size_in_bytes": 816
+      },
+      {
+        "_path": "include/sodium/crypto_core_salsa208.h",
+        "path_type": "hardlink",
+        "sha256": "f5f40276f7f06f3478750037c56b8e29b1717588b75bd1a3769ccc54f73a709a",
+        "sha256_in_prefix": "f5f40276f7f06f3478750037c56b8e29b1717588b75bd1a3769ccc54f73a709a",
+        "size_in_bytes": 968
+      },
+      {
+        "_path": "include/sodium/crypto_generichash.h",
+        "path_type": "hardlink",
+        "sha256": "df7e3590c86db50c6aa7329ecce967bab09004d71c23f458e557a07d734f944d",
+        "sha256_in_prefix": "df7e3590c86db50c6aa7329ecce967bab09004d71c23f458e557a07d734f944d",
+        "size_in_bytes": 2495
+      },
+      {
+        "_path": "include/sodium/crypto_generichash_blake2b.h",
+        "path_type": "hardlink",
+        "sha256": "da19eef8f229b8c5964972295f22e46c11bf964534816aea4bde31d7727afd20",
+        "sha256_in_prefix": "da19eef8f229b8c5964972295f22e46c11bf964534816aea4bde31d7727afd20",
+        "size_in_bytes": 3963
+      },
+      {
+        "_path": "include/sodium/crypto_hash.h",
+        "path_type": "hardlink",
+        "sha256": "5720698bd0072074ee163d8d89adaa5b6ade064bf38871afe3b814d4418487c1",
+        "sha256_in_prefix": "5720698bd0072074ee163d8d89adaa5b6ade064bf38871afe3b814d4418487c1",
+        "size_in_bytes": 901
+      },
+      {
+        "_path": "include/sodium/crypto_hash_sha256.h",
+        "path_type": "hardlink",
+        "sha256": "121d63b8749770b67b45eac983c5d602b9ca5d6dda02c11b88cdf888f17914ab",
+        "sha256_in_prefix": "121d63b8749770b67b45eac983c5d602b9ca5d6dda02c11b88cdf888f17914ab",
+        "size_in_bytes": 1492
+      },
+      {
+        "_path": "include/sodium/crypto_hash_sha512.h",
+        "path_type": "hardlink",
+        "sha256": "a4c3976041ca76a28960bcb265e6de55ab2b876f9e2f1b3427a39888314de044",
+        "sha256_in_prefix": "a4c3976041ca76a28960bcb265e6de55ab2b876f9e2f1b3427a39888314de044",
+        "size_in_bytes": 1496
+      },
+      {
+        "_path": "include/sodium/crypto_kdf.h",
+        "path_type": "hardlink",
+        "sha256": "09901e619b1909e1802ace8f1e8b9ceb2218fd49c4ee430126802df7ff402525",
+        "sha256_in_prefix": "09901e619b1909e1802ace8f1e8b9ceb2218fd49c4ee430126802df7ff402525",
+        "size_in_bytes": 1308
+      },
+      {
+        "_path": "include/sodium/crypto_kdf_blake2b.h",
+        "path_type": "hardlink",
+        "sha256": "2f0739ea610fb5c9ad8c453d84fac1d09e187f67096c70887f22c32a750e922b",
+        "sha256_in_prefix": "2f0739ea610fb5c9ad8c453d84fac1d09e187f67096c70887f22c32a750e922b",
+        "size_in_bytes": 1071
+      },
+      {
+        "_path": "include/sodium/crypto_kx.h",
+        "path_type": "hardlink",
+        "sha256": "b590d661674331aba7dade467ee902e1b61d0fe875bfc3780bd41b9e91dce316",
+        "sha256_in_prefix": "b590d661674331aba7dade467ee902e1b61d0fe875bfc3780bd41b9e91dce316",
+        "size_in_bytes": 2201
+      },
+      {
+        "_path": "include/sodium/crypto_onetimeauth.h",
+        "path_type": "hardlink",
+        "sha256": "4d07e9033ba62f556ceb3a7412226e0d74481014026953d6815cb5c4d9955891",
+        "sha256_in_prefix": "4d07e9033ba62f556ceb3a7412226e0d74481014026953d6815cb5c4d9955891",
+        "size_in_bytes": 1912
+      },
+      {
+        "_path": "include/sodium/crypto_onetimeauth_poly1305.h",
+        "path_type": "hardlink",
+        "sha256": "bed2ea5e07ffa89264413e2cf1d7730b0fd3c56d42399c86a36ccfef52f27296",
+        "sha256_in_prefix": "bed2ea5e07ffa89264413e2cf1d7730b0fd3c56d42399c86a36ccfef52f27296",
+        "size_in_bytes": 2198
+      },
+      {
+        "_path": "include/sodium/crypto_pwhash.h",
+        "path_type": "hardlink",
+        "sha256": "e529cb84849008caf0dd2f3f1bac6808a0be9c963f9d2814f59badeda85d0c5b",
+        "sha256_in_prefix": "e529cb84849008caf0dd2f3f1bac6808a0be9c963f9d2814f59badeda85d0c5b",
+        "size_in_bytes": 4966
+      },
+      {
+        "_path": "include/sodium/crypto_pwhash_argon2i.h",
+        "path_type": "hardlink",
+        "sha256": "50a6b40ea240dd5f3b01198437ab56afabd050733ffa4d3dae5a90367e2e30ca",
+        "sha256_in_prefix": "50a6b40ea240dd5f3b01198437ab56afabd050733ffa4d3dae5a90367e2e30ca",
+        "size_in_bytes": 3919
+      },
+      {
+        "_path": "include/sodium/crypto_pwhash_argon2id.h",
+        "path_type": "hardlink",
+        "sha256": "15fe59b3b5b7ef6562b446f39d28ec4d97de06c662005f0d9aad6788d61b8155",
+        "sha256_in_prefix": "15fe59b3b5b7ef6562b446f39d28ec4d97de06c662005f0d9aad6788d61b8155",
+        "size_in_bytes": 3981
+      },
+      {
+        "_path": "include/sodium/crypto_pwhash_scryptsalsa208sha256.h",
+        "path_type": "hardlink",
+        "sha256": "5104ba3a227b676f0f8d3f0978d882b9d7ac683bf43c1d8995d6003e2ffe8e1f",
+        "sha256_in_prefix": "5104ba3a227b676f0f8d3f0978d882b9d7ac683bf43c1d8995d6003e2ffe8e1f",
+        "size_in_bytes": 4688
+      },
+      {
+        "_path": "include/sodium/crypto_scalarmult.h",
+        "path_type": "hardlink",
+        "sha256": "80202693f962c5c5c69dab8e3398ee1e58c4422e21f110301ddfc6d137dd545b",
+        "sha256_in_prefix": "80202693f962c5c5c69dab8e3398ee1e58c4422e21f110301ddfc6d137dd545b",
+        "size_in_bytes": 1184
+      },
+      {
+        "_path": "include/sodium/crypto_scalarmult_curve25519.h",
+        "path_type": "hardlink",
+        "sha256": "3122574b81d8365961aeef5e984c9ac33dfcc6f2767ef70e8622ceb20f81dbd8",
+        "sha256_in_prefix": "3122574b81d8365961aeef5e984c9ac33dfcc6f2767ef70e8622ceb20f81dbd8",
+        "size_in_bytes": 1098
+      },
+      {
+        "_path": "include/sodium/crypto_scalarmult_ed25519.h",
+        "path_type": "hardlink",
+        "sha256": "d1e92c568dc731b0770bada45ee23d970a17534c41f4e5a15f44e1210e002f16",
+        "sha256_in_prefix": "d1e92c568dc731b0770bada45ee23d970a17534c41f4e5a15f44e1210e002f16",
+        "size_in_bytes": 1406
+      },
+      {
+        "_path": "include/sodium/crypto_scalarmult_ristretto255.h",
+        "path_type": "hardlink",
+        "sha256": "cfd5cb3642ee1186adfd4f4752b7cf93215f0991aaf6a2af9a93d35733d07f42",
+        "sha256_in_prefix": "cfd5cb3642ee1186adfd4f4752b7cf93215f0991aaf6a2af9a93d35733d07f42",
+        "size_in_bytes": 1119
+      },
+      {
+        "_path": "include/sodium/crypto_secretbox.h",
+        "path_type": "hardlink",
+        "sha256": "49655e9cf0302539ffa7de8d025f598fea330481575e767c134c5e06a2ac1f55",
+        "sha256_in_prefix": "49655e9cf0302539ffa7de8d025f598fea330481575e767c134c5e06a2ac1f55",
+        "size_in_bytes": 3316
+      },
+      {
+        "_path": "include/sodium/crypto_secretbox_xchacha20poly1305.h",
+        "path_type": "hardlink",
+        "sha256": "dbbe1bf02d5abd16ad0604b9ff976f028340eac0eecd3ea5dd3512e29cfdd9b6",
+        "sha256_in_prefix": "dbbe1bf02d5abd16ad0604b9ff976f028340eac0eecd3ea5dd3512e29cfdd9b6",
+        "size_in_bytes": 2853
+      },
+      {
+        "_path": "include/sodium/crypto_secretbox_xsalsa20poly1305.h",
+        "path_type": "hardlink",
+        "sha256": "c03da9bf0c12555ba39a86ba9bf8e923272f5721530de69d658b477d2da27321",
+        "sha256_in_prefix": "c03da9bf0c12555ba39a86ba9bf8e923272f5721530de69d658b477d2da27321",
+        "size_in_bytes": 2419
+      },
+      {
+        "_path": "include/sodium/crypto_secretstream_xchacha20poly1305.h",
+        "path_type": "hardlink",
+        "sha256": "84f514317b7feb33b644b2c3fc45b9f012dd5cbda98aeb8086ec8f6d7029851f",
+        "sha256_in_prefix": "84f514317b7feb33b644b2c3fc45b9f012dd5cbda98aeb8086ec8f6d7029851f",
+        "size_in_bytes": 3832
+      },
+      {
+        "_path": "include/sodium/crypto_shorthash.h",
+        "path_type": "hardlink",
+        "sha256": "f085c63bff21b6917dfe4e7415d4db740ef49f177abaf25a747e9878830c067f",
+        "sha256_in_prefix": "f085c63bff21b6917dfe4e7415d4db740ef49f177abaf25a747e9878830c067f",
+        "size_in_bytes": 960
+      },
+      {
+        "_path": "include/sodium/crypto_shorthash_siphash24.h",
+        "path_type": "hardlink",
+        "sha256": "69b5ed9869b8b5da63991ad3426bf5bd56449827d87073202cbbe2ee7635d83e",
+        "sha256_in_prefix": "69b5ed9869b8b5da63991ad3426bf5bd56449827d87073202cbbe2ee7635d83e",
+        "size_in_bytes": 1236
+      },
+      {
+        "_path": "include/sodium/crypto_sign.h",
+        "path_type": "hardlink",
+        "sha256": "9631e38d8c9d0f338628cf3942a27500ef5bbe06f7d34b4c3c4bbbd74f1ffb0c",
+        "sha256_in_prefix": "9631e38d8c9d0f338628cf3942a27500ef5bbe06f7d34b4c3c4bbbd74f1ffb0c",
+        "size_in_bytes": 3353
+      },
+      {
+        "_path": "include/sodium/crypto_sign_ed25519.h",
+        "path_type": "hardlink",
+        "sha256": "c86e5a3ee60ee0140b5aef3b91bf59de809c6f8fec596663d96304f4280dcf19",
+        "sha256_in_prefix": "c86e5a3ee60ee0140b5aef3b91bf59de809c6f8fec596663d96304f4280dcf19",
+        "size_in_bytes": 4341
+      },
+      {
+        "_path": "include/sodium/crypto_sign_edwards25519sha512batch.h",
+        "path_type": "hardlink",
+        "sha256": "958060430c84e0a2ca4c036214e8b92220f9d5d41ac76903266e122f8e89d594",
+        "sha256_in_prefix": "958060430c84e0a2ca4c036214e8b92220f9d5d41ac76903266e122f8e89d594",
+        "size_in_bytes": 2053
+      },
+      {
+        "_path": "include/sodium/crypto_stream.h",
+        "path_type": "hardlink",
+        "sha256": "ae8d27cabc066b6e369e0a4d04f0aea1aced45145d8e176a21bdcf359c4001a0",
+        "sha256_in_prefix": "ae8d27cabc066b6e369e0a4d04f0aea1aced45145d8e176a21bdcf359c4001a0",
+        "size_in_bytes": 1606
+      },
+      {
+        "_path": "include/sodium/crypto_stream_chacha20.h",
+        "path_type": "hardlink",
+        "sha256": "e6f0ef6cb1199bac25096f715fd9290e073c8a9e0fc03066699fed0fb800612b",
+        "sha256_in_prefix": "e6f0ef6cb1199bac25096f715fd9290e073c8a9e0fc03066699fed0fb800612b",
+        "size_in_bytes": 3672
+      },
+      {
+        "_path": "include/sodium/crypto_stream_salsa20.h",
+        "path_type": "hardlink",
+        "sha256": "cf1c051d837eaea3b102c63683394e415d2d9ee2f885ba105312af7e13db03b8",
+        "sha256_in_prefix": "cf1c051d837eaea3b102c63683394e415d2d9ee2f885ba105312af7e13db03b8",
+        "size_in_bytes": 1836
+      },
+      {
+        "_path": "include/sodium/crypto_stream_salsa2012.h",
+        "path_type": "hardlink",
+        "sha256": "bc65adc00270a7e18bd5acf3141c252bddb82a4628388299349ab94f9784bd8e",
+        "sha256_in_prefix": "bc65adc00270a7e18bd5acf3141c252bddb82a4628388299349ab94f9784bd8e",
+        "size_in_bytes": 1532
+      },
+      {
+        "_path": "include/sodium/crypto_stream_salsa208.h",
+        "path_type": "hardlink",
+        "sha256": "5430b7f5a934a75ee4f5c8e9ed9ddc3cec7dd1032ac8bec35c7188da5d738fa2",
+        "sha256_in_prefix": "5430b7f5a934a75ee4f5c8e9ed9ddc3cec7dd1032ac8bec35c7188da5d738fa2",
+        "size_in_bytes": 1731
+      },
+      {
+        "_path": "include/sodium/crypto_stream_xchacha20.h",
+        "path_type": "hardlink",
+        "sha256": "dcaafd5679d02460b24fe877946458ff454f4e9d35c8e1f8f1f1b48d54c96698",
+        "sha256_in_prefix": "dcaafd5679d02460b24fe877946458ff454f4e9d35c8e1f8f1f1b48d54c96698",
+        "size_in_bytes": 1875
+      },
+      {
+        "_path": "include/sodium/crypto_stream_xsalsa20.h",
+        "path_type": "hardlink",
+        "sha256": "de812c7463a2ca0f4db6c6edb671277777f0aaccff85d86a471c7da932a09b0c",
+        "sha256_in_prefix": "de812c7463a2ca0f4db6c6edb671277777f0aaccff85d86a471c7da932a09b0c",
+        "size_in_bytes": 1856
+      },
+      {
+        "_path": "include/sodium/crypto_verify_16.h",
+        "path_type": "hardlink",
+        "sha256": "d3b4fbea4b6d2bf23a9a079939a181625be76a006af129732af86bf4b544456c",
+        "sha256_in_prefix": "d3b4fbea4b6d2bf23a9a079939a181625be76a006af129732af86bf4b544456c",
+        "size_in_bytes": 419
+      },
+      {
+        "_path": "include/sodium/crypto_verify_32.h",
+        "path_type": "hardlink",
+        "sha256": "6ea1ea855b691a2b08510afe74f893d4ff44e40b14501d774d1a73dd79ad4e73",
+        "sha256_in_prefix": "6ea1ea855b691a2b08510afe74f893d4ff44e40b14501d774d1a73dd79ad4e73",
+        "size_in_bytes": 419
+      },
+      {
+        "_path": "include/sodium/crypto_verify_64.h",
+        "path_type": "hardlink",
+        "sha256": "9736126e6d38864b7c2aa0edf0075e3f6b1fe485a060067ce8c06afb340171a8",
+        "sha256_in_prefix": "9736126e6d38864b7c2aa0edf0075e3f6b1fe485a060067ce8c06afb340171a8",
+        "size_in_bytes": 419
+      },
+      {
+        "_path": "include/sodium/export.h",
+        "path_type": "hardlink",
+        "sha256": "acc6ee537f831d535b0607be90f05150103765b7ca82170fd61a85bd5e6f73ff",
+        "sha256_in_prefix": "acc6ee537f831d535b0607be90f05150103765b7ca82170fd61a85bd5e6f73ff",
+        "size_in_bytes": 1347
+      },
+      {
+        "_path": "include/sodium/randombytes.h",
+        "path_type": "hardlink",
+        "sha256": "41bf6745f8343b39a48861e9128bbff39ddd7f784d3e8c59a8fcbc55c6511c05",
+        "sha256_in_prefix": "41bf6745f8343b39a48861e9128bbff39ddd7f784d3e8c59a8fcbc55c6511c05",
+        "size_in_bytes": 1847
+      },
+      {
+        "_path": "include/sodium/randombytes_internal_random.h",
+        "path_type": "hardlink",
+        "sha256": "9909eaf527e325d69d08c55db2f76de379fd4de338ff82e72a1da5a206fa3b6b",
+        "sha256_in_prefix": "9909eaf527e325d69d08c55db2f76de379fd4de338ff82e72a1da5a206fa3b6b",
+        "size_in_bytes": 427
+      },
+      {
+        "_path": "include/sodium/randombytes_sysrandom.h",
+        "path_type": "hardlink",
+        "sha256": "cdcc193ee76bb69626b7cb63b105db2f83796b7c365c9f4e42193fa9e654bfb6",
+        "sha256_in_prefix": "cdcc193ee76bb69626b7cb63b105db2f83796b7c365c9f4e42193fa9e654bfb6",
+        "size_in_bytes": 282
+      },
+      {
+        "_path": "include/sodium/runtime.h",
+        "path_type": "hardlink",
+        "sha256": "5f618794bfa316c338bc166ffd21f00e5711a0ebf94aaa19440c88b0c94be023",
+        "sha256_in_prefix": "5f618794bfa316c338bc166ffd21f00e5711a0ebf94aaa19440c88b0c94be023",
+        "size_in_bytes": 889
+      },
+      {
+        "_path": "include/sodium/utils.h",
+        "path_type": "hardlink",
+        "sha256": "9e1edab33653155e3d4773963234b9eb0af9b1983b1ef3dc1f248c46e44dcae1",
+        "sha256_in_prefix": "9e1edab33653155e3d4773963234b9eb0af9b1983b1ef3dc1f248c46e44dcae1",
+        "size_in_bytes": 6149
+      },
+      {
+        "_path": "include/sodium/version.h",
+        "path_type": "hardlink",
+        "sha256": "ebd19973e2a7a45ecc2434e5f75bb308413cae308688cd3061e4417df3ef22df",
+        "sha256_in_prefix": "ebd19973e2a7a45ecc2434e5f75bb308413cae308688cd3061e4417df3ef22df",
+        "size_in_bytes": 509
+      },
+      {
+        "_path": "lib/libsodium.a",
+        "path_type": "hardlink",
+        "sha256": "d398f610bd8f10892b576e537692fd86d9d9fed04dd79d3352bb15ef32e76e02",
+        "sha256_in_prefix": "d398f610bd8f10892b576e537692fd86d9d9fed04dd79d3352bb15ef32e76e02",
+        "size_in_bytes": 763348
+      },
+      {
+        "_path": "lib/libsodium.so",
+        "path_type": "softlink",
+        "sha256": "037e1d5f80691fb77868a74000db95d3bbdbe8b4557c24f8eb4e91e0e919d268",
+        "size_in_bytes": 423072
+      },
+      {
+        "_path": "lib/libsodium.so.23",
+        "path_type": "softlink",
+        "sha256": "037e1d5f80691fb77868a74000db95d3bbdbe8b4557c24f8eb4e91e0e919d268",
+        "size_in_bytes": 423072
+      },
+      {
+        "_path": "lib/libsodium.so.23.3.0",
+        "path_type": "hardlink",
+        "sha256": "037e1d5f80691fb77868a74000db95d3bbdbe8b4557c24f8eb4e91e0e919d268",
+        "sha256_in_prefix": "037e1d5f80691fb77868a74000db95d3bbdbe8b4557c24f8eb4e91e0e919d268",
+        "size_in_bytes": 423072
+      },
+      {
+        "_path": "lib/pkgconfig/libsodium.pc",
+        "file_mode": "text",
+        "path_type": "hardlink",
+        "prefix_placeholder": "/home/conda/feedstock_root/build_artifacts/libsodium_1605135439710/_h_env_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_p",
+        "sha256": "ca63560f809974557e8895c5f59d68e8f614eb87fca575ab2a1925d1ce7cc9dc",
+        "sha256_in_prefix": "0ad709afd24f5652a4f7fb16f4ba24f4789134e263b08ca7a98e478cab56fcf0",
+        "size_in_bytes": 503
+      }
+    ],
+    "paths_version": 1
+  },
+  "requested_spec": "None",
+  "sha256": "53da0c8b79659df7b53eebdb80783503ce72fb4b10ed6e9e05cc0e9e4207a130",
+  "size": 374999,
+  "subdir": "linux-64",
+  "timestamp": 1605135674000,
+  "url": "https://conda.anaconda.org/conda-forge/linux-64/libsodium-1.0.18-h36c2ea0_1.tar.bz2",
+  "version": "1.0.18"
+}

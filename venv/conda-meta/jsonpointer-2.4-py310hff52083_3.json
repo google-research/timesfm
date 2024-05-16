@@ -1,0 +1,132 @@
+{
+  "build": "py310hff52083_3",
+  "build_number": 3,
+  "channel": "https://conda.anaconda.org/conda-forge/linux-64",
+  "constrains": [],
+  "depends": [
+    "python >=3.10,<3.11.0a0",
+    "python_abi 3.10.* *_cp310"
+  ],
+  "extracted_package_dir": "/opt/conda/pkgs/jsonpointer-2.4-py310hff52083_3",
+  "files": [
+    "bin/jsonpointer",
+    "lib/python3.10/site-packages/__pycache__/jsonpointer.cpython-310.pyc",
+    "lib/python3.10/site-packages/jsonpointer-2.4.dist-info/AUTHORS",
+    "lib/python3.10/site-packages/jsonpointer-2.4.dist-info/INSTALLER",
+    "lib/python3.10/site-packages/jsonpointer-2.4.dist-info/LICENSE.txt",
+    "lib/python3.10/site-packages/jsonpointer-2.4.dist-info/METADATA",
+    "lib/python3.10/site-packages/jsonpointer-2.4.dist-info/RECORD",
+    "lib/python3.10/site-packages/jsonpointer-2.4.dist-info/REQUESTED",
+    "lib/python3.10/site-packages/jsonpointer-2.4.dist-info/WHEEL",
+    "lib/python3.10/site-packages/jsonpointer-2.4.dist-info/direct_url.json",
+    "lib/python3.10/site-packages/jsonpointer-2.4.dist-info/top_level.txt",
+    "lib/python3.10/site-packages/jsonpointer.py"
+  ],
+  "fn": "jsonpointer-2.4-py310hff52083_3.conda",
+  "license": "BSD-3-Clause",
+  "link": {
+    "source": "/opt/conda/pkgs/jsonpointer-2.4-py310hff52083_3",
+    "type": 1
+  },
+  "md5": "08ec1463dbc5c806a32fc431874032ca",
+  "name": "jsonpointer",
+  "package_tarball_full_path": "/opt/conda/pkgs/jsonpointer-2.4-py310hff52083_3.conda",
+  "paths_data": {
+    "paths": [
+      {
+        "_path": "bin/jsonpointer",
+        "file_mode": "text",
+        "path_type": "hardlink",
+        "prefix_placeholder": "/home/conda/feedstock_root/build_artifacts/jsonpointer_1695397238043/_h_env_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold",
+        "sha256": "881176d4d137f58cda9855a1ba6adf973cabd8321101902da33e41852da51bff",
+        "sha256_in_prefix": "35890bd9a4788373a86f3890d0f0076c0303378a2165995c5b7411a4702db146",
+        "size_in_bytes": 2087
+      },
+      {
+        "_path": "lib/python3.10/site-packages/__pycache__/jsonpointer.cpython-310.pyc",
+        "path_type": "hardlink",
+        "sha256": "734cb32efc82db75c013319c3b95c4e3e366dfffa4231248060cdfd7d4fd0307",
+        "sha256_in_prefix": "734cb32efc82db75c013319c3b95c4e3e366dfffa4231248060cdfd7d4fd0307",
+        "size_in_bytes": 10251
+      },
+      {
+        "_path": "lib/python3.10/site-packages/jsonpointer-2.4.dist-info/AUTHORS",
+        "path_type": "hardlink",
+        "sha256": "4d58319d0f59c87bef5b07b3fe4db0f19c2d7d5545b034c6bf7b57c89bbef57f",
+        "sha256_in_prefix": "4d58319d0f59c87bef5b07b3fe4db0f19c2d7d5545b034c6bf7b57c89bbef57f",
+        "size_in_bytes": 113
+      },
+      {
+        "_path": "lib/python3.10/site-packages/jsonpointer-2.4.dist-info/INSTALLER",
+        "path_type": "hardlink",
+        "sha256": "d0edee15f91b406f3f99726e44eb990be6e34fd0345b52b910c568e0eef6a2a8",
+        "sha256_in_prefix": "d0edee15f91b406f3f99726e44eb990be6e34fd0345b52b910c568e0eef6a2a8",
+        "size_in_bytes": 5
+      },
+      {
+        "_path": "lib/python3.10/site-packages/jsonpointer-2.4.dist-info/LICENSE.txt",
+        "path_type": "hardlink",
+        "sha256": "d8b24f15d472885f788a2d6e985850f264627b86012a17bb242c83f310d907e5",
+        "sha256_in_prefix": "d8b24f15d472885f788a2d6e985850f264627b86012a17bb242c83f310d907e5",
+        "size_in_bytes": 1413
+      },
+      {
+        "_path": "lib/python3.10/site-packages/jsonpointer-2.4.dist-info/METADATA",
+        "path_type": "hardlink",
+        "sha256": "9131114c64af0a4b1ec974a3652a8ad2b48f605992a0cce8874a1809feb0bc10",
+        "sha256_in_prefix": "9131114c64af0a4b1ec974a3652a8ad2b48f605992a0cce8874a1809feb0bc10",
+        "size_in_bytes": 2505
+      },
+      {
+        "_path": "lib/python3.10/site-packages/jsonpointer-2.4.dist-info/RECORD",
+        "path_type": "hardlink",
+        "sha256": "9e34364ebd6be6d7d2279478a7c500df6a9d590aa7d1bd19bd065291cd213c35",
+        "sha256_in_prefix": "9e34364ebd6be6d7d2279478a7c500df6a9d590aa7d1bd19bd065291cd213c35",
+        "size_in_bytes": 972
+      },
+      {
+        "_path": "lib/python3.10/site-packages/jsonpointer-2.4.dist-info/REQUESTED",
+        "path_type": "hardlink",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256_in_prefix": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_in_bytes": 0
+      },
+      {
+        "_path": "lib/python3.10/site-packages/jsonpointer-2.4.dist-info/WHEEL",
+        "path_type": "hardlink",
+        "sha256": "89896fe5f5f7e7b3d0c914f6a3ab70d5b37e61c2851472aa07f2f01cee703fe8",
+        "sha256_in_prefix": "89896fe5f5f7e7b3d0c914f6a3ab70d5b37e61c2851472aa07f2f01cee703fe8",
+        "size_in_bytes": 110
+      },
+      {
+        "_path": "lib/python3.10/site-packages/jsonpointer-2.4.dist-info/direct_url.json",
+        "path_type": "hardlink",
+        "sha256": "f4adec0ceebae6728d1117f5b1b9aedd9fbcf64ff09e93966831090527b09389",
+        "sha256_in_prefix": "f4adec0ceebae6728d1117f5b1b9aedd9fbcf64ff09e93966831090527b09389",
+        "size_in_bytes": 107
+      },
+      {
+        "_path": "lib/python3.10/site-packages/jsonpointer-2.4.dist-info/top_level.txt",
+        "path_type": "hardlink",
+        "sha256": "06c51c6abfc2d276733c657669c92b27d0a9554f3fd16fe91d82b0a5d9d675d3",
+        "sha256_in_prefix": "06c51c6abfc2d276733c657669c92b27d0a9554f3fd16fe91d82b0a5d9d675d3",
+        "size_in_bytes": 12
+      },
+      {
+        "_path": "lib/python3.10/site-packages/jsonpointer.py",
+        "path_type": "hardlink",
+        "sha256": "b7458ae0a441bd8e578379b8a0f0f4b851d471ba4eb3450861f2771d1e299abe",
+        "sha256_in_prefix": "b7458ae0a441bd8e578379b8a0f0f4b851d471ba4eb3450861f2771d1e299abe",
+        "size_in_bytes": 10964
+      }
+    ],
+    "paths_version": 1
+  },
+  "requested_spec": "None",
+  "sha256": "316db08863469a56cdbfd030de5a2cc11ec7649ed7c50eff507e9caa0070ccaa",
+  "size": 16170,
+  "subdir": "linux-64",
+  "timestamp": 1695397381000,
+  "url": "https://conda.anaconda.org/conda-forge/linux-64/jsonpointer-2.4-py310hff52083_3.conda",
+  "version": "2.4"
+}

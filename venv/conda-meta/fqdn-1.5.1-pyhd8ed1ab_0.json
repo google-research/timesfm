@@ -1,0 +1,126 @@
+{
+  "build": "pyhd8ed1ab_0",
+  "build_number": 0,
+  "channel": "https://conda.anaconda.org/conda-forge/noarch",
+  "constrains": [],
+  "depends": [
+    "cached-property >=1.3.0",
+    "python >=2.7,<4"
+  ],
+  "extracted_package_dir": "/opt/conda/pkgs/fqdn-1.5.1-pyhd8ed1ab_0",
+  "files": [
+    "lib/python3.10/site-packages/fqdn-1.5.1.dist-info/INSTALLER",
+    "lib/python3.10/site-packages/fqdn-1.5.1.dist-info/METADATA",
+    "lib/python3.10/site-packages/fqdn-1.5.1.dist-info/RECORD",
+    "lib/python3.10/site-packages/fqdn-1.5.1.dist-info/REQUESTED",
+    "lib/python3.10/site-packages/fqdn-1.5.1.dist-info/WHEEL",
+    "lib/python3.10/site-packages/fqdn-1.5.1.dist-info/direct_url.json",
+    "lib/python3.10/site-packages/fqdn-1.5.1.dist-info/top_level.txt",
+    "lib/python3.10/site-packages/fqdn-1.5.1.dist-info/zip-safe",
+    "lib/python3.10/site-packages/fqdn/__init__.py",
+    "lib/python3.10/site-packages/fqdn/_compat.py",
+    "lib/python3.10/site-packages/fqdn/__pycache__/__init__.cpython-310.pyc",
+    "lib/python3.10/site-packages/fqdn/__pycache__/_compat.cpython-310.pyc"
+  ],
+  "fn": "fqdn-1.5.1-pyhd8ed1ab_0.tar.bz2",
+  "license": "MPL-2.0",
+  "link": {
+    "source": "/opt/conda/pkgs/fqdn-1.5.1-pyhd8ed1ab_0",
+    "type": 1
+  },
+  "md5": "642d35437078749ef23a5dca2c9bb1f3",
+  "name": "fqdn",
+  "noarch": "python",
+  "package_tarball_full_path": "/opt/conda/pkgs/fqdn-1.5.1-pyhd8ed1ab_0.tar.bz2",
+  "package_type": "noarch_python",
+  "paths_data": {
+    "paths": [
+      {
+        "_path": "site-packages/fqdn-1.5.1.dist-info/INSTALLER",
+        "path_type": "hardlink",
+        "sha256": "d0edee15f91b406f3f99726e44eb990be6e34fd0345b52b910c568e0eef6a2a8",
+        "sha256_in_prefix": "d0edee15f91b406f3f99726e44eb990be6e34fd0345b52b910c568e0eef6a2a8",
+        "size_in_bytes": 5
+      },
+      {
+        "_path": "site-packages/fqdn-1.5.1.dist-info/METADATA",
+        "path_type": "hardlink",
+        "sha256": "bbf184e56e7d789e5a2b43c607b203a52e925ad4be898f6771138cabad182d8c",
+        "sha256_in_prefix": "bbf184e56e7d789e5a2b43c607b203a52e925ad4be898f6771138cabad182d8c",
+        "size_in_bytes": 1408
+      },
+      {
+        "_path": "site-packages/fqdn-1.5.1.dist-info/RECORD",
+        "path_type": "hardlink",
+        "sha256": "483560e4f112d8f902d67030c21681885d320b179e952ba0b0c9b0a9dc89730e",
+        "sha256_in_prefix": "483560e4f112d8f902d67030c21681885d320b179e952ba0b0c9b0a9dc89730e",
+        "size_in_bytes": 871
+      },
+      {
+        "_path": "site-packages/fqdn-1.5.1.dist-info/REQUESTED",
+        "path_type": "hardlink",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256_in_prefix": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_in_bytes": 0
+      },
+      {
+        "_path": "site-packages/fqdn-1.5.1.dist-info/WHEEL",
+        "path_type": "hardlink",
+        "sha256": "7b0c04b9e8a8d42d977874ef4f5ee7f1d6542603afc82582b7459534b0a53fda",
+        "sha256_in_prefix": "7b0c04b9e8a8d42d977874ef4f5ee7f1d6542603afc82582b7459534b0a53fda",
+        "size_in_bytes": 92
+      },
+      {
+        "_path": "site-packages/fqdn-1.5.1.dist-info/direct_url.json",
+        "path_type": "hardlink",
+        "sha256": "92b98d19975806bbb919e273a5258027f4363191421c60547d70c6750798b606",
+        "sha256_in_prefix": "92b98d19975806bbb919e273a5258027f4363191421c60547d70c6750798b606",
+        "size_in_bytes": 105
+      },
+      {
+        "_path": "site-packages/fqdn-1.5.1.dist-info/top_level.txt",
+        "path_type": "hardlink",
+        "sha256": "40a3f55eb3067e3b538a907acabe110b2b171ca3de61c93009ea98626d040099",
+        "sha256_in_prefix": "40a3f55eb3067e3b538a907acabe110b2b171ca3de61c93009ea98626d040099",
+        "size_in_bytes": 5
+      },
+      {
+        "_path": "site-packages/fqdn-1.5.1.dist-info/zip-safe",
+        "path_type": "hardlink",
+        "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "sha256_in_prefix": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "size_in_bytes": 1
+      },
+      {
+        "_path": "site-packages/fqdn/__init__.py",
+        "path_type": "hardlink",
+        "sha256": "79a4dd669a9a77c3f62fa28e33bd20dce86d03fc5afa44f43e612fd445cc7240",
+        "sha256_in_prefix": "79a4dd669a9a77c3f62fa28e33bd20dce86d03fc5afa44f43e612fd445cc7240",
+        "size_in_bytes": 4787
+      },
+      {
+        "_path": "site-packages/fqdn/_compat.py",
+        "path_type": "hardlink",
+        "sha256": "b627858d2b709b4b68a031fd8219dd01df838324a22b87f58a6e1ca6f31c71d8",
+        "sha256_in_prefix": "b627858d2b709b4b68a031fd8219dd01df838324a22b87f58a6e1ca6f31c71d8",
+        "size_in_bytes": 174
+      },
+      {
+        "_path": "lib/python3.10/site-packages/fqdn/__pycache__/__init__.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/fqdn/__pycache__/_compat.cpython-310.pyc",
+        "path_type": "pyc_file"
+      }
+    ],
+    "paths_version": 1
+  },
+  "requested_spec": "None",
+  "sha256": "6cfd1f9bcd2358a69fb571f4b3af049b630d52647d906822dbedac03e84e4f63",
+  "size": 14395,
+  "subdir": "noarch",
+  "timestamp": 1638810388000,
+  "url": "https://conda.anaconda.org/conda-forge/noarch/fqdn-1.5.1-pyhd8ed1ab_0.tar.bz2",
+  "version": "1.5.1"
+}

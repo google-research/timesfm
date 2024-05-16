@@ -1,0 +1,166 @@
+'\" t
+.\"     Title: zmq_connect_peer
+.\"    Author: [see the "AUTHORS" section]
+.\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
+.\"      Date: 10/09/2023
+.\"    Manual: 0MQ Manual
+.\"    Source: 0MQ 4.3.5
+.\"  Language: English
+.\"
+.TH "ZMQ_CONNECT_PEER" "3" "10/09/2023" "0MQ 4\&.3\&.5" "0MQ Manual"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+zmq_connect_peer \- create outgoing connection from socket and return the connection routing id in thread\-safe and atomic way\&.
+.SH "SYNOPSIS"
+.sp
+\fBuint32_t zmq_connect_peer (void \fR\fB\fI*socket\fR\fR\fB, const char \fR\fB\fI*endpoint\fR\fR\fB);\fR
+.SH "DESCRIPTION"
+.sp
+The \fIzmq_connect_peer()\fR function connects a \fIZMQ_PEER\fR socket to an \fIendpoint\fR and then returns the endpoint \fIrouting_id\fR\&.
+.sp
+The \fIendpoint\fR is a string consisting of a \fItransport\fR:// followed by an \fIaddress\fR\&. The \fItransport\fR specifies the underlying protocol to use\&. The \fIaddress\fR specifies the transport\-specific address to connect to\&.
+.sp
+The function is supported only on the \fIZMQ_PEER\fR socket type and would return 0 with \fIerrno\fR set to \fIENOTSUP\fR otherwise\&.
+.sp
+The \fIzmq_connect_peer()\fR support the following transports:
+.PP
+\fItcp\fR
+.RS 4
+unicast transport using TCP, see
+\fBzmq_tcp\fR(7)
+.RE
+.PP
+\fIipc\fR
+.RS 4
+local inter\-process communication transport, see
+\fBzmq_ipc\fR(7)
+.RE
+.PP
+\fIinproc\fR
+.RS 4
+local in\-process (inter\-thread) communication transport, see
+\fBzmq_inproc\fR(7)
+.RE
+.PP
+\fIws\fR
+.RS 4
+unicast transport using WebSockets, see
+\fBzmq_ws\fR(7)
+.RE
+.PP
+\fIwss\fR
+.RS 4
+unicast transport using WebSockets over TLS, see
+\fBzmq_wss\fR(7)
+.RE
+.SH "RETURN VALUE"
+.sp
+The \fIzmq_connect_peer()\fR function returns the peer \fIrouting_id\fR if successful\&. Otherwise it returns 0 and sets \fIerrno\fR to one of the values defined below\&.
+.SH "ERRORS"
+.PP
+\fBEINVAL\fR
+.RS 4
+The endpoint supplied is invalid\&.
+.RE
+.PP
+\fBEPROTONOSUPPORT\fR
+.RS 4
+The requested
+\fItransport\fR
+protocol is not supported with
+\fIZMQ_PEER\fR\&.
+.RE
+.PP
+\fBENOCOMPATPROTO\fR
+.RS 4
+The requested
+\fItransport\fR
+protocol is not compatible with the socket type\&.
+.RE
+.PP
+\fBETERM\fR
+.RS 4
+The 0MQ
+\fIcontext\fR
+associated with the specified
+\fIsocket\fR
+was terminated\&.
+.RE
+.PP
+\fBENOTSOCK\fR
+.RS 4
+The provided
+\fIsocket\fR
+was invalid\&.
+.RE
+.PP
+\fBEMTHREAD\fR
+.RS 4
+No I/O thread is available to accomplish the task\&.
+.RE
+.PP
+\fBENOTSUP\fR
+.RS 4
+The socket is not of type
+\fIZMQ_PEER\fR\&.
+.RE
+.PP
+\fBEFAULT\fR
+.RS 4
+The
+\fIZMQ_IMMEDIATE\fR
+option is set on the socket\&.
+.RE
+.SH "EXAMPLE"
+.PP
+\fBConnecting a peer socket to a TCP transport and sending a message\fR. 
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+/* Create a ZMQ_SUB socket */
+void *socket = zmq_socket (context, ZMQ_PEER);
+assert (socket);
+/* Connect it to the host server001, port 5555 using a TCP transport */
+uint32_t routing_id = zmq_connect (socket, "tcp://server001:5555");
+assert (routing_id == 0);
+/* Sending a message to the peer  */
+zmq_msg_t msg;
+int rc = zmq_msg_init_data (&msg, "HELLO", 5, NULL, NULL);
+assert (rc == 0);
+rc = zmq_msg_set_routing_id (&msg, routing_id);
+assert (rc == 0);
+rc = zmq_msg_send (&msg, socket, 0);
+assert (rc == 5);
+rc = zmq_msg_close (&msg);
+assert (rc == 0);
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+.SH "SEE ALSO"
+.sp
+\fBzmq_connect\fR(3) \fBzmq_bind\fR(3) \fBzmq_socket\fR(3) \fBzmq\fR(7)
+.SH "AUTHORS"
+.sp
+This page was written by the 0MQ community\&. To make a change please read the 0MQ Contribution Policy at \m[blue]\fBhttp://www\&.zeromq\&.org/docs:contributing\fR\m[]\&.

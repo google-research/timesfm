@@ -1,0 +1,11 @@
+prefix=/workspaces/timesfm/venv
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: kadm-client
+Description: Kerberos administration client library
+Version: 1.21.2
+Requires.private: mit-krb5-gssapi gssrpc
+Cflags: -I${includedir}
+Libs: -L${libdir} -lkadm5clnt_mit

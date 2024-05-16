@@ -1,0 +1,164 @@
+{
+  "build": "pyhd8ed1ab_2",
+  "build_number": 2,
+  "channel": "https://conda.anaconda.org/conda-forge/noarch",
+  "constrains": [],
+  "depends": [
+    "python >=2.6"
+  ],
+  "extracted_package_dir": "/opt/conda/pkgs/webencodings-0.5.1-pyhd8ed1ab_2",
+  "files": [
+    "lib/python3.10/site-packages/webencodings-0.5.1.dist-info/INSTALLER",
+    "lib/python3.10/site-packages/webencodings-0.5.1.dist-info/LICENSE",
+    "lib/python3.10/site-packages/webencodings-0.5.1.dist-info/METADATA",
+    "lib/python3.10/site-packages/webencodings-0.5.1.dist-info/RECORD",
+    "lib/python3.10/site-packages/webencodings-0.5.1.dist-info/REQUESTED",
+    "lib/python3.10/site-packages/webencodings-0.5.1.dist-info/WHEEL",
+    "lib/python3.10/site-packages/webencodings-0.5.1.dist-info/direct_url.json",
+    "lib/python3.10/site-packages/webencodings-0.5.1.dist-info/top_level.txt",
+    "lib/python3.10/site-packages/webencodings/__init__.py",
+    "lib/python3.10/site-packages/webencodings/labels.py",
+    "lib/python3.10/site-packages/webencodings/mklabels.py",
+    "lib/python3.10/site-packages/webencodings/tests.py",
+    "lib/python3.10/site-packages/webencodings/x_user_defined.py",
+    "lib/python3.10/site-packages/webencodings/__pycache__/__init__.cpython-310.pyc",
+    "lib/python3.10/site-packages/webencodings/__pycache__/labels.cpython-310.pyc",
+    "lib/python3.10/site-packages/webencodings/__pycache__/mklabels.cpython-310.pyc",
+    "lib/python3.10/site-packages/webencodings/__pycache__/tests.cpython-310.pyc",
+    "lib/python3.10/site-packages/webencodings/__pycache__/x_user_defined.cpython-310.pyc"
+  ],
+  "fn": "webencodings-0.5.1-pyhd8ed1ab_2.conda",
+  "license": "BSD-3-Clause",
+  "link": {
+    "source": "/opt/conda/pkgs/webencodings-0.5.1-pyhd8ed1ab_2",
+    "type": 1
+  },
+  "md5": "daf5160ff9cde3a468556965329085b9",
+  "name": "webencodings",
+  "noarch": "python",
+  "package_tarball_full_path": "/opt/conda/pkgs/webencodings-0.5.1-pyhd8ed1ab_2.conda",
+  "package_type": "noarch_python",
+  "paths_data": {
+    "paths": [
+      {
+        "_path": "site-packages/webencodings-0.5.1.dist-info/INSTALLER",
+        "path_type": "hardlink",
+        "sha256": "d0edee15f91b406f3f99726e44eb990be6e34fd0345b52b910c568e0eef6a2a8",
+        "sha256_in_prefix": "d0edee15f91b406f3f99726e44eb990be6e34fd0345b52b910c568e0eef6a2a8",
+        "size_in_bytes": 5
+      },
+      {
+        "_path": "site-packages/webencodings-0.5.1.dist-info/LICENSE",
+        "path_type": "hardlink",
+        "sha256": "f23bae6ada76095610a77137fb92aec7342723900211c5826d54b4c57907ca56",
+        "sha256_in_prefix": "f23bae6ada76095610a77137fb92aec7342723900211c5826d54b4c57907ca56",
+        "size_in_bytes": 1490
+      },
+      {
+        "_path": "site-packages/webencodings-0.5.1.dist-info/METADATA",
+        "path_type": "hardlink",
+        "sha256": "9205986e77ff1eb9877bc7201300444f6e9e274db91dcc72fc6ab8b6d9916883",
+        "sha256_in_prefix": "9205986e77ff1eb9877bc7201300444f6e9e274db91dcc72fc6ab8b6d9916883",
+        "size_in_bytes": 2128
+      },
+      {
+        "_path": "site-packages/webencodings-0.5.1.dist-info/RECORD",
+        "path_type": "hardlink",
+        "sha256": "79f2c162a6818b3d1becd420b624eac85c114e28a05c0c5cb24d5ed6a6866764",
+        "sha256_in_prefix": "79f2c162a6818b3d1becd420b624eac85c114e28a05c0c5cb24d5ed6a6866764",
+        "size_in_bytes": 1382
+      },
+      {
+        "_path": "site-packages/webencodings-0.5.1.dist-info/REQUESTED",
+        "path_type": "hardlink",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256_in_prefix": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_in_bytes": 0
+      },
+      {
+        "_path": "site-packages/webencodings-0.5.1.dist-info/WHEEL",
+        "path_type": "hardlink",
+        "sha256": "89896fe5f5f7e7b3d0c914f6a3ab70d5b37e61c2851472aa07f2f01cee703fe8",
+        "sha256_in_prefix": "89896fe5f5f7e7b3d0c914f6a3ab70d5b37e61c2851472aa07f2f01cee703fe8",
+        "size_in_bytes": 110
+      },
+      {
+        "_path": "site-packages/webencodings-0.5.1.dist-info/direct_url.json",
+        "path_type": "hardlink",
+        "sha256": "c8dfa194fd5fa5510f2705aece6de99cb3c3c34d25f3f78a8b9e274bf3941541",
+        "sha256_in_prefix": "c8dfa194fd5fa5510f2705aece6de99cb3c3c34d25f3f78a8b9e274bf3941541",
+        "size_in_bytes": 108
+      },
+      {
+        "_path": "site-packages/webencodings-0.5.1.dist-info/top_level.txt",
+        "path_type": "hardlink",
+        "sha256": "6d9b3f6991d27ff3cd95f2070f8f81113266462f7d04974a2eb396eeb42781ea",
+        "sha256_in_prefix": "6d9b3f6991d27ff3cd95f2070f8f81113266462f7d04974a2eb396eeb42781ea",
+        "size_in_bytes": 13
+      },
+      {
+        "_path": "site-packages/webencodings/__init__.py",
+        "path_type": "hardlink",
+        "sha256": "a8e04922e3f2ff8072607e96fdb360245faa610d83a14f9d2ac0eee724560978",
+        "sha256_in_prefix": "a8e04922e3f2ff8072607e96fdb360245faa610d83a14f9d2ac0eee724560978",
+        "size_in_bytes": 10579
+      },
+      {
+        "_path": "site-packages/webencodings/labels.py",
+        "path_type": "hardlink",
+        "sha256": "e003bf2b14dd76a1adacbf67b3b9003e36f409c37ac6c088c5b2b7ec763daf71",
+        "sha256_in_prefix": "e003bf2b14dd76a1adacbf67b3b9003e36f409c37ac6c088c5b2b7ec763daf71",
+        "size_in_bytes": 8979
+      },
+      {
+        "_path": "site-packages/webencodings/mklabels.py",
+        "path_type": "hardlink",
+        "sha256": "19821ecb09e968b9cfd064a273c2c55a0774515bcefe5d4d73a62817ef3b47fe",
+        "sha256_in_prefix": "19821ecb09e968b9cfd064a273c2c55a0774515bcefe5d4d73a62817ef3b47fe",
+        "size_in_bytes": 1305
+      },
+      {
+        "_path": "site-packages/webencodings/tests.py",
+        "path_type": "hardlink",
+        "sha256": "3ad18bca384d6357ef916d46bcb27f155f59a2a0bd027ca3afbab79314dbccdb",
+        "sha256_in_prefix": "3ad18bca384d6357ef916d46bcb27f155f59a2a0bd027ca3afbab79314dbccdb",
+        "size_in_bytes": 6563
+      },
+      {
+        "_path": "site-packages/webencodings/x_user_defined.py",
+        "path_type": "hardlink",
+        "sha256": "c8ea9649d9a9cad19f52087f67a258803361a1cf81007cb279e4f5e45af8dad3",
+        "sha256_in_prefix": "c8ea9649d9a9cad19f52087f67a258803361a1cf81007cb279e4f5e45af8dad3",
+        "size_in_bytes": 4307
+      },
+      {
+        "_path": "lib/python3.10/site-packages/webencodings/__pycache__/__init__.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/webencodings/__pycache__/labels.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/webencodings/__pycache__/mklabels.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/webencodings/__pycache__/tests.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/webencodings/__pycache__/x_user_defined.cpython-310.pyc",
+        "path_type": "pyc_file"
+      }
+    ],
+    "paths_version": 1
+  },
+  "requested_spec": "None",
+  "sha256": "2adf9bd5482802837bc8814cbe28d7b2a4cbd2e2c52e381329eaa283b3ed1944",
+  "size": 15600,
+  "subdir": "noarch",
+  "timestamp": 1694681458000,
+  "url": "https://conda.anaconda.org/conda-forge/noarch/webencodings-0.5.1-pyhd8ed1ab_2.conda",
+  "version": "0.5.1"
+}

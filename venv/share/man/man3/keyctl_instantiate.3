@@ -1,0 +1,191 @@
+.\"
+.\" Copyright (C) 2006 Red Hat, Inc. All Rights Reserved.
+.\" Written by David Howells (dhowells@redhat.com)
+.\"
+.\" This program is free software; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License
+.\" as published by the Free Software Foundation; either version
+.\" 2 of the License, or (at your option) any later version.
+.\"
+.TH KEYCTL_INSTANTIATE 3 "4 May 2006" Linux "Linux Key Management Calls"
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH NAME
+keyctl_assume_authority, keyctl_instantiate, keyctl_instantiate_iov, keyctl_reject, keyctl_negate \- key instantiation functions
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH SYNOPSIS
+.nf
+.B #include <keyutils.h>
+.sp
+.BI "long keyctl_assume_authority(key_serial_t " key ");"
+.sp
+.BI "long keyctl_instantiate(key_serial_t " key ", const void *" payload ,
+.BI "size_t " plen ", key_serial_t " keyring ");"
+.sp
+.BI "long keyctl_instantiate_iov(key_serial_t " key ,
+.BI "const struct iovec *" payload_iov ", unsigned " ioc ,
+.BI "key_serial_t " keyring ");"
+.sp
+.BI "long keyctl_negate(key_serial_t " key ", unsigned " timeout ,
+.BI "key_serial_t " keyring ");"
+.sp
+.BI "long keyctl_reject(key_serial_t " key ", unsigned " timeout ,
+.BI "unsigned " error ", key_serial_t " keyring ");"
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH DESCRIPTION
+.BR keyctl_assume_authority ()
+assumes the authority for the calling thread to deal with and instantiate the
+specified uninstantiated
+.IR key .
+.P
+The calling thread must have the appropriate authorisation key resident in one
+of its keyrings for this to succeed, and that authority must not have been
+revoked.
+.P
+The authorising key is allocated by
+.BR request_key()
+when it needs to invoke
+userspace to generate a key for the requesting process.  This is then attached
+to one of the keyrings of the userspace process to which the task of
+instantiating the key is given:
+.IP
+requester -> request_key() -> instantiator
+.P
+Calling this function modifies the way
+.BR request_key ()
+works when called thereafter by the calling (instantiator) thread; once the
+authority is assumed, the keyrings of the initial process are added to the
+search path, using the initial process's UID, GID, groups and security
+context.
+.P
+If a thread has multiple instantiations to deal with, it may call this
+function to change the authorisation key currently in effect.  Supplying a
+.B zero
+.I key
+de-assumes the currently assumed authority.
+.P
+.B NOTE!
+This is a per-thread setting and not a per-process setting so that a
+multithreaded process can be used to instantiate several keys at once.
+.P
+.BR keyctl_instantiate ()
+instantiates the payload of an uninstantiated key from the data specified.
+.I payload
+and
+.I plen
+specify the data for the new payload.
+.I payload
+may be NULL and
+.I plen
+may be zero if the key type permits that.  The key type may reject the data if
+it's in the wrong format or in some other way invalid.
+.P
+.BR keyctl_instantiate_iov ()
+is similar, but the data is passed in an array of iovec structs instead of in
+a flat buffer.
+.I payload_iov
+points to the base of the array and
+.I ioc
+indicates how many elements there are.
+.I payload_iov
+may be NULL or
+.I ioc
+may be zero to indicate that no data is being supplied.
+.P
+.BR keyctl_reject ()
+marks a key as negatively instantiated and sets the expiration timer on it.
+.I timeout
+specifies the lifetime of the key in seconds.
+.I error
+specifies the error to be returned when a search hits the key (this is
+typically
+.BR EKEYREJECTED ", " EKEYREVOKED " or " EKEYEXPIRED ")."
+Note that
+.BR keyctl_reject ()
+falls back to
+.BR keyctl_negate ()
+if the kernel does not
+support it.
+.P
+.BR keyctl_negate ()
+as
+.BR keyctl_reject ()
+with an error code of
+.IB ENOKEY .
+.P
+Only a key for which authority has been assumed may be instantiated or
+negatively instantiated, and once instantiated, the authorisation key will be
+revoked and the requesting process will be able to resume.
+.P
+The destination
+.IR keyring ,
+if given, is assumed to belong to the initial requester, and not the
+instantiating process.  Therefore, the special keyring IDs refer to the
+requesting process's keyrings, not the caller's, and the requester's UID,
+etc. will be used to access them.
+.P
+The destination keyring can be
+.B zero
+if no extra link is desired.
+.P
+The requester, not the caller, must have
+.B write
+permission on the destination for a link to be made there.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH RETURN VALUE
+On success
+.BR keyctl_instantiate ()
+returns
+.BR 0 .
+On error, the value
+.B -1
+will be returned and
+.I errno
+will have been set to an appropriate error.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH ERRORS
+.TP
+.B ENOKEY
+The key or keyring specified is invalid.
+.TP
+.B EKEYEXPIRED
+The keyring specified has expired.
+.TP
+.B EKEYREVOKED
+The key or keyring specified had been revoked, or the authorisation has been
+revoked.
+.TP
+.B EINVAL
+The payload data was invalid.
+.TP
+.B ENOMEM
+Insufficient memory to store the new payload or to expand the destination
+keyring.
+.TP
+.B EDQUOT
+The key quota for the key's user would be exceeded by increasing the size of
+the key to accommodate the new payload or the key quota for the keyring's user
+would be exceeded by expanding the destination keyring.
+.TP
+.B EACCES
+The key exists, but is not
+.B writable
+by the requester.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH LINKING
+This is a library function that can be found in
+.IR libkeyutils .
+When linking,
+.B \-lkeyutils
+should be specified to the linker.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH SEE ALSO
+.ad l
+.nh
+.BR keyctl (1),
+.BR add_key (2),
+.BR keyctl (2),
+.BR request_key (2),
+.BR keyctl (3),
+.BR keyrings (7),
+.BR keyutils (7),
+.BR request\-key (8)

@@ -1,0 +1,104 @@
+{
+  "build": "pyhd8ed1ab_0",
+  "build_number": 0,
+  "channel": "https://conda.anaconda.org/conda-forge/noarch",
+  "constrains": [],
+  "depends": [
+    "python >=3.6"
+  ],
+  "extracted_package_dir": "/opt/conda/pkgs/entrypoints-0.4-pyhd8ed1ab_0",
+  "files": [
+    "lib/python3.10/site-packages/entrypoints-0.4.dist-info/INSTALLER",
+    "lib/python3.10/site-packages/entrypoints-0.4.dist-info/LICENSE",
+    "lib/python3.10/site-packages/entrypoints-0.4.dist-info/METADATA",
+    "lib/python3.10/site-packages/entrypoints-0.4.dist-info/RECORD",
+    "lib/python3.10/site-packages/entrypoints-0.4.dist-info/REQUESTED",
+    "lib/python3.10/site-packages/entrypoints-0.4.dist-info/WHEEL",
+    "lib/python3.10/site-packages/entrypoints-0.4.dist-info/direct_url.json",
+    "lib/python3.10/site-packages/entrypoints.py",
+    "lib/python3.10/site-packages/__pycache__/entrypoints.cpython-310.pyc"
+  ],
+  "fn": "entrypoints-0.4-pyhd8ed1ab_0.tar.bz2",
+  "license": "MIT",
+  "link": {
+    "source": "/opt/conda/pkgs/entrypoints-0.4-pyhd8ed1ab_0",
+    "type": 1
+  },
+  "md5": "3cf04868fee0a029769bd41f4b2fbf2d",
+  "name": "entrypoints",
+  "noarch": "python",
+  "package_tarball_full_path": "/opt/conda/pkgs/entrypoints-0.4-pyhd8ed1ab_0.tar.bz2",
+  "package_type": "noarch_python",
+  "paths_data": {
+    "paths": [
+      {
+        "_path": "site-packages/entrypoints-0.4.dist-info/INSTALLER",
+        "path_type": "hardlink",
+        "sha256": "d0edee15f91b406f3f99726e44eb990be6e34fd0345b52b910c568e0eef6a2a8",
+        "sha256_in_prefix": "d0edee15f91b406f3f99726e44eb990be6e34fd0345b52b910c568e0eef6a2a8",
+        "size_in_bytes": 5
+      },
+      {
+        "_path": "site-packages/entrypoints-0.4.dist-info/LICENSE",
+        "path_type": "hardlink",
+        "sha256": "de5fcd7349cdf399b0707a2a024833c4704743650133c72d6f0ff7561a03a848",
+        "sha256_in_prefix": "de5fcd7349cdf399b0707a2a024833c4704743650133c72d6f0ff7561a03a848",
+        "size_in_bytes": 1098
+      },
+      {
+        "_path": "site-packages/entrypoints-0.4.dist-info/METADATA",
+        "path_type": "hardlink",
+        "sha256": "952c55cf89ff4db06017f89650be1c91c93631b9289835a0f4c3e289e7acd267",
+        "sha256_in_prefix": "952c55cf89ff4db06017f89650be1c91c93631b9289835a0f4c3e289e7acd267",
+        "size_in_bytes": 2589
+      },
+      {
+        "_path": "site-packages/entrypoints-0.4.dist-info/RECORD",
+        "path_type": "hardlink",
+        "sha256": "a1088879fda1c9204aa1eba75df99f8f9108d177d25fb09f51032552efa4e53d",
+        "sha256_in_prefix": "a1088879fda1c9204aa1eba75df99f8f9108d177d25fb09f51032552efa4e53d",
+        "size_in_bytes": 699
+      },
+      {
+        "_path": "site-packages/entrypoints-0.4.dist-info/REQUESTED",
+        "path_type": "hardlink",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256_in_prefix": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_in_bytes": 0
+      },
+      {
+        "_path": "site-packages/entrypoints-0.4.dist-info/WHEEL",
+        "path_type": "hardlink",
+        "sha256": "8cf311fc3ce47385f889c42d9b3f35967358fe402c7e883baf2eeaa11bd82d7c",
+        "sha256_in_prefix": "8cf311fc3ce47385f889c42d9b3f35967358fe402c7e883baf2eeaa11bd82d7c",
+        "size_in_bytes": 81
+      },
+      {
+        "_path": "site-packages/entrypoints-0.4.dist-info/direct_url.json",
+        "path_type": "hardlink",
+        "sha256": "2ee554c1059859f68f76aa4735f9e4e81043182606c83c04453acb51867c62a7",
+        "sha256_in_prefix": "2ee554c1059859f68f76aa4735f9e4e81043182606c83c04453acb51867c62a7",
+        "size_in_bytes": 107
+      },
+      {
+        "_path": "site-packages/entrypoints.py",
+        "path_type": "hardlink",
+        "sha256": "1fde7c2c1985ae0201a14925bdc162a847f58d5d24c5520f10d34613541a51dd",
+        "sha256_in_prefix": "1fde7c2c1985ae0201a14925bdc162a847f58d5d24c5520f10d34613541a51dd",
+        "size_in_bytes": 8264
+      },
+      {
+        "_path": "lib/python3.10/site-packages/__pycache__/entrypoints.cpython-310.pyc",
+        "path_type": "pyc_file"
+      }
+    ],
+    "paths_version": 1
+  },
+  "requested_spec": "None",
+  "sha256": "2ec4a0900a4a9f42615fc04d0fb3286b796abe56590e8e042f6ec25e102dd5af",
+  "size": 9199,
+  "subdir": "noarch",
+  "timestamp": 1643888357000,
+  "url": "https://conda.anaconda.org/conda-forge/noarch/entrypoints-0.4-pyhd8ed1ab_0.tar.bz2",
+  "version": "0.4"
+}

@@ -1,0 +1,70 @@
+'\" t
+.\"     Title: zmq_gssapi
+.\"    Author: [see the "AUTHORS" section]
+.\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
+.\"      Date: 10/09/2023
+.\"    Manual: 0MQ Manual
+.\"    Source: 0MQ 4.3.5
+.\"  Language: English
+.\"
+.TH "ZMQ_GSSAPI" "7" "10/09/2023" "0MQ 4\&.3\&.5" "0MQ Manual"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+zmq_gssapi \- secure authentication and confidentiality
+.SH "SYNOPSIS"
+.sp
+The GSSAPI mechanism defines a mechanism for secure authentication and confidentiality for communications between a client and a server using the Generic Security Service Application Program Interface (GSSAPI)\&. The GSSAPI mechanism can be used on both public and private networks\&. GSSAPI itself is defined in IETF RFC\-2743: \m[blue]\fBhttp://tools\&.ietf\&.org/html/rfc2743\fR\m[]\&. The ZeroMQ GSSAPI mechanism is defined by this document: \m[blue]\fBhttp://rfc\&.zeromq\&.org/spec:38\fR\m[]\&.
+.SH "CLIENT AND SERVER ROLES"
+.sp
+A socket using GSSAPI can be either client or server, but not both\&.
+.sp
+To become a GSSAPI server, the application sets the ZMQ_GSSAPI_SERVER option on the socket\&.
+.sp
+To become a GSSAPI client, the application sets the ZMQ_GSSAPI_SERVICE_PRINCIPAL option to the name of the principal on the server to which it intends to connect\&.
+.sp
+On client or server, the application may additionally set the ZMQ_GSSAPI_PRINCIPAL option to provide the socket with the name of the principal for whom GSSAPI credentials should be acquired\&. If this option is not set, default credentials are used\&.
+.SH "OPTIONAL ENCRYPTION"
+.sp
+By default, the GSSAPI mechanism will encrypt all communications between client and server\&. If encryption is not desired (e\&.g\&. on private networks), the client and server applications can disable it by setting the ZMQ_GSSAPI_PLAINTEXT option\&. Both the client and server must set this option to the same value\&.
+.SH "PRINCIPAL NAMES"
+.sp
+Principal names specified with the ZMQ_GSSAPI_SERVICE_PRINCIPAL or ZMQ_GSSAPI_PRINCIPAL options are interpreted as "host based" name types by default\&. The ZMQ_GSSAPI_PRINCIPAL_NAMETYPE and ZMQ_GSSAPI_SERVICE_PRINCIPAL_NAMETYPE options may be used to change the name type to one of:
+.PP
+\fBZMQ_GSSAPI_NT_HOSTBASED\fR
+.RS 4
+The name should be of the form "service" or "service@hostname", which will parse into a principal of "service/hostname" in the local realm\&. This is the default name type\&.
+.RE
+.PP
+\fBZMQ_GSSAPI_NT_USER_NAME\fR
+.RS 4
+The name should be a local username, which will parse into a single\-component principal in the local realm\&.
+.RE
+.PP
+\fBZMQ_GSSAPI_NT_KRB5_PRINCIPAL\fR
+.RS 4
+The name is a principal name string\&. This name type only works with the krb5 GSSAPI mechanism\&.
+.RE
+.SH "SEE ALSO"
+.sp
+\fBzmq_setsockopt\fR(3) \fBzmq_null\fR(7) \fBzmq_curve\fR(7) \fBzmq\fR(7)
+.SH "AUTHORS"
+.sp
+This page was written by the 0MQ community\&. To make a change please read the 0MQ Contribution Policy at \m[blue]\fBhttp://www\&.zeromq\&.org/docs:contributing\fR\m[]\&.

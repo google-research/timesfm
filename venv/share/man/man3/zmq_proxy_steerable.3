@@ -1,0 +1,221 @@
+'\" t
+.\"     Title: zmq_proxy_steerable
+.\"    Author: [see the "AUTHORS" section]
+.\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
+.\"      Date: 10/09/2023
+.\"    Manual: 0MQ Manual
+.\"    Source: 0MQ 4.3.5
+.\"  Language: English
+.\"
+.TH "ZMQ_PROXY_STEERABLE" "3" "10/09/2023" "0MQ 4\&.3\&.5" "0MQ Manual"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+zmq_proxy_steerable \- built\-in 0MQ proxy with control flow
+.SH "SYNOPSIS"
+.sp
+\fBint zmq_proxy_steerable (const void \fR\fB\fI*frontend\fR\fR\fB, const void \fR\fB\fI*backend\fR\fR\fB, const void \fR\fB\fI*capture\fR\fR\fB, const void \fR\fB\fI*control\fR\fR\fB);\fR
+.SH "DESCRIPTION"
+.sp
+The \fIzmq_proxy_steerable()\fR function is a variant of the \fIzmq_proxy()\fR function\&. It accepts a fourth \fIcontrol\fR socket\&. When the \fIcontrol\fR socket is \fINULL\fR the two functions operate identically\&.
+.sp
+When a \fIcontrol\fR socket of type \fIREP\fR is provided to the proxy function the application may send commands to the proxy\&. The following commands are supported\&.
+.PP
+\fIPAUSE\fR
+.RS 4
+The proxy will cease transferring messages between its endpoints\&.
+.RE
+.PP
+\fIRESUME\fR
+.RS 4
+The proxy will resume transferring messages between its endpoints\&.
+.RE
+.PP
+\fITERMINATE\fR
+.RS 4
+The proxy function will exit with a return value of 0\&.
+.RE
+.PP
+\fISTATISTICS\fR
+.RS 4
+The proxy behavior will remain unchanged and reply with a set of simple summary values of the messages that have been sent through the proxy as described next\&.
+.RE
+.sp
+There are eight statistics values, each of size \fIuint64_t\fR in the multi\-part message reply to the \fISTATISTICS\fR command\&. These are:
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+number of messages received by the frontend socket
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+number of bytes received by the frontend socket
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+number of messages sent by the frontend socket
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+number of bytes sent by the frontend socket
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+number of messages received by the backend socket
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+number of bytes received by the backend socket
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+number of messages sent by the backend socket
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+number of bytes sent by the backend socket
+.RE
+.SH "RETURN VALUE"
+.sp
+The \fIzmq_proxy_steerable()\fR function returns 0 if TERMINATE is received on its control socket\&. Otherwise, it returns \-1 and errno set to ETERM or EINTR (the 0MQ context associated with either of the specified sockets was terminated) or EFAULT (the provided frontend or backend was invalid)\&.
+.SH "EXAMPLE"
+.PP
+\fBCreate a function to run the proxy\fR. 
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+// Create the frontend and backend sockets to be proxied
+void *frontend = zmq_socket (context, ZMQ_ROUTER);
+void *backend = zmq_socket (context, ZMQ_DEALER);
+
+// Create the proxy control socket
+void *control = zmq_socket (context, ZMQ_REP);
+
+// Bind the sockets\&.
+zmq_bind (frontend, "tcp://*:5555");
+zmq_bind (backend, "tcp://*:5556");
+zmq_bind (control, "tcp://*:5557");
+
+zmq_proxy_steerable(frontend, backend, NULL, control);
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+\fBCode in another thread/process to steer the proxy.\fR. 
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+void *control = zmq_socket (context, ZMQ_REQ);
+zmq_connect (control, "tcp://*:5557");
+
+zmq_msg_t msg;
+
+zmq_send (control, "PAUSE", 5, 0);
+zmq_msg_recv (&msg, control, 0));
+
+zmq_send (control, "RESUME", 6, 0);
+zmq_msg_recv (&msg, control, 0));
+
+zmq_send (control, "STATISTICS", 10, 0);
+while (1) {
+    zmq_msg_recv (&msg, control, 0));
+    printf(" %lu", *(uint64_t *)zmq_msg_data (&msg));
+    if (!zmq_msg_get (&msg, ZMQ_MORE))
+        break;
+}
+printf("\en");
+
+zmq_send (control, "TERMINATE", 9, 0);
+zmq_msg_recv (&msg, control, 0));
+
+zmq_close(frontend);
+zmq_close(backend);
+zmq_close(control);
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+.SH "SEE ALSO"
+.sp
+\fBzmq_proxy\fR(3) \fBzmq_bind\fR(3) \fBzmq_connect\fR(3) \fBzmq_socket\fR(3) \fBzmq\fR(7)
+.SH "AUTHORS"
+.sp
+This page was written by the 0MQ community\&. To make a change please read the 0MQ Contribution Policy at \m[blue]\fBhttp://www\&.zeromq\&.org/docs:contributing\fR\m[]\&.

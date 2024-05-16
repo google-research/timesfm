@@ -1,0 +1,144 @@
+'\" t
+.\"     Title: zmq_timers
+.\"    Author: [see the "AUTHORS" section]
+.\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
+.\"      Date: 10/09/2023
+.\"    Manual: 0MQ Manual
+.\"    Source: 0MQ 4.3.5
+.\"  Language: English
+.\"
+.TH "ZMQ_TIMERS" "3" "10/09/2023" "0MQ 4\&.3\&.5" "0MQ Manual"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+zmq_timers \- helper functions for cross\-platform timers callbacks
+.SH "SYNOPSIS"
+.sp
+\fBtypedef void(zmq_timer_fn) (int \fR\fB\fItimer_id\fR\fR\fB, void *\fR\fB\fIarg\fR\fR\fB);\fR
+.sp
+\fBvoid *zmq_timers_new (void);\fR
+.sp
+\fBint zmq_timers_destroy (void *\fR\fItimers_p\fR);*
+.sp
+\fBint zmq_timers_add (void *\fR\fB\fItimers\fR\fR\fB, size_t \fR\fB\fIinterval\fR\fR\fB, zmq_timer_fn \fR\fB\fIhandler\fR\fR\fB, void *\fR\fB\fIarg\fR\fR\fB);\fR
+.sp
+\fBint zmq_timers_cancel (void *\fR\fB\fItimers\fR\fR\fB, int \fR\fB\fItimer_id\fR\fR\fB);\fR
+.sp
+\fBint zmq_timers_set_interval (void *\fR\fB\fItimers\fR\fR\fB, int \fR\fB\fItimer_id\fR\fR\fB, size_t \fR\fB\fIinterval\fR\fR\fB);\fR
+.sp
+\fBint zmq_timers_reset (void *\fR\fB\fItimers\fR\fR\fB, int \fR\fB\fItimer_id\fR\fR\fB);\fR
+.sp
+\fBlong zmq_timers_timeout (void *\fR\fB\fItimers\fR\fR\fB);\fR
+.sp
+\fBint zmq_timers_execute (void *\fR\fB\fItimers\fR\fR\fB);\fR
+.SH "DESCRIPTION"
+.sp
+The \fIzmq_timers\fR*_ functions provide cross\-platform access to timers callbacks\&. Once a timer has been registered, it will repeat at the specified interval until it gets manually cancelled\&. To run the callbacks, \fIzmq_timers_execute\fR must be ran\&.
+.sp
+\fIzmq_timers_new\fR and \fIzmq_timers_destroy\fR manage the lifetime of a timer instance\&. \fIzmq_timers_new\fR creates and returns a new timer instance, while \fIzmq_timers_destroy\fR destroys it\&. A pointer to a valid timer must be passed as the \fItimers_p\fR argument of \fIzmq_timers_destroy\fR\&. In particular, \fIzmq_timers_destroy\fR may not be called multiple times for the same timer instance\&. \fIzmq_timers_destroy\fR sets the passed pointer to NULL in case of a successful execution\&.
+.sp
+\fIzmq_timers_add\fR and \fIzmq_timers_cancel\fR manage the timers registered\&.
+.sp
+\fIzmq_timers_add\fR registers a new \fItimer\fR with a given instance\&. \fItimers\fR must point to a valid \fItimers\fR object\&. The \fIinterval\fR parameter specifies the expiration of the timer in milliseconds\&. \fIhandler\fR and \fIarg\fR specify the callback that will be invoked on expiration and the optional parameter that will be passed through\&. The callback must be a valid function implementing the \fIzmq_timer_fn\fR prototype\&. An ID will be returned that can be used to modify or cancel the timer\&.
+.sp
+\fIzmq_timers_cancel\fR will cancel the timer associated with \fItimer_id\fR from the instance \fItimers\fR\&.
+.sp
+\fIzmq_timers_set_interval\fR will set the expiration of the timer associated with \fItimer_id\fR from the instance \fItimers\fR to \fIinterval\fR milliseconds into the future\&.
+.sp
+\fIzmq_timers_reset\fR will restart the timer associated with \fItimer_id\fR from the instance \fItimers\fR\&.
+.sp
+\fIzmq_timers_timeout\fR will return the time left in milliseconds until the next timer registered with \fItimers\fR expires\&.
+.sp
+\fIzmq_timers_execute\fR will run callbacks of all expired timers from the instance \fItimers\fR\&.
+.SH "THREAD SAFETY"
+.sp
+Like most other 0MQ objects, timers are not thread\-safe\&. All operations must be called from the same thread\&. Otherwise, behaviour is undefined\&.
+.SH "RETURN VALUE"
+.sp
+\fIzmq_timers_new\fR always returns a valid pointer to a poller\&.
+.sp
+All functions that return an int, return \-1 in case of a failure\&. In that case, zmq_errno() can be used to query the type of the error as described below\&.
+.sp
+\fIzmq_timers_timeout\fR returns the time left in milliseconds until the next timer registered with \fItimers\fR expires, or \-1 if there are no timers left\&.
+.sp
+All other functions return 0 in case of a successful execution\&.
+.SH "ERRORS"
+.sp
+On \fIzmq_timers_destroy\fR, \fIzmq_poller_cancel\fR, \fIzmq_timers_set_interval\fR, \fIzmq_timers_reset\fR, zmq_timers_timeout_, and \fIzmq_timers_execute\fR: \fBEFAULT\fR:: \fItimers\fR did not point to a valid timer\&. Note that passing an invalid pointer (e\&.g\&. pointer to deallocated memory) may cause undefined behaviour (e\&.g\&. an access violation)\&.
+.sp
+On \fIzmq_timers_add\fR: \fBEFAULT\fR:: \fItimers\fR did not point to a valid timer or \fIhandler\fR did not point to a valid function\&.
+.sp
+On \fIzmq_poller_cancel\fR, \fIzmq_timers_set_interval\fR and zmq_timers_timeout_: \fBEINVAL\fR:: \fItimer_id\fR did not exist or was already cancelled\&.
+.SH "EXAMPLE"
+.PP
+\fBAdd one timer with a simple callback that changes a boolean.\fR. 
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+    void handler (int timer_id_, void *arg_)
+    {
+        (void) timer_id_; //  Stop \*(Aqunused\*(Aq compiler warnings
+        *((bool *) arg_) = true;
+    }
+
+    \&.\&.\&.
+
+    void *timers = zmq_timers_new ();
+    assert (timers);
+
+    bool timer_invoked = false;
+
+    const unsigned long full_timeout = 100;
+
+    int timer_id =
+      zmq_timers_add (timers, full_timeout, handler, &timer_invoked);
+    assert (timer_id);
+
+    //  Timer should not have been invoked yet
+    int rc = zmq_timers_execute (timers);
+    assert (rc == 0);
+
+    //  Wait half the time and check again
+    long timeout = zmq_timers_timeout (timers);
+    assert (rc != \-1);
+    msleep (timeout / 2);
+    rc = zmq_timers_execute (timers);
+    assert (rc == 0);
+
+    // Wait until the end
+    rc = msleep (zmq_timers_timeout (timers));
+    assert (rc == 0);
+    assert (timer_invoked);
+
+    rc = zmq_timers_destroy (&timers);
+    assert (rc == 0);
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+.SH "SEE ALSO"
+.sp
+\fBzmq\fR(7)
+.SH "AUTHORS"
+.sp
+This page was written by the 0MQ community\&. To make a change please read the 0MQ Contribution Policy at \m[blue]\fBhttp://www\&.zeromq\&.org/docs:contributing\fR\m[]\&.

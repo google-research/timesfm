@@ -1,0 +1,70 @@
+{
+  "name": "@jupyter-notebook/application-extension",
+  "version": "7.1.3",
+  "description": "Jupyter Notebook - Application Extension",
+  "homepage": "https://github.com/jupyter/notebook",
+  "bugs": {
+    "url": "https://github.com/jupyter/notebook/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jupyter/notebook.git"
+  },
+  "license": "BSD-3-Clause",
+  "author": "Project Jupyter",
+  "sideEffects": [
+    "style/**/*.css",
+    "style/index.js"
+  ],
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "style": "style/index.css",
+  "directories": {
+    "lib": "lib/"
+  },
+  "files": [
+    "lib/*.d.ts",
+    "lib/*.js.map",
+    "lib/*.js",
+    "schema/*.json",
+    "style/**/*.css",
+    "style/index.js"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "build:prod": "tsc -b",
+    "clean": "rimraf lib && rimraf tsconfig.tsbuildinfo",
+    "docs": "typedoc src",
+    "watch": "tsc -b --watch"
+  },
+  "dependencies": {
+    "@jupyter-notebook/application": "^7.1.3",
+    "@jupyter-notebook/ui-components": "^7.1.3",
+    "@jupyterlab/application": "~4.1.5",
+    "@jupyterlab/apputils": "~4.2.5",
+    "@jupyterlab/codeeditor": "~4.1.5",
+    "@jupyterlab/console": "~4.1.5",
+    "@jupyterlab/coreutils": "~6.1.5",
+    "@jupyterlab/docmanager": "~4.1.5",
+    "@jupyterlab/docregistry": "~4.1.5",
+    "@jupyterlab/mainmenu": "~4.1.5",
+    "@jupyterlab/rendermime": "~4.1.5",
+    "@jupyterlab/settingregistry": "~4.1.5",
+    "@jupyterlab/translation": "~4.1.5",
+    "@lumino/coreutils": "^2.1.2",
+    "@lumino/disposable": "^2.1.2",
+    "@lumino/widgets": "^2.3.1"
+  },
+  "devDependencies": {
+    "rimraf": "^3.0.2",
+    "typescript": "~5.0.2"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "jupyterlab": {
+    "extension": true,
+    "schemaDir": "schema"
+  },
+  "styleModule": "style/index.js"
+}

@@ -1,0 +1,133 @@
+{
+  "build": "pyhd8ed1ab_0",
+  "build_number": 0,
+  "channel": "https://conda.anaconda.org/conda-forge/noarch",
+  "constrains": [],
+  "depends": [
+    "python >=3.6"
+  ],
+  "extracted_package_dir": "/opt/conda/pkgs/python-json-logger-2.0.7-pyhd8ed1ab_0",
+  "files": [
+    "lib/python3.10/site-packages/python_json_logger-2.0.7.dist-info/INSTALLER",
+    "lib/python3.10/site-packages/python_json_logger-2.0.7.dist-info/LICENSE",
+    "lib/python3.10/site-packages/python_json_logger-2.0.7.dist-info/METADATA",
+    "lib/python3.10/site-packages/python_json_logger-2.0.7.dist-info/RECORD",
+    "lib/python3.10/site-packages/python_json_logger-2.0.7.dist-info/REQUESTED",
+    "lib/python3.10/site-packages/python_json_logger-2.0.7.dist-info/WHEEL",
+    "lib/python3.10/site-packages/python_json_logger-2.0.7.dist-info/direct_url.json",
+    "lib/python3.10/site-packages/python_json_logger-2.0.7.dist-info/top_level.txt",
+    "lib/python3.10/site-packages/pythonjsonlogger/__init__.py",
+    "lib/python3.10/site-packages/pythonjsonlogger/jsonlogger.py",
+    "lib/python3.10/site-packages/pythonjsonlogger/py.typed",
+    "lib/python3.10/site-packages/pythonjsonlogger/__pycache__/__init__.cpython-310.pyc",
+    "lib/python3.10/site-packages/pythonjsonlogger/__pycache__/jsonlogger.cpython-310.pyc"
+  ],
+  "fn": "python-json-logger-2.0.7-pyhd8ed1ab_0.conda",
+  "license": "BSD-2-Clause",
+  "link": {
+    "source": "/opt/conda/pkgs/python-json-logger-2.0.7-pyhd8ed1ab_0",
+    "type": 1
+  },
+  "md5": "a61bf9ec79426938ff785eb69dbb1960",
+  "name": "python-json-logger",
+  "noarch": "python",
+  "package_tarball_full_path": "/opt/conda/pkgs/python-json-logger-2.0.7-pyhd8ed1ab_0.conda",
+  "package_type": "noarch_python",
+  "paths_data": {
+    "paths": [
+      {
+        "_path": "site-packages/python_json_logger-2.0.7.dist-info/INSTALLER",
+        "path_type": "hardlink",
+        "sha256": "d0edee15f91b406f3f99726e44eb990be6e34fd0345b52b910c568e0eef6a2a8",
+        "sha256_in_prefix": "d0edee15f91b406f3f99726e44eb990be6e34fd0345b52b910c568e0eef6a2a8",
+        "size_in_bytes": 5
+      },
+      {
+        "_path": "site-packages/python_json_logger-2.0.7.dist-info/LICENSE",
+        "path_type": "hardlink",
+        "sha256": "c15bc9948cf9868d661ea1a1e0f7242d567c0f83576bff4ba101f98de0707aeb",
+        "sha256_in_prefix": "c15bc9948cf9868d661ea1a1e0f7242d567c0f83576bff4ba101f98de0707aeb",
+        "size_in_bytes": 1290
+      },
+      {
+        "_path": "site-packages/python_json_logger-2.0.7.dist-info/METADATA",
+        "path_type": "hardlink",
+        "sha256": "1bc18d7538a511b39ade44223802e66ec4aef7decbb798b29694f8123dad09b7",
+        "sha256_in_prefix": "1bc18d7538a511b39ade44223802e66ec4aef7decbb798b29694f8123dad09b7",
+        "size_in_bytes": 6484
+      },
+      {
+        "_path": "site-packages/python_json_logger-2.0.7.dist-info/RECORD",
+        "path_type": "hardlink",
+        "sha256": "22a0b5b2847e636339f0b55f3c158886db0164d949b70ae03991fba959817a29",
+        "sha256_in_prefix": "22a0b5b2847e636339f0b55f3c158886db0164d949b70ae03991fba959817a29",
+        "size_in_bytes": 1120
+      },
+      {
+        "_path": "site-packages/python_json_logger-2.0.7.dist-info/REQUESTED",
+        "path_type": "hardlink",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256_in_prefix": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_in_bytes": 0
+      },
+      {
+        "_path": "site-packages/python_json_logger-2.0.7.dist-info/WHEEL",
+        "path_type": "hardlink",
+        "sha256": "db07a93359e4e034b8785a58ad6d534ea3dca0635f1e184efe2e66e1c3a299ba",
+        "sha256_in_prefix": "db07a93359e4e034b8785a58ad6d534ea3dca0635f1e184efe2e66e1c3a299ba",
+        "size_in_bytes": 92
+      },
+      {
+        "_path": "site-packages/python_json_logger-2.0.7.dist-info/direct_url.json",
+        "path_type": "hardlink",
+        "sha256": "270182c2515e07d4a1f9a226929577c175e0f3fc69b52ef935fc4aef3dcce4fa",
+        "sha256_in_prefix": "270182c2515e07d4a1f9a226929577c175e0f3fc69b52ef935fc4aef3dcce4fa",
+        "size_in_bytes": 114
+      },
+      {
+        "_path": "site-packages/python_json_logger-2.0.7.dist-info/top_level.txt",
+        "path_type": "hardlink",
+        "sha256": "f46f8eb1391bc0f80cf2df9b5ca3e658305166ff5c6f32c88840c4e449c69362",
+        "sha256_in_prefix": "f46f8eb1391bc0f80cf2df9b5ca3e658305166ff5c6f32c88840c4e449c69362",
+        "size_in_bytes": 17
+      },
+      {
+        "_path": "site-packages/pythonjsonlogger/__init__.py",
+        "path_type": "hardlink",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256_in_prefix": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_in_bytes": 0
+      },
+      {
+        "_path": "site-packages/pythonjsonlogger/jsonlogger.py",
+        "path_type": "hardlink",
+        "sha256": "47f79bf6e47bb7dab4ea0ca47d66772e164c20455830e5c35f1ee2cf48b4e97d",
+        "sha256_in_prefix": "47f79bf6e47bb7dab4ea0ca47d66772e164c20455830e5c35f1ee2cf48b4e97d",
+        "size_in_bytes": 10274
+      },
+      {
+        "_path": "site-packages/pythonjsonlogger/py.typed",
+        "path_type": "hardlink",
+        "sha256": "e112e9b541d0b92ab32ba0836e281f7fcbaf5908f03cf40cc629163e45783ad0",
+        "sha256_in_prefix": "e112e9b541d0b92ab32ba0836e281f7fcbaf5908f03cf40cc629163e45783ad0",
+        "size_in_bytes": 80
+      },
+      {
+        "_path": "lib/python3.10/site-packages/pythonjsonlogger/__pycache__/__init__.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/pythonjsonlogger/__pycache__/jsonlogger.cpython-310.pyc",
+        "path_type": "pyc_file"
+      }
+    ],
+    "paths_version": 1
+  },
+  "requested_spec": "None",
+  "sha256": "4790787fe1f4e8da616edca4acf6a4f8ed4e7c6967aa31b920208fc8f95efcca",
+  "size": 13383,
+  "subdir": "noarch",
+  "timestamp": 1677079727000,
+  "url": "https://conda.anaconda.org/conda-forge/noarch/python-json-logger-2.0.7-pyhd8ed1ab_0.conda",
+  "version": "2.0.7"
+}

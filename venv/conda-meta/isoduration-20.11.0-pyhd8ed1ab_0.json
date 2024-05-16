@@ -1,0 +1,269 @@
+{
+  "build": "pyhd8ed1ab_0",
+  "build_number": 0,
+  "channel": "https://conda.anaconda.org/conda-forge/noarch",
+  "constrains": [],
+  "depends": [
+    "arrow >=0.15.0",
+    "python >=3.7"
+  ],
+  "extracted_package_dir": "/opt/conda/pkgs/isoduration-20.11.0-pyhd8ed1ab_0",
+  "files": [
+    "lib/python3.10/site-packages/isoduration-20.11.0.dist-info/INSTALLER",
+    "lib/python3.10/site-packages/isoduration-20.11.0.dist-info/LICENSE",
+    "lib/python3.10/site-packages/isoduration-20.11.0.dist-info/METADATA",
+    "lib/python3.10/site-packages/isoduration-20.11.0.dist-info/RECORD",
+    "lib/python3.10/site-packages/isoduration-20.11.0.dist-info/REQUESTED",
+    "lib/python3.10/site-packages/isoduration-20.11.0.dist-info/WHEEL",
+    "lib/python3.10/site-packages/isoduration-20.11.0.dist-info/direct_url.json",
+    "lib/python3.10/site-packages/isoduration-20.11.0.dist-info/top_level.txt",
+    "lib/python3.10/site-packages/isoduration/__init__.py",
+    "lib/python3.10/site-packages/isoduration/constants.py",
+    "lib/python3.10/site-packages/isoduration/formatter/__init__.py",
+    "lib/python3.10/site-packages/isoduration/formatter/checking.py",
+    "lib/python3.10/site-packages/isoduration/formatter/exceptions.py",
+    "lib/python3.10/site-packages/isoduration/formatter/formatting.py",
+    "lib/python3.10/site-packages/isoduration/operations/__init__.py",
+    "lib/python3.10/site-packages/isoduration/operations/util.py",
+    "lib/python3.10/site-packages/isoduration/parser/__init__.py",
+    "lib/python3.10/site-packages/isoduration/parser/exceptions.py",
+    "lib/python3.10/site-packages/isoduration/parser/parsing.py",
+    "lib/python3.10/site-packages/isoduration/parser/util.py",
+    "lib/python3.10/site-packages/isoduration/types.py",
+    "lib/python3.10/site-packages/isoduration/__pycache__/__init__.cpython-310.pyc",
+    "lib/python3.10/site-packages/isoduration/__pycache__/constants.cpython-310.pyc",
+    "lib/python3.10/site-packages/isoduration/formatter/__pycache__/__init__.cpython-310.pyc",
+    "lib/python3.10/site-packages/isoduration/formatter/__pycache__/checking.cpython-310.pyc",
+    "lib/python3.10/site-packages/isoduration/formatter/__pycache__/exceptions.cpython-310.pyc",
+    "lib/python3.10/site-packages/isoduration/formatter/__pycache__/formatting.cpython-310.pyc",
+    "lib/python3.10/site-packages/isoduration/operations/__pycache__/__init__.cpython-310.pyc",
+    "lib/python3.10/site-packages/isoduration/operations/__pycache__/util.cpython-310.pyc",
+    "lib/python3.10/site-packages/isoduration/parser/__pycache__/__init__.cpython-310.pyc",
+    "lib/python3.10/site-packages/isoduration/parser/__pycache__/exceptions.cpython-310.pyc",
+    "lib/python3.10/site-packages/isoduration/parser/__pycache__/parsing.cpython-310.pyc",
+    "lib/python3.10/site-packages/isoduration/parser/__pycache__/util.cpython-310.pyc",
+    "lib/python3.10/site-packages/isoduration/__pycache__/types.cpython-310.pyc"
+  ],
+  "fn": "isoduration-20.11.0-pyhd8ed1ab_0.tar.bz2",
+  "license": "MIT",
+  "link": {
+    "source": "/opt/conda/pkgs/isoduration-20.11.0-pyhd8ed1ab_0",
+    "type": 1
+  },
+  "md5": "4cb68948e0b8429534380243d063a27a",
+  "name": "isoduration",
+  "noarch": "python",
+  "package_tarball_full_path": "/opt/conda/pkgs/isoduration-20.11.0-pyhd8ed1ab_0.tar.bz2",
+  "package_type": "noarch_python",
+  "paths_data": {
+    "paths": [
+      {
+        "_path": "site-packages/isoduration-20.11.0.dist-info/INSTALLER",
+        "path_type": "hardlink",
+        "sha256": "d0edee15f91b406f3f99726e44eb990be6e34fd0345b52b910c568e0eef6a2a8",
+        "sha256_in_prefix": "d0edee15f91b406f3f99726e44eb990be6e34fd0345b52b910c568e0eef6a2a8",
+        "size_in_bytes": 5
+      },
+      {
+        "_path": "site-packages/isoduration-20.11.0.dist-info/LICENSE",
+        "path_type": "hardlink",
+        "sha256": "452c0410e9a3d75abbef1b6cb519d31b23047092ca00f9bd619df7cb0d8b9a99",
+        "sha256_in_prefix": "452c0410e9a3d75abbef1b6cb519d31b23047092ca00f9bd619df7cb0d8b9a99",
+        "size_in_bytes": 752
+      },
+      {
+        "_path": "site-packages/isoduration-20.11.0.dist-info/METADATA",
+        "path_type": "hardlink",
+        "sha256": "02d32554fe19c7e3010cfcf2b684a7c4ee93f54f4b2a0ebbcd265743c1a5d26c",
+        "sha256_in_prefix": "02d32554fe19c7e3010cfcf2b684a7c4ee93f54f4b2a0ebbcd265743c1a5d26c",
+        "size_in_bytes": 5764
+      },
+      {
+        "_path": "site-packages/isoduration-20.11.0.dist-info/RECORD",
+        "path_type": "hardlink",
+        "sha256": "9d1dc317a7be4efcee34f7306f2bb50eb1eaff14d542d42a793fce88383e843c",
+        "sha256_in_prefix": "9d1dc317a7be4efcee34f7306f2bb50eb1eaff14d542d42a793fce88383e843c",
+        "size_in_bytes": 2601
+      },
+      {
+        "_path": "site-packages/isoduration-20.11.0.dist-info/REQUESTED",
+        "path_type": "hardlink",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256_in_prefix": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_in_bytes": 0
+      },
+      {
+        "_path": "site-packages/isoduration-20.11.0.dist-info/WHEEL",
+        "path_type": "hardlink",
+        "sha256": "7b0c04b9e8a8d42d977874ef4f5ee7f1d6542603afc82582b7459534b0a53fda",
+        "sha256_in_prefix": "7b0c04b9e8a8d42d977874ef4f5ee7f1d6542603afc82582b7459534b0a53fda",
+        "size_in_bytes": 92
+      },
+      {
+        "_path": "site-packages/isoduration-20.11.0.dist-info/direct_url.json",
+        "path_type": "hardlink",
+        "sha256": "56fdcd48c57d51a567430d001cc7908e70f50c841e1b76da1d64140bc3f2ecaa",
+        "sha256_in_prefix": "56fdcd48c57d51a567430d001cc7908e70f50c841e1b76da1d64140bc3f2ecaa",
+        "size_in_bytes": 112
+      },
+      {
+        "_path": "site-packages/isoduration-20.11.0.dist-info/top_level.txt",
+        "path_type": "hardlink",
+        "sha256": "c1365a8e3ed0d357003f1505905df4310d9099ec2d9352ce3094e0e12f95079f",
+        "sha256_in_prefix": "c1365a8e3ed0d357003f1505905df4310d9099ec2d9352ce3094e0e12f95079f",
+        "size_in_bytes": 12
+      },
+      {
+        "_path": "site-packages/isoduration/__init__.py",
+        "path_type": "hardlink",
+        "sha256": "67f4be60102beb9974574ddd8a72f144bbbb4058de3330376a116950e42649d0",
+        "sha256_in_prefix": "67f4be60102beb9974574ddd8a72f144bbbb4058de3330376a116950e42649d0",
+        "size_in_bytes": 363
+      },
+      {
+        "_path": "site-packages/isoduration/constants.py",
+        "path_type": "hardlink",
+        "sha256": "a9afca1581f0083273ae20b583ac8d717ac0d85eb8f106ed463a99a20828b884",
+        "sha256_in_prefix": "a9afca1581f0083273ae20b583ac8d717ac0d85eb8f106ed463a99a20828b884",
+        "size_in_bytes": 56
+      },
+      {
+        "_path": "site-packages/isoduration/formatter/__init__.py",
+        "path_type": "hardlink",
+        "sha256": "26f48c5d3eceab623a3e834dea73b5736dc022a103a1c50cf0b4fe3546ac7f66",
+        "sha256_in_prefix": "26f48c5d3eceab623a3e834dea73b5736dc022a103a1c50cf0b4fe3546ac7f66",
+        "size_in_bytes": 778
+      },
+      {
+        "_path": "site-packages/isoduration/formatter/checking.py",
+        "path_type": "hardlink",
+        "sha256": "065c6aede0cbe859ffea6b273ba1ebf6b03b74bbc8b2ecd1e87a67f2365cd730",
+        "sha256_in_prefix": "065c6aede0cbe859ffea6b273ba1ebf6b03b74bbc8b2ecd1e87a67f2365cd730",
+        "size_in_bytes": 1511
+      },
+      {
+        "_path": "site-packages/isoduration/formatter/exceptions.py",
+        "path_type": "hardlink",
+        "sha256": "6fe77114e1685e276108c41add9b7cb972fa0d38c9825f45c7bcff48c08cf431",
+        "sha256_in_prefix": "6fe77114e1685e276108c41add9b7cb972fa0d38c9825f45c7bcff48c08cf431",
+        "size_in_bytes": 126
+      },
+      {
+        "_path": "site-packages/isoduration/formatter/formatting.py",
+        "path_type": "hardlink",
+        "sha256": "b9a995d429f5344ffaa293f6bef7f61063ec8d4924ffd5155da376a976a9b4b5",
+        "sha256_in_prefix": "b9a995d429f5344ffaa293f6bef7f61063ec8d4924ffd5155da376a976a9b4b5",
+        "size_in_bytes": 1432
+      },
+      {
+        "_path": "site-packages/isoduration/operations/__init__.py",
+        "path_type": "hardlink",
+        "sha256": "d27abd1e0b81ce882b8ab4526cc14000911cdb400d4cd7bc565b04bb35eb75ac",
+        "sha256_in_prefix": "d27abd1e0b81ce882b8ab4526cc14000911cdb400d4cd7bc565b04bb35eb75ac",
+        "size_in_bytes": 2406
+      },
+      {
+        "_path": "site-packages/isoduration/operations/util.py",
+        "path_type": "hardlink",
+        "sha256": "2f1c0dcc62c875d7f59ba73888a0b7fd94a43e59974420e4d4e1b60e9efead2d",
+        "sha256_in_prefix": "2f1c0dcc62c875d7f59ba73888a0b7fd94a43e59974420e4d4e1b60e9efead2d",
+        "size_in_bytes": 1222
+      },
+      {
+        "_path": "site-packages/isoduration/parser/__init__.py",
+        "path_type": "hardlink",
+        "sha256": "5d429d962910f296c016a1102be17bcf07b18fe28febd43b951ba5108390ca2a",
+        "sha256_in_prefix": "5d429d962910f296c016a1102be17bcf07b18fe28febd43b951ba5108390ca2a",
+        "size_in_bytes": 739
+      },
+      {
+        "_path": "site-packages/isoduration/parser/exceptions.py",
+        "path_type": "hardlink",
+        "sha256": "4b206ecb67c60ec69cbeca5ce60f985f42dff446eea1299886f35e6267862e4e",
+        "sha256_in_prefix": "4b206ecb67c60ec69cbeca5ce60f985f42dff446eea1299886f35e6267862e4e",
+        "size_in_bytes": 619
+      },
+      {
+        "_path": "site-packages/isoduration/parser/parsing.py",
+        "path_type": "hardlink",
+        "sha256": "8fa3b93769b9a49bd6b9c772198fcafd0e93d9ce5faac0aea7e8779339b38a8b",
+        "sha256_in_prefix": "8fa3b93769b9a49bd6b9c772198fcafd0e93d9ce5faac0aea7e8779339b38a8b",
+        "size_in_bytes": 3990
+      },
+      {
+        "_path": "site-packages/isoduration/parser/util.py",
+        "path_type": "hardlink",
+        "sha256": "268500b90d0280c1baa58abd1e8b6e1f048a0f0a3842ddb95c696e0bcc4ad605",
+        "sha256_in_prefix": "268500b90d0280c1baa58abd1e8b6e1f048a0f0a3842ddb95c696e0bcc4ad605",
+        "size_in_bytes": 819
+      },
+      {
+        "_path": "site-packages/isoduration/types.py",
+        "path_type": "hardlink",
+        "sha256": "843c2cbdbfc110d6f4c06e9ff8880350093350236f432acbea5c76c5af8bf153",
+        "sha256_in_prefix": "843c2cbdbfc110d6f4c06e9ff8880350093350236f432acbea5c76c5af8bf153",
+        "size_in_bytes": 2266
+      },
+      {
+        "_path": "lib/python3.10/site-packages/isoduration/__pycache__/__init__.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/isoduration/__pycache__/constants.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/isoduration/formatter/__pycache__/__init__.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/isoduration/formatter/__pycache__/checking.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/isoduration/formatter/__pycache__/exceptions.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/isoduration/formatter/__pycache__/formatting.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/isoduration/operations/__pycache__/__init__.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/isoduration/operations/__pycache__/util.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/isoduration/parser/__pycache__/__init__.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/isoduration/parser/__pycache__/exceptions.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/isoduration/parser/__pycache__/parsing.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/isoduration/parser/__pycache__/util.cpython-310.pyc",
+        "path_type": "pyc_file"
+      },
+      {
+        "_path": "lib/python3.10/site-packages/isoduration/__pycache__/types.cpython-310.pyc",
+        "path_type": "pyc_file"
+      }
+    ],
+    "paths_version": 1
+  },
+  "requested_spec": "None",
+  "sha256": "7bb5c4d994361022f47a807b5e7d101b3dce16f7dd8a0af6ffad9f479d346493",
+  "size": 17189,
+  "subdir": "noarch",
+  "timestamp": 1638811664000,
+  "url": "https://conda.anaconda.org/conda-forge/noarch/isoduration-20.11.0-pyhd8ed1ab_0.tar.bz2",
+  "version": "20.11.0"
+}

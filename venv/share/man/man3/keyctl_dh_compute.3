@@ -1,0 +1,168 @@
+.\"
+.\" Copyright (C) 2006 Red Hat, Inc. All Rights Reserved.
+.\" Copyright (C) 2016 Intel Corporation. All rights reserved.
+.\"
+.\" This program is free software; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License
+.\" as published by the Free Software Foundation; either version
+.\" 2 of the License, or (at your option) any later version.
+.\"
+.TH KEYCTL_DH_COMPUTE 3 "07 Apr 2016" Linux "Linux Key Management Calls"
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH NAME
+keyctl_dh_compute \- Compute a Diffie-Hellman shared secret or public key
+.br
+keyctl_dh_compute_kdf \- Derive key from a Diffie-Hellman shared secret
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH SYNOPSIS
+.nf
+.B #include <keyutils.h>
+.sp
+.BI "long keyctl_dh_compute(key_serial_t " private ", key_serial_t " prime ,
+.BI "key_serial_t " base ", char *" buffer ", size_t " buflen ");"
+.sp
+.BI "long keyctl_dh_compute_alloc(key_serial_t " private,
+.BI "key_serial_t " prime ", key_serial_t " base ", void **" _buffer ");"
+.sp
+.BI "long keyctl_dh_compute_kdf(key_serial_t " private ", key_serial_t " prime ,
+.BI "key_serial_t " base ", char *" hashname ", char *" otherinfo ",
+.BI "size_t " otherinfolen ", char *" buffer ", size_t " buflen ");"
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH DESCRIPTION
+.BR keyctl_dh_compute ()
+computes a Diffie-Hellman public key or shared secret.  That computation is:
+.IP
+.I base
+^
+.I private
+( mod
+.I prime
+)
+.P
+When
+.I base
+is a key containing the shared generator value, the remote public key is
+computed.  When
+.I base
+is a key containing the remote public key, the shared secret is computed.
+.P
+.IR base ", " private ", and " prime
+must all refer to
+.BR user -type
+keys containing the parameters for the computation.  Each of these keys must
+grant the caller
+.B read
+permission in order for them to be used.
+.P
+.I buffer
+and
+.I buflen
+specify the buffer into which the computed result will be placed.
+.I buflen
+may be zero, in which case the buffer is not used and the minimum buffer length
+is fetched.
+.P
+.BR keyctl_dh_compute_alloc ()
+is similar to
+.BR keyctl_dh_compute ()
+except that it allocates a buffer big enough to hold the payload data and
+places the data in it.  If successful, a pointer to the buffer is placed in
+.IR *_buffer .
+The caller must free the buffer.
+.P
+.BR keyctl_dh_compute_kdf ()
+derives a key from a Diffie-Hellman shared secret according to the protocol
+specified in SP800-56A. The Diffie-Hellman computation is based on the same
+primitives as discussed
+for
+.BR keyctl_dh_compute ().
+.P
+To implement the protocol of SP800-56A
+.I base
+is a key containing the remote public key to compute the Diffie-Hellman
+shared secret. That shared secret is post-processed with a key derivation
+function.
+.P
+The
+.I hashname
+specifies the Linux kernel crypto API name for a hash that shall be used
+for the key derivation function, such as sha256.
+The
+.I hashname
+must be a NULL terminated string.  See
+.I /proc/crypto
+for available hashes on the system.
+.P
+Following the specification of SP800-56A section 5.8.1.2 the
+.I otherinfo
+parameter may be provided. The format of the OtherInfo field is defined
+by the caller. The caller may also specify NULL as a valid argument when
+no OtherInfo data shall be processed. The length of the
+.I otherinfo
+parameter is specified with
+.I otherinfolen
+and is restricted to a maximum length by the kernel.
+.P
+The KDF returns the requested number of bytes specified with the
+.I genlen
+or the
+.I buflen
+parameter depending on the invoked function.
+.P
+.I buffer
+and
+.I buflen
+specify the buffer into which the computed result will be placed.
+.P
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH RETURN VALUE
+On success
+.BR keyctl_dh_compute ()
+returns the amount of data placed into the buffer when
+.I buflen
+is non-zero.  When
+.I buflen
+is zero, the minimum buffer length to hold the data is returned.
+.P
+On success
+.BR keyctl_dh_compute_alloc ()
+returns the amount of data in the buffer.
+.P
+On error, both functions set errno to an appropriate code and return the value
+.BR -1 .
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH ERRORS
+.TP
+.B ENOKEY
+One of the keys specified is invalid or not readable.
+.TP
+.B EINVAL
+The buffer pointer is invalid or buflen is too small.
+.TP
+.B EOPNOTSUPP
+One of the keys was not a valid user key.
+.TP
+.B EMSGSIZE
+When using
+.BR keyctl_dh_compute_kdf (),
+the size of either
+.I otherinfolen
+or
+.I buflen
+is too big.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH LINKING
+This is a library function that can be found in
+.IR libkeyutils .
+When linking,
+.B \-lkeyutils
+should be specified to the linker.
+.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.SH SEE ALSO
+.BR keyctl (1),
+.br
+.BR keyctl (2),
+.br
+.BR keyctl (3),
+.br
+.BR keyutils (7)

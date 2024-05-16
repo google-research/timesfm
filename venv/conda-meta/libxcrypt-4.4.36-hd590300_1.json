@@ -1,0 +1,160 @@
+{
+  "build": "hd590300_1",
+  "build_number": 1,
+  "channel": "https://conda.anaconda.org/conda-forge/linux-64",
+  "constrains": [],
+  "depends": [
+    "libgcc-ng >=12"
+  ],
+  "extracted_package_dir": "/opt/conda/pkgs/libxcrypt-4.4.36-hd590300_1",
+  "files": [
+    "include/crypt.h",
+    "lib/libcrypt.so",
+    "lib/libcrypt.so.2",
+    "lib/libcrypt.so.2.0.0",
+    "lib/pkgconfig/libcrypt.pc",
+    "lib/pkgconfig/libxcrypt.pc",
+    "share/man/man3/crypt.3",
+    "share/man/man3/crypt_checksalt.3",
+    "share/man/man3/crypt_gensalt.3",
+    "share/man/man3/crypt_gensalt_ra.3",
+    "share/man/man3/crypt_gensalt_rn.3",
+    "share/man/man3/crypt_preferred_method.3",
+    "share/man/man3/crypt_r.3",
+    "share/man/man3/crypt_ra.3",
+    "share/man/man3/crypt_rn.3",
+    "share/man/man5/crypt.5"
+  ],
+  "fn": "libxcrypt-4.4.36-hd590300_1.conda",
+  "license": "LGPL-2.1-or-later",
+  "link": {
+    "source": "/opt/conda/pkgs/libxcrypt-4.4.36-hd590300_1",
+    "type": 1
+  },
+  "md5": "5aa797f8787fe7a17d1b0821485b5adc",
+  "name": "libxcrypt",
+  "package_tarball_full_path": "/opt/conda/pkgs/libxcrypt-4.4.36-hd590300_1.conda",
+  "paths_data": {
+    "paths": [
+      {
+        "_path": "include/crypt.h",
+        "path_type": "hardlink",
+        "sha256": "01023ab9ad67da6d459273369681d1a7279932f7b3f7cdd73a2967caac9651a7",
+        "sha256_in_prefix": "01023ab9ad67da6d459273369681d1a7279932f7b3f7cdd73a2967caac9651a7",
+        "size_in_bytes": 11131
+      },
+      {
+        "_path": "lib/libcrypt.so",
+        "path_type": "softlink",
+        "sha256": "11e0be2b258a3ffef56a48a80f1b9329eabbada31cb32a2bea0f91fc4aa08108",
+        "size_in_bytes": 191384
+      },
+      {
+        "_path": "lib/libcrypt.so.2",
+        "path_type": "softlink",
+        "sha256": "11e0be2b258a3ffef56a48a80f1b9329eabbada31cb32a2bea0f91fc4aa08108",
+        "size_in_bytes": 191384
+      },
+      {
+        "_path": "lib/libcrypt.so.2.0.0",
+        "path_type": "hardlink",
+        "sha256": "11e0be2b258a3ffef56a48a80f1b9329eabbada31cb32a2bea0f91fc4aa08108",
+        "sha256_in_prefix": "11e0be2b258a3ffef56a48a80f1b9329eabbada31cb32a2bea0f91fc4aa08108",
+        "size_in_bytes": 191384
+      },
+      {
+        "_path": "lib/pkgconfig/libcrypt.pc",
+        "path_type": "softlink",
+        "sha256": "6d3849ee3820d1a1ce8f3a7278d816fdc7b617cb35a80fe9f122f5164cb55fdf",
+        "size_in_bytes": 633
+      },
+      {
+        "_path": "lib/pkgconfig/libxcrypt.pc",
+        "file_mode": "text",
+        "path_type": "hardlink",
+        "prefix_placeholder": "/home/conda/feedstock_root/build_artifacts/libxcrypt_1702724158252/_h_env_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_p",
+        "sha256": "6d3849ee3820d1a1ce8f3a7278d816fdc7b617cb35a80fe9f122f5164cb55fdf",
+        "sha256_in_prefix": "19f36c6559326364a56819dcc5e1851f2ac70d377d7f5cad49b44a868576d8d0",
+        "size_in_bytes": 633
+      },
+      {
+        "_path": "share/man/man3/crypt.3",
+        "path_type": "hardlink",
+        "sha256": "5fcac56370c89b8d1f570bda9a5f39d75a555809e6c29754a6d4dd6f243c0ca8",
+        "sha256_in_prefix": "5fcac56370c89b8d1f570bda9a5f39d75a555809e6c29754a6d4dd6f243c0ca8",
+        "size_in_bytes": 10381
+      },
+      {
+        "_path": "share/man/man3/crypt_checksalt.3",
+        "path_type": "hardlink",
+        "sha256": "5f39a8f48c5b5d2a57a56f6573a0db833d880231fe863c4fc6931c9c1f7e0716",
+        "sha256_in_prefix": "5f39a8f48c5b5d2a57a56f6573a0db833d880231fe863c4fc6931c9c1f7e0716",
+        "size_in_bytes": 2891
+      },
+      {
+        "_path": "share/man/man3/crypt_gensalt.3",
+        "path_type": "hardlink",
+        "sha256": "c0e1b7fb395eed41a1a1a5a359671ccdf80416d4b31430266a26f2cade2e8d9c",
+        "sha256_in_prefix": "c0e1b7fb395eed41a1a1a5a359671ccdf80416d4b31430266a26f2cade2e8d9c",
+        "size_in_bytes": 6002
+      },
+      {
+        "_path": "share/man/man3/crypt_gensalt_ra.3",
+        "path_type": "hardlink",
+        "sha256": "088cd72a7bd163689ad11d0c33e4f70902a1bd483f91f48c00f1fadb79dfc3ae",
+        "sha256_in_prefix": "088cd72a7bd163689ad11d0c33e4f70902a1bd483f91f48c00f1fadb79dfc3ae",
+        "size_in_bytes": 25
+      },
+      {
+        "_path": "share/man/man3/crypt_gensalt_rn.3",
+        "path_type": "hardlink",
+        "sha256": "088cd72a7bd163689ad11d0c33e4f70902a1bd483f91f48c00f1fadb79dfc3ae",
+        "sha256_in_prefix": "088cd72a7bd163689ad11d0c33e4f70902a1bd483f91f48c00f1fadb79dfc3ae",
+        "size_in_bytes": 25
+      },
+      {
+        "_path": "share/man/man3/crypt_preferred_method.3",
+        "path_type": "hardlink",
+        "sha256": "2c2cb4adae81b4e4843047fd056978cbdbc9710f10c911b82bd6a4b01c95f109",
+        "sha256_in_prefix": "2c2cb4adae81b4e4843047fd056978cbdbc9710f10c911b82bd6a4b01c95f109",
+        "size_in_bytes": 1580
+      },
+      {
+        "_path": "share/man/man3/crypt_r.3",
+        "path_type": "hardlink",
+        "sha256": "e03f0b95062176ba33b640479942251523bc5ccc28e42a291204262a4614b7e0",
+        "sha256_in_prefix": "e03f0b95062176ba33b640479942251523bc5ccc28e42a291204262a4614b7e0",
+        "size_in_bytes": 17
+      },
+      {
+        "_path": "share/man/man3/crypt_ra.3",
+        "path_type": "hardlink",
+        "sha256": "e03f0b95062176ba33b640479942251523bc5ccc28e42a291204262a4614b7e0",
+        "sha256_in_prefix": "e03f0b95062176ba33b640479942251523bc5ccc28e42a291204262a4614b7e0",
+        "size_in_bytes": 17
+      },
+      {
+        "_path": "share/man/man3/crypt_rn.3",
+        "path_type": "hardlink",
+        "sha256": "e03f0b95062176ba33b640479942251523bc5ccc28e42a291204262a4614b7e0",
+        "sha256_in_prefix": "e03f0b95062176ba33b640479942251523bc5ccc28e42a291204262a4614b7e0",
+        "size_in_bytes": 17
+      },
+      {
+        "_path": "share/man/man5/crypt.5",
+        "path_type": "hardlink",
+        "sha256": "858fea44d1e1e15ef5a1fba8c13cc0280cf2dc770725c1729da3fc31cba74443",
+        "sha256_in_prefix": "858fea44d1e1e15ef5a1fba8c13cc0280cf2dc770725c1729da3fc31cba74443",
+        "size_in_bytes": 11497
+      }
+    ],
+    "paths_version": 1
+  },
+  "requested_spec": "None",
+  "sha256": "6ae68e0b86423ef188196fff6207ed0c8195dd84273cb5623b85aa08033a410c",
+  "size": 100393,
+  "subdir": "linux-64",
+  "timestamp": 1702724383000,
+  "url": "https://conda.anaconda.org/conda-forge/linux-64/libxcrypt-4.4.36-hd590300_1.conda",
+  "version": "4.4.36"
+}
