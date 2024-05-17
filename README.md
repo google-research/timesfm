@@ -58,8 +58,7 @@ to install the package.
 1. Running the provided benchmarks would require additional dependencies.
 Please use the environment files under `experiments` instead.
 
-2. The dependency `lingvo` does not support `pip install` for macOS. For now you
-can manually install it from the source following [these instructions](https://github.com/tensorflow/lingvo).
+2. The dependency `lingvo` does not support ARM architectures, and the code is not working for machines with Apple silicon. We are aware of this issue and are working on a solution. Stay tuned.
 
 ## Usage 
 
