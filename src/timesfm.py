@@ -70,7 +70,7 @@ def freq_map(freq: str):
       or freq.endswith("U")
   ):
     return 0
-  elif freq.endswith("W") or freq.endswith("M"):
+  elif freq.endswith(("W", "M", "MS")):
     return 1
   elif freq.endswith("Y") or freq.endswith("Q"):
     return 2
