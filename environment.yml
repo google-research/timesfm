@@ -1,4 +1,4 @@
-name: tfm_env_t2
+name: tfm_env
 
 channels:
   - conda-forge
