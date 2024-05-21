@@ -8,7 +8,7 @@ dependencies = [
     "einshape>=1.0.0",
     "paxml>=1.4.0",
     "praxis>=1.4.0",
-    "jax>=0.4.26",
+    "jax==0.4.26",
     "numpy>=1.26.4",
     "pandas>=2.1.4",
 ]

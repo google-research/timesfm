@@ -20,5 +20,5 @@ dependencies:
     - git+https://github.com/amazon-science/chronos-forecasting.git
     - praxis
     - paxml
-    - jax[cpu]
+    - jax[cpu]==0.4.26
     - einshape
