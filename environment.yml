@@ -13,6 +13,5 @@ dependencies:
     - utilsforecast
     - praxis
     - paxml
-    - -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html  
-    - "jax[cuda12_pip]"
+    - jax[cuda12]==0.4.26
     - einshape
