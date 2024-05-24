@@ -30,6 +30,27 @@ Please look into the README files in the respective benchmark directories within
 
 ## Installation
 
+### Installation as a package
+
+To install the CPU version of TimesFM as a package, you can run the following command without cloning this repo:
+
+`pip install timesfm`
+
+The package is currently using https://pypi.org/project/timesfm/.
+
+### Poetry (CPU) installation
+
+To install the CPU environment using Poetry, you can run the following command:
+
+```
+pip install poetry # optional
+poetry install
+```
+
+This will install the environment in the local .venv folder (depends on the configuration) and matches the python command to the poetry environment. If this is not the case, you can use `poetry run python` to use the local environment.
+
+### Conda / GPU installation
+
 For calling TimesFM, We have two environment files. Inside `timesfm`, for
 GPU installation (assuming CUDA 12 has been setup), you can create a conda
 environment `tfm_env` from the base folder through:
@@ -59,6 +80,12 @@ to install the package.
 Please use the environment files under `experiments` instead.
 
 2. The dependency `lingvo` does not support ARM architectures, and the code is not working for machines with Apple silicon. We are aware of this issue and are working on a solution. Stay tuned.
+
+#### Building the package and publishing to PyPI
+
+The package can be built using the command `poetry build`.
+
+To build and publish it to PyPI, the command `poetry publish` can be used. This command will require the user to have the necessary permissions to publish to the PyPI repository.
 
 ## Usage 
 
