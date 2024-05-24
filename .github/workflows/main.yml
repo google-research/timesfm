@@ -21,9 +21,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install poetry
       # use the hardcoded version number for now
-      # - name: Set Version number
-      #   run: |
-      #     poetry version 0.0.${{ github.run_number }}
+      - name: Set Version number
+        run: |
+          poetry version 0.0.${{ github.run_number }}
       - name: Build and Publish to PyPI
         run: |
           poetry config pypi-token.pypi ${{ secrets.PYPI_API_TOKEN }}
