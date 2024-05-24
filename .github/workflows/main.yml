@@ -22,7 +22,7 @@ jobs:
           pip install poetry
       - name: Set Version number
         run: |
-          poetry version ${{ github.event_name }}
+          poetry version ${{ github.run_number }}
       - name: Build and Publish to PyPI
         run: |
           poetry config pypi-token.pypi ${{ secrets.PYPI_API_TOKEN }}
