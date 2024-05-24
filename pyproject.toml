@@ -36,6 +36,7 @@ pandas = ">=2.1.4"
 paxml = "1.4.0"
 jax = "0.4.26"
 jaxlib = "0.4.26"
+utilsforecast = "^0.1.10"
 
 
 [build-system]
