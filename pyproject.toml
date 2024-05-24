@@ -35,6 +35,7 @@ numpy = ">=1.26.4"
 pandas = ">=2.1.4"
 paxml = "1.4.0"
 jax = "0.4.26"
+jaxlib = "0.4.26"
 
 
 [build-system]
