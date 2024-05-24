@@ -3,7 +3,7 @@ name = "timesfm"
 packages = [
     { include = "*", from = "src" },
 ]
-version = "0.0.2"
+version = "0.0.1"
 description = "Open weights time-series foundation model from Google Research."
 authors = [
     "Rajat Sen <senrajat@google.com>",
