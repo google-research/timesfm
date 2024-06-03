@@ -24,7 +24,7 @@ timesfm-1.0-200m is the first open model checkpoint:
 
 ## Benchmarks
 
-Please refer to our result tables on the [extended benchmarks](./experiments/extended_benchmarks/tfm_results.png) and the [long horizon benchmarks](./experiments/long_horizon_benchmarks/tfm_long_horizon.png).
+Please refer to our result tables on the [extended benchmarks](https://github.com/google-research/timesfm/tree/master/experiments/extended_benchmarks) and the [long horizon benchmarks](https://github.com/google-research/timesfm/tree/master/experiments/long_horizon_benchmarks).
 
 Please look into the README files in the respective benchmark directories within `experiments/` for instructions for running TimesFM on the respective benchmarks.
 
