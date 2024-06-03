@@ -20,5 +20,8 @@ dependencies:
     - git+https://github.com/amazon-science/chronos-forecasting.git
     - praxis
     - paxml
-    - jax[cuda12]==0.4.26
+    - jax[cuda12]
     - einshape
+    - python-dotenv
+    - nixtla>=0.5.1
+    - rich
