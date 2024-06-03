@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Evaluation script for timesfm."""
+"""Evaluation script for timegpt."""
 
 import os
 import sys
@@ -57,7 +57,9 @@ dataset_names = [
 ]
 
 _MODEL_NAME = flags.DEFINE_string(
-    "model_name", "timegpt-1-long-horizon", "Path to model"
+    "model_name",
+    "timegpt-1-long-horizon",
+    "Path to model, can also be set to timegpt-1",
 )
 _SAVE_DIR = flags.DEFINE_string("save_dir", "./results", "Save directory")
 
