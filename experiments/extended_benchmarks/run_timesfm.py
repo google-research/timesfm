@@ -45,7 +45,6 @@ dataset_names = [
     "nn5_weekly",
     "traffic",
     "weather",
-    "dominick",
     "australian_electricity_demand",
     "car_parts_without_missing",
     "cif_2016",
