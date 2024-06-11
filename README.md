@@ -30,6 +30,8 @@ Please look into the README files in the respective benchmark directories within
 
 ## Installation
 
+We recommend at least 16GB RAM to load TimesFM dependencies.
+
 For calling TimesFM, We have two environment files. Inside `timesfm`, for
 GPU installation (assuming CUDA 12 has been setup), you can create a conda
 environment `tfm_env` from the base folder through:
