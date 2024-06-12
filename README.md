@@ -156,7 +156,7 @@ import pandas as pd
 
 forecast_df = tfm.forecast_on_df(
     inputs=input_df,
-    freq="M",  # monthly
+    freq="ME",  # monthly
     value_name="y",
     num_jobs=-1,
 )```
