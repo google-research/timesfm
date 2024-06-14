@@ -96,16 +96,16 @@ class TimesFm:
   Attributes:
     per_core_batch_size: Batch size on each core for data parallelism.
     backend: One of "cpu", "gpu" or "tpu".
-    num_devices: Number of cores provided the backend.
+    num_devices: Number of cores provided by the backend.
     global_batch_size: per_core_batch_size * num_devices. Each batch of
       inference task will be padded with respect to global_batch_size to
       minimize latency.
     context_len: Largest context length the model allows for each decode call.
-      This technically can be any large, but practically should set to the
+      This technically can be any length, but practically should be set to the
       context length the checkpoint was trained with.
     horizon_len: Forecast horizon.
     input_patch_len: Input patch len.
-    output_patch_len: Output patch len. How many timepoints is taken from a
+    output_patch_len: Output patch len. How many timepoints are taken from a
       single step of autoregressive decoding. Can be set as the training horizon
       of the checkpoint.
     mesh_shape: Shape of the data parallelism mesh.
@@ -134,11 +134,11 @@ class TimesFm:
 
     Args:
       context_len: Largest context length the model allows for each decode call.
-        This technically can be any large, but practically should set to the
+        This technically can be any length, but practically should be set to the
         context length the checkpoint was trained with.
       horizon_len: Forecast horizon.
       input_patch_len: Input patch len.
-      output_patch_len: Output patch len. How many timepoints is taken from a
+      output_patch_len: Output patch len. How many timepoints are taken from a
         single step of autoregressive decoding. Can be set as the training
         horizon of the checkpoint.
       num_layers: Number of transformer layers.
@@ -524,7 +524,7 @@ class TimesFm:
         timestamps and a value column for the time series values.
       freq: string valued `freq` of data. Notice this is different from the
         `freq` required by `forecast`. See `freq_map` for allowed values.
-      forecast_context_len: If provided none zero, we take the last
+      forecast_context_len: If provided non-zero, we take the last
         `forecast_context_len` time-points from each series as the forecast
         context instead of the `context_len` set by the model.
       value_name: The name of the value column.
