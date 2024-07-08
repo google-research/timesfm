@@ -35,7 +35,7 @@ from praxis import py_utils
 from praxis import pytypes
 from praxis.layers import normalizations
 from praxis.layers import transformers
-import patched_decoder
+from . import patched_decoder
 from utilsforecast.processing import make_future_dataframe
 
 instantiate = base_hyperparams.instantiate
@@ -277,7 +277,10 @@ class TimesFm:
     self._logging(
         f"Restored checkpoint in {time.time() - start_time:.2f} seconds."
     )
-
+    self.jit_decode()
+    
+  def jit_decode(self):
+    """Jitting decoding function."""
     # Initialize and jit the decode fn.
     def _decode(inputs):
       assert self._model is not None

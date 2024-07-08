@@ -26,7 +26,7 @@ from paxml import checkpoints
 import timesfm
 import torch
 import tqdm
-from . import data_loader
+from timesfm import data_loader
 
 
 FLAGS = flags.FLAGS
