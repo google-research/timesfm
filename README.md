@@ -159,4 +159,9 @@ forecast_df = tfm.forecast_on_df(
     freq="M",  # monthly
     value_name="y",
     num_jobs=-1,
-)```
+)
+```
+
+## Finetuning
+
+We have provided an example of finetuning the model on a new dataset in `notebooks/finetuning.ipynb`. 
