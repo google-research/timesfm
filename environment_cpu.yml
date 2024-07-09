@@ -15,3 +15,4 @@ dependencies:
     - paxml
     - jax[cpu]==0.4.26
     - einshape
+    - scikit-learn

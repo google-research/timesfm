@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Directory to extract time covariates.
 
 Extract time covariates from datetime.
@@ -35,6 +36,7 @@ from pandas.tseries.offsets import Easter
 from sklearn.preprocessing import StandardScaler
 from tqdm import tqdm
 
+
 # This is 183 to cover half a year (in both directions), also for leap years
 # + 17 as Eastern can be between March, 22 - April, 25
 MAX_WINDOW = 183 + 17
@@ -48,8 +50,9 @@ def _distance_to_holiday(holiday):
         index - pd.Timedelta(days=MAX_WINDOW),
         index + pd.Timedelta(days=MAX_WINDOW),
     )
-    assert (len(holiday_date) != 0  # pylint: disable=g-explicit-length-test
-           ), f"No closest holiday for the date index {index} found."
+    assert (
+        len(holiday_date) != 0  # pylint: disable=g-explicit-length-test
+    ), f"No closest holiday for the date index {index} found."
     # It sometimes returns two dates if it is exactly half a year after the
     # holiday. In this case, the smaller distance (182 days) is returned.
     return (index - holiday_date[0]).days
@@ -57,19 +60,16 @@ def _distance_to_holiday(holiday):
   return _distance_to_day
 
 
-EasterSunday = Holiday("Easter Sunday",
-                       month=1,
-                       day=1,
-                       offset=[Easter(), Day(0)])
+EasterSunday = Holiday(
+    "Easter Sunday", month=1, day=1, offset=[Easter(), Day(0)]
+)
 NewYearsDay = Holiday("New Years Day", month=1, day=1)
-SuperBowl = Holiday("Superbowl",
-                    month=2,
-                    day=1,
-                    offset=DateOffset(weekday=SU(1)))
-MothersDay = Holiday("Mothers Day",
-                     month=5,
-                     day=1,
-                     offset=DateOffset(weekday=SU(2)))
+SuperBowl = Holiday(
+    "Superbowl", month=2, day=1, offset=DateOffset(weekday=SU(1))
+)
+MothersDay = Holiday(
+    "Mothers Day", month=5, day=1, offset=DateOffset(weekday=SU(2))
+)
 IndependenceDay = Holiday("Independence Day", month=7, day=4)
 ChristmasEve = Holiday("Christmas", month=12, day=24)
 ChristmasDay = Holiday("Christmas", month=12, day=25)

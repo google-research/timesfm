@@ -159,8 +159,7 @@ forecast_df = tfm.forecast_on_df(
     freq="M",  # monthly
     value_name="y",
     num_jobs=-1,
-)
-```
+)```
 
 ## Finetuning
 
