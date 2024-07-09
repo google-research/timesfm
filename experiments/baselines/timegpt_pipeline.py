@@ -12,10 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List, Optional, Tuple
 import os
-import pandas as pd
+from time import time
+from typing import List, Optional, Tuple
+from dotenv import load_dotenv
 from gluonts.time_feature.seasonality import get_seasonality as _get_seasonality
+from nixtla import NixtlaClient
+import pandas as pd
 from tqdm import tqdm
 from utilsforecast.processing import (
     backtest_splits,
@@ -25,17 +28,15 @@ from utilsforecast.processing import (
     take_rows,
     vertical_concat,
 )
-from time import time
-from dotenv import load_dotenv
-from nixtla import NixtlaClient
 
 
 def get_seasonality(freq: str) -> int:
   return _get_seasonality(freq, seasonalities={"D": 7})
 
 
-def maybe_convert_col_to_datetime(df: pd.DataFrame,
-                                  col_name: str) -> pd.DataFrame:
+def maybe_convert_col_to_datetime(
+    df: pd.DataFrame, col_name: str
+) -> pd.DataFrame:
   if not pd.api.types.is_datetime64_any_dtype(df[col_name]):
     df = df.copy()
     df[col_name] = pd.to_datetime(df[col_name])
@@ -63,15 +64,14 @@ def zero_pad_time_series(df, freq, min_length=36):
           end=start_date,
           periods=min_length - len(subset) + 1,
           freq=freq,  # 'MS' for month start
-      )[:-1]  # Exclude the start_date itself
+      )[
+          :-1
+      ]  # Exclude the start_date itself
 
       # 2c. Create padding data
-      padding_df = pd.DataFrame({
-          "ds": padding_dates,
-          "unique_id": unique_id,
-          "y": 0
-      }  # Zero padding
-                               )
+      padding_df = pd.DataFrame(
+          {"ds": padding_dates, "unique_id": unique_id, "y": 0}  # Zero padding
+      )
 
       # 2d. Combine original and padding data, and append to the list
       padded_data.append(pd.concat([padding_df, subset]).sort_values("ds"))
@@ -83,8 +83,9 @@ def zero_pad_time_series(df, freq, min_length=36):
 
 class Forecaster:
   """Borrowed from
-    https://github.com/Nixtla/nixtla/tree/main/experiments/foundation-time-series-arena/xiuhmolpilli/models.
-    """
+
+  https://github.com/Nixtla/nixtla/tree/main/experiments/foundation-time-series-arena/xiuhmolpilli/models.
+  """
 
   def forecast(
       self,
@@ -120,7 +121,8 @@ class Forecaster:
     for _, (cutoffs, train, valid) in tqdm(enumerate(splits)):
       if len(valid.columns) > 3:
         raise NotImplementedError(
-            "Cross validation with exogenous variables is not yet supported.")
+            "Cross validation with exogenous variables is not yet supported."
+        )
       y_pred = self.forecast(
           df=train,
           h=h,
@@ -134,9 +136,10 @@ class Forecaster:
       )
       if result.shape[0] < valid.shape[0]:
         raise ValueError(
-            "Cross validation result produced less results than expected. "
-            "Please verify that the frequency parameter (freq) matches your series' "
-            "and that there aren't any missing periods.")
+            "Cross validation result produced less results than expected."
+            " Please verify that the frequency parameter (freq) matches your"
+            " series' and that there aren't any missing periods."
+        )
       results.append(result)
     out = vertical_concat(results)
     out = drop_index_if_pandas(out)
@@ -148,9 +151,10 @@ class Forecaster:
 
 class TimeGPT(Forecaster):
   """Borrowed from
-    https://github.com/Nixtla/nixtla/tree/main/experiments/foundation-time-series-arena/xiuhmolpilli/models.
-    We modify the class to take care of edge cases.
-    """
+
+  https://github.com/Nixtla/nixtla/tree/main/experiments/foundation-time-series-arena/xiuhmolpilli/models.
+  We modify the class to take care of edge cases.
+  """
 
   def __init__(
       self,
@@ -199,7 +203,7 @@ class TimeGPT(Forecaster):
       all_unique_ids = df["unique_id"].unique()
       all_fcst_df = []
       for i in range(0, len(all_unique_ids), chunk_size):
-        chunk_ids = all_unique_ids[i:i + chunk_size]
+        chunk_ids = all_unique_ids[i : i + chunk_size]
         chunk_df = df[df["unique_id"].isin(chunk_ids)]
         fct_chunk_df = client.forecast(
             df=chunk_df,
@@ -236,11 +240,13 @@ def run_timegpt(
     chunk_size = 5000
   else:
     chunk_size = None
-  fcsts_df = model.forecast(df=padded_train_df,
-                            h=horizon,
-                            level=level,
-                            freq=freq,
-                            chunk_size=chunk_size)
+  fcsts_df = model.forecast(
+      df=padded_train_df,
+      h=horizon,
+      level=level,
+      freq=freq,
+      chunk_size=chunk_size,
+  )
   total_time = time() - init_time
   # In case levels are not returned we replace the levels with the mean predictions.
   # Note that this does not affect the results table as we only compare on point

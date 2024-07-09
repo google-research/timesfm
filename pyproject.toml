@@ -3,7 +3,7 @@
 [project]
 name = "timesfm"
 description = "Open weights time-series foundation model from Google Research."
-version = "0.0.1"
+version = "1.0.0"
 dependencies = [
     "einshape>=1.0.0",
     "paxml>=1.4.0",
@@ -11,6 +11,7 @@ dependencies = [
     "jax>=0.4.26",
     "numpy>=1.26.4",
     "pandas>=2.1.4",
+    "sklearn>=1.15.1",
 ]
 authors = [
      {name = "Rajat Sen", email = "senrajat@google.com"},
