@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """TimesFM forecast API for inference."""
 
 import logging
@@ -52,23 +51,16 @@ def moving_average(arr, window_size):
   """Calculates the moving average using NumPy's convolution function."""
   # Pad with zeros to handle initial window positions
   arr_padded = np.pad(arr, (window_size - 1, 0), "constant")
-  smoothed_arr = (
-      np.convolve(arr_padded, np.ones(window_size), "valid") / window_size
-  )
+  smoothed_arr = (np.convolve(arr_padded, np.ones(window_size), "valid") /
+                  window_size)
   return [smoothed_arr, arr - smoothed_arr]
 
 
 def freq_map(freq: str):
   """Returns the frequency map for the given frequency string."""
   freq = str.upper(freq)
-  if (
-      freq.endswith("H")
-      or freq.endswith("T")
-      or freq.endswith("MIN")
-      or freq.endswith("D")
-      or freq.endswith("B")
-      or freq.endswith("U")
-  ):
+  if (freq.endswith("H") or freq.endswith("T") or freq.endswith("MIN") or
+      freq.endswith("D") or freq.endswith("B") or freq.endswith("U")):
     return 0
   elif freq.endswith(("W", "M", "MS")):
     return 1
@@ -179,9 +171,7 @@ class TimesFm:
             num_layers=num_layers,
             transformer_layer_params_tpl=pax_fiddle.Config(
                 transformers.Transformer,
-                ln_tpl=pax_fiddle.Config(
-                    normalizations.RmsNorm,
-                ),
+                ln_tpl=pax_fiddle.Config(normalizations.RmsNorm,),
             ),
         ),
     )
@@ -199,34 +189,38 @@ class TimesFm:
 
   def _get_sample_inputs(self):
     return {
-        "input_ts": jnp.zeros(
-            (
-                self.per_core_batch_size,
-                self.context_len + self.output_patch_len,
+        "input_ts":
+            jnp.zeros(
+                (
+                    self.per_core_batch_size,
+                    self.context_len + self.output_patch_len,
+                ),
+                dtype=jnp.float32,
             ),
-            dtype=jnp.float32,
-        ),
-        "input_padding": jnp.zeros(
-            (
-                self.per_core_batch_size,
-                self.context_len + self.output_patch_len,
+        "input_padding":
+            jnp.zeros(
+                (
+                    self.per_core_batch_size,
+                    self.context_len + self.output_patch_len,
+                ),
+                dtype=jnp.float32,
             ),
-            dtype=jnp.float32,
-        ),
-        "freq": jnp.zeros(
-            (
-                self.per_core_batch_size,
-                1,
+        "freq":
+            jnp.zeros(
+                (
+                    self.per_core_batch_size,
+                    1,
+                ),
+                dtype=jnp.int32,
             ),
-            dtype=jnp.int32,
-        ),
     }
 
   def load_from_checkpoint(
       self,
       checkpoint_path: Optional[str] = None,
       repo_id: str = "google/timesfm-1.0-200m",
-      checkpoint_type: checkpoints.CheckpointType = checkpoints.CheckpointType.FLAX,
+      checkpoint_type: checkpoints.CheckpointType = checkpoints.CheckpointType.
+      FLAX,
       step: int | None = None,
   ) -> None:
     """Loads a checkpoint and compiles the decoder.
@@ -246,8 +240,7 @@ class TimesFm:
     start_time = time.time()
     self._model = instantiate(self.model_p)
     var_weight_hparams = self._model.abstract_init_with_metadata(
-        self._get_sample_inputs(), do_eval=True
-    )
+        self._get_sample_inputs(), do_eval=True)
     train_state_partition_specs = tasks_lib.create_state_partition_specs(
         var_weight_hparams,
         mesh_shape=self.mesh_shape,
@@ -261,8 +254,7 @@ class TimesFm:
         learners=None,
     )
     self._logging(
-        f"Constructed model weights in {time.time() - start_time:.2f} seconds."
-    )
+        f"Constructed model weights in {time.time() - start_time:.2f} seconds.")
 
     # Load the model weights.
     self._logging(f"Restoring checkpoint from {checkpoint_path}.")
@@ -275,12 +267,12 @@ class TimesFm:
         step=step,
     )
     self._logging(
-        f"Restored checkpoint in {time.time() - start_time:.2f} seconds."
-    )
+        f"Restored checkpoint in {time.time() - start_time:.2f} seconds.")
     self.jit_decode()
-    
+
   def jit_decode(self):
     """Jitting decoding function."""
+
     # Initialize and jit the decode fn.
     def _decode(inputs):
       assert self._model is not None
@@ -310,34 +302,36 @@ class TimesFm:
     with base_layer.JaxContext.new_context(hparams=self._eval_context):
       _ = self._pmapped_decode(
           NestedMap({
-              "input_ts": jnp.zeros(
-                  (
-                      self.num_devices,
-                      self.per_core_batch_size,
-                      self.context_len,
+              "input_ts":
+                  jnp.zeros(
+                      (
+                          self.num_devices,
+                          self.per_core_batch_size,
+                          self.context_len,
+                      ),
+                      dtype=jnp.float32,
                   ),
-                  dtype=jnp.float32,
-              ),
-              "input_padding": jnp.zeros(
-                  (
-                      self.num_devices,
-                      self.per_core_batch_size,
-                      self.context_len + self.horizon_len,
+              "input_padding":
+                  jnp.zeros(
+                      (
+                          self.num_devices,
+                          self.per_core_batch_size,
+                          self.context_len + self.horizon_len,
+                      ),
+                      dtype=jnp.float32,
                   ),
-                  dtype=jnp.float32,
-              ),
-              "date_features": None,
-              "freq": jnp.zeros(
-                  (self.num_devices, self.per_core_batch_size, 1),
-                  dtype=jnp.int32,
-              ),
-          })
-      )
+              "date_features":
+                  None,
+              "freq":
+                  jnp.zeros(
+                      (self.num_devices, self.per_core_batch_size, 1),
+                      dtype=jnp.int32,
+                  ),
+          }))
     self._logging(f"Jitted decoding in {time.time() - start_time:.2f} seconds.")
 
-  def _preprocess(
-      self, inputs: Sequence[np.array], freq: Sequence[int]
-  ) -> tuple[np.array, np.array, int]:
+  def _preprocess(self, inputs: Sequence[np.array],
+                  freq: Sequence[int]) -> tuple[np.array, np.array, int]:
     """Formats and pads raw inputs to feed into the model.
 
     This function both pads each time series to match the context length, and
@@ -358,24 +352,21 @@ class TimesFm:
 
     input_ts, input_padding, inp_freq = [], [], []
 
-    pmap_pad = (
-        (len(inputs) - 1) // self.global_batch_size + 1
-    ) * self.global_batch_size - len(inputs)
+    pmap_pad = ((len(inputs) - 1) // self.global_batch_size +
+                1) * self.global_batch_size - len(inputs)
 
     for i, ts in enumerate(inputs):
       input_len = ts.shape[0]
       padding = np.zeros(shape=(input_len + self.horizon_len,), dtype=float)
       if input_len < self.context_len:
         num_front_pad = self.context_len - input_len
-        ts = np.concatenate(
-            [np.zeros(shape=(num_front_pad,), dtype=float), ts], axis=0
-        )
+        ts = np.concatenate([np.zeros(shape=(num_front_pad,), dtype=float), ts],
+                            axis=0)
         padding = np.concatenate(
-            [np.ones(shape=(num_front_pad,), dtype=float), padding], axis=0
-        )
+            [np.ones(shape=(num_front_pad,), dtype=float), padding], axis=0)
       elif input_len > self.context_len:
-        ts = ts[-self.context_len :]
-        padding = padding[-(self.context_len + self.horizon_len) :]
+        ts = ts[-self.context_len:]
+        padding = padding[-(self.context_len + self.horizon_len):]
 
       input_ts.append(ts)
       input_padding.append(padding)
@@ -425,8 +416,7 @@ class TimesFm:
     if not self._train_state or not self._model:
       raise ValueError(
           "Checkpoint not loaded. Call `load_from_checkpoint` before"
-          " `forecast`."
-      )
+          " `forecast`.")
     if forecast_context_len is None:
       forecast_context_len = self.context_len
     inputs = [np.array(ts)[-forecast_context_len:] for ts in inputs]
@@ -448,47 +438,45 @@ class TimesFm:
       full_outputs = []
       assert input_ts.shape[0] % self.global_batch_size == 0
       for i in range(input_ts.shape[0] // self.global_batch_size):
-        input_ts_in = jnp.array(
-            input_ts[
-                i * self.global_batch_size : (i + 1) * self.global_batch_size
-            ]
-        )
+        input_ts_in = jnp.array(input_ts[i * self.global_batch_size:(i + 1) *
+                                         self.global_batch_size])
         input_padding_in = jnp.array(
-            input_padding[
-                i * self.global_batch_size : (i + 1) * self.global_batch_size
-            ],
-        )
+            input_padding[i * self.global_batch_size:(i + 1) *
+                          self.global_batch_size],)
         inp_freq_in = jnp.array(
-            inp_freq[
-                i * self.global_batch_size : (i + 1) * self.global_batch_size, :
-            ],
+            inp_freq[i * self.global_batch_size:(i + 1) *
+                     self.global_batch_size, :],
             dtype=jnp.int32,
         )
         pmapped_inputs = NestedMap({
-            "input_ts": es.jax_einshape(
-                "(db)...->db...",
-                input_ts_in,
-                d=self.num_devices,
-            ),
-            "input_padding": es.jax_einshape(
-                "(db)...->db...",
-                input_padding_in,
-                d=self.num_devices,
-            ),
-            "date_features": None,
-            "freq": es.jax_einshape(
-                "(db)...->db...",
-                inp_freq_in,
-                d=self.num_devices,
-            ),
+            "input_ts":
+                es.jax_einshape(
+                    "(db)...->db...",
+                    input_ts_in,
+                    d=self.num_devices,
+                ),
+            "input_padding":
+                es.jax_einshape(
+                    "(db)...->db...",
+                    input_padding_in,
+                    d=self.num_devices,
+                ),
+            "date_features":
+                None,
+            "freq":
+                es.jax_einshape(
+                    "(db)...->db...",
+                    inp_freq_in,
+                    d=self.num_devices,
+                ),
         })
         mean_output, full_output = self._pmapped_decode(pmapped_inputs)
-        mean_output = es.jax_einshape(
-            "db...->(db)...", mean_output, d=self.num_devices
-        )
-        full_output = es.jax_einshape(
-            "db...->(db)...", full_output, d=self.num_devices
-        )
+        mean_output = es.jax_einshape("db...->(db)...",
+                                      mean_output,
+                                      d=self.num_devices)
+        full_output = es.jax_einshape("db...->(db)...",
+                                      full_output,
+                                      d=self.num_devices)
         mean_output = np.array(mean_output)
         full_output = np.array(full_output)
         mean_outputs.append(mean_output)
@@ -539,14 +527,10 @@ class TimesFm:
     Returns:
       Future forecasts dataframe.
     """
-    if not (
-        "unique_id" in inputs.columns
-        and "ds" in inputs.columns
-        and value_name in inputs.columns
-    ):
+    if not ("unique_id" in inputs.columns and "ds" in inputs.columns and
+            value_name in inputs.columns):
       raise ValueError(
-          f"DataFrame must have unique_id, ds and {value_name} columns."
-      )
+          f"DataFrame must have unique_id, ds and {value_name} columns.")
     if not forecast_context_len:
       forecast_context_len = self.context_len
     logging.info("Preprocessing dataframe.")
@@ -571,17 +555,15 @@ class TimesFm:
       with multiprocessing.Pool(processes=num_jobs) as pool:
         results = pool.starmap(
             process_group,
-            [
-                (key, group, value_name, forecast_context_len)
-                for key, group in df_sorted.groupby("unique_id")
-            ],
+            [(key, group, value_name, forecast_context_len)
+             for key, group in df_sorted.groupby("unique_id")],
         )
       new_inputs, uids = zip(*results)
     print("Finished preprocessing dataframe.")
     freq_inps = [freq_map(freq)] * len(new_inputs)
-    _, full_forecast = self.forecast(
-        new_inputs, freq=freq_inps, window_size=window_size
-    )
+    _, full_forecast = self.forecast(new_inputs,
+                                     freq=freq_inps,
+                                     window_size=window_size)
     print("Finished forecasting.")
     fcst_df = make_future_dataframe(
         uids=uids,
@@ -589,16 +571,13 @@ class TimesFm:
         h=self.horizon_len,
         freq=freq,
     )
-    fcst_df[model_name] = full_forecast[:, 0 : self.horizon_len, 0].reshape(
-        -1, 1
-    )
+    fcst_df[model_name] = full_forecast[:, 0:self.horizon_len, 0].reshape(-1, 1)
 
     if self._model.quantiles is not None:
       for i, q in enumerate(self._model.quantiles):
         q_col = f"{model_name}-q-{q}"
-        fcst_df[q_col] = full_forecast[:, 0 : self.horizon_len, 1 + i].reshape(
-            -1, 1
-        )
+        fcst_df[q_col] = full_forecast[:, 0:self.horizon_len,
+                                       1 + i].reshape(-1, 1)
         if q == 0.5:
           fcst_df[model_name] = fcst_df[q_col]
     logging.info("Finished creating output dataframe.")
