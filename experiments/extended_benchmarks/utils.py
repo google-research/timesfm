@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Forked from https://github.com/Nixtla/nixtla/blob/main/experiments/amazon-chronos/src/utils.py."""
 
 from functools import partial
@@ -46,11 +45,9 @@ def quantile_loss(
     target_col: str = "y",
 ) -> pd.DataFrame:
   delta_y = df[models].sub(df[target_col], axis=0)
-  res = (
-      np.maximum(q * delta_y, (q - 1) * delta_y)
-      .groupby(df[id_col], observed=True)
-      .mean()
-  )
+  res = (np.maximum(q * delta_y,
+                    (q - 1) * delta_y).groupby(df[id_col],
+                                               observed=True).mean())
   res.index.name = id_col
   res = res.reset_index()
   return res
@@ -66,10 +63,8 @@ class ExperimentHandler:
       models_dir: str = "./models",
   ):
     if dataset not in gluonts_datasets:
-      raise Exception(
-          f"dataset {dataset} not found in gluonts "
-          f"available datasets: {', '.join(gluonts_datasets)}"
-      )
+      raise Exception(f"dataset {dataset} not found in gluonts "
+                      f"available datasets: {', '.join(gluonts_datasets)}")
     self.dataset = dataset
     self.quantiles = quantiles
     self.level = self._transform_quantiles_to_levels(quantiles)
@@ -80,10 +75,8 @@ class ExperimentHandler:
     gluonts_dataset = get_dataset(self.dataset)
     self.horizon = gluonts_dataset.metadata.prediction_length
     if self.horizon is None:
-      raise Exception(
-          f"horizon not found for dataset {self.dataset} "
-          "experiment cannot be run"
-      )
+      raise Exception(f"horizon not found for dataset {self.dataset} "
+                      "experiment cannot be run")
     self.freq = gluonts_dataset.metadata.freq
     # get_seasonality() returns 1 for freq='D', override this to 7. This significantly improves the accuracy of
     # statistical models on datasets like m5/nn5_daily. The models like AutoARIMA/AutoETS can still set
@@ -122,9 +115,8 @@ class ExperimentHandler:
 
   @staticmethod
   def _transform_quantiles_to_levels(quantiles: List[float]) -> List[int]:
-    level = [
-        int(100 - 200 * q) for q in quantiles if q < 0.5
-    ]  # in this case mean=mediain
+    level = [int(100 - 200 * q) for q in quantiles if q < 0.5
+            ]  # in this case mean=mediain
     level = sorted(list(set(level)))
     return level
 
@@ -153,9 +145,8 @@ class ExperimentHandler:
       last_n: int | None = None,
   ) -> pd.DataFrame:
     with multiprocessing.Pool(os.cpu_count()) as pool:  # Create a process pool
-      results = pool.map(
-          parallel_transform, zip(gluonts_dataset, repeat(last_n))
-      )
+      results = pool.map(parallel_transform, zip(gluonts_dataset,
+                                                 repeat(last_n)))
     df = pd.concat(results)
     df = df.reset_index(drop=True)
     return df
@@ -177,9 +168,8 @@ class ExperimentHandler:
   def save_dataframe(self, df: pd.DataFrame, file_name: str):
     df.to_csv(f"{self.results_dir}/{file_name}", index=False)
 
-  def save_results(
-      self, fcst_df: pd.DataFrame, total_time: float, model_name: str
-  ):
+  def save_results(self, fcst_df: pd.DataFrame, total_time: float,
+                   model_name: str):
     self.save_dataframe(
         fcst_df,
         f"{model_name}-{self.dataset}-fcst.csv",
@@ -215,23 +205,21 @@ class ExperimentHandler:
     times_df = []
     for model in models:
       fcst_method_df = pd.read_csv(
-          f"{self.results_dir}/{model}-{self.dataset}-fcst.csv"
-      ).set_index(["unique_id", "ds"])
+          f"{self.results_dir}/{model}-{self.dataset}-fcst.csv").set_index(
+              ["unique_id", "ds"])
       fcsts_df.append(fcst_method_df)
       time_method_df = pd.read_csv(
-          f"{self.results_dir}/{model}-{self.dataset}-time.csv"
-      )
+          f"{self.results_dir}/{model}-{self.dataset}-time.csv")
       times_df.append(time_method_df)
     fcsts_df = pd.concat(fcsts_df, axis=1).reset_index()
     fcsts_df["ds"] = pd.to_datetime(fcsts_df["ds"])
     times_df = pd.concat(times_df)
-    return self.evaluate_from_predictions(
-        models=models, fcsts_df=fcsts_df, times_df=times_df
-    )
+    return self.evaluate_from_predictions(models=models,
+                                          fcsts_df=fcsts_df,
+                                          times_df=times_df)
 
-  def evaluate_from_predictions(
-      self, models: List[str], fcsts_df: pd.DataFrame, times_df: pd.DataFrame
-  ) -> pd.DataFrame:
+  def evaluate_from_predictions(self, models: List[str], fcsts_df: pd.DataFrame,
+                                times_df: pd.DataFrame) -> pd.DataFrame:
     test_df = self.test_df
     train_df = self.train_df
     test_df = test_df.merge(fcsts_df, how="left")
@@ -262,9 +250,9 @@ class ExperimentHandler:
     eval_prob_df["metric"] = "scaled_crps"
     eval_df = pd.concat([eval_df, eval_prob_df]).reset_index(drop=True)
     eval_df = eval_df.groupby("metric").mean(numeric_only=True).reset_index()
-    eval_df = eval_df.melt(
-        id_vars="metric", value_name="value", var_name="model"
-    )
+    eval_df = eval_df.melt(id_vars="metric",
+                           value_name="value",
+                           var_name="model")
     times_df.insert(0, "metric", "time")
     times_df = times_df.rename(columns={"time": "value"})
     eval_df = pd.concat([eval_df, times_df])

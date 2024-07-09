@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Evaluation script for timesfm."""
 
 import os
@@ -25,7 +24,6 @@ from paxml import checkpoints
 import timesfm
 
 from .utils import ExperimentHandler
-
 
 dataset_names = [
     "m1_monthly",
@@ -74,15 +72,13 @@ context_dict = {
     "m4_yearly": 64,
 }
 
-_MODEL_PATH = flags.DEFINE_string(
-    "model_path", "/home/timesfm_q10_20240501", "Path to model"
-)
+_MODEL_PATH = flags.DEFINE_string("model_path", "/home/timesfm_q10_20240501",
+                                  "Path to model")
 _BATCH_SIZE = flags.DEFINE_integer("batch_size", 64, "Batch size")
 _HORIZON = flags.DEFINE_integer("horizon", 128, "Horizon")
 _BACKEND = flags.DEFINE_string("backend", "gpu", "Backend")
 _NUM_JOBS = flags.DEFINE_integer("num_jobs", 1, "Number of jobs")
 _SAVE_DIR = flags.DEFINE_string("save_dir", "./results", "Save directory")
-
 
 QUANTILES = list(np.arange(1, 10) / 10.0)
 
@@ -127,9 +123,9 @@ def main():
     )
     total_time = time.time() - init_time
     time_df = pd.DataFrame({"time": [total_time], "model": model_name})
-    results = exp.evaluate_from_predictions(
-        models=[model_name], fcsts_df=fcsts_df, times_df=time_df
-    )
+    results = exp.evaluate_from_predictions(models=[model_name],
+                                            fcsts_df=fcsts_df,
+                                            times_df=time_df)
     print(results, flush=True)
     results_list.append(results)
     results_full = pd.concat(results_list)

@@ -165,3 +165,18 @@ forecast_df = tfm.forecast_on_df(
 ## Finetuning
 
 We have provided an example of finetuning the model on a new dataset in `notebooks/finetuning.ipynb`. 
+
+## Contribution Style guide
+
+If you would like to submit a PR please make sure that you use our formatting style. We use [yapf](https://github.com/google/yapf) for formatting with the following options,
+
+```
+[style]
+based_on_style = google
+# Add your custom style rules here
+indent_width = 2
+spaces_before_comment = 2
+
+```
+
+Please run `yapf --in-place --recursive <filename>` on all affected files.
