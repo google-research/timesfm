@@ -25,3 +25,4 @@ dependencies:
     - python-dotenv
     - nixtla>=0.5.1
     - rich
+    - scikit-learn

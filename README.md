@@ -164,7 +164,7 @@ forecast_df = tfm.forecast_on_df(
 
 ## Finetuning
 
-We have provided an example of finetuning the model on a new dataset in `notebooks/finetuning.ipynb`. 
+We have provided an example of finetuning the model on a new dataset in `notebooks/finetuning.ipynb`.
 
 ## Contribution Style guide
 
