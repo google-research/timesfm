@@ -11,7 +11,7 @@ dependencies = [
     "jax>=0.4.26",
     "numpy>=1.26.4",
     "pandas>=2.1.4",
-    "sklearn>=1.15.1",
+    "scikit-learn>=1.5.1",
 ]
 authors = [
      {name = "Rajat Sen", email = "senrajat@google.com"},
