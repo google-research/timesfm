@@ -1,17 +1,20 @@
 # This project can be installed with `python3 -m pip install -e .` from the main directory. 
 
 [project]
-name = "timesfm"
+name = "timesfm-jax"
 description = "Open weights time-series foundation model from Google Research."
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
-    "einshape>=1.0.0",
-    "paxml>=1.4.0",
-    "praxis>=1.4.0",
-    "jax>=0.4.26",
-    "numpy>=1.26.4",
-    "pandas>=2.1.4",
-    "scikit-learn>=1.5.1",
+    "jax==0.4.26",
+    "paxml==1.4.0",
+    "praxis==1.4.0",
+    "jaxlib==0.4.26",
+    "numpy==1.26.4",
+    "pandas==2.1.4",
+    "einshape==1.0.0",
+    "utilsforecast==0.1.10",
+    "huggingface_hub[cli]==0.23.0", 
+    "scikit-learn==1.5.1",
 ]
 authors = [
      {name = "Rajat Sen", email = "senrajat@google.com"},
