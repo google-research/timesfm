@@ -14,6 +14,8 @@ to download model checkpoints.
 
 This is not an officially supported Google product.
 
+We recommend at least 16GB RAM to load TimesFM dependencies.
+
 ## Checkpoint timesfm-1.0-200m
 
 timesfm-1.0-200m is the first open model checkpoint:
@@ -32,51 +34,28 @@ Please look into the README files in the respective benchmark directories within
 
 ### Installation as a package
 
-To install the CPU version of TimesFM as a package, you can run the following command without cloning this repo:
+To install the GPU/default version of TimesFM as a package, you can run the following command without cloning this repo:
 
 `pip install timesfm`
 
 The package is currently using https://pypi.org/project/timesfm/.
 
-### Poetry (CPU) installation
+To install the CPU version of TimesFM, you can run the command `pip install timesfm[cpu]`
 
-To install the CPU environment using Poetry, you can run the following command:
+### Local installation
+
+To from the current repository/local version (like you would have previously done with `pip -e .`), you can run the command
 
 ```
 pip install poetry # optional
 poetry install
 ```
 
+If you prefer the CPU version, run the command `poetry install -E cpu`
+
 This will install the environment in the local .venv folder (depends on the configuration) and matches the python command to the poetry environment. If this is not the case, you can use `poetry run python` to use the local environment.
 
-### Conda / GPU installation
-
-We recommend at least 16GB RAM to load TimesFM dependencies.
-
-For calling TimesFM, We have two environment files. Inside `timesfm`, for
-GPU installation (assuming CUDA 12 has been setup), you can create a conda
-environment `tfm_env` from the base folder through:
-
-```
-conda env create --file=environment.yml
-```
-
-For a CPU setup please use,
-
-```
-conda env create --file=environment_cpu.yml
-```
-to create the environment instead.
-
-Follow by
-
-```
-conda activate tfm_env
-pip install -e .
-```
-to install the package.
-
-**Note**: 
+## Notes
 
 1. Running the provided benchmarks would require additional dependencies.
 Please use the environment files under `experiments` instead.

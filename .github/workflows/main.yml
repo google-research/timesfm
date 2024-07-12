@@ -20,7 +20,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install poetry
-      # use the hardcoded version number for now
+      # use the hardcoded version number for now. if this is merged to the main repo, you can uncomment these lines to automatically tag the version number with the github run number
       # - name: Set Version number
       #   run: |
       #     poetry version 0.0.${{ github.run_number }}
