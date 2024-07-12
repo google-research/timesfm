@@ -24,9 +24,9 @@ import numpy as np
 import pandas as pd
 from paxml import checkpoints
 import timesfm
+from timesfm import data_loader
 import torch
 import tqdm
-from . import data_loader
 
 
 FLAGS = flags.FLAGS

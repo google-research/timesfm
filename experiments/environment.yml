@@ -22,3 +22,7 @@ dependencies:
     - paxml
     - jax[cuda12]==0.4.26
     - einshape
+    - python-dotenv
+    - nixtla>=0.5.1
+    - rich
+    - scikit-learn

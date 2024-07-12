@@ -14,6 +14,7 @@
 
 """TimesFM forecast API for inference."""
 
+import collections
 import logging
 import multiprocessing
 from os import path
@@ -21,11 +22,11 @@ import time
 from typing import Any, Literal, Optional, Sequence
 
 import einshape as es
+from huggingface_hub import snapshot_download
 import jax
 import jax.numpy as jnp
 import numpy as np
 import pandas as pd
-from huggingface_hub import snapshot_download
 from paxml import checkpoints
 from paxml import tasks_lib
 from praxis import base_hyperparams
@@ -35,12 +36,19 @@ from praxis import py_utils
 from praxis import pytypes
 from praxis.layers import normalizations
 from praxis.layers import transformers
-import patched_decoder
+
 from utilsforecast.processing import make_future_dataframe
+
+from . import patched_decoder
+from . import xreg_lib
 
 instantiate = base_hyperparams.instantiate
 NestedMap = py_utils.NestedMap
 JTensor = pytypes.JTensor
+Category = xreg_lib.Category
+XRegMode = xreg_lib.XRegMode
+
+_TOL = 1e-6
 
 
 def process_group(key, group, value_name, forecast_context_len):
@@ -76,6 +84,20 @@ def freq_map(freq: str):
     return 2
   else:
     raise ValueError(f"Invalid frequency: {freq}")
+
+
+# Per time series normalization: forward.
+def _normalize(batch):
+  stats = [
+      (np.mean(x), np.where((w := np.std(x)) > _TOL, w, 1.0)) for x in batch
+  ]
+  new_batch = [(x - stat[0]) / stat[1] for x, stat in zip(batch, stats)]
+  return new_batch, stats
+
+
+# Per time series normalization: inverse.
+def _renormalize(batch, stats):
+  return [x * stat[1] + stat[0] for x, stat in zip(batch, stats)]
 
 
 class TimesFm:
@@ -157,6 +179,7 @@ class TimesFm:
     self.horizon_len = horizon_len
     self.input_patch_len = input_patch_len
     self.output_patch_len = output_patch_len
+    self._horizon_start = self.context_len - self.input_patch_len
 
     self.mesh_shape = [1, self.num_devices, 1]
     self.mesh_name = ["replica", "data", "mdl"]
@@ -277,6 +300,10 @@ class TimesFm:
     self._logging(
         f"Restored checkpoint in {time.time() - start_time:.2f} seconds."
     )
+    self.jit_decode()
+
+  def jit_decode(self):
+    """Jitting decoding function."""
 
     # Initialize and jit the decode fn.
     def _decode(inputs):
@@ -288,6 +315,7 @@ class TimesFm:
           horizon_len=self.horizon_len,
           output_patch_len=self.output_patch_len,
           max_len=self.context_len,
+          return_forecast_on_context=True,
           rngs={
               base_layer.PARAMS: self._key1,
               base_layer.RANDOM: self._key2,
@@ -397,6 +425,7 @@ class TimesFm:
       freq: Sequence[int] | None = None,
       window_size: int | None = None,
       forecast_context_len: int | None = None,
+      return_forecast_on_context: bool = False,
   ) -> tuple[JTensor, JTensor]:
     """Forecasts on a list of time series.
 
@@ -409,6 +438,8 @@ class TimesFm:
       window_size: window size of trend + residual decomposition. If None then
         we do not do decomposition.
       forecast_context_len: optional max context length.
+      return_forecast_on_context: True to return the forecast on the context
+        when available, i.e. after the first input patch.
 
     Returns:
     A tuple for JTensors:
@@ -480,6 +511,9 @@ class TimesFm:
             ),
         })
         mean_output, full_output = self._pmapped_decode(pmapped_inputs)
+        if not return_forecast_on_context:
+          mean_output = mean_output[:, :, self._horizon_start :, ...]
+          full_output = full_output[:, :, self._horizon_start :, ...]
         mean_output = es.jax_einshape(
             "db...->(db)...", mean_output, d=self.num_devices
         )
@@ -505,6 +539,240 @@ class TimesFm:
       mean_outputs = np.maximum(mean_outputs, 0.0)
       full_outputs = np.maximum(full_outputs, 0.0)
     return mean_outputs, full_outputs
+
+  def forecast_with_covariates(
+      self,
+      inputs: list[Sequence[float]],
+      dynamic_numerical_covariates: (
+          dict[str, Sequence[Sequence[float]]] | None
+      ) = None,
+      dynamic_categorical_covariates: (
+          dict[str, Sequence[Sequence[Category]]] | None
+      ) = None,
+      static_numerical_covariates: dict[str, Sequence[float]] | None = None,
+      static_categorical_covariates: (
+          dict[str, Sequence[Category]] | None
+      ) = None,
+      freq: Sequence[int] | None = None,
+      window_size: int | None = None,
+      forecast_context_len: int | None = None,
+      xreg_mode: XRegMode = "xreg + timesfm",
+      normalize_xreg_target_per_input: bool = True,
+      ridge: float = 0.0,
+      max_rows_per_col: int = 0,
+      force_on_cpu: bool = False,
+  ):
+    """Forecasts on a list of time series with covariates.
+
+    To optimize inference speed, avoid string valued categorical covariates.
+
+    Args:
+      inputs: A list of time series forecast contexts. Each context time series
+        should be in a format convertible to JTensor by `jnp.array`.
+      dynamic_numerical_covariates: A dict of dynamic numerical covariates.
+      dynamic_categorical_covariates: A dict of dynamic categorical covariates.
+      static_numerical_covariates: A dict of static numerical covariates.
+      static_categorical_covariates: A dict of static categorical covariates.
+      freq: frequency of each context time series. 0 for high frequency
+        (default), 1 for medium, and 2 for low. Notice this is different from
+        the `freq` required by `forecast_on_df`.
+      window_size: window size of trend + residual decomposition. If None then
+        we do not do decomposition.
+      forecast_context_len: optional max context length.
+      xreg_mode: one of "xreg + timesfm" or "timesfm + xreg". "xreg + timesfm"
+        fits a model on the residuals of the TimesFM forecast. "timesfm + xreg"
+        fits a model on the targets then forecasts on the residuals via TimesFM.
+      normalize_xreg_target_per_input: whether to normalize the xreg target per
+        input in the given batch.
+      ridge: ridge penalty for the linear model.
+      max_rows_per_col: max number of rows per column for the linear model.
+      force_on_cpu: whether to force running on cpu for the linear model.
+
+    Returns:
+      A tuple of two lists. The first is the outputs of the model. The second is
+      the outputs of the xreg.
+    """
+
+    # Verify and bookkeep covariates.
+    if not (
+        dynamic_numerical_covariates
+        or dynamic_categorical_covariates
+        or static_numerical_covariates
+        or static_categorical_covariates
+    ):
+      raise ValueError(
+          "At least one of dynamic_numerical_covariates,"
+          " dynamic_categorical_covariates, static_numerical_covariates,"
+          " static_categorical_covariates must be set."
+      )
+
+    # Track the lengths of (1) each input, (2) the part that can be used in the
+    # linear model, and (3) the horizon.
+    input_lens, train_lens, test_lens = [], [], []
+
+    for i, input_ts in enumerate(inputs):
+      input_len = len(input_ts)
+      input_lens.append(input_len)
+
+      if xreg_mode == "timesfm + xreg":
+        # For fitting residuals, no TimesFM forecast on the first patch.
+        train_lens.append(max(0, input_len - self.input_patch_len))
+      elif xreg_mode == "xreg + timesfm":
+        train_lens.append(input_len)
+      else:
+        raise ValueError(f"Unsupported mode: {xreg_mode}")
+
+      if dynamic_numerical_covariates:
+        test_lens.append(
+            len(list(dynamic_numerical_covariates.values())[0][i]) - input_len
+        )
+      elif dynamic_categorical_covariates:
+        test_lens.append(
+            len(list(dynamic_categorical_covariates.values())[0][i]) - input_len
+        )
+      else:
+        test_lens.append(self.horizon_len)
+
+      if test_lens[-1] > self.horizon_len:
+        raise ValueError(
+            "Forecast requested longer horizon than the model definition "
+            f"supports: {test_lens[-1]} vs {self.horizon_len}."
+        )
+
+    # Prepare the covariates into train and test.
+    train_dynamic_numerical_covariates = collections.defaultdict(list)
+    test_dynamic_numerical_covariates = collections.defaultdict(list)
+    train_dynamic_categorical_covariates = collections.defaultdict(list)
+    test_dynamic_categorical_covariates = collections.defaultdict(list)
+    for covariates, train_covariates, test_covariates in (
+        (
+            dynamic_numerical_covariates,
+            train_dynamic_numerical_covariates,
+            test_dynamic_numerical_covariates,
+        ),
+        (
+            dynamic_categorical_covariates,
+            train_dynamic_categorical_covariates,
+            test_dynamic_categorical_covariates,
+        ),
+    ):
+      if not covariates:
+        continue
+      for covariate_name, covariate_values in covariates.items():
+        for input_len, train_len, covariate_value in zip(
+            input_lens, train_lens, covariate_values
+        ):
+          train_covariates[covariate_name].append(
+              covariate_value[(input_len - train_len) : input_len]
+          )
+          test_covariates[covariate_name].append(covariate_value[input_len:])
+
+    # Fit models.
+    if xreg_mode == "timesfm + xreg":
+      # Forecast via TimesFM then fit a model on the residuals.
+      mean_outputs, _ = self.forecast(
+          inputs,
+          freq,
+          window_size,
+          forecast_context_len,
+          return_forecast_on_context=True,
+      )
+      targets = [
+          (
+              np.array(input_ts)[-train_len:]
+              - mean_output[
+                  (self._horizon_start - train_len) : self._horizon_start
+              ]
+          )
+          for input_ts, mean_output, train_len in zip(
+              inputs, mean_outputs, train_lens
+          )
+      ]
+      per_instance_stats = None
+      if normalize_xreg_target_per_input:
+        targets, per_instance_stats = _normalize(targets)
+      xregs = xreg_lib.BatchedInContextXRegLinear(
+          targets=targets,
+          train_lens=train_lens,
+          test_lens=test_lens,
+          train_dynamic_numerical_covariates=train_dynamic_numerical_covariates,
+          test_dynamic_numerical_covariates=test_dynamic_numerical_covariates,
+          train_dynamic_categorical_covariates=train_dynamic_categorical_covariates,
+          test_dynamic_categorical_covariates=test_dynamic_categorical_covariates,
+          static_numerical_covariates=static_numerical_covariates,
+          static_categorical_covariates=static_categorical_covariates,
+      ).fit(
+          ridge=ridge,
+          one_hot_encoder_drop=None if ridge > 0 else "first",
+          max_rows_per_col=max_rows_per_col,
+          force_on_cpu=force_on_cpu,
+          debug_info=False,
+          assert_covariates=True,
+          assert_covariate_shapes=True,
+      )
+      if normalize_xreg_target_per_input:
+        xregs = _renormalize(xregs, per_instance_stats)
+      outputs = [
+          (
+              mean_output[
+                  self._horizon_start : (self._horizon_start + test_len)
+              ]
+              + xreg
+          )
+          for mean_output, test_len, xreg in zip(mean_outputs, test_lens, xregs)
+      ]
+
+    else:
+      # Fit a model on the targets then forecast on the residuals via TimesFM.
+      targets = [
+          np.array(input_ts)[-train_len:]
+          for input_ts, train_len in zip(inputs, train_lens)
+      ]
+      per_instance_stats = None
+      if normalize_xreg_target_per_input:
+        targets, per_instance_stats = _normalize(targets)
+      xregs, xregs_on_context, _, _, _ = xreg_lib.BatchedInContextXRegLinear(
+          targets=targets,
+          train_lens=train_lens,
+          test_lens=test_lens,
+          train_dynamic_numerical_covariates=train_dynamic_numerical_covariates,
+          test_dynamic_numerical_covariates=test_dynamic_numerical_covariates,
+          train_dynamic_categorical_covariates=train_dynamic_categorical_covariates,
+          test_dynamic_categorical_covariates=test_dynamic_categorical_covariates,
+          static_numerical_covariates=static_numerical_covariates,
+          static_categorical_covariates=static_categorical_covariates,
+      ).fit(
+          ridge=ridge,
+          one_hot_encoder_drop=None if ridge > 0 else "first",
+          max_rows_per_col=max_rows_per_col,
+          force_on_cpu=force_on_cpu,
+          debug_info=True,
+          assert_covariates=True,
+          assert_covariate_shapes=True,
+      )
+      mean_outputs, _ = self.forecast(
+          [
+              target - xreg_on_context
+              for target, xreg_on_context in zip(targets, xregs_on_context)
+          ],
+          freq,
+          window_size,
+          forecast_context_len,
+          return_forecast_on_context=True,
+      )
+      outputs = [
+          (
+              mean_output[
+                  self._horizon_start : (self._horizon_start + test_len)
+              ]
+              + xreg
+          )
+          for mean_output, test_len, xreg in zip(mean_outputs, test_lens, xregs)
+      ]
+      if normalize_xreg_target_per_input:
+        outputs = _renormalize(outputs, per_instance_stats)
+
+    return outputs, xregs
 
   def forecast_on_df(
       self,

@@ -24,6 +24,7 @@ import einshape as es
 from jax import lax
 import jax.numpy as jnp
 from praxis import base_layer
+from praxis import base_model
 from praxis import layers
 from praxis import pax_fiddle
 from praxis import py_utils
@@ -49,6 +50,7 @@ DEFAULT_QUANTILES = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 
 # NestedMap keys
 _INPUT_TS = "input_ts"
+_TARGET_FUTURE = "actual_ts"
 _INPUT_PADDING = "input_padding"
 _OUTPUT_TS = "output_ts"
 _FREQ = "freq"
@@ -324,15 +326,19 @@ class PatchedTimeSeriesDecoder(base_layer.BaseLayer):
     """Preprocess input for stacked transformer."""
     # Reshape into patches.
     patched_inputs = es.jax_einshape("b(np)->bnp", input_ts, p=self.patch_len)
-    input_padding = jnp.where(
-        jnp.abs(input_ts - PAD_VAL) < _TOLERANCE, 1, input_padding
-    )
     patched_pads = es.jax_einshape(
         "b(np)->bnp", input_padding, p=self.patch_len
+    )
+    patched_inputs = jnp.where(
+        jnp.abs(patched_pads - 1.0) < _TOLERANCE, 0.0, patched_inputs
+    )
+    patched_pads = jnp.where(
+        jnp.abs(patched_inputs - PAD_VAL) < _TOLERANCE, 1, patched_pads
     )
     patched_inputs, stats = self._forward_transform(
         patched_inputs, patched_pads
     )
+
     # B x N x D
     patched_inputs = patched_inputs * (1.0 - patched_pads)
     concat_inputs = jnp.concatenate([patched_inputs, patched_pads], axis=-1)
@@ -404,6 +410,7 @@ class PatchedTimeSeriesDecoder(base_layer.BaseLayer):
       horizon_len: int,
       output_patch_len: Optional[int] = None,
       max_len: int = 512,
+      return_forecast_on_context: bool = False,
   ) -> tuple[JTensor, JTensor]:
     """Auto-regressive decoding without caching.
 
@@ -414,15 +421,19 @@ class PatchedTimeSeriesDecoder(base_layer.BaseLayer):
       output_patch_len: output length to be fetched from one step of
         auto-regressive decoding.
       max_len: maximum training context length.
+      return_forecast_on_context: whether to return the model forecast on the
+        context except the first input patch.
 
     Returns:
       Tuple of two forecasting results:
-      - Point (mean) output predictions as a tensor with shape B x H.
+      - Point (mean) output predictions as a tensor with shape B x H'.
       - Full predictions (mean and quantiles) as a tensor with shape
-        B x H x (1 + # quantiles).
+        B x H' x (1 + # quantiles).
+      In particular, if return_forecast_on_context is True, H' is H plus
+      the forecastable context length, i.e. context_len - (first) patch_len.
     """
     final_out = inputs[_INPUT_TS]
-    inp_time_len = final_out.shape[1]
+    context_len = final_out.shape[1]
     paddings = inputs[_INPUT_PADDING]
     if self.use_freq:
       freq = inputs[_FREQ].astype(jnp.int32)
@@ -439,7 +450,7 @@ class PatchedTimeSeriesDecoder(base_layer.BaseLayer):
     num_decode_patches = (
         horizon_len + output_patch_len - 1
     ) // output_patch_len
-    for _ in range(num_decode_patches):
+    for step_index in range(num_decode_patches):
       current_padding = paddings[:, 0 : final_out.shape[1]]
       input_ts = final_out[:, -max_len:]
       input_padding = current_padding[:, -max_len:]
@@ -449,13 +460,96 @@ class PatchedTimeSeriesDecoder(base_layer.BaseLayer):
           freq=freq,
       )
       fprop_outputs = self(model_input)[_OUTPUT_TS]
+      if return_forecast_on_context and step_index == 0:
+        # For the first decodings step, collect the model forecast on the
+        # context except the unavailable first input batch forecast.
+        new_full_ts = fprop_outputs[:, :-1, : self.patch_len, :]
+        new_full_ts = es.jax_einshape("bnph->b(np)h", new_full_ts)
+
+        full_outputs.append(new_full_ts)
+
       # (full batch, last patch, output_patch_len, index of mean forecast = 0)
       new_ts = fprop_outputs[:, -1, :output_patch_len, 0]
+      new_full_ts = fprop_outputs[:, -1, :output_patch_len, :]
       # (full batch, last patch, output_patch_len, all output indices)
-      full_outputs.append(fprop_outputs[:, -1, :output_patch_len, :])
+      full_outputs.append(new_full_ts)
       final_out = jnp.concatenate([final_out, new_ts], axis=-1)
 
-    return (
-        final_out[:, inp_time_len : inp_time_len + horizon_len],
-        jnp.concatenate(full_outputs, axis=1)[:, 0:horizon_len, :],
+    if return_forecast_on_context:
+      # `full_outputs` indexing starts at after the first input patch.
+      full_outputs = jnp.concatenate(full_outputs, axis=1)[
+          :, : (context_len - self.patch_len + horizon_len), :
+      ]
+    else:
+      # `full_outputs` indexing starts at the forecast horizon.
+      full_outputs = jnp.concatenate(full_outputs, axis=1)[:, 0:horizon_len, :]
+
+    return (full_outputs[:, :, 0], full_outputs)
+
+
+class PatchedDecoderFinetuneModel(base_model.BaseModel):
+  """Model class for finetuning patched time-series decoder.
+
+  Attributes:
+    core_layer_tpl: config for core layer.
+    freq: freq to finetune on.
+  """
+
+  core_layer_tpl: LayerTpl = template_field(PatchedTimeSeriesDecoder)
+  freq: int = 0
+
+  def setup(self) -> None:
+    self.create_child("core_layer", self.core_layer_tpl)
+
+  def compute_predictions(self, input_batch: NestedMap) -> NestedMap:
+    input_ts = input_batch[_INPUT_TS]
+    input_padding = jnp.zeros_like(input_ts)
+    context_len = input_ts.shape[1]
+    input_patch_len = self.core_layer_tpl.patch_len
+    context_pad = (
+        (context_len + input_patch_len - 1) // input_patch_len
+    ) * input_patch_len - context_len
+
+    input_ts = jnp.pad(input_ts, [(0, 0), (context_pad, 0)])
+    input_padding = jnp.pad(
+        input_padding, [(0, 0), (context_pad, 0)], constant_values=1
     )
+    freq = jnp.ones([input_ts.shape[0], 1], dtype=jnp.int32) * self.freq
+    new_input_batch = NestedMap(
+        input_ts=input_ts,
+        input_padding=input_padding,
+        freq=freq,
+    )
+    return self.core_layer(new_input_batch)
+
+  def _quantile_loss(
+      self, pred: JTensor, actual: JTensor, quantile: float
+  ) -> JTensor:
+    """Calculates quantile loss.
+
+    Args:
+      pred: B x T
+      actual: B x T
+      quantile: quantile at which loss is computed.
+
+    Returns:
+      per coordinate loss.
+    """
+    dev = actual - pred
+    loss_first = dev * quantile
+    loss_second = -dev * (1.0 - quantile)
+    return 2 * jnp.where(loss_first >= 0, loss_first, loss_second)
+
+  def compute_loss(
+      self, prediction_output: NestedMap, input_batch: NestedMap
+  ) -> Tuple[NestedMap, NestedMap]:
+    output_ts = prediction_output[_OUTPUT_TS]
+    actual_ts = input_batch[_TARGET_FUTURE]
+    pred_ts = output_ts[:, -1, 0 : actual_ts.shape[1], :]
+    loss = jnp.square(pred_ts[:, :, 0] - actual_ts)
+    for i, quantile in enumerate(self.core_layer.quantiles):
+      loss += self._quantile_loss(pred_ts[:, :, i + 1], actual_ts, quantile)
+    loss = loss.mean()
+    loss_weight = jnp.array(1.0, dtype=jnp.float32)
+    per_example_out = NestedMap()
+    return {"avg_qloss": (loss, loss_weight)}, per_example_out

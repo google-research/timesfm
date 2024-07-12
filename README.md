@@ -24,7 +24,7 @@ timesfm-1.0-200m is the first open model checkpoint:
 
 ## Benchmarks
 
-Please refer to our result tables on the [extended benchmarks](./experiments/extended_benchmarks/tfm_results.png) and the [long horizon benchmarks](./experiments/long_horizon_benchmarks/tfm_long_horizon.png).
+Please refer to our result tables on the [extended benchmarks](https://github.com/google-research/timesfm/tree/master/experiments/extended_benchmarks) and the [long horizon benchmarks](https://github.com/google-research/timesfm/tree/master/experiments/long_horizon_benchmarks).
 
 Please look into the README files in the respective benchmark directories within `experiments/` for instructions for running TimesFM on the respective benchmarks.
 
@@ -50,6 +50,8 @@ poetry install
 This will install the environment in the local .venv folder (depends on the configuration) and matches the python command to the poetry environment. If this is not the case, you can use `poetry run python` to use the local environment.
 
 ### Conda / GPU installation
+
+We recommend at least 16GB RAM to load TimesFM dependencies.
 
 For calling TimesFM, We have two environment files. Inside `timesfm`, for
 GPU installation (assuming CUDA 12 has been setup), you can create a conda
@@ -184,4 +186,24 @@ forecast_df = tfm.forecast_on_df(
     freq="M",  # monthly
     value_name="y",
     num_jobs=-1,
-)```
+)
+```
+
+## Finetuning
+
+We have provided an example of finetuning the model on a new dataset in `notebooks/finetuning.ipynb`.
+
+## Contribution Style guide
+
+If you would like to submit a PR please make sure that you use our formatting style. We use [yapf](https://github.com/google/yapf) for formatting with the following options,
+
+```
+[style]
+based_on_style = google
+# Add your custom style rules here
+indent_width = 2
+spaces_before_comment = 2
+
+```
+
+Please run `yapf --in-place --recursive <filename>` on all affected files.
