@@ -783,6 +783,7 @@ class TimesFm:
       model_name: str = "timesfm",
       window_size: int | None = None,
       num_jobs: int = 1,
+      verbose: bool = True,
   ) -> pd.DataFrame:
     """Forecasts on a list of time series.
 
@@ -800,6 +801,7 @@ class TimesFm:
       window_size: window size of trend + residual decomposition. If None then
         we do not do decomposition.
       num_jobs: number of parallel processes to use for dataframe processing.
+      verbose: output model states in terminal.
 
     Returns:
       Future forecasts dataframe.
@@ -819,7 +821,8 @@ class TimesFm:
     new_inputs = []
     uids = []
     if num_jobs == 1:
-      print("Processing dataframe with single process.")
+      if verbose:
+        print("Processing dataframe with single process.")
       for key, group in df_sorted.groupby("unique_id"):
         inp, uid = process_group(
             key,
@@ -832,7 +835,8 @@ class TimesFm:
     else:
       if num_jobs == -1:
         num_jobs = multiprocessing.cpu_count()
-      print("Processing dataframe with multiple processes.")
+      if verbose:
+        print("Processing dataframe with multiple processes.")
       with multiprocessing.Pool(processes=num_jobs) as pool:
         results = pool.starmap(
             process_group,
@@ -842,12 +846,14 @@ class TimesFm:
             ],
         )
       new_inputs, uids = zip(*results)
-    print("Finished preprocessing dataframe.")
+    if verbose:
+        print("Finished preprocessing dataframe.")
     freq_inps = [freq_map(freq)] * len(new_inputs)
     _, full_forecast = self.forecast(
         new_inputs, freq=freq_inps, window_size=window_size
     )
-    print("Finished forecasting.")
+    if verbose:
+        print("Finished forecasting.")
     fcst_df = make_future_dataframe(
         uids=uids,
         last_times=df_sorted.groupby("unique_id")["ds"].tail(1),
