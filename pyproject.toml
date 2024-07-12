@@ -1,7 +1,7 @@
 # This project can be installed with `python3 -m pip install -e .` from the main directory. 
 
 [project]
-name = "timesfm-jax"
+name = "timesfm"
 description = "Open weights time-series foundation model from Google Research."
 version = "1.0.1"
 dependencies = [
