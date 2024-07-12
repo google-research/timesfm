@@ -30,18 +30,15 @@ include = [
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.11"
-einshape = ">=1.0.0"
-numpy = ">=1.26.4"
-pandas = ">=2.1.4"
+einshape = "1.0.0"
+numpy = "1.26.4"
+pandas = "2.1.4"
 paxml = "1.4.0"
-utilsforecast = "^0.1.10"
-jax = {version = "0.4.26", extras = ["cuda12"]}
-# unfortunately we have to solve it using https://stackoverflow.com/questions/72037181/how-to-add-optional-dependencies-of-a-library-as-extra-in-poetry-and-pyproject
-Jax = {version = "0.4.26", extras = ["cpu"], optional = true}
-
-[tool.poetry.extras]
-cpu = ['Jax']
-
+utilsforecast = "0.1.10"
+jax = "0.4.26"
+jaxlib = "0.4.26"
+huggingface_hub = {version = "0.23.0", extras = ["cli"]}
+scikit-learn = "1.5.1"
 
 [build-system]
 requires = ["poetry-core"]

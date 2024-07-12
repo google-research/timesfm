@@ -1,0 +1,18 @@
+name: tfm_env
+
+channels:
+  - conda-forge
+  - defaults
+  - anaconda
+dependencies:
+  - jupyterlab
+  - pip
+  - python=3.10
+  - pip:
+    - huggingface_hub[cli]
+    - utilsforecast
+    - praxis
+    - paxml
+    - jax[cuda12]==0.4.26
+    - einshape
+    - scikit-learn
