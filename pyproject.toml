@@ -5,7 +5,7 @@ name = "timesfm-jax"
 description = "Open weights time-series foundation model from Google Research."
 version = "1.0.1"
 dependencies = [
-    "jax==0.4.26",
+    "jax[cuda12]==0.4.26",
     "paxml==1.4.0",
     "praxis==1.4.0",
     "jaxlib==0.4.26",
