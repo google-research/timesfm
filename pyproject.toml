@@ -14,7 +14,7 @@ dependencies = [
     "einshape==1.0.0",
     "utilsforecast==0.1.10",
     "huggingface_hub[cli]==0.23.0", 
-    "scikit-learn==1.5.1",
+    "scikit-learn==1.0.2",
 ]
 authors = [
      {name = "Rajat Sen", email = "senrajat@google.com"},
