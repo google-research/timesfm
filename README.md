@@ -14,6 +14,8 @@ to download model checkpoints.
 
 This is not an officially supported Google product.
 
+We recommend at least 16GB RAM to load TimesFM dependencies.
+
 ## Checkpoint timesfm-1.0-200m
 
 timesfm-1.0-200m is the first open model checkpoint:
@@ -30,7 +32,13 @@ Please look into the README files in the respective benchmark directories within
 
 ## Installation
 
-We recommend at least 16GB RAM to load TimesFM dependencies.
+### Installation as a package
+
+To install the TimesFM as a package, you can run the following command without cloning this repo:
+
+`pip install timesfm`
+
+### Installation using conda
 
 For calling TimesFM, We have two environment files. Inside `timesfm`, for
 GPU installation (assuming CUDA 12 has been setup), you can create a conda
@@ -61,6 +69,31 @@ to install the package.
 Please use the environment files under `experiments` instead.
 
 2. The dependency `lingvo` does not support ARM architectures, and the code is not working for machines with Apple silicon. We are aware of this issue and are working on a solution. Stay tuned.
+
+
+### Local installation using poetry
+
+To from the current repository/local version (like you would have previously done with `pip -e .`), you can run the command
+
+```
+pip install poetry # optional
+poetry install
+```
+
+This will install the environment in the local .venv folder (depends on the configuration) and matches the python command to the poetry environment. If this is not the case, you can use `poetry run python` to use the local environment.
+
+### Notes
+
+1. Running the provided benchmarks would require additional dependencies.
+Please use the environment files under `experiments` instead.
+
+2. The dependency `lingvo` does not support ARM architectures, and the code is not working for machines with Apple silicon. We are aware of this issue and are working on a solution. Stay tuned.
+
+#### Building the package and publishing to PyPI
+
+The package can be built using the command `poetry build`.
+
+To build and publish it to PyPI, the command `poetry publish` can be used. This command will require the user to have the necessary permissions to publish to the PyPI repository.
 
 ## Usage 
 

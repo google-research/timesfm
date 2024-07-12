@@ -1,0 +1,3 @@
+.venv/
+dist/
+**__pycache__/** */
