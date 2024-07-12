@@ -4,7 +4,7 @@ packages = [
     { include = "*", from = "src" },
 ]
 description = "Open weights time-series foundation model from Google Research."
-version = "0.0.12"
+version = "1.0.1"
 authors = [
     "Rajat Sen <senrajat@google.com>",
     "Yichen Zhou <yichenzhou@google.com>",
@@ -38,7 +38,7 @@ utilsforecast = "0.1.10"
 jax = {version = "0.4.26", extras = ["cuda12"]}
 jaxlib = "0.4.26"
 huggingface_hub = {version = "0.23.0", extras = ["cli"]}
-scikit-learn = "1.5.1"
+scikit-learn = "1.0.2"
 
 [build-system]
 requires = ["poetry-core"]
