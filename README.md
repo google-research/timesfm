@@ -34,13 +34,9 @@ Please look into the README files in the respective benchmark directories within
 
 ### Installation as a package
 
-To install the GPU/default version of TimesFM as a package, you can run the following command without cloning this repo:
+To install the TimesFM as a package, you can run the following command without cloning this repo:
 
 `pip install timesfm`
-
-The package is currently using https://pypi.org/project/timesfm/.
-
-To install the CPU version of TimesFM, you can run the command `pip install timesfm[cpu]`
 
 ### Local installation
 
@@ -50,8 +46,6 @@ To from the current repository/local version (like you would have previously don
 pip install poetry # optional
 poetry install
 ```
-
-If you prefer the CPU version, run the command `poetry install -E cpu`
 
 This will install the environment in the local .venv folder (depends on the configuration) and matches the python command to the poetry environment. If this is not the case, you can use `poetry run python` to use the local environment.
 
