@@ -19,7 +19,7 @@ We recommend at least 16GB RAM to load TimesFM dependencies.
 ## Update - July 15, 2024
 
 - Launched [finetuning support](https://github.com/google-research/timesfm/blob/master/notebooks/finetuning.ipynb) that lets you finetune the weights of the pretrained TimesFM model on your own data.
-- Launched [~zero-shot covariate support](https://github.com/google-research/timesfm/blob/master/notebooks/covariates.ipynb) with external regressors.
+- Launched [~zero-shot covariate support](https://github.com/google-research/timesfm/blob/master/notebooks/covariates.ipynb) with external regressors. More details [here](https://github.com/google-research/timesfm?tab=readme-ov-file#covariates-support).
 
 ## Checkpoint timesfm-1.0-200m
 
@@ -241,7 +241,7 @@ In this example, besides the `Daily_sales`, we also have covariates `Category`, 
 
 **Notice:** Here we make it mandatory that the dynamic covariates need to cover both the forecasting context and horizon. For example, all dynamic covariates in the example have 14 values: the first 7 correspond to the observed 7 days, and the last 7 correspond to the next 7 days.
 
-We can now provide the past data of the two products along with static and dynamic covariates as a batch input to TimesFM and produc forecasts that take into the account the covariates. To learn more, check out the example in `notebooks/covariates.ipynb`.
+We can now provide the past data of the two products along with static and dynamic covariates as a batch input to TimesFM and produce forecasts that take into the account the covariates. To learn more, check out the example in `notebooks/covariates.ipynb`.
 
 ## Finetuning
 
