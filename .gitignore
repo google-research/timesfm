@@ -5,3 +5,4 @@ checkpoints/
 wandb/
 datasets/
 results/
+timesfm_jax.egg-info/
