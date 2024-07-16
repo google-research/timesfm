@@ -13,14 +13,11 @@
 # limitations under the License.
 
 from jax import numpy as jnp
-from praxis import base_layer, pytypes
-from praxis.layers.attentions import AttentionProjection, CombinedQKVProjectionLayer
-from praxis.layers.linears import Linear
+from praxis import base_layer
+from praxis.layers import attentions, linears
 
 WeightInit = base_layer.WeightInit
-template_field = base_layer.template_field
 WeightHParams = base_layer.WeightHParams
-JTensor = pytypes.JTensor
 
 
 class DoraTheta(base_layer.Theta):
@@ -83,7 +80,7 @@ class DoraThetaDescriptor:
         return DoraTheta(obj)
 
 
-class DoraLinear(Linear):
+class DoraLinear(linears.Linear):
     rank: int = 0
     lora_init: WeightInit | None = None
     theta = DoraThetaDescriptor()
@@ -121,7 +118,7 @@ class DoraLinear(Linear):
         )
 
 
-class DoraAttentionProjection(AttentionProjection):
+class DoraAttentionProjection(attentions.AttentionProjection):
     rank: int = 0
     lora_init: WeightInit | None = None
     theta = DoraThetaDescriptor()
@@ -166,7 +163,7 @@ class DoraAttentionProjection(AttentionProjection):
         )
 
 
-class DoraCombinedQKVProjection(CombinedQKVProjectionLayer):
+class DoraCombinedQKVProjection(attentions.CombinedQKVProjectionLayer):
     rank: int = 0
     lora_init: WeightInit | None = None
     theta = DoraThetaDescriptor()

@@ -13,15 +13,11 @@
 # limitations under the License.
 
 from jax import numpy as jnp
-from praxis import base_layer, pax_fiddle, pytypes
-from praxis.layers.attentions import AttentionProjection, CombinedQKVProjectionLayer
-from praxis.layers.linears import Linear
+from praxis import base_layer
+from praxis.layers import attentions, linears
 
 WeightInit = base_layer.WeightInit
-LayerTpl = pax_fiddle.Config[base_layer.BaseLayer]
-template_field = base_layer.template_field
 WeightHParams = base_layer.WeightHParams
-JTensor = pytypes.JTensor
 
 
 class LoraTheta(base_layer.Theta):
@@ -75,7 +71,7 @@ class LoraThetaDescriptor:
         return LoraTheta(obj)
 
 
-class LoraLinear(Linear):
+class LoraLinear(linears.Linear):
     rank: int = 0
     lora_init: WeightInit | None = None
     theta = LoraThetaDescriptor()
@@ -104,7 +100,7 @@ class LoraLinear(Linear):
         )
 
 
-class LoraAttentionProjection(AttentionProjection):
+class LoraAttentionProjection(attentions.AttentionProjection):
     rank: int = 0
     lora_init: WeightInit | None = None
     theta = LoraThetaDescriptor()
@@ -140,7 +136,7 @@ class LoraAttentionProjection(AttentionProjection):
         )
 
 
-class LoraCombinedQKVProjection(CombinedQKVProjectionLayer):
+class LoraCombinedQKVProjection(attentions.CombinedQKVProjectionLayer):
     rank: int = 0
     lora_init: WeightInit | None = None
     theta = LoraThetaDescriptor()
