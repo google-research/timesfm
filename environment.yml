@@ -1,4 +1,4 @@
-name: ok_tfm_env
+name: tfm_env
 
 channels:
   - conda-forge
