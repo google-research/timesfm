@@ -335,9 +335,7 @@ def finetune(
 
     patience = 0
     best_eval_loss = 1e7
-    checkpoint_dir = (
-        f"{checkpoint_dir}/run_ignore_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-    )
+    checkpoint_dir = f"{checkpoint_dir}/run_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{wandb.run.id}"
     for epoch in range(num_epochs):
         print(f"Epoch: {epoch + 1}")
         train_its = train_batches.as_numpy_iterator()
