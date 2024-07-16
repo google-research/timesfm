@@ -1,4 +1,4 @@
-name: tfm_env
+name: ok_tfm_env
 
 channels:
   - conda-forge
@@ -16,3 +16,5 @@ dependencies:
     - jax[cuda12]==0.4.26
     - einshape
     - scikit-learn
+    - typer
+    - wandb
