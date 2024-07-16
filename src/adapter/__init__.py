@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""TimesFM init file."""
+"""adapter init file."""
 
 from .dora_layers import DoraAttentionProjection, DoraCombinedQKVProjection, DoraLinear
 from .lora_layers import LoraAttentionProjection, LoraCombinedQKVProjection, LoraLinear
