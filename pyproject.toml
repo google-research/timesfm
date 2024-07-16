@@ -1,29 +1,45 @@
-# This project can be installed with `python3 -m pip install -e .` from the main directory. 
-
-[project]
-name = "timesfm-jax"
+[tool.poetry]
+name = "timesfm"
+packages = [
+    { include = "*", from = "src" },
+]
 description = "Open weights time-series foundation model from Google Research."
 version = "1.0.1"
-dependencies = [
-    "jax==0.4.26",
-    "paxml==1.4.0",
-    "praxis==1.4.0",
-    "jaxlib==0.4.26",
-    "numpy==1.26.4",
-    "pandas==2.1.4",
-    "einshape==1.0.0",
-    "utilsforecast==0.1.10",
-    "huggingface_hub[cli]==0.23.0", 
-    "scikit-learn==1.5.1",
-]
 authors = [
-     {name = "Rajat Sen", email = "senrajat@google.com"},
-     {name = "Yichen Zhou", email = "yichenzhou@google.com"},
-     {name = "Abhimanyu Das", email = "abhidas@google.com"},
-     {name = "Petros Mol", email = "pmol@google.com"},
+    "Rajat Sen <senrajat@google.com>",
+    "Yichen Zhou <yichenzhou@google.com>",
+    "Abhimanyu Das <abhidas@google.com>",
+    "Petros Mol <pmol@google.com>",
+    "Justin Güse <guese.justin@gmail.com>",
+]
+readme = "README.md"
+keywords = ["time series", "timesfm", "forecast", "time series model"]
+homepage = "https://github.com/google-research/timesfm"
+repository = "https://github.com/google-research/timesfm"
+classifiers = [
+    "Environment :: Console",
+    "Framework :: Flake8",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development :: Documentation",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Software Development :: Quality Assurance",
+]
+include = [
+    "LICENSE",
 ]
 
+[tool.poetry.dependencies]
+python = ">=3.10,<3.11"
+einshape = "1.0.0"
+numpy = "1.26.4"
+pandas = "2.1.4"
+paxml = "1.4.0"
+utilsforecast = "0.1.10"
+jax = {version = "0.4.26", extras = ["cuda12"]}
+jaxlib = "0.4.26"
+huggingface_hub = {version = "0.23.0", extras = ["cli"]}
+scikit-learn = "1.0.2"
 
 [build-system]
-requires = ["setuptools"]
-build-backend = "setuptools.build_meta"
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

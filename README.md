@@ -14,6 +14,13 @@ to download model checkpoints.
 
 This is not an officially supported Google product.
 
+We recommend at least 16GB RAM to load TimesFM dependencies.
+
+## Update - July 15, 2024
+
+- Launched [finetuning support](https://github.com/google-research/timesfm/blob/master/notebooks/finetuning.ipynb) that lets you finetune the weights of the pretrained TimesFM model on your own data.
+- Launched [~zero-shot covariate support](https://github.com/google-research/timesfm/blob/master/notebooks/covariates.ipynb) with external regressors. More details [here](https://github.com/google-research/timesfm?tab=readme-ov-file#covariates-support).
+
 ## Checkpoint timesfm-1.0-200m
 
 timesfm-1.0-200m is the first open model checkpoint:
@@ -30,7 +37,13 @@ Please look into the README files in the respective benchmark directories within
 
 ## Installation
 
-We recommend at least 16GB RAM to load TimesFM dependencies.
+### Installation as a package
+
+To install the TimesFM as a package, you can run the following command without cloning this repo:
+
+`pip install timesfm`
+
+### Installation using conda
 
 For calling TimesFM, We have two environment files. Inside `timesfm`, for
 GPU installation (assuming CUDA 12 has been setup), you can create a conda
@@ -61,6 +74,31 @@ to install the package.
 Please use the environment files under `experiments` instead.
 
 2. The dependency `lingvo` does not support ARM architectures, and the code is not working for machines with Apple silicon. We are aware of this issue and are working on a solution. Stay tuned.
+
+
+### Local installation using poetry
+
+To from the current repository/local version (like you would have previously done with `pip -e .`), you can run the command
+
+```
+pip install poetry # optional
+poetry install
+```
+
+This will install the environment in the local .venv folder (depends on the configuration) and matches the python command to the poetry environment. If this is not the case, you can use `poetry run python` to use the local environment.
+
+### Notes
+
+1. Running the provided benchmarks would require additional dependencies.
+Please use the environment files under `experiments` instead.
+
+2. The dependency `lingvo` does not support ARM architectures, and the code is not working for machines with Apple silicon. We are aware of this issue and are working on a solution. Stay tuned.
+
+#### Building the package and publishing to PyPI
+
+The package can be built using the command `poetry build`.
+
+To build and publish it to PyPI, the command `poetry publish` can be used. This command will require the user to have the necessary permissions to publish to the PyPI repository.
 
 ## Usage 
 
@@ -161,6 +199,49 @@ forecast_df = tfm.forecast_on_df(
     num_jobs=-1,
 )
 ```
+
+## Covariates Support
+
+We now have an external regressors library on top of TimesFM that can support static covariates as well as dynamic covariates available in the future. We have an usage example in `notebooks/covariates.ipynb`.
+
+Let's take a toy example of forecasting sales for a grocery store: 
+
+**Task:** Given the observed the daily sales of this week (7 days), forecast the daily sales of next week (7 days).
+
+```
+Product: ice cream
+Daily_sales: [30, 30, 4, 5, 7, 8, 10]
+Category: food
+Base_price: 1.99
+Weekday: [0, 1, 2, 3, 4, 5, 6, 0, 1, 2, 3, 4, 5, 6]
+Has_promotion: [Yes, Yes, No, No, No, Yes, Yes, No, No, No, No, No, No, No]
+Daily_temperature: [31.0, 24.3, 19.4, 26.2, 24.6, 30.0, 31.1, 32.4, 30.9, 26.0, 25.0, 27.8, 29.5, 31.2]
+```
+
+```
+Product: sunscreen
+Daily_sales: [5, 7, 12, 13, 5, 6, 10]
+Category: skin product
+Base_price: 29.99
+Weekday: [0, 1, 2, 3, 4, 5, 6, 0, 1, 2, 3, 4, 5, 6]
+Has_promotion: [No, No, Yes, Yes, No, No, No, Yes, Yes, Yes, Yes, Yes, Yes, Yes]
+Daily_temperature: [31.0, 24.3, 19.4, 26.2, 24.6, 30.0, 31.1, 32.4, 30.9, 26.0, 25.0, 27.8, 29.5, 31.2]
+```
+
+In this example, besides the `Daily_sales`, we also have covariates `Category`, `Base_price`, `Weekday`, `Has_promotion`, `Daily_temperature`. Let's introduce some concepts:
+
+**Static covariates** are covariates for each time series. 
+- In our example, `Category` is a **static categorical covariate**, 
+- `Base_price` is a **static numerical covariates**.
+
+**Dynamic covariates** are covaraites for each time stamps.
+- Date / time related features can be usually treated as dynamic covariates.
+- In our example, `Weekday` and `Has_promotion` are **dynamic categorical covariates**.
+- `Daily_temperate` is a **dynamic numerical covariate**.
+
+**Notice:** Here we make it mandatory that the dynamic covariates need to cover both the forecasting context and horizon. For example, all dynamic covariates in the example have 14 values: the first 7 correspond to the observed 7 days, and the last 7 correspond to the next 7 days.
+
+We can now provide the past data of the two products along with static and dynamic covariates as a batch input to TimesFM and produce forecasts that take into the account the covariates. To learn more, check out the example in `notebooks/covariates.ipynb`.
 
 ## Finetuning
 

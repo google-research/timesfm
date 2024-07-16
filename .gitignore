@@ -1,4 +1,6 @@
-__pycache__/
+.venv/
+dist/
+**__pycache__/** */
 checkpoints/
 wandb/
 datasets/
