@@ -235,10 +235,10 @@ def finetune(
 
     @pax_fiddle.auto_config
     def build_learner() -> learners.Learner:
-        bprop_variable_inclusion = None
-        bprop_variable_exclusion = None
+        bprop_variable_inclusion = []
+        bprop_variable_exclusion = []
         if use_lora:
-            bprop_variable_inclusion = [r"^.*lora.*$"]
+            bprop_variable_inclusion.append(r"^.*lora.*$")
             if use_dora:
                 bprop_variable_inclusion.append(r"^.*dora.*$")
         elif use_linear_probing:
