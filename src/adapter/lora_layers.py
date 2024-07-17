@@ -35,13 +35,13 @@ class LoraTheta(base_layer.Theta):
         else:
             return False
 
-    def _lorafy_var(self, var):
+    def _lorafy_var(self, w):
         lora_a = super().__getattr__("lora_a")
         lora_b = super().__getattr__("lora_b")
-        new_var = self.module.einsum("...dr,...nr->...dn", lora_a, lora_b)
-        new_var = jnp.reshape(new_var, var.shape)
-        new_var += var
-        return new_var
+        lora_delta = self.module.einsum("...dr,...nr->...dn", lora_a, lora_b)
+        lora_delta = jnp.reshape(lora_delta, w.shape)
+        w_prime = w + lora_delta
+        return w_prime
 
     def __getattr__(self, k):
         var = super().__getattr__(k)

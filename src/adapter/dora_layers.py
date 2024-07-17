@@ -37,20 +37,20 @@ class DoraTheta(base_layer.Theta):
         else:
             return False
 
-    def _dorafy_var(self, var):
+    def _dorafy_var(self, w):
         lora_a = super().__getattr__("lora_a")
         lora_b = super().__getattr__("lora_b")
         dora_m = super().__getattr__("dora_m")
 
-        new_var = self.module.einsum("...dr,...nr->...dn", lora_a, lora_b)
-        new_var = jnp.reshape(new_var, var.shape)
+        lora_delta = self.module.einsum("...dr,...nr->...dn", lora_a, lora_b)
+        lora_delta = jnp.reshape(lora_delta, w.shape)
 
-        new_var += var
+        w_prime = w + lora_delta
 
-        column_norm = jnp.linalg.norm(new_var, ord=2, axis=0, keepdims=True)
-        norm_adapted = new_var / column_norm
-        w = dora_m * norm_adapted
-        return w
+        column_norm = jnp.linalg.norm(w_prime, ord=2, axis=0, keepdims=True)
+        norm_adapted = w_prime / column_norm
+        w_prime = dora_m * norm_adapted
+        return w_prime
 
     def __getattr__(self, k):
         var = super().__getattr__(k)
