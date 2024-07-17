@@ -18,3 +18,4 @@ dependencies:
     - scikit-learn
     - typer
     - wandb
+    - pytest
