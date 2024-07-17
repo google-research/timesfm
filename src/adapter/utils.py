@@ -12,6 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""
+This file provides functionality for loading and merging adapter weights
+in timesfm model, specifically for LoRA and DoRA.
+LoRA: https://arxiv.org/abs/2106.09685
+DoRA: https://arxiv.org/abs/2402.09353v4 
+"""
+
 import time
 
 import jax
@@ -36,6 +43,18 @@ from timesfm import TimesFm
 def get_adapter_params(
     params: dict, lora_target_modules: str, num_layers: int, use_dora: bool = False
 ) -> dict:
+    """
+    Extracts adapter parameters from the given model parameters for saving the checkpoint.
+
+    Args:
+        params (dict): The full model parameters.
+        lora_target_modules (str): Target modules for LoRA/DoRA adaptation.
+        num_layers (int): Number of transformer layers.
+        use_dora (bool, optional): Whether DoRA was used or not. Defaults to False.
+
+    Returns:
+        dict: A dictionary containing the extracted adapter parameters.
+    """
     adapter_params = {}
     for i in range(num_layers):
         layer_key = f"x_layers_{i}"
@@ -86,6 +105,20 @@ def load_adapter_checkpoint(
     lora_target_modules: str,
     use_dora: bool,
 ) -> None:
+    """
+    Loads an adapter checkpoint and merges it with the original model weights.
+
+    Args:
+        model (TimesFm): The model to update.
+        adapter_checkpoint_path (str): Path to the adapter checkpoint.
+        lora_rank (int): Rank of the LoRA adaptation.
+        lora_target_modules (str): Target modules for adaptation.
+        use_dora (bool): Whether DoRA was used or not.
+
+    Returns:
+        None
+    """
+
     """
     currently loading and initializing the model with adapter layers first and then merging the
     adapter weights to original weights and replacing the adapter layers back to original layer.
@@ -171,6 +204,16 @@ def _merge_adapter_weights(
     num_layers: int,
     use_dora: bool,
 ) -> None:
+    """
+    Merges adapter weights with the original model weights.
+
+    Args:
+        model (TimesFm): The model to update.
+        adapter_train_state (TrainState): The adapter's train state.
+        lora_target_modules (str): Target modules for adaptation.
+        num_layers (int): Number of transformer layers.
+        use_dora (bool): Whether DoRA was used or not.
+    """
     for i in range(num_layers):
         layer_key = f"x_layers_{i}"
 
@@ -238,6 +281,18 @@ def _merge_adapter_weights(
 def _get_adapter_weight_params(
     var_weight_hparams: dict, lora_target_modules: str, num_layers: int, use_dora: bool
 ) -> dict:
+    """
+    Extracts adapter weight parameters from the given variable weight hyperparameters.
+
+    Args:
+        var_weight_hparams (dict): Variable weight hyperparameters.
+        lora_target_modules (str): Target modules for adaptation.
+        num_layers (int): Number of transformer layers.
+        use_dora (bool): Whether DoRA was used or not.
+
+    Returns:
+        dict: A dictionary containing the extracted adapter weight parameters.
+    """
     adapter_params = {}
     for i in range(num_layers):
         layer = f"x_layers_{i}"
@@ -284,7 +339,17 @@ def load_adapter_layer(
     use_dora: bool = False,
 ) -> tuple[pax_fiddle.Config, pax_fiddle.Config]:
     """
-    update self attention modules with LoRA/DoRA layers
+    Updates target modules with adapter layers.
+
+    Args:
+        mdl_vars (dict): Model variables.
+        model (pax_fiddle.Config): Model configuration.
+        lora_rank (int): Rank of the LoRA adaptation.
+        lora_target_modules (str): Target modules for adaptation.
+        use_dora (bool, optional): Whether DoRA was used or not.
+
+    Returns:
+        tuple[pax_fiddle.Config, pax_fiddle.Config]: Updated model configurations.
     """
     original_linear_tpl = original_attn_tpl = original_combined_qkv_tpl = None
     if lora_target_modules in ["all", "mlp"]:
@@ -358,7 +423,18 @@ def _initialize_adapter_params(
     seed: int = 1234,
 ) -> dict:
     """
-    initialize and add LoRA params in self attention
+    Initializes and adds adapter parameters to target modules.
+
+    Args:
+        mdl_vars (dict): Model variables.
+        num_layers (int): Number of transformer layers.
+        lora_rank (int): Rank of the LoRA adaptation.
+        lora_target_modules (str): Target modules for adaptation.
+        use_dora (bool, optional): Whether DoRA was used or not.
+        seed (int, optional): Random seed for initialization. Defaults to 1234.
+
+    Returns:
+        dict: Updated model variables with initialized adapter parameters.
     """
     for i in range(num_layers):
         layer_key = f"x_layers_{i}"
