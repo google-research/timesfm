@@ -202,7 +202,7 @@ forecast_df = tfm.forecast_on_df(
 
 ## Covariates Support
 
-We now have an external regressors library on top of TimesFM that can support static covariates as well as dynamic covariates available in the future. We have an usage example in [notebooks/covariates.ipynb](notebooks/covariates.ipynb).
+We now have an external regressors library on top of TimesFM that can support static covariates as well as dynamic covariates available in the future. We have an usage example in [notebooks/covariates.ipynb](https://github.com/google-research/timesfm/blob/master/notebooks/covariates.ipynb).
 
 Let's take a toy example of forecasting sales for a grocery store: 
 
@@ -241,11 +241,11 @@ In this example, besides the `Daily_sales`, we also have covariates `Category`, 
 
 **Notice:** Here we make it mandatory that the dynamic covariates need to cover both the forecasting context and horizon. For example, all dynamic covariates in the example have 14 values: the first 7 correspond to the observed 7 days, and the last 7 correspond to the next 7 days.
 
-We can now provide the past data of the two products along with static and dynamic covariates as a batch input to TimesFM and produce forecasts that take into the account the covariates. To learn more, check out the example in [notebooks/covariates.ipynb](notebooks/covariates.ipynb).
+We can now provide the past data of the two products along with static and dynamic covariates as a batch input to TimesFM and produce forecasts that take into the account the covariates. To learn more, check out the example in [notebooks/covariates.ipynb](https://github.com/google-research/timesfm/blob/master/notebooks/covariates.ipynb).
 
 ## Finetuning
 
-We have provided an example of finetuning the model on a new dataset in [notebooks/finetuning.ipynb](notebooks/finetuning.ipynb).
+We have provided an example of finetuning the model on a new dataset in [notebooks/finetuning.ipynb](https://github.com/google-research/timesfm/blob/master/notebooks/finetuning.ipynb).
 
 ## Contribution Style guide
 
