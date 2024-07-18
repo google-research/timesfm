@@ -60,14 +60,6 @@ EPS = 1e-7
 RANDOM_SEED = 1234
 
 
-def get_forecasts(model, past: np.ndarray, freq: int) -> np.ndarray:
-    """Get forecasts."""
-    lfreq = [freq] * past.shape[0]
-    _, out = model.forecast(list(past), lfreq)
-    out = out[:, :, 5]
-    return out
-
-
 def finetune(
     *,
     checkpoint_path: Annotated[
@@ -337,13 +329,13 @@ def finetune(
     best_eval_loss = 1e7
     checkpoint_dir = f"{checkpoint_dir}/run_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{wandb.run.id}"
     for epoch in range(num_epochs):
+        if patience >= early_stop_patience:
+            print("Early stopping.")
+            break
         print(f"Epoch: {epoch + 1}")
         train_its = train_batches.as_numpy_iterator()
         train_losses = []
         for batch in tqdm(train_its):
-            if patience >= early_stop_patience:
-                print("Early stopping.")
-                break
             tbatch = process_train_batch(batch)
             tbatch = reshape_batch_for_pmap(tbatch, num_devices)
             replicated_jax_states, step_fun_out = p_train_step(
