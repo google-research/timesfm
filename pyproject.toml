@@ -30,15 +30,15 @@ include = [
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.11"
-einshape = "1.0.0"
-numpy = "1.26.4"
-pandas = "2.1.4"
-paxml = "1.4.0"
-utilsforecast = "0.1.10"
-jax = {version = "0.4.26", extras = ["cuda12"]}
-jaxlib = "0.4.26"
-huggingface_hub = {version = "0.23.0", extras = ["cli"]}
-scikit-learn = "1.0.2"
+einshape = ">=1.0.0"
+numpy = ">=1.26.4"
+pandas = ">=2.1.4"
+paxml = ">=1.4.0"
+utilsforecast = ">=0.1.10"
+jax = {version = ">=0.4.26", extras = ["cuda12"]}
+jaxlib = ">=0.4.26"
+huggingface_hub = {version = ">=0.23.0", extras = ["cli"]}
+scikit-learn = ">=1.0.2"
 
 [build-system]
 requires = ["poetry-core"]
