@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "timesfm"
 packages = [
-    { include = "*", from = "src" },
+    { include = "timesfm", from = "src" },
 ]
 description = "Open weights time-series foundation model from Google Research."
 version = "1.0.1"
