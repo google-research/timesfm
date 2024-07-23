@@ -38,7 +38,7 @@ utilsforecast = ">=0.1.10"
 jax = {version = ">=0.4.26", extras = ["cuda12"]}
 jaxlib = ">=0.4.26"
 huggingface_hub = {version = ">=0.23.0", extras = ["cli"]}
-scikit-learn = ">=1.0.2"
+scikit-learn = ">=1.2.2"
 
 [build-system]
 requires = ["poetry-core"]
