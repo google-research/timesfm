@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Helper functions for in-context covariates and regression."""
 
 import itertools
@@ -36,20 +35,19 @@ def _unnest(nested: Sequence[Sequence[Any]]) -> np.ndarray:
 def _repeat(elements: Iterable[Any], counts: Iterable[int]) -> np.ndarray:
   return np.array(
       list(
-          itertools.chain.from_iterable(map(itertools.repeat, elements, counts))
-      )
-  )
+          itertools.chain.from_iterable(map(itertools.repeat, elements,
+                                            counts))))
 
 
 def _to_padded_jax_array(x: np.ndarray) -> jax.Array:
   if x.ndim == 1:
     (i,) = x.shape
-    di = 2 ** math.ceil(math.log2(i)) - i
+    di = 2**math.ceil(math.log2(i)) - i
     return jnp.pad(x, ((0, di),), mode="constant", constant_values=0.0)
   elif x.ndim == 2:
     i, j = x.shape
-    di = 2 ** math.ceil(math.log2(i)) - i
-    dj = 2 ** math.ceil(math.log2(j)) - j
+    di = 2**math.ceil(math.log2(i)) - i
+    dj = 2**math.ceil(math.log2(j)) - j
     return jnp.pad(x, ((0, di), (0, dj)), mode="constant", constant_values=0.0)
   else:
     raise ValueError(f"Unsupported array shape: {x.shape}")
@@ -86,21 +84,16 @@ class BatchedInContextXRegBase:
       train_lens: Sequence[int],
       test_lens: Sequence[int],
       train_dynamic_numerical_covariates: (
-          Mapping[str, Sequence[Sequence[float]]] | None
-      ) = None,
+          Mapping[str, Sequence[Sequence[float]]] | None) = None,
       train_dynamic_categorical_covariates: (
-          Mapping[str, Sequence[Sequence[Category]]] | None
-      ) = None,
+          Mapping[str, Sequence[Sequence[Category]]] | None) = None,
       test_dynamic_numerical_covariates: (
-          Mapping[str, Sequence[Sequence[float]]] | None
-      ) = None,
+          Mapping[str, Sequence[Sequence[float]]] | None) = None,
       test_dynamic_categorical_covariates: (
-          Mapping[str, Sequence[Sequence[Category]]] | None
-      ) = None,
+          Mapping[str, Sequence[Sequence[Category]]] | None) = None,
       static_numerical_covariates: Mapping[str, Sequence[float]] | None = None,
-      static_categorical_covariates: (
-          Mapping[str, Sequence[Category]] | None
-      ) = None,
+      static_categorical_covariates: (Mapping[str, Sequence[Category]] |
+                                      None) = None,
   ) -> None:
     """Initializes with the exogenous covariate inputs.
 
@@ -187,17 +180,13 @@ class BatchedInContextXRegBase:
     self.train_lens = train_lens
     self.test_lens = test_lens
     self.train_dynamic_numerical_covariates = (
-        train_dynamic_numerical_covariates or {}
-    )
+        train_dynamic_numerical_covariates or {})
     self.train_dynamic_categorical_covariates = (
-        train_dynamic_categorical_covariates or {}
-    )
-    self.test_dynamic_numerical_covariates = (
-        test_dynamic_numerical_covariates or {}
-    )
+        train_dynamic_categorical_covariates or {})
+    self.test_dynamic_numerical_covariates = (test_dynamic_numerical_covariates
+                                              or {})
     self.test_dynamic_categorical_covariates = (
-        test_dynamic_categorical_covariates or {}
-    )
+        test_dynamic_categorical_covariates or {})
     self.static_numerical_covariates = static_numerical_covariates or {}
     self.static_categorical_covariates = static_categorical_covariates or {}
 
@@ -205,31 +194,23 @@ class BatchedInContextXRegBase:
     """Verifies the validity of the covariate inputs."""
 
     # Check presence.
-    if (
-        self.train_dynamic_numerical_covariates
-        and not self.test_dynamic_numerical_covariates
-    ) or (
-        not self.train_dynamic_numerical_covariates
-        and self.test_dynamic_numerical_covariates
-    ):
+    if (self.train_dynamic_numerical_covariates and
+        not self.test_dynamic_numerical_covariates) or (
+            not self.train_dynamic_numerical_covariates and
+            self.test_dynamic_numerical_covariates):
       raise ValueError(
           "train_dynamic_numerical_covariates and"
           " test_dynamic_numerical_covariates must be both present or both"
-          " absent."
-      )
+          " absent.")
 
-    if (
-        self.train_dynamic_categorical_covariates
-        and not self.test_dynamic_categorical_covariates
-    ) or (
-        not self.train_dynamic_categorical_covariates
-        and self.test_dynamic_categorical_covariates
-    ):
+    if (self.train_dynamic_categorical_covariates and
+        not self.test_dynamic_categorical_covariates) or (
+            not self.train_dynamic_categorical_covariates and
+            self.test_dynamic_categorical_covariates):
       raise ValueError(
           "train_dynamic_categorical_covariates and"
           " test_dynamic_categorical_covariates must be both present or both"
-          " absent."
-      )
+          " absent.")
 
     # Check keys.
     for dict_a, dict_b, dict_a_name, dict_b_name in (
@@ -248,46 +229,38 @@ class BatchedInContextXRegBase:
     ):
       if w := set(dict_a.keys()) - set(dict_b.keys()):
         raise ValueError(
-            f"{dict_a_name} has keys not present in {dict_b_name}: {w}"
-        )
+            f"{dict_a_name} has keys not present in {dict_b_name}: {w}")
       if w := set(dict_b.keys()) - set(dict_a.keys()):
         raise ValueError(
-            f"{dict_b_name} has keys not present in {dict_a_name}: {w}"
-        )
+            f"{dict_b_name} has keys not present in {dict_a_name}: {w}")
 
     # Check shapes.
     if assert_covariate_shapes:
       if len(self.targets) != len(self.train_lens):
         raise ValueError(
-            "targets and train_lens must have the same number of elements."
-        )
+            "targets and train_lens must have the same number of elements.")
 
       if len(self.train_lens) != len(self.test_lens):
         raise ValueError(
-            "train_lens and test_lens must have the same number of elements."
-        )
+            "train_lens and test_lens must have the same number of elements.")
 
-      for i, (target, train_len) in enumerate(
-          zip(self.targets, self.train_lens)
-      ):
+      for i, (target, train_len) in enumerate(zip(self.targets,
+                                                  self.train_lens)):
         if len(target) != train_len:
           raise ValueError(
-              f"targets[{i}] has length {len(target)} != expected {train_len}."
-          )
+              f"targets[{i}] has length {len(target)} != expected {train_len}.")
 
       for key, values in self.static_numerical_covariates.items():
         if len(values) != len(self.train_lens):
           raise ValueError(
               f"static_numerical_covariates has key {key} with number of"
-              f" examples {len(values)} != expected {len(self.train_lens)}."
-          )
+              f" examples {len(values)} != expected {len(self.train_lens)}.")
 
       for key, values in self.static_categorical_covariates.items():
         if len(values) != len(self.train_lens):
           raise ValueError(
               f"static_categorical_covariates has key {key} with number of"
-              f" examples {len(values)} != expected {len(self.train_lens)}."
-          )
+              f" examples {len(values)} != expected {len(self.train_lens)}.")
 
       for lens, dict_cov, dict_cov_name in (
           (
@@ -315,14 +288,12 @@ class BatchedInContextXRegBase:
           if len(cov_values) != len(lens):
             raise ValueError(
                 f"{dict_cov_name} has key {key} with number of examples"
-                f" {len(cov_values)} != expected {len(lens)}."
-            )
+                f" {len(cov_values)} != expected {len(lens)}.")
           for i, cov_value in enumerate(cov_values):
             if len(cov_value) != lens[i]:
               raise ValueError(
                   f"{dict_cov_name} has key {key} with its {i}-th example"
-                  f" length {len(cov_value)} != expected {lens[i]}."
-              )
+                  f" length {len(cov_value)} != expected {lens[i]}.")
 
   def create_covariate_matrix(
       self,
@@ -356,11 +327,9 @@ class BatchedInContextXRegBase:
     # Numerical features.
     for name in sorted(self.train_dynamic_numerical_covariates):
       x_train.append(
-          _unnest(self.train_dynamic_numerical_covariates[name])[:, np.newaxis]
-      )
+          _unnest(self.train_dynamic_numerical_covariates[name])[:, np.newaxis])
       x_test.append(
-          _unnest(self.test_dynamic_numerical_covariates[name])[:, np.newaxis]
-      )
+          _unnest(self.test_dynamic_numerical_covariates[name])[:, np.newaxis])
 
     for covs in self.static_numerical_covariates.values():
       x_train.append(_repeat(covs, self.train_lens)[:, np.newaxis])
@@ -372,25 +341,22 @@ class BatchedInContextXRegBase:
 
       # Normalize for robustness.
       x_mean = np.mean(x_train, axis=0, keepdims=True)
-      x_std = np.where(
-          (w := np.std(x_train, axis=0, keepdims=True)) > _TOL, w, 1.0
-      )
+      x_std = np.where((w := np.std(x_train, axis=0, keepdims=True)) > _TOL, w,
+                       1.0)
       x_train = [(x_train - x_mean) / x_std]
       x_test = [(x_test - x_mean) / x_std]
 
     # Categorical features. Encode one by one.
     one_hot_encoder = preprocessing.OneHotEncoder(
         drop=one_hot_encoder_drop,
-        sparse=False,
+        sparse_output=False,
         handle_unknown="ignore",
     )
     for name in sorted(self.train_dynamic_categorical_covariates.keys()):
-      ohe_train = _unnest(self.train_dynamic_categorical_covariates[name])[
-          :, np.newaxis
-      ]
-      ohe_test = _unnest(self.test_dynamic_categorical_covariates[name])[
-          :, np.newaxis
-      ]
+      ohe_train = _unnest(
+          self.train_dynamic_categorical_covariates[name])[:, np.newaxis]
+      ohe_test = _unnest(
+          self.test_dynamic_categorical_covariates[name])[:, np.newaxis]
       x_train.append(np.array(one_hot_encoder.fit_transform(ohe_train)))
       x_test.append(np.array(one_hot_encoder.transform(ohe_test)))
 
@@ -426,12 +392,8 @@ class BatchedInContextXRegLinear(BatchedInContextXRegBase):
       debug_info: bool = False,
       assert_covariates: bool = False,
       assert_covariate_shapes: bool = False,
-  ) -> (
-      list[np.ndarray]
-      | tuple[
-          list[np.ndarray], list[np.ndarray], jax.Array, jax.Array, jax.Array
-      ]
-  ):
+  ) -> (list[np.ndarray] | tuple[list[np.ndarray], list[np.ndarray], jax.Array,
+                                 jax.Array, jax.Array]):
     """Fits a linear model for in-context regression.
 
     Args:
@@ -495,14 +457,10 @@ class BatchedInContextXRegLinear(BatchedInContextXRegBase):
       x_train = _to_padded_jax_array(x_train)
       flat_targets = _to_padded_jax_array(flat_targets)
       x_test = _to_padded_jax_array(x_test)
-      beta_hat = (
-          jnp.linalg.pinv(
-              x_train.T @ x_train + ridge * jnp.eye(x_train.shape[1]),
-              hermitian=True,
-          )
-          @ x_train.T
-          @ flat_targets
-      )
+      beta_hat = (jnp.linalg.pinv(
+          x_train.T @ x_train + ridge * jnp.eye(x_train.shape[1]),
+          hermitian=True,
+      ) @ x_train.T @ flat_targets)
       y_hat = x_test @ beta_hat
       y_hat_context = x_train_raw @ beta_hat if debug_info else None
 
@@ -511,18 +469,14 @@ class BatchedInContextXRegLinear(BatchedInContextXRegBase):
 
     # Reconstruct the ragged 2-dim batched forecasts from flattened linear fits.
     train_index, test_index = 0, 0
-    for train_index_delta, test_index_delta in zip(
-        self.train_lens, self.test_lens
-    ):
-      outputs.append(
-          np.array(y_hat[test_index : (test_index + test_index_delta)])
-      )
+    for train_index_delta, test_index_delta in zip(self.train_lens,
+                                                   self.test_lens):
+      outputs.append(np.array(y_hat[test_index:(test_index +
+                                                test_index_delta)]))
       if debug_info:
         outputs_context.append(
-            np.array(
-                y_hat_context[train_index : (train_index + train_index_delta)]
-            )
-        )
+            np.array(y_hat_context[train_index:(train_index +
+                                                train_index_delta)]))
       train_index += train_index_delta
       test_index += test_index_delta
 

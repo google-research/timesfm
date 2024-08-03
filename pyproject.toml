@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "timesfm"
 packages = [
-    { include = "*", from = "src" },
+    { include = "timesfm", from = "src" },
 ]
 description = "Open weights time-series foundation model from Google Research."
 version = "1.0.1"
@@ -30,15 +30,15 @@ include = [
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.11"
-einshape = "1.0.0"
-numpy = "1.26.4"
-pandas = "2.1.4"
-paxml = "1.4.0"
-utilsforecast = "0.1.10"
-jax = {version = "0.4.26", extras = ["cuda12"]}
-jaxlib = "0.4.26"
-huggingface_hub = {version = "0.23.0", extras = ["cli"]}
-scikit-learn = "1.0.2"
+einshape = ">=1.0.0"
+numpy = ">=1.26.4"
+pandas = ">=2.1.4"
+paxml = ">=1.4.0"
+utilsforecast = ">=0.1.10"
+jax = {version = ">=0.4.26", extras = ["cuda12"]}
+jaxlib = ">=0.4.26"
+huggingface_hub = {version = ">=0.23.0", extras = ["cli"]}
+scikit-learn = ">=1.2.2"
 typer = "^0.12.3"
 wandb = "^0.17.5"
 
