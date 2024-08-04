@@ -62,12 +62,12 @@ RANDOM_SEED = 1234
 
 def finetune(
     *,
-    checkpoint_path: Annotated[
-        str, typer.Option(help="The path to the model checkpoint.")
-    ] = None,
     model_name: Annotated[
         str, typer.Option(help="Specify the name of the huggingface model.")
     ] = "google/timesfm-1.0-200m",
+    checkpoint_path: Annotated[
+        str, typer.Option(help="The path to the local model checkpoint.")
+    ] = None,
     datetime_col: Annotated[str, typer.Option(help="Column having datetime.")] = "ds",
     ts_cols: Annotated[
         list[str], typer.Option(help="Columns of time-series features.")
@@ -115,7 +115,7 @@ def finetune(
     use_lora: Annotated[
         bool,
         typer.Option(
-            help="Train low rank adapters. Freeze all other params in model",
+            help="Train low rank adapters for stacked transformer block",
         ),
     ] = False,
     lora_rank: Annotated[
@@ -126,7 +126,9 @@ def finetune(
     ] = 8,
     lora_target_modules: Annotated[
         str,
-        typer.Option(help="LoRA target modules. Allowed values: [all, attention, mlp]"),
+        typer.Option(
+            help="LoRA target modules of the transformer block. Allowed values: [all, attention, mlp]"
+        ),
     ] = "all",
     use_dora: Annotated[
         bool,
@@ -137,7 +139,7 @@ def finetune(
     use_linear_probing: Annotated[
         bool,
         typer.Option(
-            help="Linear Probing. Train only input/output and embedding params. Freeze params in self attention modules.",
+            help="Linear Probing. Train only input/output and embedding params. Freeze params in stack transformer block.",
         ),
     ] = False,
     checkpoint_dir: Annotated[
