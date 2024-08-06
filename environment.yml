@@ -16,3 +16,6 @@ dependencies:
     - jax[cuda12]==0.4.26
     - einshape
     - scikit-learn
+    - typer
+    - wandb
+    - pytest

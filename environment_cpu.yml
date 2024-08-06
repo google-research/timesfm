@@ -16,3 +16,6 @@ dependencies:
     - jax[cpu]==0.4.26
     - einshape
     - scikit-learn
+    - typer
+    - wandb
+    - pytest
