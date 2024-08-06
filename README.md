@@ -16,8 +16,9 @@ This is not an officially supported Google product.
 
 We recommend at least 16GB RAM to load TimesFM dependencies.
 
-## Update - July 15, 2024
+## Update - Aug. 6, 2024
 
+- Shoutout to @tanmayshishodia for checking in PEFT methods like LoRA and DoRA.
 - To install TimesFM, you can now simply do: `pip install timesfm`.
 - Launched [finetuning support](https://github.com/google-research/timesfm/blob/master/notebooks/finetuning.ipynb) that lets you finetune the weights of the pretrained TimesFM model on your own data.
 - Launched [~zero-shot covariate support](https://github.com/google-research/timesfm/blob/master/notebooks/covariates.ipynb) with external regressors. More details [here](https://github.com/google-research/timesfm?tab=readme-ov-file#covariates-support).
