@@ -36,7 +36,7 @@ _BATCH_SIZE = flags.DEFINE_integer(
 )
 _DATASET = flags.DEFINE_string("dataset", "etth1", "The name of the dataset.")
 _MODEL_PATH = flags.DEFINE_string(
-    "model_path", "./timesfm_q10_20240501", "The name of the dataset."
+    "model_path", "./timesfm_q10_20240501", "Path to model."
 )
 _DATETIME_COL = flags.DEFINE_string(
     "datetime_col", "date", "Column having datetime."
