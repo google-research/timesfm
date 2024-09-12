@@ -1,8 +1,6 @@
 [tool.poetry]
 name = "timesfm"
-packages = [
-    { include = "timesfm", from = "src" },
-]
+packages = [{ include = "timesfm", from = "src" }]
 description = "Open weights time-series foundation model from Google Research."
 version = "1.0.1"
 authors = [
@@ -24,23 +22,37 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: Software Development :: Quality Assurance",
 ]
-include = [
-    "LICENSE",
-]
+include = ["LICENSE"]
 
 [tool.poetry.dependencies]
-python = ">=3.10,<3.11"
+python = ">=3.10,<3.12"
 einshape = ">=1.0.0"
 numpy = ">=1.26.4"
 pandas = ">=2.1.4"
-paxml = ">=1.4.0"
 utilsforecast = ">=0.1.10"
-jax = {version = ">=0.4.26", extras = ["cuda12"]}
-jaxlib = ">=0.4.26"
-huggingface_hub = {version = ">=0.23.0", extras = ["cli"]}
+huggingface_hub = { version = ">=0.23.0", extras = ["cli"] }
 scikit-learn = ">=1.2.2"
 typer = ">=0.12.3"
 wandb = ">=0.17.5"
+ipython = "^8.27.0"
+absl-py = "1.4.0"
+
+[tool.poetry.group.pax]
+optional = true
+
+[tool.poetry.group.pax.dependencies]
+paxml = { version = ">=1.4.0", python = ">=3.10,<3.11" }
+lingvo = { version = ">=0.12.7", python = ">=3.10,<3.11" }
+jax = { version = ">=0.4.26", extras = ["cuda12"], python = ">=3.10,<3.11" }
+jaxlib = { version = ">=0.4.26", python = ">=3.10,<3.11" }
+
+[tool.poetry.group.torch]
+optional = true
+
+[tool.poetry.group.torch.dependencies]
+torch = { version = ">=2.0.0", extras = ["cuda"], python = ">=3.11,<3.12" }
+jax = { version = ">=0.4.26", extras = ["cuda12"], python = ">=3.11,<3.12" }
+jaxlib = { version = ">=0.4.26", python = ">=3.11,<3.12" }
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=8.3.2"

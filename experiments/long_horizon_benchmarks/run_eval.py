@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Eval pipeline."""
 
 import json
@@ -22,44 +21,33 @@ from absl import flags
 import chronos
 import numpy as np
 import pandas as pd
-from paxml import checkpoints
 import timesfm
 from timesfm import data_loader
 import torch
 import tqdm
 
-
 FLAGS = flags.FLAGS
 
-_BATCH_SIZE = flags.DEFINE_integer(
-    "batch_size", 64, "Batch size for the randomly sampled batch"
-)
+_BATCH_SIZE = flags.DEFINE_integer("batch_size", 64,
+                                   "Batch size for the randomly sampled batch")
 _DATASET = flags.DEFINE_string("dataset", "etth1", "The name of the dataset.")
-_MODEL_PATH = flags.DEFINE_string(
-    "model_path", "./timesfm_q10_20240501", "The name of the dataset."
-)
-_DATETIME_COL = flags.DEFINE_string(
-    "datetime_col", "date", "Column having datetime."
-)
-_NUM_COV_COLS = flags.DEFINE_list(
-    "num_cov_cols", None, "Column having numerical features."
-)
-_CAT_COV_COLS = flags.DEFINE_list(
-    "cat_cov_cols", None, "Column having categorical features."
-)
+_MODEL_PATH = flags.DEFINE_string("model_path", "./timesfm_q10_20240501",
+                                  "The name of the dataset.")
+_DATETIME_COL = flags.DEFINE_string("datetime_col", "date",
+                                    "Column having datetime.")
+_NUM_COV_COLS = flags.DEFINE_list("num_cov_cols", None,
+                                  "Column having numerical features.")
+_CAT_COV_COLS = flags.DEFINE_list("cat_cov_cols", None,
+                                  "Column having categorical features.")
 _TS_COLS = flags.DEFINE_list("ts_cols", None, "Columns of time-series features")
-_NORMALIZE = flags.DEFINE_bool(
-    "normalize", True, "normalize data for eval or not"
-)
-_CONTEXT_LEN = flags.DEFINE_integer(
-    "context_len", 512, "Length of the context window"
-)
+_NORMALIZE = flags.DEFINE_bool("normalize", True,
+                               "normalize data for eval or not")
+_CONTEXT_LEN = flags.DEFINE_integer("context_len", 512,
+                                    "Length of the context window")
 _PRED_LEN = flags.DEFINE_integer("pred_len", 96, "prediction length.")
 _BACKEND = flags.DEFINE_string("backend", "gpu", "backend to use")
-_RESULTS_DIR = flags.DEFINE_string(
-    "results_dir", "./results/long_horizon", "results directory"
-)
-
+_RESULTS_DIR = flags.DEFINE_string("results_dir", "./results/long_horizon",
+                                   "results directory")
 
 DATA_DICT = {
     "ettm2": {
@@ -176,9 +164,8 @@ def eval():
       holiday=False,
       permute=False,
   )
-  eval_itr = dtl.tf_dataset(
-      mode="test", shift=_PRED_LEN.value
-  ).as_numpy_iterator()
+  eval_itr = dtl.tf_dataset(mode="test",
+                            shift=_PRED_LEN.value).as_numpy_iterator()
   model_path = _MODEL_PATH.value
   if model_path.startswith("amazon"):
     model = chronos.ChronosPipeline.from_pretrained(
@@ -188,19 +175,12 @@ def eval():
     )
   else:
     model = timesfm.TimesFm(
-        context_len=_CONTEXT_LEN.value,
-        horizon_len=_PRED_LEN.value,
-        input_patch_len=32,
-        output_patch_len=128,
-        num_layers=20,
-        model_dims=1280,
-        backend=_BACKEND.value,
-        per_core_batch_size=batch_size,
-        quantiles=QUANTILES,
-    )
-    model.load_from_checkpoint(
-        model_path,
-        checkpoint_type=checkpoints.CheckpointType.FLAX,
+        hparams=timesfm.TimesFmHparams(
+            backend=_BACKEND.value,
+            per_core_batch_size=_BATCH_SIZE.value,
+            horizon_len=_PRED_LEN.value,
+        ),
+        checkpoint=timesfm.TimesFmCheckpoint(huggingface_repo_id=model_path),
     )
   smape_run_losses = []
   mse_run_losses = []
@@ -213,10 +193,9 @@ def eval():
   for batch in tqdm.tqdm(eval_itr):
     past = batch[0]
     actuals = batch[3]
-    forecasts = get_forecasts(
-        model_path, model, past, int_freq, _PRED_LEN.value
-    )
-    forecasts = forecasts[:, 0 : actuals.shape[1]]
+    forecasts = get_forecasts(model_path, model, past, int_freq,
+                              _PRED_LEN.value)
+    forecasts = forecasts[:, 0:actuals.shape[1]]
     mae_run_losses.append(_mae(forecasts, actuals).sum())
     mse_run_losses.append(_mse(forecasts, actuals).sum())
     smape_run_losses.append(_smape(forecasts, actuals).sum())

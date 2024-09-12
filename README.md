@@ -16,14 +16,14 @@ This is not an officially supported Google product.
 
 We recommend at least 16GB RAM to load TimesFM dependencies.
 
-## Update - Aug. 6, 2024
-
+## Update - Sep. 12, 2024
+- We have released full pytorch support (excludoing PEFT parts).
 - Shoutout to @tanmayshishodia for checking in PEFT methods like LoRA and DoRA.
 - To install TimesFM, you can now simply do: `pip install timesfm`.
 - Launched [finetuning support](https://github.com/google-research/timesfm/blob/master/notebooks/finetuning.ipynb) that lets you finetune the weights of the pretrained TimesFM model on your own data.
 - Launched [~zero-shot covariate support](https://github.com/google-research/timesfm/blob/master/notebooks/covariates.ipynb) with external regressors. More details [here](https://github.com/google-research/timesfm?tab=readme-ov-file#covariates-support).
 
-## Checkpoint timesfm-1.0-200m
+## Checkpoint timesfm-1.0-200m (-pytorch)
 
 timesfm-1.0-200m is the first open model checkpoint:
 
@@ -39,68 +39,55 @@ Please look into the README files in the respective benchmark directories within
 
 ## Installation
 
-### Installation as a package
+### Local installation using poetry
 
-To install the TimesFM as a package, you can run the following command without cloning this repo:
-
-`pip install timesfm`
-
-### Installation using conda
-
-For calling TimesFM, We have two environment files. Inside `timesfm`, for
-GPU installation (assuming CUDA 12 has been setup), you can create a conda
-environment `tfm_env` from the base folder through:
+We will be using `pyenv` and `poetry`. In order to set these things up please follow the instructions [here](https://substack.com/home/post/p-148747960?r=28a5lx&utm_campaign=post&utm_medium=web). Note that the PAX (or JAX) version needs to run on python 3.10.x and the PyTorch version can run on >=3.11.x. Therefore make sure you have two versions of python installed:
 
 ```
-conda env create --file=environment.yml
+pyenv install 3.10
+pyenv install 3.11
+pyenv versions # to list the versions available (lets assume the versions are 3.10.15 and 3.11.10)
 ```
 
-For a CPU setup please use,
+### For PAX version installation do the following.
 
 ```
-conda env create --file=environment_cpu.yml
+pyenv local 3.10.15
+poetry env use 3.10.15
+poetry lock
+poetry install --only  pax
 ```
-to create the environment instead.
 
-Follow by
+After than you can run the timesfm under `poetry shell` or do `poetry run python3 ...`.
+
+### For PyTorch version installation do the following.
 
 ```
-conda activate tfm_env
-pip install -e .
+pyenv local 3.11.10
+poetry env use 3.11.10
+poetry lock
+poetry install --only  torch
 ```
-to install the package.
+
+After than you can run the timesfm under `poetry shell` or do `poetry run python3 ...`.
 
 **Note**: 
 
 1. Running the provided benchmarks would require additional dependencies.
-Please use the environment files under `experiments` instead.
+Please see the `experiments` section fro more instructions.
 
 2. The dependency `lingvo` does not support ARM architectures, and the code is not working for machines with Apple silicon. We are aware of this issue and are working on a solution. Stay tuned.
-
-
-### Local installation using poetry
-
-To from the current repository/local version (like you would have previously done with `pip -e .`), you can run the command
-
-```
-pip install poetry # optional
-poetry install
-```
-
-This will install the environment in the local .venv folder (depends on the configuration) and matches the python command to the poetry environment. If this is not the case, you can use `poetry run python` to use the local environment.
 
 ### Notes
 
-1. Running the provided benchmarks would require additional dependencies.
-Please use the environment files under `experiments` instead.
+1. Running the provided benchmarks would require additional dependencies. Please see the `experiments` folder.
 
-2. The dependency `lingvo` does not support ARM architectures, and the code is not working for machines with Apple silicon. We are aware of this issue and are working on a solution. Stay tuned.
+2. The dependency `lingvo` does not support ARM architectures, and the PAX version is not working for machines with Apple silicon.
 
-#### Building the package and publishing to PyPI
+### Install from PyPI (and publish)
 
-The package can be built using the command `poetry build`.
+Instructions coming soon.
 
-To build and publish it to PyPI, the command `poetry publish` can be used. This command will require the user to have the necessary permissions to publish to the PyPI repository.
 
 ## Usage 
 
@@ -110,32 +97,36 @@ Then the base class can be loaded as,
 ```python
 import timesfm
 
+# For PAX
 tfm = timesfm.TimesFm(
-    context_len=<context>,
-    horizon_len=<horizon>,
-    input_patch_len=32,
-    output_patch_len=128,
-    num_layers=20,
-    model_dims=1280,
-    backend=<backend>,
-)
-tfm.load_from_checkpoint(repo_id="google/timesfm-1.0-200m")
+      hparams=timesfm.TimesFmHparams(
+          backend="gpu",
+          per_core_batch_size=32,
+          horizon_len=128,
+      ),
+      checkpoint=timesfm.TimesFmCheckpoint(
+          huggingface_repo_id="google/timesfm-1.0-200m"),
+  )
+
+# For Torch
+tfm = timesfm.TimesFm(
+      hparams=timesfm.TimesFmHparams(
+          backend="gpu",
+          per_core_batch_size=32,
+          horizon_len=128,
+      ),
+      checkpoint=timesfm.TimesFmCheckpoint(
+          huggingface_repo_id="google/timesfm-1.0-200m-pytorch"),
+  )
 ```
 
-Note that the four parameters are fixed to load the 200m model
+Note some of the parameters are fixed to load the 200m model
 
-```python
-input_patch_len=32,
-output_patch_len=128,
-num_layers=20,
-model_dims=1280,
-```
-
-1. The `context_len` here can be set as the max context length **of the model**. **It needs to be a multiplier of `input_patch_len`, i.e. a multiplier of 32.** You can provide a shorter series to the `tfm.forecast()` function and the model will handle it. Currently, the model handles a max context length of 512, which can be increased in later releases. The input time series can have **any context length**. Padding / truncation will be handled by the inference code if needed.
+1. The `context_len` in `hparams` here can be set as the max context length **of the model**. **It needs to be a multiplier of `input_patch_len`, i.e. a multiplier of 32.** You can provide a shorter series to the `tfm.forecast()` function and the model will handle it. Currently, the model handles a max context length of 512, which can be increased in later releases. The input time series can have **any context length**. Padding / truncation will be handled by the inference code if needed.
 
 2. The horizon length can be set to anything. We recommend setting it to the largest horizon length you would need in the forecasting tasks for your application. We generally recommend horizon length <= context length but it is not a requirement in the function call.
 
-3. `backend` is one of "cpu", "gpu" or "tpu", case sensitive.
+3. `backend` is one of "cpu", "gpu", case sensitive.
 
 ### Perform inference
 
