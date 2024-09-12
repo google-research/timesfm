@@ -17,7 +17,7 @@ This is not an officially supported Google product.
 We recommend at least 16GB RAM to load TimesFM dependencies.
 
 ## Update - Sep. 12, 2024
-- We have released full pytorch support (excludoing PEFT parts).
+- We have released full pytorch support (excluding PEFT parts).
 - Shoutout to @tanmayshishodia for checking in PEFT methods like LoRA and DoRA.
 - To install TimesFM, you can now simply do: `pip install timesfm`.
 - Launched [finetuning support](https://github.com/google-research/timesfm/blob/master/notebooks/finetuning.ipynb) that lets you finetune the weights of the pretrained TimesFM model on your own data.
