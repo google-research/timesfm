@@ -22,7 +22,7 @@ import torch.nn.functional as F
 
 
 def _create_quantiles() -> list[float]:
-  return [0.1, 0.25, 0.5, 0.75, 0.9]
+  return [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 
 
 @dataclasses.dataclass
@@ -192,7 +192,8 @@ def convert_paddings_to_mask(
   Returns:
       A torch.Tensor of shape [B, 1, 1, T] ready to add to attention logits.
   """
-  attention_mask = paddings[:, None, None, :]  # Equivalent to jnp.newaxis
+  attention_mask = paddings.detach().clone()
+  attention_mask = attention_mask[:, None, None, :]  # Equivalent to jnp.newaxis
   attention_mask *= get_large_negative_number(dtype)
   return attention_mask
 
