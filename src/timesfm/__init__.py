@@ -12,11 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """TimesFM init file."""
-
+print(
+    "TimesFM v1.2.0. See https://github.com/google-research/timesfm/blob/master/README.md for updated APIs."
+)
 from timesfm.timesfm_base import freq_map, TimesFmCheckpoint, TimesFmHparams, TimesFmBase
 try:
+  print("Loaded Jax TimesFM.")
   from timesfm.timesfm_jax import TimesFmJax as TimesFm
   from timesfm import data_loader
 except Exception as _:
-  print("No pax dependencies installed.")
+  print("Loaded PyTorch TimesFM.")
   from timesfm.timesfm_torch import TimesFmTorch as TimesFm
