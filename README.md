@@ -55,7 +55,7 @@ pyenv versions # to list the versions available (lets assume the versions are 3.
 pyenv local 3.10.15
 poetry env use 3.10.15
 poetry lock
-poetry install --only  pax
+poetry install -E  pax
 ```
 
 After than you can run the timesfm under `poetry shell` or do `poetry run python3 ...`.
@@ -66,7 +66,7 @@ After than you can run the timesfm under `poetry shell` or do `poetry run python
 pyenv local 3.11.10
 poetry env use 3.11.10
 poetry lock
-poetry install --only  torch
+poetry install -E  torch
 ```
 
 After than you can run the timesfm under `poetry shell` or do `poetry run python3 ...`.
@@ -86,7 +86,13 @@ Please see the `experiments` section fro more instructions.
 
 ### Install from PyPI (and publish)
 
-Instructions coming soon.
+On python 3.11 you can install the torch version using:
+
+```pip install timesfm[torch]```
+
+On python 3.10 you can install the pax version using:
+
+```pip install timesfm[pax]```
 
 
 ## Usage 
