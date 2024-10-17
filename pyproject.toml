@@ -37,22 +37,31 @@ wandb = ">=0.17.5"
 ipython = "^8.27.0"
 absl-py = ">=1.4.0"
 
-[tool.poetry.group.pax]
-optional = true
+[tool.poetry.extras]
+pax = ["paxml", "lingvo", "jax", "jaxlib"]
+torch = ["torch",  "jax", "jaxlib"]  # jax & jaxlib are already in pax
 
-[tool.poetry.group.pax.dependencies]
-paxml = { version = ">=1.4.0", python = ">=3.10,<3.11" }
-lingvo = { version = ">=0.12.7", python = ">=3.10,<3.11" }
-jax = { version = ">=0.4.26", extras = ["cuda12"], python = ">=3.10,<3.11" }
-jaxlib = { version = ">=0.4.26", python = ">=3.10,<3.11" }
+[tool.poetry.dependencies.paxml]
+version = ">=1.4.0"
+python = ">=3.10,<3.11"
 
-[tool.poetry.group.torch]
-optional = true
+[tool.poetry.dependencies.lingvo]
+version = ">=0.12.7"
+python = ">=3.10,<3.11"
 
-[tool.poetry.group.torch.dependencies]
-torch = { version = ">=2.0.0", extras = ["cuda"], python = ">=3.11,<3.12" }
-jax = { version = ">=0.4.26", extras = ["cuda12"], python = ">=3.11,<3.12" }
-jaxlib = { version = ">=0.4.26", python = ">=3.11,<3.12" }
+[tool.poetry.dependencies.jax]
+version = ">=0.4.26"
+extras = ["cuda12"]
+python = ">=3.10,<3.12"  # Support both python versions
+
+[tool.poetry.dependencies.jaxlib]
+version = ">=0.4.26"
+python = ">=3.10,<3.12"  # Support both python versions
+
+[tool.poetry.dependencies.torch]
+version = ">=2.0.0"
+extras = ["cuda"]
+python = ">=3.11,<3.12"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=8.3.2"
