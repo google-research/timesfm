@@ -55,8 +55,9 @@ class TimesFmTorch(timesfm_base.TimesFmBase):
     checkpoint_path = checkpoint.path
     repo_id = checkpoint.huggingface_repo_id
     if checkpoint_path is None:
-      checkpoint_path = path.join(snapshot_download(repo_id),
-                                  "torch_model.ckpt")
+      checkpoint_path = path.join(
+                snapshot_download(repo_id, local_dir=checkpoint.local_dir),
+                "torch_model.ckpt")
     self._model = ppd.PatchedTimeSeriesDecoder(self._model_config)
     loaded_checkpoint = torch.load(checkpoint_path, weights_only=True)
     logging.info("Loading checkpoint from %s", checkpoint_path)

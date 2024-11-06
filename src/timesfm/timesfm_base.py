@@ -130,6 +130,7 @@ class TimesFmCheckpoint:
   huggingface_repo_id: str | None = None
   type: Any = None
   step: int | None = None
+  local_dir: str | None = None
 
 
 class TimesFmBase:
