@@ -46,6 +46,7 @@ class TimesFmTorch(timesfm_base.TimesFmBase):
     self.global_batch_size = self.per_core_batch_size
     self._device = torch.device("cuda:0" if (
         torch.cuda.is_available() and self.backend == "gpu") else "cpu")
+    self._median_index = -1
 
   def load_from_checkpoint(
       self,
@@ -67,14 +68,13 @@ class TimesFmTorch(timesfm_base.TimesFmBase):
     self._model.eval()
     # TODO: add compilation.
 
-  def forecast(
+  def _forecast(
       self,
       inputs: Sequence[Any],
       freq: Sequence[int] | None = None,
       window_size: int | None = None,
       forecast_context_len: int | None = None,
       return_forecast_on_context: bool = False,
-      truncate_negative: bool = False,
   ) -> tuple[np.ndarray, np.ndarray]:
     """Forecasts on a list of time series.
 
@@ -89,8 +89,6 @@ class TimesFmTorch(timesfm_base.TimesFmBase):
           forecast_context_len: optional max context length.
           return_forecast_on_context: True to return the forecast on the context
             when available, i.e. after the first input patch.
-          truncate_negative: truncate to only non-negative values if all the contexts
-            have non-negative values.
 
         Returns:
         A tuple for JTensors:
@@ -110,7 +108,6 @@ class TimesFmTorch(timesfm_base.TimesFmBase):
     else:
       fcontext_len = forecast_context_len
     inputs = [np.array(ts)[-fcontext_len:] for ts in inputs]
-    inp_min = np.min([np.min(ts) for ts in inputs])
 
     if window_size is not None:
       new_inputs = []
@@ -166,7 +163,4 @@ class TimesFmTorch(timesfm_base.TimesFmBase):
     if window_size is not None:
       mean_outputs = mean_outputs[0::2, ...] + mean_outputs[1::2, ...]
       full_outputs = full_outputs[0::2, ...] + full_outputs[1::2, ...]
-    if inp_min >= 0 and truncate_negative:
-      mean_outputs = np.maximum(mean_outputs, 0.0)
-      full_outputs = np.maximum(full_outputs, 0.0)
     return mean_outputs, full_outputs
