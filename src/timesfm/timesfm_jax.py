@@ -89,6 +89,7 @@ class TimesFmJax(timesfm_base.TimesFmBase):
     self._pmapped_decode = None
     self._model = None
     self._train_state = None
+    self._median_index = -1
 
   def load_from_checkpoint(
       self,
