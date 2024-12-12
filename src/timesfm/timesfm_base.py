@@ -109,6 +109,7 @@ class TimesFmHparams:
   per_core_batch_size: int = 32
   backend: Literal["cpu", "gpu", "tpu"] = "cpu"
   quantiles: Sequence[float] | None = DEFAULT_QUANTILES
+  use_positional_embedding: bool = True
   # Hparams beyond the model.
   point_forecast_mode: Literal["mean", "median"] = "median"
 
@@ -172,6 +173,7 @@ class TimesFmBase:
     self.backend = hparams.backend
     self.quantiles = hparams.quantiles
     self.num_heads = hparams.num_heads
+    self.use_pos_emb = hparams.use_positional_embedding
 
     # Rewrite these values in __post_init__ for SPMD.
     self.num_cores = 1

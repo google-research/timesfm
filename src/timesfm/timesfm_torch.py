@@ -40,6 +40,7 @@ class TimesFmTorch(timesfm_base.TimesFmBase):
         horizon_len=self.output_patch_len,
         head_dim=self.model_dims // self.num_heads,
         quantiles=self.quantiles,
+        use_positional_embedding=self.use_pos_emb,
     )
     self._model = None
     self.num_cores = 1

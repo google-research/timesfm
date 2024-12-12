@@ -237,6 +237,7 @@ class PatchedTimeSeriesDecoder(base_layer.BaseLayer):
   stacked_transformer_params_tpl: LayerTpl = template_field(
       transformers.StackedTransformer)
   use_freq: bool = True
+  use_pos_emb: bool = True
 
   def setup(self) -> None:
     """Construct the model."""
@@ -332,16 +333,17 @@ class PatchedTimeSeriesDecoder(base_layer.BaseLayer):
     model_input = self.input_ff_layer(concat_inputs)
     # A patch should not be padded even if there is at least one zero.
     patched_padding = jnp.min(patched_pads, axis=-1)
-
-    if pos_emb is None:
-      position_emb = self.position_emb(seq_length=model_input.shape[1])
-    else:
-      position_emb = pos_emb
-    if self.do_eval:
-      if position_emb.shape[0] != model_input.shape[0]:
-        position_emb = jnp.repeat(position_emb, model_input.shape[0], axis=0)
-      position_emb = _shift_padded_seq(patched_padding, position_emb)
-    model_input += position_emb
+    
+    if self.use_pos_emb:
+      if pos_emb is None:
+        position_emb = self.position_emb(seq_length=model_input.shape[1])
+      else:
+        position_emb = pos_emb
+      if self.do_eval:
+        if position_emb.shape[0] != model_input.shape[0]:
+          position_emb = jnp.repeat(position_emb, model_input.shape[0], axis=0)
+        position_emb = _shift_padded_seq(patched_padding, position_emb)
+      model_input += position_emb
 
     return model_input, patched_padding, stats, patched_inputs
 

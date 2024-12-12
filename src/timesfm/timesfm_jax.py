@@ -117,6 +117,7 @@ class TimesFmJax(timesfm_base.TimesFmBase):
         residual_block_tpl=pax_fiddle.Config(patched_decoder.ResidualBlock),
         quantiles=self.quantiles,
         use_freq=True,
+        use_pos_emb=self.use_pos_emb,
         stacked_transformer_params_tpl=pax_fiddle.Config(
             transformers.StackedTransformer,
             num_heads=self.num_heads,
