@@ -365,8 +365,8 @@ class TimesFmBase:
     stats = None
     
     tmp_inputs = []
-    for each_inputs in inputs:
-      arr = np.array(each_inputs)
+    for each_input in inputs:
+      arr = np.array(each_input)
       if not np.isfinite(arr).all():
         arr = np.where(np.isfinite(arr), arr, np.nan)
         arr = strip_leading_nans(arr)
