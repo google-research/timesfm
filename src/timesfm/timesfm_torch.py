@@ -58,8 +58,8 @@ class TimesFmTorch(timesfm_base.TimesFmBase):
     repo_id = checkpoint.huggingface_repo_id
     if checkpoint_path is None:
       checkpoint_path = path.join(
-                snapshot_download(repo_id, local_dir=checkpoint.local_dir),
-                "torch_model.ckpt")
+          snapshot_download(repo_id, local_dir=checkpoint.local_dir),
+          "torch_model.ckpt")
     self._model = ppd.PatchedTimeSeriesDecoder(self._model_config)
     loaded_checkpoint = torch.load(checkpoint_path, weights_only=True)
     logging.info("Loading checkpoint from %s", checkpoint_path)
@@ -79,36 +79,33 @@ class TimesFmTorch(timesfm_base.TimesFmBase):
   ) -> tuple[np.ndarray, np.ndarray]:
     """Forecasts on a list of time series.
 
-        Args:
-          inputs: list of time series forecast contexts. Each context time series
-            should be in a format convertible to JTensor by `jnp.array`.
-          freq: frequency of each context time series. 0 for high frequency
-            (default), 1 for medium, and 2 for low. Notice this is different from
-            the `freq` required by `forecast_on_df`.
-          window_size: window size of trend + residual decomposition. If None then
-            we do not do decomposition.
-          forecast_context_len: optional max context length.
-          return_forecast_on_context: True to return the forecast on the context
-            when available, i.e. after the first input patch.
+    Args:
+      inputs: list of time series forecast contexts. Each context time series
+        should be in a format convertible to JTensor by `jnp.array`.
+      freq: frequency of each context time series. 0 for high frequency
+        (default), 1 for medium, and 2 for low. Notice this is different from
+        the `freq` required by `forecast_on_df`.
+      window_size: window size of trend + residual decomposition. If None then
+        we do not do decomposition.
+      forecast_context_len: optional max context length.
+      return_forecast_on_context: True to return the forecast on the context
+        when available, i.e. after the first input patch.
 
-        Returns:
-        A tuple for JTensors:
-        - the mean forecast of size (# inputs, # forecast horizon),
-        - the full forecast (mean + quantiles) of size
-            (# inputs,  # forecast horizon, 1 + # quantiles).
+    Returns:
+    A tuple for JTensors:
+    - the mean forecast of size (# inputs, # forecast horizon),
+    - the full forecast (mean + quantiles) of size
+        (# inputs,  # forecast horizon, 1 + # quantiles).
 
-        Raises:
-        ValueError: If the checkpoint is not properly loaded.
-        """
-    if not self._model:
-      raise ValueError(
-          "Checkpoint not loaded. Call `load_from_checkpoint` before"
-          " `forecast`.")
+    Raises:
+    ValueError: If the checkpoint is not properly loaded.
+    """
+    if self._model is None:
+      raise ValueError("Checkpoint is not properly loaded.")
+
     if forecast_context_len is None:
-      fcontext_len = self.context_len
-    else:
-      fcontext_len = forecast_context_len
-    inputs = [np.array(ts)[-fcontext_len:] for ts in inputs]
+      forecast_context_len = self.context_len
+    inputs = [np.array(ts)[-forecast_context_len:] for ts in inputs]
 
     if window_size is not None:
       new_inputs = []
@@ -121,36 +118,39 @@ class TimesFmTorch(timesfm_base.TimesFmBase):
       freq = [0] * len(inputs)
 
     input_ts, input_padding, inp_freq, pmap_pad = self._preprocess(inputs, freq)
+
     with torch.no_grad():
       mean_outputs = []
       full_outputs = []
-      assert input_ts.shape[0] % self.global_batch_size == 0
       for i in range(input_ts.shape[0] // self.global_batch_size):
-        input_ts_in = torch.from_numpy(
-            np.array(input_ts[i * self.global_batch_size:(i + 1) *
-                              self.global_batch_size],
-                     dtype=np.float32)).to(self._device)
-        input_padding_in = torch.from_numpy(
-            np.array(input_padding[i * self.global_batch_size:(i + 1) *
-                                   self.global_batch_size],
-                     dtype=np.float32)).to(self._device)
-        inp_freq_in = torch.from_numpy(
-            np.array(inp_freq[
-                i * self.global_batch_size:(i + 1) * self.global_batch_size,
-                :,
-            ],
-                     dtype=np.int32)).long().to(self._device)
+        t_input_ts = torch.Tensor(input_ts[i * self.global_batch_size:(i + 1) *
+                                           self.global_batch_size]).to(
+                                               self._device)
+        t_input_padding = torch.Tensor(
+            input_padding[i * self.global_batch_size:(i + 1) *
+                          self.global_batch_size]).to(self._device)
+        t_inp_freq = torch.LongTensor(
+            inp_freq[i * self.global_batch_size:(i + 1) *
+                     self.global_batch_size, :]).to(self._device)
+
         mean_output, full_output = self._model.decode(
-            input_ts=input_ts_in,
-            paddings=input_padding_in,
-            freq=inp_freq_in,
+            input_ts=t_input_ts,
+            paddings=t_input_padding,
+            freq=t_inp_freq,
             horizon_len=self.horizon_len,
-            return_forecast_on_context=return_forecast_on_context,
+            output_patch_len=self.output_patch_len,
+            # Returns forecasts on context for parity with the Jax version.
+            return_forecast_on_context=True,
         )
-        mean_output = mean_output.detach().cpu().numpy()
-        full_output = full_output.detach().cpu().numpy()
-        mean_output = np.array(mean_output)
-        full_output = np.array(full_output)
+        if not return_forecast_on_context:
+          mean_output = mean_output[:, self._horizon_start:, ...]
+          full_output = full_output[:, self._horizon_start:, ...]
+
+        if self.backend == "gpu":
+          mean_output = mean_output.cpu()
+          full_output = full_output.cpu()
+        mean_output = mean_output.detach().numpy()
+        full_output = full_output.detach().numpy()
         mean_outputs.append(mean_output)
         full_outputs.append(full_output)
 
@@ -164,4 +164,5 @@ class TimesFmTorch(timesfm_base.TimesFmBase):
     if window_size is not None:
       mean_outputs = mean_outputs[0::2, ...] + mean_outputs[1::2, ...]
       full_outputs = full_outputs[0::2, ...] + full_outputs[1::2, ...]
+
     return mean_outputs, full_outputs

@@ -16,10 +16,8 @@ This is not an officially supported Google product.
 
 We recommend at least 16GB RAM to load TimesFM dependencies.
 
-## Update - Sep. 12, 2024
-- We have released full pytorch support (excluding PEFT parts).
-- Shoutout to @tanmayshishodia for checking in PEFT methods like LoRA and DoRA.
-- To install TimesFM, you can now simply do: `pip install timesfm`.
+## Update - Dec. 30, 2024
+- We are launching a 500m checkpoint as a part of TimesFM-2.0 release.
 - Launched [finetuning support](https://github.com/google-research/timesfm/blob/master/notebooks/finetuning.ipynb) that lets you finetune the weights of the pretrained TimesFM model on your own data.
 - Launched [~zero-shot covariate support](https://github.com/google-research/timesfm/blob/master/notebooks/covariates.ipynb) with external regressors. More details [here](https://github.com/google-research/timesfm?tab=readme-ov-file#covariates-support).
 
@@ -29,6 +27,14 @@ timesfm-1.0-200m is the first open model checkpoint:
 
 - It performs univariate time series forecasting for context lengths up to 512 timepoints and any horizon lengths, with an optional frequency indicator.
 - It focuses on point forecasts, and does not support probabilistic forecasts. We experimentally offer quantile heads but they have not been calibrated after pretraining.
+- It requires the context to be contiguous (i.e. no "holes"), and the context and the horizon to be of the same frequency.
+
+## Checkpoint timesfm-2.0-500m (-jax/-pytorch)
+
+timesfm-2.0-500m is the second open model checkpoint:
+
+- It performs univariate time series forecasting for context lengths up to 2048 timepoints and any horizon lengths, with an optional frequency indicator.
+- It focuses on point forecasts. We experimentally offer 10 quantile heads but they have not been calibrated after pretraining.
 - It requires the context to be contiguous (i.e. no "holes"), and the context and the horizon to be of the same frequency.
 
 ## Benchmarks
@@ -103,6 +109,37 @@ Then the base class can be loaded as,
 ```python
 import timesfm
 
+# Loading the timesfm-2.0 checkpoint:
+# For PAX
+tfm = timesfm.TimesFm(
+      hparams=timesfm.TimesFmHparams(
+          backend="gpu",
+          per_core_batch_size=32,
+          horizon_len=128,
+          num_layers=50,
+          context_len=2048,
+
+          use_positional_embedding=False,
+      ),
+      checkpoint=timesfm.TimesFmCheckpoint(
+          huggingface_repo_id="google/timesfm-2.0-500m-jax"),
+  )
+
+# For Torch
+tfm = timesfm.TimesFm(
+      hparams=timesfm.TimesFmHparams(
+          backend="gpu",
+          per_core_batch_size=32,
+          horizon_len=128,
+          num_layers=50,
+          use_positional_embedding=False,
+          context_len=2048,
+      ),
+      checkpoint=timesfm.TimesFmCheckpoint(
+          huggingface_repo_id="google/timesfm-2.0-500m-pytorch"),
+  )
+
+# Loading the timesfm-1.0 checkpoint:
 # For PAX
 tfm = timesfm.TimesFm(
       hparams=timesfm.TimesFmHparams(
@@ -126,9 +163,9 @@ tfm = timesfm.TimesFm(
   )
 ```
 
-Note some of the parameters are fixed to load the 200m model
+Note some of the parameters are fixed to load the 200m and 500m models
 
-1. The `context_len` in `hparams` here can be set as the max context length **of the model**. **It needs to be a multiplier of `input_patch_len`, i.e. a multiplier of 32.** You can provide a shorter series to the `tfm.forecast()` function and the model will handle it. Currently, the model handles a max context length of 512, which can be increased in later releases. The input time series can have **any context length**. Padding / truncation will be handled by the inference code if needed.
+1. The `context_len` in `hparams` here can be set as the max context length **of the model** (a maximum of 2048 for 2.0 models and 512 for 1.0 models). **It needs to be a multiplier of `input_patch_len`, i.e. a multiplier of 32.** You can provide a shorter series to the `tfm.forecast()` function and the model will handle it. The input time series can have **any context length**. Padding / truncation will be handled by the inference code if needed.
 
 2. The horizon length can be set to anything. We recommend setting it to the largest horizon length you would need in the forecasting tasks for your application. We generally recommend horizon length <= context length but it is not a requirement in the function call.
 
