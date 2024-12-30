@@ -5,16 +5,16 @@ Research for time-series forecasting.
 
 * Paper: [A decoder-only foundation model for time-series forecasting](https://arxiv.org/abs/2310.10688), to appear in ICML 2024.
 * [Google Research blog](https://research.google/blog/a-decoder-only-foundation-model-for-time-series-forecasting/)
-* [Hugging Face checkpoint repo](https://huggingface.co/google/timesfm-1.0-200m)
+* [Hugging Face release](https://huggingface.co/collections/google/timesfm-release-66e4be5fdb56e960c1e482a6)
 
 This repo contains the code to load public TimesFM checkpoints and run model
 inference. Please visit our 
-[Hugging Face checkpoint repo](https://huggingface.co/google/timesfm-1.0-200m)
+[Hugging Face release](https://huggingface.co/collections/google/timesfm-release-66e4be5fdb56e960c1e482a6)
 to download model checkpoints.
 
 This is not an officially supported Google product.
 
-We recommend at least 16GB RAM to load TimesFM dependencies.
+We recommend at least 32GB RAM to load TimesFM dependencies.
 
 ## Update - Dec. 30, 2024
 - We are launching a 500m checkpoint as a part of TimesFM-2.0 release.
