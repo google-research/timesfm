@@ -35,11 +35,6 @@ timesfm-2.0-500m is our second open model checkpoint:
 - It performs univariate time series forecasting for context lengths up to 2048 timepoints and any horizon lengths, with an optional frequency indicator.
 - It focuses on point forecasts. We experimentally offer 10 quantile heads but they have not been calibrated after pretraining.
 
-## Benchmarks
-
-Please refer to our result tables on the [extended benchmarks](https://github.com/google-research/timesfm/tree/master/experiments/extended_benchmarks) and the [long horizon benchmarks](https://github.com/google-research/timesfm/tree/master/experiments/long_horizon_benchmarks).
-
-Please look into the README files in the respective benchmark directories within `experiments/` for instructions for running TimesFM on the respective benchmarks.
 
 ## Installation
 
