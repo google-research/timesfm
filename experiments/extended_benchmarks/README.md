@@ -22,7 +22,7 @@ poetry run python3 -m experiments.extended_benchmarks.run_timesfm --model_path=g
 
 Note: In the current version of TimesFM we focus on point forecasts and therefore the mase, smape have been calculated using the quantile head corresponding to the median i.e 0.5 quantile. We do offer 10 quantile heads but they have not been calibrated after pretraining. We recommend using them with caution or calibrate/conformalize them on a hold out for your applications. More to follow on later versions.
 
-## Benchmark Results
+## Benchmark Results for TimesFM-1.0
 
 ![Benchmark Results Table](./tfm_extended_new.png)
 

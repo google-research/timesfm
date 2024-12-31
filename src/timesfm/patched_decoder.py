@@ -333,7 +333,7 @@ class PatchedTimeSeriesDecoder(base_layer.BaseLayer):
     model_input = self.input_ff_layer(concat_inputs)
     # A patch should not be padded even if there is at least one zero.
     patched_padding = jnp.min(patched_pads, axis=-1)
-    
+
     if self.use_pos_emb:
       if pos_emb is None:
         position_emb = self.position_emb(seq_length=model_input.shape[1])
@@ -401,7 +401,7 @@ class PatchedTimeSeriesDecoder(base_layer.BaseLayer):
       inputs: NestedMap,
       horizon_len: int,
       output_patch_len: Optional[int] = None,
-      max_len: int = 512,
+      max_len: int | None = None,
       return_forecast_on_context: bool = False,
   ) -> tuple[JTensor, JTensor]:
     """Auto-regressive decoding without caching.
@@ -427,6 +427,8 @@ class PatchedTimeSeriesDecoder(base_layer.BaseLayer):
     final_out = inputs[_INPUT_TS]
     context_len = final_out.shape[1]
     paddings = inputs[_INPUT_PADDING]
+    if max_len is None:
+      max_len = context_len
     if self.use_freq:
       freq = inputs[_FREQ].astype(jnp.int32)
     else:

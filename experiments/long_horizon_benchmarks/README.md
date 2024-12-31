@@ -36,7 +36,7 @@ poetry run python3 -m experiments.long_horizon_benchmarks.run_eval \
 
 You can change the model size from "mini" to "large" as required. The datasets we benchmark on are etth1, etth2, ettm1 and ettm2.
 
-## Benchmark Results
+## Benchmark Results for TimesFM-1.0
 
 ![Benchmark Results Table](./tfm_long_horizon.png)
 

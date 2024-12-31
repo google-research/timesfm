@@ -61,6 +61,7 @@ def freq_map(freq: str):
   else:
     raise ValueError(f"Invalid frequency: {freq}")
 
+
 def strip_leading_nans(arr):
   """
   Removes contiguous NaN values from the beginning of a NumPy array.
@@ -76,6 +77,7 @@ def strip_leading_nans(arr):
   isnan = np.isnan(arr)
   first_valid_index = np.argmax(~isnan)
   return arr[first_valid_index:]
+
 
 def linear_interpolation(arr):
   """
@@ -95,7 +97,9 @@ def linear_interpolation(arr):
   if not np.any(nans):  # Check if there are any NaNs
     return arr
 
-  x = lambda z: z.nonzero()[0]
+  def x(z):
+    return z.nonzero()[0]
+
   nans_indices = x(nans)
   non_nans_indices = x(~nans)
   non_nans_values = arr[~nans]
@@ -363,7 +367,7 @@ class TimesFmBase:
     ValueError: If the checkpoint is not properly loaded.
     """
     stats = None
-    
+
     tmp_inputs = []
     for each_input in inputs:
       arr = np.array(each_input)
@@ -372,7 +376,7 @@ class TimesFmBase:
         arr = strip_leading_nans(arr)
         arr = linear_interpolation(arr)
       tmp_inputs.append(arr)
-  
+
     inputs = tmp_inputs
     if normalize:
       inputs, stats = _normalize(inputs)

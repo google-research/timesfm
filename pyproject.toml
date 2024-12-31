@@ -2,7 +2,7 @@
 name = "timesfm"
 packages = [{ include = "timesfm", from = "src" }]
 description = "Open weights time-series foundation model from Google Research."
-version = "1.0.1"
+version = "1.2.5"
 authors = [
     "Rajat Sen <senrajat@google.com>",
     "Yichen Zhou <yichenzhou@google.com>",
@@ -28,7 +28,7 @@ include = ["LICENSE"]
 python = ">=3.10,<3.12"
 einshape = ">=1.0.0"
 numpy = ">=1.26.4"
-pandas = ">=2.1.4"
+pandas = ">=2.0.0"
 utilsforecast = ">=0.1.10"
 huggingface_hub = { version = ">=0.23.0", extras = ["cli"] }
 scikit-learn = ">=1.2.2"
