@@ -17,7 +17,7 @@ This is not an officially supported Google product.
 We recommend at least 32GB RAM to load TimesFM dependencies.
 
 ## Update - Dec. 30, 2024
-- We are launching a 500m checkpoint as a part of TimesFM-2.0 release.
+- We are launching a 500m checkpoint as a part of TimesFM-2.0 release. This new checkpoint can be upto 25% better than v1.0 on leading benchmarks and also has a 4 times longer max. context length.
 - Launched [finetuning support](https://github.com/google-research/timesfm/blob/master/notebooks/finetuning.ipynb) that lets you finetune the weights of the pretrained TimesFM model on your own data.
 - Launched [~zero-shot covariate support](https://github.com/google-research/timesfm/blob/master/notebooks/covariates.ipynb) with external regressors. More details [here](https://github.com/google-research/timesfm?tab=readme-ov-file#covariates-support).
 
@@ -34,7 +34,11 @@ timesfm-2.0-500m is our second open model checkpoint:
 
 - It performs univariate time series forecasting for context lengths up to 2048 timepoints and any horizon lengths, with an optional frequency indicator.
 - It focuses on point forecasts. We experimentally offer 10 quantile heads but they have not been calibrated after pretraining.
+- This new checkpoint can be upto 25% better than v1.0 on leading benchmarks and also has a 4 times longer max. context length.
 
+## Benchmarking
+
+TimesFM 2.0 has been added to [GIFT-Eval](https://huggingface.co/spaces/Salesforce/GIFT-Eval) which is one of the most comprehensive time-series bechmarks available. It takes the top spot in terms of aggregated MASE and CRPS, where it is 6\% better than the next best model in terms of aggregated MASE.
 
 ## Installation
 
