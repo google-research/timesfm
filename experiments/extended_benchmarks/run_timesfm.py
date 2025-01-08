@@ -54,7 +54,10 @@ dataset_names = [
     "hospital",
 ]
 
-context_dict = {
+
+context_dict_v2 = {}
+
+context_dict_v1 = {
     "cif_2016": 32,
     "tourism_yearly": 64,
     "covid_deaths": 64,
@@ -71,7 +74,7 @@ context_dict = {
     "m4_yearly": 64,
 }
 
-_MODEL_PATH = flags.DEFINE_string("model_path", "google/timesfm-1.0-200m",
+_MODEL_PATH = flags.DEFINE_string("model_path", "google/timesfm-2.0-500m-jax",
                                   "Path to model")
 _BATCH_SIZE = flags.DEFINE_integer("batch_size", 64, "Batch size")
 _HORIZON = flags.DEFINE_integer("horizon", 128, "Horizon")
@@ -84,14 +87,27 @@ QUANTILES = list(np.arange(1, 10) / 10.0)
 
 def main():
   results_list = []
+  model_path = _MODEL_PATH.value
+  num_layers = 20
+  max_context_len = 512
+  use_positional_embedding = True
+  context_dict = context_dict_v1
+  if "2.0" in model_path:
+    num_layers = 50
+    use_positional_embedding = False
+    max_context_len = 2048
+    context_dict = context_dict_v2
+
   tfm = timesfm.TimesFm(
       hparams=timesfm.TimesFmHparams(
-          backend=_BACKEND.value,
-          per_core_batch_size=_BATCH_SIZE.value,
-          horizon_len=_HORIZON.value,
+          backend="gpu",
+          per_core_batch_size=32,
+          horizon_len=128,
+          num_layers=num_layers,
+          context_len=max_context_len,
+          use_positional_embedding=use_positional_embedding,
       ),
-      checkpoint=timesfm.TimesFmCheckpoint(
-          huggingface_repo_id=_MODEL_PATH.value),
+      checkpoint=timesfm.TimesFmCheckpoint(huggingface_repo_id=model_path),
   )
   run_id = np.random.randint(100000)
   model_name = "timesfm"
@@ -102,7 +118,8 @@ def main():
     if dataset in context_dict:
       context_len = context_dict[dataset]
     else:
-      context_len = 512
+      context_len = max_context_len
+
     train_df = exp.train_df
     freq = exp.freq
     init_time = time.time()
@@ -113,6 +130,7 @@ def main():
         model_name=model_name,
         forecast_context_len=context_len,
         num_jobs=_NUM_JOBS.value,
+        normalize=True,
     )
     total_time = time.time() - init_time
     time_df = pd.DataFrame({"time": [total_time], "model": model_name})
