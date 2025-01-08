@@ -32,8 +32,8 @@ _BATCH_SIZE = flags.DEFINE_integer("batch_size", 64,
                                    "Batch size for the randomly sampled batch")
 _DATASET = flags.DEFINE_string("dataset", "etth1", "The name of the dataset.")
 
-_MODEL_PATH = flags.DEFINE_string("model_path", "./timesfm_q10_20240501",
-                                  "The name of the dataset.")
+_MODEL_PATH = flags.DEFINE_string("model_path", "google/timesfm-2.0-500m-jax",
+                                  "The name of the model.")
 _DATETIME_COL = flags.DEFINE_string("datetime_col", "date",
                                     "Column having datetime.")
 _NUM_COV_COLS = flags.DEFINE_list("num_cov_cols", None,
@@ -43,7 +43,7 @@ _CAT_COV_COLS = flags.DEFINE_list("cat_cov_cols", None,
 _TS_COLS = flags.DEFINE_list("ts_cols", None, "Columns of time-series features")
 _NORMALIZE = flags.DEFINE_bool("normalize", True,
                                "normalize data for eval or not")
-_CONTEXT_LEN = flags.DEFINE_integer("context_len", 512,
+_CONTEXT_LEN = flags.DEFINE_integer("context_len", 2048,
                                     "Length of the context window")
 _PRED_LEN = flags.DEFINE_integer("pred_len", 96, "prediction length.")
 _BACKEND = flags.DEFINE_string("backend", "gpu", "backend to use")
@@ -177,9 +177,12 @@ def eval():
   else:
     model = timesfm.TimesFm(
         hparams=timesfm.TimesFmHparams(
-            backend=_BACKEND.value,
-            per_core_batch_size=_BATCH_SIZE.value,
-            horizon_len=_PRED_LEN.value,
+            backend="gpu",
+            per_core_batch_size=32,
+            horizon_len=128,
+            num_layers=50,
+            context_len=_CONTEXT_LEN.value,
+            use_positional_embedding=False,
         ),
         checkpoint=timesfm.TimesFmCheckpoint(huggingface_repo_id=model_path),
     )

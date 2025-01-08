@@ -636,6 +636,7 @@ class TimesFmBase:
       model_name: str = "timesfm",
       window_size: int | None = None,
       num_jobs: int = 1,
+      normalize: bool = False,
       verbose: bool = True,
   ) -> pd.DataFrame:
     """Forecasts on a list of time series.
@@ -654,6 +655,7 @@ class TimesFmBase:
       window_size: window size of trend + residual decomposition. If None then
         we do not do decomposition.
       num_jobs: number of parallel processes to use for dataframe processing.
+      normalize: normalize context before forecasting or not.
       verbose: output model states in terminal.
 
     Returns:
@@ -698,6 +700,7 @@ class TimesFmBase:
     freq_inps = [freq_map(freq)] * len(new_inputs)
     _, full_forecast = self.forecast(new_inputs,
                                      freq=freq_inps,
+                                     normalize=normalize,
                                      window_size=window_size)
     if verbose:
       print("Finished forecasting.")
