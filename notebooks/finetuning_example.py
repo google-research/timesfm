@@ -2,23 +2,21 @@
 Example usage of the TimesFM Finetuning Framework.
 """
 
-import yfinance as yf
-import torch
 from os import path
-import numpy as np
-from torch.utils.data import Dataset
-from timesfm import TimesFm, TimesFmHparams, TimesFmCheckpoint
-from timesfm.pytorch_patched_decoder import PatchedTimeSeriesDecoder
-from finetuning_torch import FinetuningConfig, TimesFMFinetuner
-from huggingface_hub import snapshot_download
+from typing import Optional, Tuple
+
 import numpy as np
 import pandas as pd
-from torch.utils.data import Dataset
 import torch
+import torch.multiprocessing as mp
 import yfinance as yf
-from typing import Tuple, Optional
+from finetuning_torch import FinetuningConfig, TimesFMFinetuner
+from huggingface_hub import snapshot_download
+from torch.utils.data import Dataset
 
-from timesfm import TimesFm, TimesFmHparams
+from timesfm import TimesFm, TimesFmCheckpoint, TimesFmHparams
+from timesfm.pytorch_patched_decoder import PatchedTimeSeriesDecoder
+import os
 
 
 class TimeSeriesDataset(Dataset):
@@ -199,7 +197,7 @@ def get_data(context_len: int, horizon_len: int) -> Tuple[Dataset, Dataset]:
     return train_dataset, val_dataset
 
 
-def basic_example():
+def single_gpu_example():
     """Basic example of finetuning TimesFM on stock data."""
     model, hparams, tfm_config = get_model(load_weights=True)
     config = FinetuningConfig(batch_size=256, num_epochs=5, learning_rate=1e-4, use_wandb=True)
@@ -220,5 +218,76 @@ def basic_example():
     )
 
 
+def setup_process(rank, world_size, model, config, train_dataset, val_dataset, return_dict):
+    """Initialize the distributed process."""
+    # Set up the process group
+    os.environ["MASTER_ADDR"] = "localhost"
+    os.environ["MASTER_PORT"] = "12355"
+
+    # Initialize the process group
+    torch.distributed.init_process_group(backend="nccl", init_method="env://", world_size=world_size, rank=rank)
+
+    # Set the device for this process
+    torch.cuda.set_device(rank)
+
+    try:
+        finetuner = TimesFMFinetuner(model, config, rank=rank)
+        results = finetuner.finetune(train_dataset=train_dataset, val_dataset=val_dataset)
+
+        if rank == 0:  # Only store results and plot from the main process
+            return_dict["results"] = results
+            plot_predictions(
+                model=model,
+                val_dataset=val_dataset,
+                save_path="timesfm_predictions.png",
+            )
+    finally:
+        # Cleanup - important!
+        torch.distributed.destroy_process_group()
+
+
+def multi_gpu_example():
+    """Example of finetuning TimesFM using multiple GPUs."""
+    # Define which GPUs to use
+    gpu_ids = [0]  # Just using one GPU
+    world_size = len(gpu_ids)
+
+    # Initialize model and config
+    model, hparams, tfm_config = get_model(load_weights=True)
+    config = FinetuningConfig(
+        batch_size=256,
+        num_epochs=5,
+        learning_rate=1e-4,
+        use_wandb=False,
+        distributed=True,
+        gpu_ids=gpu_ids,
+    )
+
+    # Get datasets
+    train_dataset, val_dataset = get_data(128, tfm_config.horizon_len)
+
+    # Create a multiprocessing manager to share results between processes
+    manager = mp.Manager()
+    return_dict = manager.dict()
+
+    # Launch processes
+    mp.spawn(
+        setup_process,
+        args=(world_size, model, config, train_dataset, val_dataset, return_dict),
+        nprocs=world_size,
+        join=True,
+    )
+
+    # Get results from the main process
+    results = return_dict.get("results", None)
+    print("\nFinetuning completed!")
+    if results:
+        print(f"Training history: {len(results['history']['train_loss'])} epochs")
+
+    return results
+
+
 if __name__ == "__main__":
-    basic_example()
+    # Use either single GPU or multi-GPU example
+    # basic_example()  # Single GPU
+    multi_gpu_example()  # Multi-GPU

@@ -26,17 +26,19 @@ Example usage:
 
 import abc
 import logging
-from dataclasses import dataclass
+import multiprocessing as mp
+import os
+from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Optional, Dict, Any
+from typing import Any, Dict, List, Optional
 
 import torch
-from torch.utils.data import Dataset, DataLoader
+import torch.distributed as dist
 import torch.optim as optim
 from torch.nn.parallel import DistributedDataParallel as DDP
-import wandb
-import multiprocessing as mp
+from torch.utils.data import DataLoader, Dataset
 
+import wandb
 from timesfm import TimesFm
 
 
@@ -59,34 +61,42 @@ class FinetuningConfig:
     use_wandb: bool = False
     wandb_project: str = "timesfm-finetuning"
 
+    gpu_ids: List[int] = field(default_factory=lambda: [0])  # List of GPU IDs to use
+    distributed: bool = False
+    master_port: str = "12355"
+    master_addr: str = "localhost"
+
 
 class TimesFMFinetuner:
-    """Main class for finetuning TimesFM models."""
-
     def __init__(
         self,
         model: TimesFm,
         config: FinetuningConfig,
+        rank: int = 0,
         loss_fn: Optional[callable] = None,
         logger: Optional[logging.Logger] = None,
     ):
-        """
-        Initialize TimesFM finetuner.
-
-        Args:
-            model: TimesFM model to finetune
-            config: Finetuning configuration
-            logger: Optional logger instance
-        """
         self.model = model
         self.config = config
         self.logger = logger or logging.getLogger(__name__)
+        self.rank = rank
 
-        self.device = torch.device(config.device)
-        self.loss_fn = loss_fn or (lambda x, y: torch.mean((x - y.squeeze(-1)) ** 2))  # MSELoss()
+        if config.distributed:
+            self._setup_distributed(rank)
 
-        if config.use_wandb:
+        self.device = torch.device(f"cuda:{rank}" if torch.cuda.is_available() else "cpu")
+        self.loss_fn = loss_fn or (lambda x, y: torch.mean((x - y.squeeze(-1)) ** 2))
+
+        if config.use_wandb and rank == 0:  # Only initialize wandb on main process
             self._setup_wandb()
+
+    def _setup_distributed(self, rank):
+        """Setup distributed training environment."""
+        os.environ["MASTER_ADDR"] = self.config.master_addr
+        os.environ["MASTER_PORT"] = self.config.master_port
+
+        if not dist.is_initialized():
+            dist.init_process_group(backend="nccl", world_size=len(self.config.gpu_ids), rank=rank)
 
     def _setup_wandb(self) -> None:
         """Initialize Weights & Biases logging."""
@@ -94,14 +104,22 @@ class TimesFMFinetuner:
 
     def _create_dataloader(self, dataset: Dataset, name: str) -> DataLoader:
         """Create a dataloader from a dataset."""
+        if self.config.distributed:
+            sampler = torch.utils.data.distributed.DistributedSampler(
+                dataset, num_replicas=len(self.config.gpu_ids), rank=dist.get_rank(), shuffle=name == "train"
+            )
+        else:
+            sampler = None
+
         return DataLoader(
             dataset,
             batch_size=self.config.batch_size,
-            shuffle=name == "train",
-            num_workers=mp.cpu_count(),
+            shuffle=(name == "train" and not self.config.distributed),
+            num_workers=mp.cpu_count() // len(self.config.gpu_ids),
             pin_memory=self.device.type == "cuda",
             persistent_workers=True,
             prefetch_factor=2,
+            sampler=sampler,
         )
 
     def _train_epoch(self, train_loader: DataLoader, optimizer: torch.optim.Optimizer) -> float:
@@ -157,13 +175,19 @@ class TimesFMFinetuner:
         """
         self.model = self.model.to(self.device)
 
+        if self.config.distributed:
+            self.model = DDP(
+                self.model,
+                device_ids=[self.config.gpu_ids[dist.get_rank()]],
+                output_device=self.config.gpu_ids[dist.get_rank()],
+            )
+
         train_loader = self._create_dataloader(train_dataset, "train")
         val_loader = self._create_dataloader(val_dataset, "val")
 
         optimizer = optim.Adam(
             self.model.parameters(), lr=self.config.learning_rate, weight_decay=self.config.weight_decay
         )
-
         history = {"train_loss": [], "val_loss": [], "learning_rate": []}
 
         self.logger.info(f"Starting training for {self.config.num_epochs} epochs...")
@@ -195,5 +219,8 @@ class TimesFMFinetuner:
                 print(f"[Epoch {epoch+1}] Train Loss: {train_loss:.4f} | Val Loss: {val_loss:.4f}")
         except KeyboardInterrupt:
             self.logger.info("Training interrupted by user")
+
+        if self.config.distributed:
+            dist.destroy_process_group()
 
         return {"history": history}
