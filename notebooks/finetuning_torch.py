@@ -39,7 +39,6 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.utils.data import DataLoader, Dataset
 
 import wandb
-from timesfm import TimesFm
 
 
 @dataclass
@@ -63,14 +62,14 @@ class FinetuningConfig:
 
     gpu_ids: List[int] = field(default_factory=lambda: [0])  # List of GPU IDs to use
     distributed: bool = False
-    master_port: str = "12355"
+    master_port: str = "12358"
     master_addr: str = "localhost"
 
 
 class TimesFMFinetuner:
     def __init__(
         self,
-        model: TimesFm,
+        model,
         config: FinetuningConfig,
         rank: int = 0,
         loss_fn: Optional[callable] = None,
@@ -87,7 +86,7 @@ class TimesFMFinetuner:
         self.device = torch.device(f"cuda:{rank}" if torch.cuda.is_available() else "cpu")
         self.loss_fn = loss_fn or (lambda x, y: torch.mean((x - y.squeeze(-1)) ** 2))
 
-        if config.use_wandb and rank == 0:  # Only initialize wandb on main process
+        if config.use_wandb and rank == 0:
             self._setup_wandb()
 
     def _setup_distributed(self, rank):
@@ -100,7 +99,11 @@ class TimesFMFinetuner:
 
     def _setup_wandb(self) -> None:
         """Initialize Weights & Biases logging."""
-        wandb.init(project=self.config.wandb_project, config=self.config.__dict__)
+
+    def _setup_wandb(self) -> None:
+        """Initialize Weights & Biases logging only on the main process."""
+        if self.rank == 0:  # Only initialize on main process
+            wandb.init(project=self.config.wandb_project, config=self.config.__dict__)
 
     def _create_dataloader(self, dataset: Dataset, name: str) -> DataLoader:
         """Create a dataloader from a dataset."""
@@ -115,15 +118,11 @@ class TimesFMFinetuner:
             dataset,
             batch_size=self.config.batch_size,
             shuffle=(name == "train" and not self.config.distributed),
-            num_workers=mp.cpu_count() // len(self.config.gpu_ids),
-            pin_memory=self.device.type == "cuda",
-            persistent_workers=True,
-            prefetch_factor=2,
             sampler=sampler,
         )
 
     def _train_epoch(self, train_loader: DataLoader, optimizer: torch.optim.Optimizer) -> float:
-        """Train for one epoch."""
+        """Train for one epoch with loss debugging."""
         self.model.train()
         total_loss = 0.0
         n_batches = len(train_loader)
@@ -136,6 +135,10 @@ class TimesFMFinetuner:
             last_patch_pred = predictions_mean[:, -1, :]
             loss = self.loss_fn(last_patch_pred, x_future.squeeze(-1))
 
+            if self.config.distributed:
+                losses = [torch.zeros_like(loss) for _ in range(dist.get_world_size())]
+                dist.all_gather(losses, loss)
+
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
@@ -144,21 +147,26 @@ class TimesFMFinetuner:
 
         return total_loss / n_batches
 
-    @torch.no_grad()
     def _validate(self, val_loader: DataLoader) -> float:
-        """Perform validation."""
+        """Perform validation with loss debugging."""
         self.model.eval()
         total_loss = 0.0
 
-        for batch in val_loader:
-            x_context, x_padding, freq, x_future = [t.to(self.device) for t in batch]
+        with torch.no_grad():
+            for batch in val_loader:
+                x_context, x_padding, freq, x_future = [t.to(self.device) for t in batch]
 
-            predictions = self.model(x_context, x_padding.float(), freq)
-            predictions_mean = predictions[..., 0]
-            last_patch_pred = predictions_mean[:, -1, :]
+                predictions = self.model(x_context, x_padding.float(), freq)
+                predictions_mean = predictions[..., 0]
+                last_patch_pred = predictions_mean[:, -1, :]
 
-            loss = self.loss_fn(last_patch_pred, x_future.squeeze(-1))
-            total_loss += loss.item()
+                loss = self.loss_fn(last_patch_pred, x_future.squeeze(-1))
+
+                if self.config.distributed:
+                    losses = [torch.zeros_like(loss) for _ in range(dist.get_world_size())]
+                    dist.all_gather(losses, loss)
+
+                total_loss += loss.item()
 
         return total_loss / len(val_loader)
 
@@ -202,21 +210,58 @@ class TimesFMFinetuner:
 
                 current_lr = optimizer.param_groups[0]["lr"]
 
-                history["train_loss"].append(train_loss)
-                history["val_loss"].append(val_loss)
-                history["learning_rate"].append(current_lr)
+                if self.config.distributed:
+                    train_tensor = torch.tensor(train_loss, device=self.device)
+                    val_tensor = torch.tensor(val_loss, device=self.device)
 
-                metrics = {
-                    "train_loss": train_loss,
-                    "val_loss": val_loss,
-                    "learning_rate": current_lr,
-                    "epoch": epoch + 1,
-                }
+                    world_size = dist.get_world_size()
+                    train_losses = [torch.zeros_like(train_tensor, device=self.device) for _ in range(world_size)]
+                    val_losses = [torch.zeros_like(val_tensor, device=self.device) for _ in range(world_size)]
 
-                if self.config.use_wandb:
-                    wandb.log(metrics)
+                    dist.all_gather(train_losses, train_tensor)
+                    dist.all_gather(val_losses, val_tensor)
 
-                print(f"[Epoch {epoch+1}] Train Loss: {train_loss:.4f} | Val Loss: {val_loss:.4f}")
+                    if self.rank == 0 and self.config.use_wandb:
+                        train_losses = [t.cpu().item() for t in train_losses]
+                        val_losses = [t.cpu().item() for t in val_losses]
+
+                        for gpu_idx, (t_loss, v_loss) in enumerate(zip(train_losses, val_losses)):
+                            wandb.log(
+                                {
+                                    f"train_loss_gpu_{gpu_idx}": t_loss,
+                                    f"val_loss_gpu_{gpu_idx}": v_loss,
+                                },
+                                commit=False,
+                            )
+
+                        wandb.log(
+                            {
+                                "train_loss": train_loss,
+                                "val_loss": val_loss,
+                                "learning_rate": current_lr,
+                                "epoch": epoch + 1,
+                            }
+                        )
+                        history["train_loss"].append(train_loss)
+                        history["val_loss"].append(val_loss)
+                        history["learning_rate"].append(current_lr)
+
+                else:
+                    if self.config.use_wandb:
+                        wandb.log(
+                            {
+                                "train_loss": train_loss,
+                                "val_loss": val_loss,
+                                "learning_rate": current_lr,
+                                "epoch": epoch + 1,
+                            }
+                        )
+                    history["train_loss"].append(train_loss)
+                    history["val_loss"].append(val_loss)
+                    history["learning_rate"].append(current_lr)
+
+                if self.rank == 0:
+                    print(f"[Epoch {epoch+1}] Train Loss: {train_loss:.4f} | Val Loss: {val_loss:.4f}")
         except KeyboardInterrupt:
             self.logger.info("Training interrupted by user")
 

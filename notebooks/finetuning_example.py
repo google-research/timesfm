@@ -107,7 +107,6 @@ def get_model(load_weights: bool = False):
         checkpoint_path = path.join(snapshot_download(repo_id), "torch_model.ckpt")
         loaded_checkpoint = torch.load(checkpoint_path, weights_only=True)
         model.load_state_dict(loaded_checkpoint)
-    model = model.to(device)
     return model, hparams, tfm._model_config
 
 
@@ -219,54 +218,55 @@ def single_gpu_example():
 
 
 def setup_process(rank, world_size, model, config, train_dataset, val_dataset, return_dict):
-    """Initialize the distributed process."""
-    # Set up the process group
-    os.environ["MASTER_ADDR"] = "localhost"
-    os.environ["MASTER_PORT"] = "12355"
-
-    # Initialize the process group
-    torch.distributed.init_process_group(backend="nccl", init_method="env://", world_size=world_size, rank=rank)
-
-    # Set the device for this process
-    torch.cuda.set_device(rank)
-
+    """Setup process function with optimized CUDA handling."""
     try:
+        if torch.cuda.is_available():
+            torch.cuda.set_device(rank)
+
+        os.environ["MASTER_ADDR"] = config.master_addr
+        os.environ["MASTER_PORT"] = config.master_port
+        if not torch.distributed.is_initialized():
+            torch.distributed.init_process_group(backend="nccl", world_size=world_size, rank=rank)
+
         finetuner = TimesFMFinetuner(model, config, rank=rank)
+
         results = finetuner.finetune(train_dataset=train_dataset, val_dataset=val_dataset)
 
-        if rank == 0:  # Only store results and plot from the main process
+        if rank == 0:
             return_dict["results"] = results
             plot_predictions(
                 model=model,
                 val_dataset=val_dataset,
                 save_path="timesfm_predictions.png",
             )
+
+    except Exception as e:
+        print(f"Error in process {rank}: {str(e)}")
+        raise e
     finally:
-        # Cleanup - important!
-        torch.distributed.destroy_process_group()
+        if torch.distributed.is_initialized():
+            torch.distributed.destroy_process_group()
 
 
 def multi_gpu_example():
-    """Example of finetuning TimesFM using multiple GPUs."""
-    # Define which GPUs to use
-    gpu_ids = [0]  # Just using one GPU
+    """Example of finetuning TimesFM using multiple GPUs with optimized spawn."""
+    mp.set_start_method("spawn", force=True)
+
+    gpu_ids = [0, 1]
     world_size = len(gpu_ids)
 
-    # Initialize model and config
     model, hparams, tfm_config = get_model(load_weights=True)
+
+    # Create config
     config = FinetuningConfig(
         batch_size=256,
         num_epochs=5,
         learning_rate=1e-4,
-        use_wandb=False,
+        use_wandb=True,
         distributed=True,
         gpu_ids=gpu_ids,
     )
-
-    # Get datasets
     train_dataset, val_dataset = get_data(128, tfm_config.horizon_len)
-
-    # Create a multiprocessing manager to share results between processes
     manager = mp.Manager()
     return_dict = manager.dict()
 
@@ -278,16 +278,17 @@ def multi_gpu_example():
         join=True,
     )
 
-    # Get results from the main process
     results = return_dict.get("results", None)
     print("\nFinetuning completed!")
-    if results:
-        print(f"Training history: {len(results['history']['train_loss'])} epochs")
-
     return results
 
 
 if __name__ == "__main__":
-    # Use either single GPU or multi-GPU example
-    # basic_example()  # Single GPU
-    multi_gpu_example()  # Multi-GPU
+    try:
+        # single_gpu_example()  # Single GPU
+        multi_gpu_example()  # Multi-GPU
+    except Exception as e:
+        print(f"Training failed: {str(e)}")
+    finally:
+        if torch.distributed.is_initialized():
+            torch.distributed.destroy_process_group()
