@@ -90,7 +90,7 @@ class TimesFMFinetuner:
 
     def _setup_wandb(self) -> None:
         """Initialize Weights & Biases logging."""
-        wandb.init(project=self.config.wandb_project, entity=self.config.wandb_entity, config=self.config.__dict__)
+        wandb.init(project=self.config.wandb_project, config=self.config.__dict__)
 
     def _create_dataloader(self, dataset: Dataset, name: str) -> DataLoader:
         """Create a dataloader from a dataset."""

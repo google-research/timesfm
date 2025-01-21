@@ -202,7 +202,7 @@ def get_data(context_len: int, horizon_len: int) -> Tuple[Dataset, Dataset]:
 def basic_example():
     """Basic example of finetuning TimesFM on stock data."""
     model, hparams, tfm_config = get_model(load_weights=True)
-    config = FinetuningConfig(batch_size=256, num_epochs=5, learning_rate=1e-4, use_wandb=False)
+    config = FinetuningConfig(batch_size=256, num_epochs=5, learning_rate=1e-4, use_wandb=True)
 
     train_dataset, val_dataset = get_data(128, tfm_config.horizon_len)
     finetuner = TimesFMFinetuner(model, config)
