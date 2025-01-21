@@ -261,7 +261,7 @@ def multi_gpu_example():
     config = FinetuningConfig(
         batch_size=256,
         num_epochs=5,
-        learning_rate=1e-4,
+        learning_rate=3e-5,
         use_wandb=True,
         distributed=True,
         gpu_ids=gpu_ids,
