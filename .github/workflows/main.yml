@@ -23,7 +23,7 @@ jobs:
       # e.g. poetry version 0.1.${{ github.run_number }}
       - name: Set Version number
         run: |
-          poetry version 1.2.7
+          poetry version 1.2.8
       - name: Build and Publish to PyPI
         run: |
           poetry config pypi-token.pypi ${{ secrets.PYPI_API_TOKEN }}

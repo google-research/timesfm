@@ -12,14 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """TimesFM init file."""
+
 print(
-    "TimesFM v1.2.0. See https://github.com/google-research/timesfm/blob/master/README.md for updated APIs."
+    " See https://github.com/google-research/timesfm/blob/master/README.md for updated APIs."
 )
-from timesfm.timesfm_base import freq_map, TimesFmCheckpoint, TimesFmHparams, TimesFmBase
+from timesfm.timesfm_base import (
+    freq_map,
+    TimesFmCheckpoint,
+    TimesFmHparams,
+    TimesFmBase,
+)
+import sys
+
 try:
-  print("Loaded Jax TimesFM.")
-  from timesfm.timesfm_jax import TimesFmJax as TimesFm
-  from timesfm import data_loader
+    from timesfm.timesfm_jax import TimesFmJax as TimesFm
+    from timesfm import data_loader
+
+    print(f"Loaded Jax TimesFM, likely because python version is {sys.version}.")
 except Exception as _:
-  print("Loaded PyTorch TimesFM.")
-  from timesfm.timesfm_torch import TimesFmTorch as TimesFm
+    from timesfm.timesfm_torch import TimesFmTorch as TimesFm
+
+    print(f"Loaded PyTorch TimesFM, likely because python version is {sys.version}.")
