@@ -13,7 +13,7 @@ import torch.distributed as dist
 import torch.nn as nn
 from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.utils.data import DataLoader, Dataset
-from timesfm.patched_decoder import DEFAULT_QUANTILES
+from timesfm.pytorch_patched_decoder import _create_quantiles
 
 import wandb
 
@@ -127,7 +127,7 @@ class FinetuningConfig:
       weight_decay: L2 regularization factor.
       freq_type: Frequency, can be [0, 1, 2].
       use_quantile_loss: bool = False  # Flag to enable/disable quantile loss
-      quantiles: List[float] = field(default_factory=lambda: [0.1, 0.5, 0.9])
+      quantiles: Optional[List[float]] = None
       device: Device to train on ('cuda' or 'cpu').
       distributed: Whether to use distributed training.
       gpu_ids: List of GPU IDs to use.
@@ -147,6 +147,7 @@ class FinetuningConfig:
   weight_decay: float = 0.01
   freq_type: int = 0
   use_quantile_loss: bool = False
+  quantiles: Optional[List[float]] = None
   device: str = "cuda" if torch.cuda.is_available() else "cpu"
   distributed: bool = False
   gpu_ids: List[int] = field(default_factory=lambda: [0])
@@ -266,7 +267,7 @@ class TimesFMFinetuner:
 
     loss = self.loss_fn(last_patch_pred, x_future.squeeze(-1))
     if self.config.use_quantile_loss:
-      quantiles = self.config.quantiles or DEFAULT_QUANTILES
+      quantiles = self.config.quantiles or _create_quantiles()
       for i, quantile in enumerate(quantiles):
         last_patch_quantile = predictions[:, -1, :, i + 1]
         loss += torch.mean(
