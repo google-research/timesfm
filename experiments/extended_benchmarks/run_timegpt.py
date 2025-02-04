@@ -11,7 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Evaluation script for timesfm."""
+
+"""Evaluation script for timegpt."""
 
 import os
 import sys
@@ -20,9 +21,10 @@ import time
 from absl import flags
 import numpy as np
 import pandas as pd
-import timesfm
 
+from ..baselines.timegpt_pipeline import run_timegpt
 from .utils import ExperimentHandler
+
 
 dataset_names = [
     "m1_monthly",
@@ -54,89 +56,43 @@ dataset_names = [
     "hospital",
 ]
 
-
-context_dict_v2 = {}
-
-context_dict_v1 = {
-    "cif_2016": 32,
-    "tourism_yearly": 64,
-    "covid_deaths": 64,
-    "tourism_quarterly": 64,
-    "tourism_monthly": 64,
-    "m1_monthly": 64,
-    "m1_quarterly": 64,
-    "m1_yearly": 64,
-    "m3_monthly": 64,
-    "m3_other": 64,
-    "m3_quarterly": 64,
-    "m3_yearly": 64,
-    "m4_quarterly": 64,
-    "m4_yearly": 64,
-}
-
-_MODEL_PATH = flags.DEFINE_string("model_path", "google/timesfm-2.0-500m-jax",
-                                  "Path to model")
-_BATCH_SIZE = flags.DEFINE_integer("batch_size", 64, "Batch size")
-_HORIZON = flags.DEFINE_integer("horizon", 128, "Horizon")
-_BACKEND = flags.DEFINE_string("backend", "gpu", "Backend")
-_NUM_JOBS = flags.DEFINE_integer("num_jobs", 1, "Number of jobs")
+_MODEL_NAME = flags.DEFINE_string(
+    "model_name",
+    "timegpt-1-long-horizon",
+    "Path to model, can also be set to timegpt-1",
+)
 _SAVE_DIR = flags.DEFINE_string("save_dir", "./results", "Save directory")
+
 
 QUANTILES = list(np.arange(1, 10) / 10.0)
 
 
 def main():
   results_list = []
-  model_path = _MODEL_PATH.value
-  num_layers = 20
-  max_context_len = 512
-  use_positional_embedding = True
-  context_dict = context_dict_v1
-  if "2.0" in model_path:
-    num_layers = 50
-    use_positional_embedding = False
-    max_context_len = 2048
-    context_dict = context_dict_v2
-
-  tfm = timesfm.TimesFm(
-      hparams=timesfm.TimesFmHparams(
-          backend="gpu",
-          per_core_batch_size=32,
-          horizon_len=128,
-          num_layers=num_layers,
-          context_len=max_context_len,
-          use_positional_embedding=use_positional_embedding,
-      ),
-      checkpoint=timesfm.TimesFmCheckpoint(huggingface_repo_id=model_path),
-  )
   run_id = np.random.randint(100000)
-  model_name = "timesfm"
+  model_name = _MODEL_NAME.value
   for dataset in dataset_names:
     print(f"Evaluating model {model_name} on dataset {dataset}", flush=True)
     exp = ExperimentHandler(dataset, quantiles=QUANTILES)
-
-    if dataset in context_dict:
-      context_len = context_dict[dataset]
-    else:
-      context_len = max_context_len
-
     train_df = exp.train_df
+    horizon = exp.horizon
+    seasonality = exp.seasonality
     freq = exp.freq
-    init_time = time.time()
-    fcsts_df = tfm.forecast_on_df(
-        inputs=train_df,
+    level = exp.level
+    fcsts_df, total_time, model_name = run_timegpt(
+        train_df=train_df,
+        horizon=exp.horizon,
+        model=model_name,
+        seasonality=seasonality,
         freq=freq,
-        value_name="y",
-        model_name=model_name,
-        forecast_context_len=context_len,
-        num_jobs=_NUM_JOBS.value,
-        normalize=True,
+        dataset=dataset,
+        level=level,
     )
-    total_time = time.time() - init_time
     time_df = pd.DataFrame({"time": [total_time], "model": model_name})
-    results = exp.evaluate_from_predictions(models=[model_name],
-                                            fcsts_df=fcsts_df,
-                                            times_df=time_df)
+    fcsts_df = exp.fcst_from_level_to_quantiles(fcsts_df, model_name)
+    results = exp.evaluate_from_predictions(
+        models=[model_name], fcsts_df=fcsts_df, times_df=time_df
+    )
     print(results, flush=True)
     results_list.append(results)
     results_full = pd.concat(results_list)

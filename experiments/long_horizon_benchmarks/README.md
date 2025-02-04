@@ -6,12 +6,21 @@ All experiments were performed on a [g2-standard-32](https://cloud.google.com/co
 
 ## Running TimesFM on the benchmark
 
-Install the environment and the package as detailed in the main README and then follow the steps from the base directory.
+We need to add the following packages for running these benchmarks. Follow the installation instructions till before `poetry lock`. Then,
 
 ```
-conda activate tfm_env
-TF_CPP_MIN_LOG_LEVEL=2 XLA_PYTHON_CLIENT_PREALLOCATE=false python3 -m experiments.long_horizon_benchmarks.run_eval \
---model_path=<model_path> --backend="gpu" \
+poetry add git+https://github.com/awslabs/gluon-ts.git
+poetry add git+https://github.com/amazon-science/chronos-forecasting.git
+poetry lock
+poetry install --only pax
+```
+Note that for now only the pax version runs on this benchmark, because we had to remove the old tf dependency from the pytorch version. We will fix this issue soon.
+
+To run the timesfm on the benchmark do:
+
+```
+poetry run python3 -m experiments.long_horizon_benchmarks.run_eval \
+--model_path=google/timesfm-1.0-200m --backend="gpu" \
 --pred_len=96 --context_len=512 --dataset=etth1
 ```
 
@@ -20,14 +29,14 @@ In the above, `<model_path>` should point to the checkpoint directory that can b
 For running chronos on the same benchmark you can run the command,
 
 ```
-TF_CPP_MIN_LOG_LEVEL=2 XLA_PYTHON_CLIENT_PREALLOCATE=false python3 -m experiments.long_horizon_benchmarks.run_eval \
+poetry run python3 -m experiments.long_horizon_benchmarks.run_eval \
 --model_path=amazon/chronos-t5-mini --backend="gpu" \
 --pred_len=96 --context_len=512 --dataset=etth1
 ```
 
 You can change the model size from "mini" to "large" as required. The datasets we benchmark on are etth1, etth2, ettm1 and ettm2.
 
-## Benchmark Results
+## Benchmark Results for TimesFM-1.0
 
 ![Benchmark Results Table](./tfm_long_horizon.png)
 
