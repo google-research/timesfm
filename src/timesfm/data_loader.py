@@ -20,7 +20,6 @@ from absl import logging
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
-import tensorflow as tf
 from . import time_features
 
 
@@ -244,6 +243,8 @@ class TimeSeriesdata(object):
 
   def tf_dataset(self, mode='train', shift=1):
     """Tensorflow Dataset."""
+    import tensorflow as tf
+
     if mode == 'train':
       gen_fn = self.train_gen
     else:
@@ -252,4 +253,16 @@ class TimeSeriesdata(object):
                          [tf.int32] * 2)
     dataset = tf.data.Dataset.from_generator(gen_fn, output_types)
     dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
+    return dataset
+
+  def torch_dataset(self, mode="train", shift=1):
+    """PyTorch Dataset."""
+    from .pytorch_timesfm_iterable_dataset import TimesFmIterableDataset
+
+    if mode == "train":
+      gen_fn = self.train_gen
+    else:
+      gen_fn = lambda: self.test_val_gen(mode, shift)  # noqa: E731
+
+    dataset = TimesFmIterableDataset(gen_fn)
     return dataset
