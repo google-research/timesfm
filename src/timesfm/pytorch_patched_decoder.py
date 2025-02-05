@@ -21,7 +21,7 @@ from torch import nn
 import torch.nn.functional as F
 
 
-def _create_quantiles() -> list[float]:
+def create_quantiles() -> list[float]:
   return [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 
 
@@ -48,7 +48,7 @@ class TimesFMConfig:
   # Horizon length
   horizon_len: int = 128
   # quantiles
-  quantiles: List[float] = dataclasses.field(default_factory=_create_quantiles)
+  quantiles: List[float] = dataclasses.field(default_factory=create_quantiles)
   # Padding value
   pad_val: float = 1123581321.0
   # Tolerance

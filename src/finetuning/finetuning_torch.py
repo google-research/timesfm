@@ -13,7 +13,7 @@ import torch.distributed as dist
 import torch.nn as nn
 from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.utils.data import DataLoader, Dataset
-from timesfm.pytorch_patched_decoder import _create_quantiles
+from timesfm.pytorch_patched_decoder import create_quantiles
 
 import wandb
 
@@ -267,7 +267,7 @@ class TimesFMFinetuner:
 
     loss = self.loss_fn(last_patch_pred, x_future.squeeze(-1))
     if self.config.use_quantile_loss:
-      quantiles = self.config.quantiles or _create_quantiles()
+      quantiles = self.config.quantiles or create_quantiles()
       for i, quantile in enumerate(quantiles):
         last_patch_quantile = predictions[:, -1, :, i + 1]
         loss += torch.mean(
