@@ -9,6 +9,7 @@ authors = [
     "Abhimanyu Das <abhidas@google.com>",
     "Petros Mol <pmol@google.com>",
     "Justin Güse <guese.justin@gmail.com>",
+    "Michael Chertushkin <chertushkinmichael@gmail.com>"
 ]
 readme = "README.md"
 keywords = ["time series", "timesfm", "forecast", "time series model"]
