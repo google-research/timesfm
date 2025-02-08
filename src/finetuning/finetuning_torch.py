@@ -6,16 +6,121 @@ import logging
 import os
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import torch
 import torch.distributed as dist
 import torch.nn as nn
+import wandb
 from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.utils.data import DataLoader, Dataset
-from timesfm.pytorch_patched_decoder import create_quantiles
+from tqdm import tqdm
 
-import wandb
+from timesfm.pytorch_patched_decoder import create_quantiles
+from timesfm.pytorch_timesfm_iterable_dataset import TimesFmIterableDataset
+
+
+class FineTunningDataset(Dataset):
+  """A dataset to for finetuning TimesFM models.
+  
+  Args:
+    input_ts_arr: Input time series data.
+    input_padding_arr: Padding mask for input data.
+    freq_arr: Frequency of the time series data.
+    actual_ts_arr: Actual time series data.
+  """
+  def __init__(
+    self,
+    input_ts_arr: torch.FloatTensor,
+    input_padding_arr: torch.LongTensor,
+    freq_arr: torch.LongTensor,
+    actual_ts_arr: torch.FloatTensor,
+  ):
+    super().__init__()
+    if (
+      len(input_ts_arr) != len(input_padding_arr)
+      or len(input_ts_arr) != len(freq_arr)
+      or len(input_ts_arr) != len(actual_ts_arr)
+    ):
+      raise ValueError("All arrays must have the same length")
+    self.input_ts_arr = input_ts_arr
+    self.input_padding_arr = input_padding_arr
+    self.freq_arr = freq_arr
+    self.actual_ts_arr = actual_ts_arr
+  
+  def __len__(self):
+    return len(self.input_ts_arr)
+  
+  def __getitem__(
+      self,
+      idx: int
+  ) -> Tuple[
+    torch.FloatTensor,
+    torch.LongTensor,
+    torch.LongTensor,
+    torch.FloatTensor
+  ]:
+    return (
+      self.input_ts_arr[idx],
+      self.input_padding_arr[idx],
+      self.freq_arr[idx],
+      self.actual_ts_arr[idx],
+    )
+
+  @classmethod
+  def from_timesfm_iterable_dataset(
+    cls, dataset: TimesFmIterableDataset, input_patch_len: int, freq: int = 0
+  ):
+    """Create a FineTunningDataset from a TimesFmIterableDataset.
+
+    This method handles the generation of padding and frequency arrays, which were
+    extracted from the original implementation in timesfm.data_loader.TimeSeriesData
+    and ported to the PyTorch version.
+
+    Args:
+      dataset: TimesFmIterableDataset instance.
+      input_patch_len: Length of the input patch.
+        See `timesfm.timesfm_base.TimesFmBase.input_patch_len`.
+      freq: Frequency of the time series data.
+
+    Returns:
+      FineTunningDataset instance.
+    """
+    
+    input_ts_arr = []
+    input_padding_arr = []
+    freq_arr = []
+    actual_ts_arr = []
+
+    for batch in tqdm(dataset):
+      input_ts = torch.as_tensor(batch[0], dtype=torch.float32) # shape: [num_ts, context_len]
+      input_padding = torch.zeros_like(input_ts) # shape: [num_ts, context_len]
+
+      context_len = input_ts.shape[1]
+      context_pad = (
+        (context_len + input_patch_len - 1) // input_patch_len
+      ) * input_patch_len - context_len
+      input_ts = torch.nn.functional.pad(input_ts, (context_pad, 0))
+      input_padding = torch.nn.functional.pad(
+        input_padding, (context_pad, 0), value=1
+      )
+      freq: torch.Tensor = (
+        torch.ones([input_ts.shape[0], 1], dtype=torch.int32) * freq
+      ) # shape: [num_ts, 1]
+
+      actual_ts = torch.as_tensor(batch[3], dtype=torch.float32) # shape: [num_ts, pred_len]
+
+      input_ts_arr.append(input_ts)
+      input_padding_arr.append(input_padding)
+      freq_arr.append(freq)
+      actual_ts_arr.append(actual_ts)
+    
+    input_ts_arr = torch.concatenate(input_ts_arr, dim=0)
+    input_padding_arr = torch.concatenate(input_padding_arr, dim=0)
+    freq_arr = torch.concatenate(freq_arr, dim=0)
+    actual_ts_arr = torch.concatenate(actual_ts_arr, dim=0)
+
+    return cls(input_ts_arr, input_padding_arr, freq_arr, actual_ts_arr)
 
 
 class MetricsLogger(ABC):
