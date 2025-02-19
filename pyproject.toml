@@ -51,7 +51,6 @@ python = ">=3.10,<3.11"
 
 [tool.poetry.dependencies.jax]
 version = ">=0.4.26"
-extras = ["cuda12"]
 python = ">=3.10,<3.12"  # Support both python versions
 
 [tool.poetry.dependencies.jaxlib]
