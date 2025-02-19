@@ -81,7 +81,7 @@ After than you can run the timesfm under `poetry shell` or do `poetry run python
 **Note**: 
 
 1. Running the provided benchmarks would require additional dependencies.
-Please see the `experiments` section fro more instructions.
+Please see the `experiments` section for more instructions.
 
 2. The dependency `lingvo` does not support ARM architectures, and the code is not working for machines with Apple silicon. We are aware of this issue and are working on a solution. Stay tuned.
 
