@@ -1,6 +1,9 @@
 [tool.poetry]
 name = "timesfm"
-packages = [{ include = "timesfm", from = "src" }]
+packages = [
+    { include = "timesfm", from = "src" },
+    { include = "finetuning", from = "src" },
+]
 description = "Open weights time-series foundation model from Google Research."
 version = "1.2.8"
 authors = [
