@@ -5,7 +5,7 @@ packages = [
     { include = "finetuning", from = "src" },
 ]
 description = "Open weights time-series foundation model from Google Research."
-version = "1.2.8"
+version = "1.2.9"
 authors = [
     "Rajat Sen <senrajat@google.com>",
     "Yichen Zhou <yichenzhou@google.com>",
