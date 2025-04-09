@@ -45,7 +45,8 @@ def moving_average(arr, window_size):
   """Calculates the moving average using NumPy's convolution function."""
   # Pad with zeros to handle initial window positions
   arr_padded = np.pad(arr, (window_size - 1, 0), "constant")
-  smoothed_arr = (np.convolve(arr_padded, np.ones(window_size), "valid") / window_size)
+  smoothed_arr = (np.convolve(arr_padded, np.ones(window_size), "valid") / 
+                  window_size)
   return [smoothed_arr, arr - smoothed_arr]
 
 
