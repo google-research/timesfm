@@ -78,18 +78,24 @@ poetry install -E  torch
 
 After than you can run the timesfm under `poetry shell` or do `poetry run python3 ...`.
 
-**Note**: 
+**Additional Note**: 
 
-1. Running the provided benchmarks would require additional dependencies.
-Please see the `experiments` section fro more instructions.
+If you plan to use the **`forecast_with_covariates`** function (which requires external regressors), 
+you need to install **JAX** and **jaxlib**. Installing TimesFM with either the `[pax]` or the `[torch]` extras will include these packages by default.
+However, if you installed the base version of TimesFM, you must manually install the dependencies:
+```
+pip install jax jaxlib
+```
 
-2. The dependency `lingvo` does not support ARM architectures, and the code is not working for machines with Apple silicon. We are aware of this issue and are working on a solution. Stay tuned.
+**Why is this needed?**  
+The `forecast_with_covariates` method relies on the `xreg_lib` module, which depends on JAX and jaxlib. If these packages are not installed, 
+calling `forecast_with_covariates` will raise an error. However, due to a lazy import mechanism, `xreg_lib` (and hence JAX/jaxlib) is not needed for standard `forecast` calls.
 
 ### Notes
 
 1. Running the provided benchmarks would require additional dependencies. Please see the `experiments` folder.
 
-2. The dependency `lingvo` does not support ARM architectures, and the PAX version is not working for machines with Apple silicon.
+2. The dependency `lingvo` does not support ARM architectures, and the code is not working for machines with Apple silicon. We are aware of this issue and are working on a solution. Stay tuned.
 
 ### Install from PyPI (and publish)
 
