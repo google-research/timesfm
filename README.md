@@ -78,18 +78,23 @@ poetry install -E  torch
 
 After than you can run the timesfm under `poetry shell` or do `poetry run python3 ...`.
 
-**Note**: 
+**Additional Note**: 
 
-1. Running the provided benchmarks would require additional dependencies.
-Please see the `experiments` section fro more instructions.
+If you plan to use the **`forecast_with_covariates`** function (which requires external regressors), 
+you need to install **JAX** and **jaxlib**. If you installed the base version of TimesFM (`torch`), you must manually install the dependencies for **`forecast_with_covariates`** support:
+```
+pip install jax jaxlib
+```
 
-2. The dependency `lingvo` does not support ARM architectures, and the code is not working for machines with Apple silicon. We are aware of this issue and are working on a solution. Stay tuned.
+**Why is this needed?**  
+The `forecast_with_covariates` method relies on the `xreg_lib` module, which depends on JAX and jaxlib. If these packages are not installed, 
+calling `forecast_with_covariates` will raise an error. However, due to a lazy import mechanism, `xreg_lib` (and hence JAX/jaxlib) is not needed for standard `forecast` calls.
 
 ### Notes
 
 1. Running the provided benchmarks would require additional dependencies. Please see the `experiments` folder.
 
-2. The dependency `lingvo` does not support ARM architectures, and the PAX version is not working for machines with Apple silicon.
+2. The dependency `lingvo` does not support ARM architectures, and the code is not working for machines with Apple silicon. We are aware of this issue and are working on a solution. Stay tuned.
 
 ### Install from PyPI (and publish)
 
@@ -240,6 +245,12 @@ forecast_df = tfm.forecast_on_df(
 ## Covariates Support
 
 We now have an external regressors library on top of TimesFM that can support static covariates as well as dynamic covariates available in the future. We have an usage example in [notebooks/covariates.ipynb](https://github.com/google-research/timesfm/blob/master/notebooks/covariates.ipynb).
+
+If you plan to use the **`forecast_with_covariates`** on timesfm `torch` version, you need to install **JAX** and **jaxlib**. 
+You must manually install the dependencies for **`forecast_with_covariates`** support:
+```
+pip install jax jaxlib
+```
 
 Let's take a toy example of forecasting sales for a grocery store: 
 

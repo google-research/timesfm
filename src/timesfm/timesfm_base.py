@@ -17,17 +17,20 @@ import collections
 import dataclasses
 import logging
 import multiprocessing
-from typing import Any, Literal, Sequence
+from typing import Any, Literal, Sequence, TYPE_CHECKING
 
 import numpy as np
 import pandas as pd
 
 from utilsforecast.processing import make_future_dataframe
 
-from . import xreg_lib
-
-Category = xreg_lib.Category
-XRegMode = xreg_lib.XRegMode
+if TYPE_CHECKING:
+    from . import xreg_lib
+    Category = xreg_lib.Category
+    XRegMode = xreg_lib.XRegMode
+else:
+    Category = int | str
+    XRegMode = str
 
 _TOL = 1e-6
 DEFAULT_QUANTILES = (0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9)
@@ -42,7 +45,7 @@ def moving_average(arr, window_size):
   """Calculates the moving average using NumPy's convolution function."""
   # Pad with zeros to handle initial window positions
   arr_padded = np.pad(arr, (window_size - 1, 0), "constant")
-  smoothed_arr = (np.convolve(arr_padded, np.ones(window_size), "valid") /
+  smoothed_arr = (np.convolve(arr_padded, np.ones(window_size), "valid") / 
                   window_size)
   return [smoothed_arr, arr - smoothed_arr]
 
@@ -463,6 +466,8 @@ class TimesFmBase:
       A tuple of two lists. The first is the outputs of the model. The second is
       the outputs of the xreg.
     """
+
+    from . import xreg_lib
 
     # Verify and bookkeep covariates.
     if not (dynamic_numerical_covariates or dynamic_categorical_covariates or

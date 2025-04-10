@@ -42,7 +42,7 @@ absl-py = ">=1.4.0"
 
 [tool.poetry.extras]
 pax = ["paxml", "lingvo", "jax", "jaxlib"]
-torch = ["torch",  "jax", "jaxlib"]  # jax & jaxlib are already in pax
+torch = ["torch"] 
 
 [tool.poetry.dependencies.paxml]
 version = ">=1.4.0"
