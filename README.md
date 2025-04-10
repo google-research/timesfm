@@ -81,8 +81,7 @@ After than you can run the timesfm under `poetry shell` or do `poetry run python
 **Additional Note**: 
 
 If you plan to use the **`forecast_with_covariates`** function (which requires external regressors), 
-you need to install **JAX** and **jaxlib**. Installing TimesFM with either the `[pax]` or the `[torch]` extras will include these packages by default.
-However, if you installed the base version of TimesFM, you must manually install the dependencies:
+you need to install **JAX** and **jaxlib**. If you installed the base version of TimesFM (`torch`), you must manually install the dependencies for **`forecast_with_covariates`** support:
 ```
 pip install jax jaxlib
 ```
