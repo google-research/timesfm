@@ -246,6 +246,12 @@ forecast_df = tfm.forecast_on_df(
 
 We now have an external regressors library on top of TimesFM that can support static covariates as well as dynamic covariates available in the future. We have an usage example in [notebooks/covariates.ipynb](https://github.com/google-research/timesfm/blob/master/notebooks/covariates.ipynb).
 
+If you plan to use the **`forecast_with_covariates`** on timesfm `torch` version, you need to install **JAX** and **jaxlib**. 
+You must manually install the dependencies for **`forecast_with_covariates`** support:
+```
+pip install jax jaxlib
+```
+
 Let's take a toy example of forecasting sales for a grocery store: 
 
 **Task:** Given the observed the daily sales of this week (7 days), forecast the daily sales of next week (7 days).
