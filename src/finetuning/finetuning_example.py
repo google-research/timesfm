@@ -2,10 +2,13 @@
 Example usage of the TimesFM Finetuning Framework.
 
 For single GPU:
-python script.py --training_mode=single
+python finetuning_example.py --training_mode=single
 
 For multiple GPUs:
-python script.py --training_mode=multi --gpu_ids=0,1,2
+python finetuning_example.py --training_mode=multi --gpu_ids=0,1,2
+
+For Linear Probing:
+python finetuning_example.py --training_mode=multi --gpu_ids=0,1,2 --strategy=linear_probing
 """
 
 import os
@@ -22,6 +25,7 @@ from huggingface_hub import snapshot_download
 from torch.utils.data import Dataset
 
 from finetuning.finetuning_torch import FinetuningConfig, TimesFMFinetuner
+from finetuning.finetuning_strategies import LinearProbingStrategy, FullFinetuningStrategy
 from timesfm import TimesFm, TimesFmCheckpoint, TimesFmHparams
 from timesfm.pytorch_patched_decoder import PatchedTimeSeriesDecoder
 
@@ -32,6 +36,13 @@ flags.DEFINE_enum(
     "single",
     ["single", "multi"],
     'Training mode: "single" for single-GPU or "multi" for multi-GPU training.',
+)
+
+flags.DEFINE_enum(
+    "strategy",
+    "full",
+    ["full", "linear_probing"],
+    'Finetuning strategy: "full" for full finetuning or "linear_probe" for linear probing.',
 )
 
 flags.DEFINE_list(
@@ -139,8 +150,7 @@ def get_model(load_weights: bool = False):
       horizon_len=128,
       num_layers=50,
       use_positional_embedding=False,
-      context_len=
-      192,  # Context length can be anything up to 2048 in multiples of 32
+      context_len=192,  # Context length can be anything up to 2048 in multiples of 32
   )
   tfm = TimesFm(hparams=hparams,
                 checkpoint=TimesFmCheckpoint(huggingface_repo_id=repo_id))
@@ -151,6 +161,22 @@ def get_model(load_weights: bool = False):
     loaded_checkpoint = torch.load(checkpoint_path, weights_only=True)
     model.load_state_dict(loaded_checkpoint)
   return model, hparams, tfm._model_config
+
+def get_model_with_strategy(load_weights: bool = False, strategy: str = "full"):
+  """Get model with specified finetuning strategy."""
+  base_model, hparams, model_config = get_model(load_weights)
+  
+  # Apply finetuning strategy
+  if strategy == "linear_probing":
+    strategy = LinearProbingStrategy()
+    model = strategy.configure_model(base_model)
+  elif strategy == "full":
+    strategy = FullFinetuningStrategy()
+    model = strategy.configure_model(base_model)
+  else:
+    raise ValueError(f"Unknown finetuning strategy: {strategy}")
+
+  return model, hparams, model_config
 
 
 def plot_predictions(
@@ -253,7 +279,7 @@ def get_data(context_len: int,
 
 def single_gpu_example():
   """Basic example of finetuning TimesFM on stock data."""
-  model, hparams, tfm_config = get_model(load_weights=True)
+  model, hparams, tfm_config = get_model_with_strategy(load_weights=True, strategy=FLAGS.strategy)
   config = FinetuningConfig(batch_size=256,
                             num_epochs=5,
                             learning_rate=1e-4,
@@ -324,7 +350,7 @@ def multi_gpu_example():
   gpu_ids = [0, 1]
   world_size = len(gpu_ids)
 
-  model, hparams, tfm_config = get_model(load_weights=True)
+  model, hparams, tfm_config = get_model_with_strategy(load_weights=True, strategy=FLAGS.strategy)
 
   # Create config
   config = FinetuningConfig(
