@@ -39,6 +39,8 @@ scikit-learn = ">=1.2.2"
 typer = ">=0.12.3"
 wandb = ">=0.17.5"
 absl-py = ">=1.4.0"
+yfinance = "0.2.63"
+safetensors = "^0.5.3"
 
 [tool.poetry.extras]
 pax = ["paxml", "lingvo", "jax", "jaxlib"]
