@@ -57,9 +57,18 @@ def freq_map(freq: str):
     return 1
   elif freq.endswith(("H", "T", "MIN", "D", "B", "U", "S")):
     return 0
-  elif freq.endswith(("W", "M")):
+  elif (
+    freq.endswith(("W", "M"))
+    or freq.startswith("W-")
+    or (freq.startswith("M") and len(freq) == 2)
+  ):
     return 1
-  elif freq.endswith(("Y", "Q", "A")):
+  elif (
+    freq.endswith(("Y", "Q", "A"))
+    or freq.startswith("Y-")
+    or freq.startswith("Q-")
+    or freq.startswith("A-")
+  ):
     return 2
   else:
     raise ValueError(f"Invalid frequency: {freq}")
