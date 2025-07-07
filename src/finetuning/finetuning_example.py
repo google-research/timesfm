@@ -9,6 +9,7 @@ python script.py --training_mode=multi --gpu_ids=0,1,2
 """
 
 import os
+from dataclasses import asdict
 from os import path
 from typing import Optional, Tuple
 
@@ -19,11 +20,13 @@ import torch.multiprocessing as mp
 import yfinance as yf
 from absl import app, flags
 from huggingface_hub import snapshot_download
+from safetensors.torch import load_file
 from torch.utils.data import Dataset
 
 from finetuning.finetuning_torch import FinetuningConfig, TimesFMFinetuner
 from timesfm import TimesFm, TimesFmCheckpoint, TimesFmHparams
-from timesfm.pytorch_patched_decoder import PatchedTimeSeriesDecoder
+from timesfm.pytorch_patched_decoder import (PatchedTimeSeriesDecoder,
+                                             TimesFMConfig)
 
 FLAGS = flags.FLAGS
 
@@ -39,6 +42,11 @@ flags.DEFINE_list(
     "Comma-separated list of GPU IDs to use for multi-GPU training. Example: 0,1,2"
 )
 
+flags.DEFINE_string(
+    "local_model_path",
+    None,
+    "Path to a local .safetensors model file. If provided, overrides Hugging Face download."
+)
 
 class TimeSeriesDataset(Dataset):
   """Dataset for time series data compatible with TimesFM."""
@@ -132,25 +140,32 @@ def prepare_datasets(series: np.ndarray,
 
 def get_model(load_weights: bool = False):
   device = "cuda" if torch.cuda.is_available() else "cpu"
-  repo_id = "google/timesfm-2.0-500m-pytorch"
   hparams = TimesFmHparams(
       backend=device,
       per_core_batch_size=32,
       horizon_len=128,
       num_layers=50,
       use_positional_embedding=False,
-      context_len=
-      192,  # Context length can be anything up to 2048 in multiples of 32
+      context_len=192,
   )
-  tfm = TimesFm(hparams=hparams,
-                checkpoint=TimesFmCheckpoint(huggingface_repo_id=repo_id))
-
-  model = PatchedTimeSeriesDecoder(tfm._model_config)
+  
   if load_weights:
-    checkpoint_path = path.join(snapshot_download(repo_id), "torch_model.ckpt")
-    loaded_checkpoint = torch.load(checkpoint_path, weights_only=True)
+    if FLAGS.local_model_path:
+      tfm_config = TimesFMConfig()
+      model = PatchedTimeSeriesDecoder(tfm_config)
+      loaded_checkpoint = load_file(FLAGS.local_model_path)
+    else:
+      repo_id = "google/timesfm-2.0-500m-pytorch"
+      tfm = TimesFm(hparams=hparams,
+              checkpoint=TimesFmCheckpoint(huggingface_repo_id=repo_id))
+
+      tfm_config = tfm._model_config
+      model = PatchedTimeSeriesDecoder(tfm_config)
+      checkpoint_path = path.join(snapshot_download(repo_id), "torch_model.ckpt")
+      loaded_checkpoint = torch.load(checkpoint_path, weights_only=True)
+
     model.load_state_dict(loaded_checkpoint)
-  return model, hparams, tfm._model_config
+  return model, hparams, tfm_config
 
 
 def plot_predictions(
