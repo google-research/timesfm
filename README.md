@@ -16,6 +16,8 @@ This is not an officially supported Google product.
 
 We recommend at least 32GB RAM to load TimesFM dependencies.
 
+**Need help?** See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for common installation and usage issues.
+
 ## Update - Dec. 30, 2024
 - We are launching a 500m checkpoint as a part of TimesFM-2.0 release. This new checkpoint can be upto 25% better than v1.0 on leading benchmarks and also has a 4 times longer max. context length.
 - Launched [finetuning support](https://github.com/google-research/timesfm/blob/master/notebooks/finetuning.ipynb) that lets you finetune the weights of the pretrained TimesFM model on your own data.
