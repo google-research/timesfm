@@ -15,26 +15,25 @@
 """Transformer layers for TimesFM."""
 
 import math
-from typing import Callable, Optional, Tuple
+from typing import Callable
 
 import torch
 from torch import nn
 import torch.nn.functional as F
 
-from .. import abstract
+from .. import configs
 from . import normalization
 from . import util
 
 LayerNorm = nn.LayerNorm
 RMSNorm = normalization.RMSNorm
-TransformerConfig = abstract.TransformerConfig
 DecodeCache = util.DecodeCache
 
 
 def make_attn_mask(
     query_length: int,
     num_all_masked_kv: torch.Tensor,
-    query_index_offset: Optional[torch.Tensor] = None,
+    query_index_offset: torch.Tensor | None = None,
     kv_length: int = 0,
 ) -> torch.Tensor:
   """Makes attention mask."""
@@ -72,7 +71,7 @@ class RotaryPositionalEmbedding(nn.Module):
   def forward(
       self,
       inputs: torch.Tensor,
-      position: Optional[torch.Tensor] = None,
+      position: torch.Tensor | None = None,
   ):
     """Generates a JTensor of sinusoids with different frequencies."""
     if self.embedding_dims != inputs.shape[-1]:
@@ -201,9 +200,9 @@ class MultiHeadAttention(nn.Module):
       self,
       inputs_q: torch.Tensor,
       *,
-      decode_cache: Optional[DecodeCache] = None,
-      patch_mask: Optional[torch.Tensor] = None,
-  ) -> Tuple[torch.Tensor, Optional[DecodeCache]]:
+      decode_cache: DecodeCache | None = None,
+      patch_mask: torch.Tensor | None = None,
+  ) -> tuple[torch.Tensor, DecodeCache | None]:
     b, n_patches, _ = inputs_q.shape
     if patch_mask is None:
       patch_mask = torch.zeros(
@@ -253,10 +252,10 @@ class MultiHeadAttention(nn.Module):
       key = decode_cache.key.clone()
       value = decode_cache.value.clone()
       decode_cache.next_index += n_patches
-      decode_cache.num_masked += num_masked
+      decode_cache.num_masked = num_masked
       attn_mask = make_attn_mask(
           query_length=n_patches,
-          num_all_masked_kv=decode_cache.num_masked,
+          num_all_masked_kv=num_masked,
           query_index_offset=next_index,
           kv_length=decode_cache_size,
       )
@@ -279,7 +278,7 @@ class MultiHeadAttention(nn.Module):
 class Transformer(nn.Module):
   """Classic Transformer used in TimesFM."""
 
-  def __init__(self, config: TransformerConfig):
+  def __init__(self, config: configs.TransformerConfig):
     super().__init__()
     self.config = config
 
@@ -326,8 +325,8 @@ class Transformer(nn.Module):
       self,
       input_embeddings: torch.Tensor,
       patch_mask: torch.Tensor,
-      decode_cache: Optional[DecodeCache] = None,
-  ) -> Tuple[torch.Tensor, Optional[DecodeCache]]:
+      decode_cache: DecodeCache | None = None,
+  ) -> tuple[torch.Tensor, DecodeCache | None]:
     attn_output, decode_cache = self.attn(
         inputs_q=self.pre_attn_ln(input_embeddings),
         decode_cache=decode_cache,
