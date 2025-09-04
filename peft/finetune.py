@@ -187,7 +187,7 @@ def finetune(
     val_batches = dtl.tf_dataset(mode="val", shift=horizon_len)
 
     for tbatch in tqdm(train_batches.as_numpy_iterator()):
-        pass
+        break
 
     tfm = TimesFm(
         context_len=context_len,
