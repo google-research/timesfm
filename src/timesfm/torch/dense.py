@@ -17,16 +17,13 @@
 import torch
 from torch import nn
 
-from .. import abstract
-
-ResidualBlockConfig = abstract.ResidualBlockConfig
-RandomFourierFeaturesConfig = abstract.RandomFourierFeaturesConfig
+from .. import configs
 
 
 class ResidualBlock(nn.Module):
   """Residual block with two linear layers and a linear residual connection."""
 
-  def __init__(self, config: ResidualBlockConfig):
+  def __init__(self, config: configs.ResidualBlockConfig):
     super().__init__()
     self.config = config
     self.hidden_layer = nn.Linear(
@@ -62,7 +59,7 @@ class ResidualBlock(nn.Module):
 class RandomFourierFeatures(nn.Module):
   """Random Fourier features layer."""
 
-  def __init__(self, config: RandomFourierFeaturesConfig):
+  def __init__(self, config: configs.RandomFourierFeaturesConfig):
     super().__init__()
     self.config = config
 

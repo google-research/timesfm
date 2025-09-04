@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Utility functions for TimesFM layers."""
+"""PyTorch utility functions for TimesFM layers."""
 
 import dataclasses
 import torch
