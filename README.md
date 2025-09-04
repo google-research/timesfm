@@ -284,7 +284,7 @@ In this example, besides the `Daily_sales`, we also have covariates `Category`, 
 - In our example, `Category` is a **static categorical covariate**, 
 - `Base_price` is a **static numerical covariates**.
 
-**Dynamic covariates** are covaraites for each time stamps.
+**Dynamic covariates** are covariates for each time stamp.
 - Date / time related features can be usually treated as dynamic covariates.
 - In our example, `Weekday` and `Has_promotion` are **dynamic categorical covariates**.
 - `Daily_temperate` is a **dynamic numerical covariate**.
