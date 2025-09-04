@@ -109,9 +109,13 @@ class TimesFmTorch(timesfm_base.TimesFmBase):
 
     if window_size is not None:
       new_inputs = []
-      for ts in inputs:
+      new_freqs = []
+      for i, ts in enumerate(inputs):
         new_inputs.extend(timesfm_base.moving_average(ts, window_size))
+        if freq is not None:
+          new_freqs.extend([freq[i]] * 2)
       inputs = new_inputs
+      freq = new_freqs if freq is not None else None
 
     if freq is None:
       logging.info("No frequency provided via `freq`. Default to high (0).")
