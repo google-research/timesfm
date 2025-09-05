@@ -1,0 +1,31 @@
+[tool.poetry]
+name = "timesfm"
+version = "2.0.0"
+description = "A time series foundation model."
+authors = [
+    "Rajat Sen <senrajat@google.com>",
+    "Yichen Zhou <yichenzhou@google.com>",
+    "Abhimanyu Das <abhidas@google.com>",
+    "Petros Mol <pmol@google.com>",
+    "Michael Chertushkin <chertushkinmichael@gmail.com>"
+]
+license = "Apache-2.0"
+readme = "README.md"
+packages = [{include = "timesfm", from = "src"}]
+
+[tool.poetry.dependencies]
+python = ">=3.11"
+einshape = ">=1.0.0"
+numpy = ">=1.26.4"
+pandas = ">=2.0.0"
+utilsforecast = ">=0.1.10"
+huggingface_hub = { version = ">=0.23.0", extras = ["cli"] }
+scikit-learn = ">=1.2.2"
+absl-py = ">=1.4.0"
+safetensors = ">=0.5.3"
+torch = { version = ">=2.0.0", extras = ["cuda"] }
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
