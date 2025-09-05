@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "timesfm"
+version = "2.0.0"
+authors = [
+    {name = "Yichen Zhou", email = "yichenzhou@google.com"},
+    {name = "Rajat Sen", email = "senrajat@google.com"},
+]
+description = "PLACEHOLDER"
+readme = "README.md"
+license = "Apache-2.0"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "numpy",
+    "torch",
+    "huggingface_hub",
+    "safetensors",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/google-research/timesfm"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+exclude = ["v1", "v1.*"]

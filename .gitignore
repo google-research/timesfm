@@ -1,8 +1,20 @@
+# Environments
 .venv/
+
+# Build artifacts
 dist/
+build/
+*.egg-info/
+
+# Caches
 __pycache__/
+
+# TimesFM
 checkpoints/
 wandb/
 datasets/
 results/
 timesfm_jax.egg-info/
+
+# Old version
+v1/
