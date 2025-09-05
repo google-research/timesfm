@@ -16,8 +16,10 @@
 
 import logging
 import math
+import os
 from typing import Sequence
 
+import huggingface_hub
 import numpy as np
 import safetensors
 import torch
@@ -75,10 +77,7 @@ class TimesFM_2p5_200M_torch_module(nn.Module):  # pylint: disable=invalid-name
 
   def load_checkpoint(self, path: str):
     """Loads a PyTorch TimesFM model from a checkpoint."""
-    tensors = {}
-    with safetensors.safe_open(path, framework="pt") as f:
-      for k in f.keys():
-        tensors[k] = f.get_tensor(k)
+    tensors = safetensors.torch.load_file(path)
     self.load_state_dict(tensors)
     self.to(self.device)
 
@@ -261,7 +260,25 @@ class TimesFM_2p5_200M_torch(timesfm_2p5_base.TimesFM_2p5):  # pylint: disable=i
 
   model: nn.Module = TimesFM_2p5_200M_torch_module()
 
-  def load_checkpoint(self, path: str):
+  def load_checkpoint(
+      self,
+      *,
+      path: str | None = None,
+      hf_repo_id: str | None = "gg-hf/timesfm-2.5-200m-pytorch",
+  ):
+    """Loads a PyTorch safetensors TimesFM model."""
+    if path:
+      pass
+    elif hf_repo_id:
+      logging.info(
+          "Downloading checkpoint from HuggingFace repo %s", hf_repo_id
+      )
+      path = os.path.join(
+          huggingface_hub.snapshot_download(hf_repo_id), "model.safetensors"
+      )
+      logging.info("Loading checkpoint from: %s", path)
+    else:
+      raise ValueError("Either path or hf_repo_id must be provided.")
     self.model.load_checkpoint(path)
 
   def compile(self, forecast_config: configs.ForecastConfig, **kwargs):
