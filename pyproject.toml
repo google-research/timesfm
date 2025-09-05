@@ -15,13 +15,8 @@ packages = [{include = "timesfm", from = "src"}]
 
 [tool.poetry.dependencies]
 python = ">=3.11"
-einshape = ">=1.0.0"
 numpy = ">=1.26.4"
-pandas = ">=2.0.0"
-utilsforecast = ">=0.1.10"
 huggingface_hub = { version = ">=0.23.0", extras = ["cli"] }
-scikit-learn = ">=1.2.2"
-absl-py = ">=1.4.0"
 safetensors = ">=0.5.3"
 torch = { version = ">=2.0.0", extras = ["cuda"] }
 
