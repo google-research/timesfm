@@ -28,6 +28,7 @@ class ForecastConfig:
   window_size: int = 0
   per_core_batch_size: int = 1
   use_continuous_quantile_head: bool = False
+  force_flip_invariance: bool = True
   infer_is_positive: bool = True
   fix_quantile_crossing: bool = False
   return_backcast: bool = False
