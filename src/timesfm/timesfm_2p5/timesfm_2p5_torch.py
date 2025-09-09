@@ -21,7 +21,7 @@ from typing import Sequence
 
 import huggingface_hub
 import numpy as np
-import safetensors
+from safetensors.torch import load_file
 import torch
 from torch import nn
 
@@ -34,7 +34,7 @@ from . import timesfm_2p5_base
 revin = util.revin
 
 
-class TimesFM_2p5_200M_torch_module(nn.Module):  # pylint: disable=invalid-name
+class TimesFM_2p5_200M_torch_module(nn.Module):
   """TimesFM 2.5 with 200M parameters."""
 
   config = timesfm_2p5_base.TimesFM_2p5_200M_Definition()
@@ -77,7 +77,7 @@ class TimesFM_2p5_200M_torch_module(nn.Module):  # pylint: disable=invalid-name
 
   def load_checkpoint(self, path: str):
     """Loads a PyTorch TimesFM model from a checkpoint."""
-    tensors = safetensors.torch.load_file(path)
+    tensors = load_file(path)
     self.load_state_dict(tensors)
     self.to(self.device)
 
@@ -237,7 +237,7 @@ class TimesFM_2p5_200M_torch_module(nn.Module):  # pylint: disable=invalid-name
       mask = torch.zeros_like(input_t, dtype=torch.bool)
       len_front_mask = self.p - (len(each_input) % self.p)
       if len_front_mask < self.p:
-        input_t = torch.concat(
+        input_t = torch.cat(
             [torch.zeros(len_front_mask, dtype=torch.float32), input_t], dim=0
         )
         mask = torch.cat(
@@ -249,13 +249,13 @@ class TimesFM_2p5_200M_torch_module(nn.Module):  # pylint: disable=invalid-name
       to_concat = [t_pf[:, -1, ...]]
       if t_ar is not None:
         to_concat.append(t_ar.reshape(1, -1, self.q))
-      torch_forecast = torch.concatenate(to_concat, dim=1)[..., :horizon]
+      torch_forecast = torch.cat(to_concat, dim=1)[..., :horizon]
       torch_forecast = torch_forecast.squeeze(0)
       outputs.append(torch_forecast.detach().cpu().numpy())
     return outputs
 
 
-class TimesFM_2p5_200M_torch(timesfm_2p5_base.TimesFM_2p5):  # pylint: disable=invalid-name
+class TimesFM_2p5_200M_torch(timesfm_2p5_base.TimesFM_2p5):
   """PyTorch implementation of TimesFM 2.5 with 200M parameters."""
 
   model: nn.Module = TimesFM_2p5_200M_torch_module()
@@ -348,13 +348,34 @@ class TimesFM_2p5_200M_torch(timesfm_2p5_base.TimesFM_2p5):  # pylint: disable=i
       pf_outputs, quantile_spreads, ar_outputs = self.model.decode(
           forecast_config.max_horizon, inputs, masks
       )
-      full_forecast = torch.concatenate(
+      full_forecast = torch.cat(
           [
               pf_outputs[:, -1, ...],
               ar_outputs.reshape(batch_size, -1, self.model.q),
           ],
           dim=1,
       )
+
+      flip_quantile_fn = lambda x: torch.cat(
+          [x[..., :1], torch.flip(x[..., 1:], dims=(-1,))], dim=-1
+      )
+
+      if fc.force_flip_invariance:
+        flipped_pf_outputs, flipped_quantile_spreads, flipped_ar_outputs = (
+            self.model.decode(forecast_config.max_horizon, -inputs, masks)
+        )
+        flipped_quantile_spreads = flip_quantile_fn(flipped_quantile_spreads)
+        flipped_pf_outputs = flip_quantile_fn(flipped_pf_outputs)
+        flipped_full_forecast = torch.cat(
+            [
+                flipped_pf_outputs[:, -1, ...],
+                flipped_ar_outputs.reshape(batch_size, -1, self.model.q),
+            ],
+            dim=1,
+        )
+        quantile_spreads = (quantile_spreads - flipped_quantile_spreads) / 2
+        pf_outputs = (pf_outputs - flipped_pf_outputs) / 2
+        full_forecast = (full_forecast - flipped_full_forecast) / 2
 
       if fc.use_continuous_quantile_head:
         for quantile_index in [1, 2, 3, 4, 6, 7, 8, 9]:

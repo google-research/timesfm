@@ -1,34 +1,27 @@
-[build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_meta"
-
-[project]
+[tool.poetry]
 name = "timesfm"
 version = "2.0.0"
+description = "A time series foundation model."
 authors = [
-    {name = "Yichen Zhou", email = "yichenzhou@google.com"},
-    {name = "Rajat Sen", email = "senrajat@google.com"},
+    "Rajat Sen <senrajat@google.com>",
+    "Yichen Zhou <yichenzhou@google.com>",
+    "Abhimanyu Das <abhidas@google.com>",
+    "Petros Mol <pmol@google.com>",
+    "Michael Chertushkin <chertushkinmichael@gmail.com>"
 ]
-description = "PLACEHOLDER"
-readme = "README.md"
 license = "Apache-2.0"
-classifiers = [
-    "Programming Language :: Python :: 3",
-    "Operating System :: OS Independent",
-]
-dependencies = [
-    "numpy",
-    "torch",
-    "huggingface_hub",
-    "safetensors",
-]
+readme = "README.md"
+packages = [{include = "timesfm", from = "src"}]
 
-[project.urls]
-"Homepage" = "https://github.com/google-research/timesfm"
+[tool.poetry.dependencies]
+python = ">=3.11"
+numpy = ">=1.26.4"
+huggingface_hub = { version = ">=0.23.0", extras = ["cli"] }
+safetensors = ">=0.5.3"
+torch = { version = ">=2.0.0", extras = ["cuda"] }
 
-[tool.setuptools]
-package-dir = {"" = "src"}
 
-[tool.setuptools.packages.find]
-where = ["src"]
-exclude = ["v1", "v1.*"]
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+

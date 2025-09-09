@@ -77,7 +77,7 @@ def linear_interpolation(arr):
 
 
 @dataclasses.dataclass(frozen=True)
-class TimesFM_2p5_200M_Definition:  # pylint: disable=invalid-name
+class TimesFM_2p5_200M_Definition:
   """Framework-agnostic config of TimesFM 2.5."""
 
   context_limit = 16384
@@ -125,7 +125,7 @@ class TimesFM_2p5_200M_Definition:  # pylint: disable=invalid-name
   )
 
 
-class TimesFM_2p5:  # pylint: disable=invalid-name
+class TimesFM_2p5:
   """Abstract base class for TimesFM models."""
 
   forecast_config: ForecastConfig | None = None
