@@ -164,7 +164,7 @@ class TimesFM_2p5:
       value = linear_interpolation(strip_leading_nans(np.array(each_input)))
       if (w := len(value)) >= context:
         value = value[-context:]
-        mask = np.zeros_like(value, dtype=np.bool)
+        mask = np.zeros_like(value, dtype=bool)
       else:
         mask = np.array([True] * (context - w) + [False] * w)
         value = np.pad(value, (context - w, 0), "constant", constant_values=0.0)
