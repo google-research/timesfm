@@ -264,13 +264,13 @@ class TimesFM_2p5_200M_torch(timesfm_2p5_base.TimesFM_2p5):
         self,
         *,
         path: str | None = None,
-        hf_repo_id: str | None = "gg-hf/timesfm-2.5-200m-pytorch",
+        hf_repo_id: str | None = "google/timesfm-2.5-200m-pytorch",
     ):
         """Loads a PyTorch safetensors TimesFM model."""
         if path:
             pass
         elif hf_repo_id:
-            logging.info("Downloading checkpoint from HuggingFace repo %s", hf_repo_id)
+            logging.info("Downloading checkpoint from Hugging Face repo %s", hf_repo_id)
             path = os.path.join(
                 huggingface_hub.snapshot_download(hf_repo_id), "model.safetensors"
             )
