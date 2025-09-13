@@ -20,59 +20,59 @@ from typing import Literal
 
 @dataclasses.dataclass(frozen=False)
 class ForecastConfig:
-    """Options for forecasting."""
+  """Options for forecasting."""
 
-    max_context: int = 0
-    max_horizon: int = 0
-    normalize_inputs: bool = False
-    window_size: int = 0
-    per_core_batch_size: int = 1
-    use_continuous_quantile_head: bool = False
-    force_flip_invariance: bool = True
-    infer_is_positive: bool = True
-    fix_quantile_crossing: bool = False
-    return_backcast: bool = False
+  max_context: int = 0
+  max_horizon: int = 0
+  normalize_inputs: bool = False
+  window_size: int = 0
+  per_core_batch_size: int = 1
+  use_continuous_quantile_head: bool = False
+  force_flip_invariance: bool = True
+  infer_is_positive: bool = True
+  fix_quantile_crossing: bool = False
+  return_backcast: bool = False
 
 
 @dataclasses.dataclass(frozen=True)
 class ResidualBlockConfig:
-    """Framework-agnostic config for a residual block."""
+  """Framework-agnostic config for a residual block."""
 
-    input_dims: int
-    hidden_dims: int
-    output_dims: int
-    use_bias: bool
-    activation: Literal["relu", "swish", "none"]
+  input_dims: int
+  hidden_dims: int
+  output_dims: int
+  use_bias: bool
+  activation: Literal["relu", "swish", "none"]
 
 
 @dataclasses.dataclass(frozen=True)
 class RandomFourierFeaturesConfig:
-    """Framework-agnostic config for random fourier features."""
+  """Framework-agnostic config for random fourier features."""
 
-    input_dims: int
-    output_dims: int
-    projection_stddev: float
-    use_bias: bool
+  input_dims: int
+  output_dims: int
+  projection_stddev: float
+  use_bias: bool
 
 
 @dataclasses.dataclass(frozen=True)
 class TransformerConfig:
-    """Framework-agnostic config for a transformer."""
+  """Framework-agnostic config for a transformer."""
 
-    model_dims: int
-    hidden_dims: int
-    num_heads: int
-    attention_norm: Literal["rms"]
-    feedforward_norm: Literal["rms"]
-    qk_norm: Literal["rms", "none"]
-    use_bias: bool
-    use_rotary_position_embeddings: bool
-    ff_activation: Literal["relu", "swish", "none"]
+  model_dims: int
+  hidden_dims: int
+  num_heads: int
+  attention_norm: Literal["rms"]
+  feedforward_norm: Literal["rms"]
+  qk_norm: Literal["rms", "none"]
+  use_bias: bool
+  use_rotary_position_embeddings: bool
+  ff_activation: Literal["relu", "swish", "none"]
 
 
 @dataclasses.dataclass(frozen=True)
 class StackedTransformersConfig:
-    """Framework-agnostic config for a stacked transformers."""
+  """Framework-agnostic config for a stacked transformers."""
 
-    num_layers: int
-    transformer: TransformerConfig
+  num_layers: int
+  transformer: TransformerConfig
