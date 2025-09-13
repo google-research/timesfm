@@ -20,7 +20,33 @@ from typing import Literal
 
 @dataclasses.dataclass(frozen=False)
 class ForecastConfig:
-  """Options for forecasting."""
+  """Options for forecasting.
+
+  Attributes:
+    max_context: The maximum context length. This is used by the complied decode
+      function at inference time during batched inference. Any input time series
+      with length less than max_context will be padded with zeros, and with
+      length greater than max_context will be truncated.
+    max_horizon: The maximum horizon length. This is used by the complied decode
+      function at inference time during batched inference. The compiled cached
+      decoding function will by default forecast till max_horizon.
+    normalize_inputs: Whether to normalize the inputs. This is useful when the
+      raw inputs are of extremely large or small magnitudes which may result in
+      numerical issues.
+    window_size: The window size for decomposed forecasting.
+      TODO(siriuz42):implement it.
+    per_core_batch_size: The batch size per core. Used at inference time during
+      batched inference when multiple GPU / TPU devices are used.
+    use_continuous_quantile_head: Whether to use a separate continuous quantile
+      head to avoid quantile collapsing.
+    force_flip_invariance: Whether to force flip invariance. TimesFM guarantees
+      that TimesFM(aX + b) = a * TimesFM(x) + b for a >= 0 by default. This flag
+      extends it to a < 0 as well.
+    infer_is_positive: Whether to guarantee nonnegativity of the output if the
+      input is nonnegative.
+    fix_quantile_crossing: Whether to fix quantile crossing.
+    return_backcast: Whether to return backcast.
+  """
 
   max_context: int = 0
   max_horizon: int = 0

@@ -229,8 +229,22 @@ class TimesFM_2p5_200M_torch_module(nn.Module):
 
     return renormed_outputs, renormed_quantile_spread, ar_renormed_outputs
 
-  def forecast_naive(self, horizon: int, inputs: Sequence[np.ndarray]):
-    """Forecasts the time series."""
+  def forecast_naive(
+      self, horizon: int, inputs: Sequence[np.ndarray]
+  ) -> list[np.ndarray]:
+    """Forecasts the time series.
+
+    This is a naive implementation for debugging purposes. No forecasting
+    flags are used here. Forecasting quality can be subpar.
+
+    Args:
+      horizon: The number of time points to forecast.
+      inputs: A sequence of numpy arrays, each representing a time series to
+        query forecast for.
+
+    Returns:
+      A list of numpy arrays of forecasts.
+    """
     outputs = []
     for each_input in inputs:
       input_t = torch.tensor(each_input, dtype=torch.float32)
@@ -265,13 +279,14 @@ class TimesFM_2p5_200M_torch(timesfm_2p5_base.TimesFM_2p5):
       *,
       path: str | None = None,
       hf_repo_id: str | None = "google/timesfm-2.5-200m-pytorch",
-  ):
+  ) -> None:
     """Loads a PyTorch safetensors TimesFM model.
 
     Args:
         path: Path to a local checkpoint. If not provided, will try to download
           from the default Hugging Face repo.
-        hf_repo_id: Use another Hugging Face repo ID.
+        hf_repo_id: If provided, will download from the specified Hugging Face
+          repo instead.
     """
     if path:
       pass
@@ -287,7 +302,16 @@ class TimesFM_2p5_200M_torch(timesfm_2p5_base.TimesFM_2p5):
       raise ValueError("Either path or hf_repo_id must be provided.")
     self.model.load_checkpoint(path)
 
-  def compile(self, forecast_config: configs.ForecastConfig, **kwargs):
+  def compile(self, forecast_config: configs.ForecastConfig, **kwargs) -> None:
+    """Attempts to compile the model for fast decoding.
+
+    See configs.ForecastConfig for more details on the supported flags.
+
+    Args:
+      forecast_config: Configuration for forecasting flags.
+      **kwargs: Additional keyword arguments to pass to model.compile().
+    """
+
     if kwargs.get("backend", None) is not None:
       self.model.compile(**kwargs)
     self.global_batch_size = (
@@ -354,13 +378,10 @@ class TimesFM_2p5_200M_torch(timesfm_2p5_base.TimesFM_2p5):
       pf_outputs, quantile_spreads, ar_outputs = self.model.decode(
           forecast_config.max_horizon, inputs, masks
       )
-      full_forecast = torch.cat(
-          [
-              pf_outputs[:, -1, ...],
-              ar_outputs.reshape(batch_size, -1, self.model.q),
-          ],
-          dim=1,
-      )
+      to_cat = [pf_outputs[:, -1, ...]]
+      if ar_outputs is not None:
+        to_cat.append(ar_outputs.reshape(batch_size, -1, self.model.q))
+      full_forecast = torch.cat(to_cat, dim=1)
 
       flip_quantile_fn = lambda x: torch.cat(
           [x[..., :1], torch.flip(x[..., 1:], dims=(-1,))], dim=-1
@@ -372,13 +393,12 @@ class TimesFM_2p5_200M_torch(timesfm_2p5_base.TimesFM_2p5):
         )
         flipped_quantile_spreads = flip_quantile_fn(flipped_quantile_spreads)
         flipped_pf_outputs = flip_quantile_fn(flipped_pf_outputs)
-        flipped_full_forecast = torch.cat(
-            [
-                flipped_pf_outputs[:, -1, ...],
-                flipped_ar_outputs.reshape(batch_size, -1, self.model.q),
-            ],
-            dim=1,
-        )
+        to_cat = [flipped_pf_outputs[:, -1, ...]]
+        if flipped_ar_outputs is not None:
+          to_cat.append(
+              flipped_ar_outputs.reshape(batch_size, -1, self.model.q)
+          )
+        flipped_full_forecast = torch.cat(to_cat, dim=1)
         quantile_spreads = (quantile_spreads - flipped_quantile_spreads) / 2
         pf_outputs = (pf_outputs - flipped_pf_outputs) / 2
         full_forecast = (full_forecast - flipped_full_forecast) / 2

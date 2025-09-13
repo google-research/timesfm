@@ -126,7 +126,13 @@ class TimesFM_2p5_200M_Definition:
 
 
 class TimesFM_2p5:
-  """Abstract base class for TimesFM models."""
+  """Abstract base class for TimesFM models.
+
+  Attributes:
+    forecast_config: Configuration for forecasting flags.
+    compiled_decode: Compiled decode function.
+    global_batch_size: Global batch size.
+  """
 
   forecast_config: ForecastConfig | None = None
   compiled_decode: Callable[..., Any] | None = None
