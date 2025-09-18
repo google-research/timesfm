@@ -28,6 +28,7 @@ class MetricsLogger(ABC):
   @abstractmethod
   def log_metrics(self,
                   metrics: Dict[str, Any],
+import torch.optim as optim
                   step: Optional[int] = None) -> None:
     """Log metrics to the specified backend.
 
@@ -221,30 +222,13 @@ class TimesFMFinetuner:
       sampler = torch.utils.data.distributed.DistributedSampler(
           dataset,
           num_replicas=len(self.config.gpu_ids),
-          rank=dist.get_rank(),
-          shuffle=is_train)
-    else:
-      sampler = None
-
-    return DataLoader(
-        dataset,
-        batch_size=self.config.batch_size,
-        shuffle=(is_train and not self.config.distributed),
-        sampler=sampler,
-    )
-
-  def _quantile_loss(self, pred: torch.Tensor, actual: torch.Tensor,
                      quantile: float) -> torch.Tensor:
     """Calculates quantile loss.
         Args:
             pred: Predicted values
             actual: Actual values
-            quantile: Quantile at which loss is computed
-        Returns:
-            Quantile loss
-        """
-    dev = actual - pred
-    loss_first = dev * quantile
+    optimizer_class = getattr(optim, optimizer_name)
+    return optimizer_class(params_to_optimize, **optimizer_params)
     loss_second = -dev * (1.0 - quantile)
     return 2 * torch.where(loss_first >= 0, loss_first, loss_second)
 
