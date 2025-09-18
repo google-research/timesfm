@@ -21,7 +21,7 @@ jobs:
     # Set Poetry version from tag name (strip leading 'v')
     - name: Set Version number from tag
       run: |
-        poetry version "${GITHUB_REF_NAME#v}"
+        poetry version $(echo ${{ github.ref_name }} | sed 's/^v//')
     - name: Build and Publish to PyPI
       run: |
         poetry config pypi-token.pypi ${{ secrets.PYPI_API_TOKEN }}
