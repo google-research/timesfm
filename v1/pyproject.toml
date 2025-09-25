@@ -42,16 +42,18 @@ absl-py = ">=1.4.0"
 safetensors = "^0.5.3"
 
 [tool.poetry.extras]
-pax = ["paxml", "lingvo", "jax", "jaxlib"]
+# Note: `lingvo` is an optional Google-internal dependency with strict Python
+# version and packaging constraints that cause install failures on some
+# environments (Colab etc.). We omit it from the pax extra here so users can
+# opt-in explicitly if they need it and have a compatible environment.
+pax = ["paxml", "jax", "jaxlib"]
 torch = ["torch"] 
 
 [tool.poetry.dependencies.paxml]
 version = ">=1.4.0"
 python = ">=3.10,<3.11"
 
-[tool.poetry.dependencies.lingvo]
-version = ">=0.12.7"
-python = ">=3.10,<3.11"
+
 
 [tool.poetry.dependencies.jax]
 version = ">=0.4.26"
