@@ -59,8 +59,8 @@ pip install -e .
 ```python
 import numpy as np
 import timesfm
-model = timesfm.TimesFM_2p5_200M_torch()
-model.load_checkpoint()
+model = TimesFM_2p5_200M_torch.from_pretrained("google/timesfm-2.5-200m-pytorch")
+
 model.compile(
     timesfm.ForecastConfig(
         max_context=1024,
