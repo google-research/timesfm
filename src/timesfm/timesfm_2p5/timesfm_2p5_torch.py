@@ -55,10 +55,17 @@ class TimesFM_2p5_200M_torch_module(nn.Module):
     # Layers.
     self.tokenizer = dense.ResidualBlock(self.config.tokenizer)
     self.stacked_xf = nn.ModuleList(
-      [transformer.Transformer(self.config.stacked_transformers.transformer) for _ in range(self.x)]
+      [
+        transformer.Transformer(self.config.stacked_transformers.transformer)
+        for _ in range(self.x)
+      ]
     )
-    self.output_projection_point = dense.ResidualBlock(self.config.output_projection_point)
-    self.output_projection_quantiles = dense.ResidualBlock(self.config.output_projection_quantiles)
+    self.output_projection_point = dense.ResidualBlock(
+      self.config.output_projection_point
+    )
+    self.output_projection_quantiles = dense.ResidualBlock(
+      self.config.output_projection_quantiles
+    )
 
     # Device.
     if torch.cuda.is_available():
@@ -89,7 +96,9 @@ class TimesFM_2p5_200M_torch_module(nn.Module):
     output_embeddings = input_embeddings
     new_decode_caches = []
     for i, layer in enumerate(self.stacked_xf):
-      output_embeddings, new_cache = layer(output_embeddings, masks[..., -1], decode_caches[i])
+      output_embeddings, new_cache = layer(
+        output_embeddings, masks[..., -1], decode_caches[i]
+      )
       new_decode_caches.append(new_cache)
     output_ts = self.output_projection_point(output_embeddings)
     output_quantile_spread = self.output_projection_quantiles(output_embeddings)
@@ -174,7 +183,9 @@ class TimesFM_2p5_200M_torch_module(nn.Module):
       last_renormed_output = renormed_outputs[:, -1, :, self.aridx]
 
       for _ in range(num_decode_steps):
-        new_patched_input = torch.reshape(last_renormed_output, (batch_size, self.m, self.p))
+        new_patched_input = torch.reshape(
+          last_renormed_output, (batch_size, self.m, self.p)
+        )
         new_mask = torch.zeros_like(new_patched_input, dtype=torch.bool)
 
         n, mu, sigma = last_n, last_mu, last_sigma
@@ -208,7 +219,9 @@ class TimesFM_2p5_200M_torch_module(nn.Module):
 
     return renormed_outputs, renormed_quantile_spread, ar_renormed_outputs
 
-  def forecast_naive(self, horizon: int, inputs: Sequence[np.ndarray]) -> list[np.ndarray]:
+  def forecast_naive(
+    self, horizon: int, inputs: Sequence[np.ndarray]
+  ) -> list[np.ndarray]:
     """Forecasts the time series.
 
     This is a naive implementation for debugging purposes. No forecasting
@@ -228,7 +241,9 @@ class TimesFM_2p5_200M_torch_module(nn.Module):
       mask = torch.zeros_like(input_t, dtype=torch.bool)
       len_front_mask = self.p - (len(each_input) % self.p)
       if len_front_mask < self.p:
-        input_t = torch.cat([torch.zeros(len_front_mask, dtype=torch.float32), input_t], dim=0)
+        input_t = torch.cat(
+          [torch.zeros(len_front_mask, dtype=torch.float32), input_t], dim=0
+        )
         mask = torch.cat([torch.ones(len_front_mask, dtype=torch.bool), mask], dim=0)
       input_t = input_t[None, ...]
       mask = mask[None, ...]
@@ -307,7 +322,9 @@ class TimesFM_2p5_200M_torch(timesfm_2p5_base.TimesFM_2p5, ModelHubMixin):
 
     if kwargs.get("backend", None) is not None:
       self.model.compile(**kwargs)
-    self.global_batch_size = forecast_config.per_core_batch_size * self.model.device_count
+    self.global_batch_size = (
+      forecast_config.per_core_batch_size * self.model.device_count
+    )
 
     # Shortcut.
     fc = forecast_config
@@ -335,7 +352,9 @@ class TimesFM_2p5_200M_torch(timesfm_2p5_base.TimesFM_2p5, ModelHubMixin):
         f" {self.model.config.context_limit}."
       )
     if fc.use_continuous_quantile_head and (fc.max_horizon > self.model.os):
-      raise ValueError(f"Continuous quantile head is not supported for horizons > {self.model.os}.")
+      raise ValueError(
+        f"Continuous quantile head is not supported for horizons > {self.model.os}."
+      )
     self.forecast_config = fc
 
     def _compiled_decode(horizon, inputs, masks):
@@ -372,8 +391,8 @@ class TimesFM_2p5_200M_torch(timesfm_2p5_base.TimesFM_2p5, ModelHubMixin):
         return torch.cat([x[..., :1], torch.flip(x[..., 1:], dims=(-1,))], dim=-1)
 
       if fc.force_flip_invariance:
-        flipped_pf_outputs, flipped_quantile_spreads, flipped_ar_outputs = self.model.decode(
-          forecast_config.max_horizon, -inputs, masks
+        flipped_pf_outputs, flipped_quantile_spreads, flipped_ar_outputs = (
+          self.model.decode(forecast_config.max_horizon, -inputs, masks)
         )
         flipped_quantile_spreads = flip_quantile_fn(flipped_quantile_spreads)
         flipped_pf_outputs = flip_quantile_fn(flipped_pf_outputs)
@@ -395,7 +414,9 @@ class TimesFM_2p5_200M_torch(timesfm_2p5_base.TimesFM_2p5, ModelHubMixin):
       full_forecast = full_forecast[:, :horizon, :]
 
       if fc.return_backcast:
-        full_backcast = pf_outputs[:, :-1, : self.model.p, :].reshape(batch_size, -1, self.model.q)
+        full_backcast = pf_outputs[:, :-1, : self.model.p, :].reshape(
+          batch_size, -1, self.model.q
+        )
         full_forecast = torch.cat([full_backcast, full_forecast], dim=1)
 
       if fc.fix_quantile_crossing:

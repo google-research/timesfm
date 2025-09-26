@@ -21,7 +21,7 @@ safetensors = ">=0.5.3"
 torch = { version = ">=2.0.0", extras = ["cuda"] }
 
 [tool.ruff]
-line-length = 100
+line-length = 88
 indent-width = 2
 
 
