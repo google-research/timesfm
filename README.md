@@ -59,7 +59,7 @@ pip install -e .
 ```python
 import numpy as np
 import timesfm
-model = TimesFM_2p5_200M_torch.from_pretrained("google/timesfm-2.5-200m-pytorch")
+model = timesfm.TimesFM_2p5_200M_torch.from_pretrained("google/timesfm-2.5-200m-pytorch")
 
 model.compile(
     timesfm.ForecastConfig(
