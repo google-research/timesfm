@@ -20,6 +20,10 @@ huggingface_hub = { version = ">=0.23.0", extras = ["cli"] }
 safetensors = ">=0.5.3"
 torch = { version = ">=2.0.0", extras = ["cuda"] }
 
+[tool.ruff]
+line-length = 88
+indent-width = 2
+
 
 [build-system]
 requires = ["poetry-core"]
