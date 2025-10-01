@@ -94,6 +94,7 @@ class TransformerConfig:
   use_bias: bool
   use_rotary_position_embeddings: bool
   ff_activation: Literal["relu", "swish", "none"]
+  fuse_qkv: bool
 
 
 @dataclasses.dataclass(frozen=True)

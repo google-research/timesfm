@@ -22,7 +22,7 @@ from typing import Dict, Optional, Sequence, Union
 import numpy as np
 import torch
 from huggingface_hub import ModelHubMixin, hf_hub_download
-from safetensors.torch import load_file
+from safetensors.torch import load_file, save_file
 from torch import nn
 
 from .. import configs
@@ -75,11 +75,19 @@ class TimesFM_2p5_200M_torch_module(nn.Module):
       self.device = torch.device("cpu")
       self.device_count = 1
 
-  def load_checkpoint(self, path: str):
+  def load_checkpoint(self, path: str, **kwargs):
     """Loads a PyTorch TimesFM model from a checkpoint."""
     tensors = load_file(path)
-    self.load_state_dict(tensors)
+    self.load_state_dict(tensors, strict=True)
     self.to(self.device)
+    torch_compile = True
+    if "torch_compile" in kwargs:
+      torch_compile = kwargs["torch_compile"]
+    if torch_compile:
+      print("Compiling model...")
+      self = torch.compile(self)
+
+    self.eval()
 
   def forward(
     self,
@@ -112,9 +120,6 @@ class TimesFM_2p5_200M_torch_module(nn.Module):
 
   def decode(self, horizon: int, inputs, masks):
     """Decodes the time series."""
-
-    inputs = inputs.to(self.device)
-    masks = masks.to(self.device)
 
     with torch.no_grad():
       batch_size, context = inputs.shape[0], inputs.shape[1]
@@ -307,8 +312,19 @@ class TimesFM_2p5_200M_torch(timesfm_2p5_base.TimesFM_2p5, ModelHubMixin):
 
     logging.info("Loading checkpoint from: %s", model_file_path)
     # Load the weights into the model.
-    instance.model.load_checkpoint(model_file_path)
+    instance.model.load_checkpoint(model_file_path, **model_kwargs)
     return instance
+
+  def _save_pretrained(self, save_directory: Union[str, Path]):
+    """
+    Saves the model's state dictionary to a safetensors file. This method
+    is called by the `save_pretrained` method from `ModelHubMixin`.
+    """
+    if not os.path.exists(save_directory):
+      os.makedirs(save_directory)
+
+    weights_path = os.path.join(save_directory, "model.safetensors")
+    save_file(self.model.state_dict(), weights_path)
 
   def compile(self, forecast_config: configs.ForecastConfig, **kwargs) -> None:
     """Attempts to compile the model for fast decoding.
@@ -319,9 +335,6 @@ class TimesFM_2p5_200M_torch(timesfm_2p5_base.TimesFM_2p5, ModelHubMixin):
       forecast_config: Configuration for forecasting flags.
       **kwargs: Additional keyword arguments to pass to model.compile().
     """
-
-    if kwargs.get("backend", None) is not None:
-      self.model.compile(**kwargs)
     self.global_batch_size = (
       forecast_config.per_core_batch_size * self.model.device_count
     )
@@ -363,8 +376,10 @@ class TimesFM_2p5_200M_torch(timesfm_2p5_base.TimesFM_2p5, ModelHubMixin):
           f"Horizon must be less than the max horizon. {horizon} > {fc.max_horizon}."
         )
 
-      inputs = torch.Tensor(np.array(inputs)).to(self.model.device)
-      masks = torch.Tensor(np.array(masks)).to(self.model.device).to(torch.bool)
+      inputs = (
+        torch.from_numpy(np.array(inputs)).to(self.model.device).to(torch.float32)
+      )
+      masks = torch.from_numpy(np.array(masks)).to(self.model.device).to(torch.bool)
       batch_size = inputs.shape[0]
 
       if fc.infer_is_positive:

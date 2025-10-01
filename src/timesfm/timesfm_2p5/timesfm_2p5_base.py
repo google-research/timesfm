@@ -16,7 +16,9 @@
 
 import dataclasses
 from typing import Any, Callable
+
 import numpy as np
+
 from .. import configs
 
 ResidualBlockConfig = configs.ResidualBlockConfig
@@ -85,43 +87,44 @@ class TimesFM_2p5_200M_Definition:
   output_patch_len: int = 128
   output_quantile_len: int = 1024
   quantiles: list[float] = dataclasses.field(
-      default_factory=lambda: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+    default_factory=lambda: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
   )
   decode_index: int = 5
   tokenizer: ResidualBlockConfig = ResidualBlockConfig(
-      input_dims=64,
-      hidden_dims=1280,
-      output_dims=1280,
-      use_bias=True,
-      activation="swish",
+    input_dims=64,
+    hidden_dims=1280,
+    output_dims=1280,
+    use_bias=True,
+    activation="swish",
   )
   stacked_transformers: StackedTransformersConfig = StackedTransformersConfig(
-      num_layers=20,
-      transformer=TransformerConfig(
-          model_dims=1280,
-          hidden_dims=1280,
-          num_heads=16,
-          attention_norm="rms",
-          feedforward_norm="rms",
-          qk_norm="rms",
-          use_bias=False,
-          use_rotary_position_embeddings=True,
-          ff_activation="swish",
-      ),
+    num_layers=20,
+    transformer=TransformerConfig(
+      model_dims=1280,
+      hidden_dims=1280,
+      num_heads=16,
+      attention_norm="rms",
+      feedforward_norm="rms",
+      qk_norm="rms",
+      use_bias=False,
+      use_rotary_position_embeddings=True,
+      ff_activation="swish",
+      fuse_qkv=True,
+    ),
   )
   output_projection_point: ResidualBlockConfig = ResidualBlockConfig(
-      input_dims=1280,
-      hidden_dims=1280,
-      output_dims=1280,
-      use_bias=False,
-      activation="swish",
+    input_dims=1280,
+    hidden_dims=1280,
+    output_dims=1280,
+    use_bias=False,
+    activation="swish",
   )
   output_projection_quantiles: ResidualBlockConfig = ResidualBlockConfig(
-      input_dims=1280,
-      hidden_dims=1280,
-      output_dims=10240,
-      use_bias=False,
-      activation="swish",
+    input_dims=1280,
+    hidden_dims=1280,
+    output_dims=10240,
+    use_bias=False,
+    activation="swish",
   )
 
 
@@ -147,7 +150,7 @@ class TimesFM_2p5:
     raise NotImplementedError()
 
   def forecast(
-      self, horizon: int, inputs: list[np.ndarray]
+    self, horizon: int, inputs: list[np.ndarray]
   ) -> tuple[np.ndarray, np.ndarray]:
     """Forecasts the time series."""
     if self.compiled_decode is None:
@@ -179,9 +182,7 @@ class TimesFM_2p5:
       idx += 1
       if idx == self.global_batch_size:
         idx = 0
-        point_forecast, quantile_forecast = self.compiled_decode(
-            horizon, values, masks
-        )
+        point_forecast, quantile_forecast = self.compiled_decode(horizon, values, masks)
         output_points.append(point_forecast)
         output_quantiles.append(quantile_forecast)
         values = []
