@@ -109,56 +109,6 @@ class TimesFM_2p5_200M_Definition:
       use_bias=False,
       use_rotary_position_embeddings=True,
       ff_activation="swish",
-      fuse_qkv=False,
-    ),
-  )
-  output_projection_point: ResidualBlockConfig = ResidualBlockConfig(
-    input_dims=1280,
-    hidden_dims=1280,
-    output_dims=1280,
-    use_bias=False,
-    activation="swish",
-  )
-  output_projection_quantiles: ResidualBlockConfig = ResidualBlockConfig(
-    input_dims=1280,
-    hidden_dims=1280,
-    output_dims=10240,
-    use_bias=False,
-    activation="swish",
-  )
-
-
-@dataclasses.dataclass(frozen=True)
-class TimesFM_2p5_new_200M_Definition:
-  """Framework-agnostic config of TimesFM 2.5."""
-
-  context_limit = 16384
-  input_patch_len: int = 32
-  output_patch_len: int = 128
-  output_quantile_len: int = 1024
-  quantiles: list[float] = dataclasses.field(
-    default_factory=lambda: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
-  )
-  decode_index: int = 5
-  tokenizer: ResidualBlockConfig = ResidualBlockConfig(
-    input_dims=64,
-    hidden_dims=1280,
-    output_dims=1280,
-    use_bias=True,
-    activation="swish",
-  )
-  stacked_transformers: StackedTransformersConfig = StackedTransformersConfig(
-    num_layers=20,
-    transformer=TransformerConfig(
-      model_dims=1280,
-      hidden_dims=1280,
-      num_heads=16,
-      attention_norm="rms",
-      feedforward_norm="rms",
-      qk_norm="rms",
-      use_bias=False,
-      use_rotary_position_embeddings=True,
-      ff_activation="swish",
       fuse_qkv=True,
     ),
   )
