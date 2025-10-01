@@ -131,7 +131,7 @@ def _dot_product_attention(
 
 def _torch_dot_product_attention(query, key, value, mask=None):
   """
-  Performs the exact same (unscaled) attention as your original function,
+  Performs the exact same (unscaled) attention as the above function,
   but using the fast and fused F.scaled_dot_product_attention kernel.
   """
 
