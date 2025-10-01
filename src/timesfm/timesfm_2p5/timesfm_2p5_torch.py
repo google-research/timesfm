@@ -262,16 +262,10 @@ class TimesFM_2p5_200M_torch_module(nn.Module):
     return outputs
 
 
-class TimesFM_2p5_200M_torch_new_module(TimesFM_2p5_200M_torch_module):
-  """TimesFM 2.5 with 200M parameters."""
-
-  config = timesfm_2p5_base.TimesFM_2p5_new_200M_Definition()
-
-
 class TimesFM_2p5_200M_torch(timesfm_2p5_base.TimesFM_2p5, ModelHubMixin):
   """PyTorch implementation of TimesFM 2.5 with 200M parameters."""
 
-  model: nn.Module = TimesFM_2p5_200M_torch_new_module()
+  model: nn.Module = TimesFM_2p5_200M_torch_module()
 
   @classmethod
   def _from_pretrained(
