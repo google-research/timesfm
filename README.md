@@ -74,7 +74,6 @@ model.compile(
         force_flip_invariance=True,
         infer_is_positive=True,
         fix_quantile_crossing=True,
-        torch_compile=True,
     )
 )
 point_forecast, quantile_forecast = model.forecast(
