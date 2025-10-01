@@ -63,7 +63,7 @@ import timesfm
 
 torch.set_float32_matmul_precision("high")
 
-model = TimesFM_2p5_200M_torch.from_pretrained("google/timesfm-2.5-200m-pytorch")
+model = timesfm.TimesFM_2p5_200M_torch.from_pretrained("google/timesfm-2.5-200m-pytorch")
 
 model.compile(
     timesfm.ForecastConfig(
@@ -74,6 +74,7 @@ model.compile(
         force_flip_invariance=True,
         infer_is_positive=True,
         fix_quantile_crossing=True,
+        torch_compile=True,
     )
 )
 point_forecast, quantile_forecast = model.forecast(
