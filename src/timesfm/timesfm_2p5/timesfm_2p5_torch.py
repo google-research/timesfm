@@ -75,11 +75,19 @@ class TimesFM_2p5_200M_torch_module(nn.Module):
       self.device = torch.device("cpu")
       self.device_count = 1
 
-  def load_checkpoint(self, path: str):
+  def load_checkpoint(self, path: str, **kwargs):
     """Loads a PyTorch TimesFM model from a checkpoint."""
     tensors = load_file(path)
     self.load_state_dict(tensors, strict=True)
     self.to(self.device)
+    torch_compile = True
+    if "torch_compile" in kwargs:
+      torch_compile = kwargs["torch_compile"]
+    if torch_compile:
+      print("Compiling model...")
+      self = torch.compile(self)
+
+    self.eval()
 
   def forward(
     self,
@@ -310,7 +318,7 @@ class TimesFM_2p5_200M_torch(timesfm_2p5_base.TimesFM_2p5, ModelHubMixin):
 
     logging.info("Loading checkpoint from: %s", model_file_path)
     # Load the weights into the model.
-    instance.model.load_checkpoint(model_file_path)
+    instance.model.load_checkpoint(model_file_path, **model_kwargs)
     return instance
 
   def _save_pretrained(self, save_directory: Union[str, Path]):
@@ -333,10 +341,6 @@ class TimesFM_2p5_200M_torch(timesfm_2p5_base.TimesFM_2p5, ModelHubMixin):
       forecast_config: Configuration for forecasting flags.
       **kwargs: Additional keyword arguments to pass to model.compile().
     """
-
-    if forecast_config.torch_compile:
-      self.model = torch.compile(self.model)
-    self.model.eval()
     self.global_batch_size = (
       forecast_config.per_core_batch_size * self.model.device_count
     )

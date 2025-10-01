@@ -129,6 +129,28 @@ def _dot_product_attention(
   return torch.einsum("...hqk,...khd->...qhd", attn_weights, value)
 
 
+def _torch_dot_product_attention(query, key, value, mask=None):
+  """
+  Performs the exact same (unscaled) attention as your original function,
+  but using the fast and fused F.scaled_dot_product_attention kernel.
+  """
+
+  # 1. Permute inputs from (B, L, H, D) to the expected (B, H, L, D)
+  query = query.permute(0, 2, 1, 3)
+  key = key.permute(0, 2, 1, 3)
+  value = value.permute(0, 2, 1, 3)
+
+  # 2. Call the fused attention kernel
+  #    - Pass the mask to `attn_mask`.
+  #    - Set `scale=1.0` to disable the default 1/sqrt(d_k) scaling.
+  output = F.scaled_dot_product_attention(query, key, value, attn_mask=mask, scale=1.0)
+
+  # 3. Permute the output back to the original (B, L, H, D) layout
+  output = output.permute(0, 2, 1, 3)
+
+  return output
+
+
 class PerDimScale(nn.Module):
   """Per-dimension scaling."""
 
@@ -155,7 +177,7 @@ class MultiHeadAttention(nn.Module):
     use_per_dim_scale: bool = True,
     use_rotary_position_embeddings: bool = True,
     use_bias: bool = False,
-    attention_fn: Callable[..., torch.Tensor] = _dot_product_attention,
+    attention_fn: Callable[..., torch.Tensor] = _torch_dot_product_attention,
     qk_norm: str = "rms",
     fuse_qkv: bool = False,
   ):
