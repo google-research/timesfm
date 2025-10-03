@@ -166,6 +166,29 @@ files = [
 ]
 
 [[package]]
+name = "einshape"
+version = "1.0"
+description = "DSL-based reshaping library for JAX and other frameworks"
+optional = true
+python-versions = "*"
+groups = ["main"]
+markers = "extra == \"flax\""
+files = [
+    {file = "einshape-1.0-py3-none-any.whl", hash = "sha256:42da4c2dea3a27f87ee45a7cee5072a636b97cb184bb07bf5d6412ba0ff7b965"},
+    {file = "einshape-1.0.tar.gz", hash = "sha256:53538d75dd099f4ead4a4f786fafdcb0b729bb587e0b3afeca25ceef18c9ac14"},
+]
+
+[package.dependencies]
+absl-py = "*"
+numpy = "*"
+
+[package.extras]
+jax = ["jax (>=0.1.71)"]
+jaxlib = ["jaxlib (>=0.1.49)"]
+tensorflow = ["tensorflow (>=1.8.0)"]
+tensorflow-with-gpu = ["tensorflow-gpu (>=1.8.0)"]
+
+[[package]]
 name = "etils"
 version = "1.13.0"
 description = "Collection of common python utils"
@@ -492,6 +515,27 @@ files = [
 ml_dtypes = ">=0.5.0"
 numpy = ">=2.0"
 scipy = ">=1.13"
+
+[[package]]
+name = "jaxtyping"
+version = "0.3.3"
+description = "Type annotations and runtime checking for shape and dtype of JAX/NumPy/PyTorch/etc. arrays."
+optional = true
+python-versions = ">=3.10"
+groups = ["main"]
+markers = "extra == \"flax\""
+files = [
+    {file = "jaxtyping-0.3.3-py3-none-any.whl", hash = "sha256:a1c2f0f4351a8deda84b0e3b5c5a50894a1cdae2b82d841279fce4393aff4a7c"},
+    {file = "jaxtyping-0.3.3.tar.gz", hash = "sha256:8003cfd16ba2ad9b47fdda1d982a575299a81ddfc7997ad0e917c87a0897ea86"},
+]
+
+[package.dependencies]
+wadler-lindig = ">=0.1.3"
+
+[package.extras]
+dev = ["pre-commit (>=4.3.0)"]
+docs = ["griffe (==1.7.3)", "hippogriffe (==0.2.1)", "mkdocs (==1.6.1)", "mkdocs-include-exclude-files (==0.1.0)", "mkdocs-ipynb (==0.1.1)", "mkdocs-material (==9.6.7)", "mkdocstrings (==0.28.3)", "mkdocstrings-python (==1.16.8)", "pymdown-extensions (==10.14.3)"]
+tests = ["beartype (>=0.21.0)", "cloudpickle (>=3.1.1)", "equinox (>=0.13.1)", "ipython (>=8.37.0)", "jax (>=0.5.3)", "mlx[cpu] (>=0.29.1)", "numpy (<2)", "pytest (>=8.4.2)", "pytest-asyncio (>=1.2.0)", "tensorflow (>=2.18.1)", "typeguard (==2.13.3)"]
 
 [[package]]
 name = "jinja2"
@@ -2168,6 +2212,22 @@ tests = ["autopep8", "isort", "llnl-hatchet", "numpy", "pytest", "pytest-forked"
 tutorials = ["matplotlib", "pandas", "tabulate"]
 
 [[package]]
+name = "typeguard"
+version = "4.4.4"
+description = "Run-time type checker for Python"
+optional = true
+python-versions = ">=3.9"
+groups = ["main"]
+markers = "extra == \"flax\""
+files = [
+    {file = "typeguard-4.4.4-py3-none-any.whl", hash = "sha256:b5f562281b6bfa1f5492470464730ef001646128b180769880468bd84b68b09e"},
+    {file = "typeguard-4.4.4.tar.gz", hash = "sha256:3a7fd2dffb705d4d0efaed4306a704c89b9dee850b688f060a8b1615a79e5f74"},
+]
+
+[package.dependencies]
+typing_extensions = ">=4.14.0"
+
+[[package]]
 name = "typing-extensions"
 version = "4.15.0"
 description = "Backported and Experimental Type Hints for Python 3.9+"
@@ -2196,6 +2256,23 @@ brotli = ["brotli (>=1.0.9) ; platform_python_implementation == \"CPython\"", "b
 h2 = ["h2 (>=4,<5)"]
 socks = ["pysocks (>=1.5.6,!=1.5.7,<2.0)"]
 zstd = ["zstandard (>=0.18.0)"]
+
+[[package]]
+name = "wadler-lindig"
+version = "0.1.7"
+description = "A Wadler–Lindig pretty-printer for Python."
+optional = true
+python-versions = ">=3.10"
+groups = ["main"]
+markers = "extra == \"flax\""
+files = [
+    {file = "wadler_lindig-0.1.7-py3-none-any.whl", hash = "sha256:e3ec83835570fd0a9509f969162aeb9c65618f998b1f42918cfc8d45122fe953"},
+    {file = "wadler_lindig-0.1.7.tar.gz", hash = "sha256:81d14d3fe77d441acf3ebd7f4aefac20c74128bf460e84b512806dccf7b2cd55"},
+]
+
+[package.extras]
+dev = ["numpy", "pre-commit", "pytest"]
+docs = ["hippogriffe (==0.1.0)", "mkdocs (==1.6.1)", "mkdocs-include-exclude-files (==0.1.0)", "mkdocs-ipynb (==0.1.0)", "mkdocs-material (==9.6.7)", "mkdocstrings[python] (==0.28.3)", "pymdown-extensions (==10.14.3)"]
 
 [[package]]
 name = "wcwidth"
@@ -2231,10 +2308,10 @@ test = ["big-O", "jaraco.functools", "jaraco.itertools", "jaraco.test", "more_it
 type = ["pytest-mypy"]
 
 [extras]
-flax = ["flax", "jax", "optax"]
+flax = ["einshape", "flax", "jax", "jaxtyping", "optax", "orbax-checkpoint", "typeguard"]
 torch = ["torch"]
 
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11,<4.0"
-content-hash = "957015245f795b978f935442beab9c9f147aed8c31f431d61c7abe9280bfd0f8"
+content-hash = "7b87c7bc3f3e45443f080890c0a6c0b29045dda5e90c4cf78c9add3add0448d3"
