@@ -18,7 +18,6 @@ from flax import nnx
 import jax
 import jax.numpy as jnp
 import jaxtyping
-import typeguard
 
 Array = jaxtyping.Array
 Bool = jaxtyping.Bool
@@ -44,7 +43,6 @@ class RMSNorm(nnx.Module):
     self.num_features = num_features
     self.epsilon = epsilon
 
-  @jaxtyping.jaxtyped(typechecker=typeguard.typechecked)
   def __call__(
       self, inputs: Float[Array, "b ... d"]
   ) -> Float[Array, "b ... d"]:
@@ -69,7 +67,6 @@ class LayerNorm(nnx.Module):
     self.num_features = num_features
     self.epsilon = epsilon
 
-  @jaxtyping.jaxtyped(typechecker=typeguard.typechecked)
   def __call__(
       self, inputs: Float[Array, "b ... d"]
   ) -> Float[Array, "b ... d"]:

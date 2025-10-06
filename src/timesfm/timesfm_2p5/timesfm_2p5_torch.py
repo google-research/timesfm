@@ -13,6 +13,7 @@
 # limitations under the License.
 """TimesFM models."""
 
+import dataclasses
 import logging
 import math
 import os
@@ -349,7 +350,7 @@ class TimesFM_2p5_200M_torch(timesfm_2p5_base.TimesFM_2p5, ModelHubMixin):
         self.model.p,
         new_context := math.ceil(fc.max_context / self.model.p) * self.model.p,
       )
-      fc.max_context = new_context
+      fc = dataclasses.replace(fc, max_context=new_context)
     if fc.max_horizon % self.model.o != 0:
       logging.info(
         "When compiling, max horizon needs to be multiple of the output patch"
@@ -357,7 +358,7 @@ class TimesFM_2p5_200M_torch(timesfm_2p5_base.TimesFM_2p5, ModelHubMixin):
         self.model.o,
         new_horizon := math.ceil(fc.max_horizon / self.model.o) * self.model.o,
       )
-      fc.max_horizon = new_horizon
+      forecast_config = dataclasses.replace(fc, max_horizon=new_horizon)
     if fc.max_context + fc.max_horizon > self.model.config.context_limit:
       raise ValueError(
         "Context + horizon must be less than the context limit."

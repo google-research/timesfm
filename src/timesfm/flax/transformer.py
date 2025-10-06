@@ -23,7 +23,6 @@ import jax
 from jax import lax
 import jax.numpy as jnp
 import jaxtyping
-import typeguard
 
 from .. import configs
 from . import normalization, util
@@ -127,7 +126,6 @@ class PerDimScale(nnx.Module):
     self.num_dims = num_dims
     self.per_dim_scale = nnx.Param(jnp.zeros(shape=(num_dims,)))
 
-  @jaxtyping.jaxtyped(typechecker=typeguard.typechecked)
   def __call__(self, x: Float[Array, "b ... d"]) -> Float[Array, "b ... d"]:
     return x * (
         1.442695041
@@ -344,7 +342,6 @@ class Transformer(nnx.Module):
     else:
       raise ValueError(f"Activation: {config.ff_activation} not supported.")
 
-  @jaxtyping.jaxtyped(typechecker=typeguard.typechecked)
   def __call__(
       self,
       input_embeddings: Float[Array, "b n d"],

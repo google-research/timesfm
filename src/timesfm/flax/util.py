@@ -40,7 +40,6 @@ class DecodeCache:
   value: Float[Array, "b n h d"]
 
 
-@jaxtyping.jaxtyped(typechecker=typeguard.typechecked)
 @jax.jit
 def update_running_stats(
     n: Float[Array, "b"],

@@ -46,6 +46,8 @@ Array = jaxtyping.Array
 def try_gc():
   for d in jax.local_devices():
     stats = d.memory_stats()
+    if stats is None:
+      return
     if stats["bytes_in_use"] / stats["bytes_limit"] > 0.75:
       gc.collect()
       break
@@ -458,9 +460,10 @@ class TimesFM_2p5_200M_flax(timesfm_2p5_base.TimesFM_2p5):
   """Flax implementation of TimesFM 2.5 with 200M parameters."""
 
   model: nnx.Module = TimesFM_2p5_200M_flax_module()
-
+  
+  @classmethod
   def from_pretrained(
-      self,
+      cls,
       *,
       path: str | None = None,
       hf_repo_id: str | None = "google/timesfm-2.5-200m-flax",
@@ -476,11 +479,13 @@ class TimesFM_2p5_200M_flax(timesfm_2p5_base.TimesFM_2p5):
       logging.info("Loading checkpoint from: %s", path)
     else:
       raise ValueError("Either path or hf_repo_id must be provided.")
-
+    
+    instance = cls()
     checkpointer = ocp.StandardCheckpointer()
-    graph, state = nnx.split(self.model)
+    graph, state = nnx.split(instance.model)
     state = checkpointer.restore(path, state)
-    self.model = nnx.merge(graph, state)
+    instance.model = nnx.merge(graph, state)
+    return instance
 
   def compile(self, forecast_config: configs.ForecastConfig, **kwargs):
 

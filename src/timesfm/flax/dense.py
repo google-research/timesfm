@@ -18,7 +18,6 @@ from flax import nnx
 import jax
 import jax.numpy as jnp
 import jaxtyping
-import typeguard
 
 from .. import configs
 
@@ -64,7 +63,6 @@ class ResidualBlock(nnx.Module):
     else:
       raise ValueError(f"Activation: {config.activation} not supported.")
 
-  @jaxtyping.jaxtyped(typechecker=typeguard.typechecked)
   def __call__(self, x: Float[Array, "b ... i"]) -> Float[Array, "b ... o"]:
     return self.output_layer(
         self.activation(self.hidden_layer(x))
@@ -99,7 +97,6 @@ class RandomFourierFeatures(nnx.Module):
         rngs=rngs,
     )
 
-  @jaxtyping.jaxtyped(typechecker=typeguard.typechecked)
   def __call__(self, x: Float[Array, "b ... i"]) -> Float[Array, "b ... o"]:
     projected = self.projection_layer(x)
     cos_features = jnp.cos(projected)

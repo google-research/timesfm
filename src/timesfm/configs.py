@@ -18,7 +18,7 @@ import dataclasses
 from typing import Literal
 
 
-@dataclasses.dataclass(frozen=False)
+@dataclasses.dataclass(frozen=True)
 class ForecastConfig:
   """Options for forecasting.
 
