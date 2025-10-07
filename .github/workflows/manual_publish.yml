@@ -1,13 +1,10 @@
-name: Python package build
+name: Manual PyPI Publish
 
 on:
-  push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+  workflow_dispatch:
 
 jobs:
-  build:
+  build-and-publish:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -19,8 +16,10 @@ jobs:
         run: |
           curl -LsSf https://astral.sh/uv/install.sh | sh
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-      - name: Install build dependencies
+      - name: Install Poetry
         run: |
-          uv pip install build
-      - name: Build package
-        run: python -m build
+          uv pip install poetry
+      - name: Build and Publish to PyPI
+        run: |
+          poetry config pypi-token.pypi ${{ secrets.PYPI_API_TOKEN }}
+          poetry publish --build

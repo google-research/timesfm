@@ -44,15 +44,28 @@ will be under construction over the next few weeks to
 
 ### Install
 
-TODO(siriuz42): Package timesfm==2.0.0 and upload to PyPI .
+1.  Clone the repository:
+    ```shell
+    git clone https://github.com/google-research/timesfm.git
+    cd timesfm
+    ```
 
-Run
+2.  Create a virtual environment and install dependencies using `uv`:
+    ```shell
+    # Create a virtual environment
+    uv venv
+    
+    # Activate the environment
+    source .venv/bin/activate
+    
+    # Install the dependencies
+    uv pip install -r requirements.txt
+    ```
 
-```shell
-git clone https://github.com/google-research/timesfm.git
-cd timesfm
-pip install -e .
-```
+3.  (Optional) If you plan to modify the source code, install the package in editable mode:
+    ```shell
+    uv pip install -e .
+    ```
 
 ### Code Example
 

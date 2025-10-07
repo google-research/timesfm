@@ -1,31 +1,29 @@
-[tool.poetry]
+[project]
 name = "timesfm"
 version = "2.0.0"
 description = "A time series foundation model."
 authors = [
-    "Rajat Sen <senrajat@google.com>",
-    "Yichen Zhou <yichenzhou@google.com>",
-    "Abhimanyu Das <abhidas@google.com>",
-    "Petros Mol <pmol@google.com>",
-    "Michael Chertushkin <chertushkinmichael@gmail.com>"
+    {name = "Rajat Sen", email = "senrajat@google.com"},
+    {name = "Yichen Zhou", email = "yichenzhou@google.com"},
+    {name = "Abhimanyu Das", email = "abhidas@google.com"},
+    {name = "Petros Mol", email = "pmol@google.com"},
+    {name = "Michael Chertushkin", email = "chertushkinmichael@gmail.com"},
 ]
-license = "Apache-2.0"
+license = {text = "Apache-2.0"}
 readme = "README.md"
-packages = [{include = "timesfm", from = "src"}]
-
-[tool.poetry.dependencies]
-python = ">=3.11"
-numpy = ">=1.26.4"
-huggingface_hub = { version = ">=0.23.0", extras = ["cli"] }
-safetensors = ">=0.5.3"
-torch = { version = ">=2.0.0", extras = ["cuda"] }
+requires-python = ">=3.11"
+dependencies = [
+    "numpy>=1.26.4",
+    "huggingface_hub[cli]>=0.23.0",
+    "safetensors>=0.5.3",
+    "torch>=2.0.0",
+]
 
 [tool.ruff]
 line-length = 88
 indent-width = 2
 
-
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
 
