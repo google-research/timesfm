@@ -23,12 +23,12 @@ torch = [
     "torch>=2.0.0",
 ]
 flax = [
-    "flax>=0.8.2",
-    "optax>=0.2.2",
-    "einshape>=0.8.0",
-    "orbax-checkpoint>=0.5.15",
-    "jaxtyping>=0.2.29",
-    "jax>=0.4.26",
+    "flax",
+    "optax",
+    "einshape",
+    "orbax-checkpoint",
+    "jaxtyping",
+    "jax[cuda12]"
 ]
 
 [tool.ruff]
