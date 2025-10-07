@@ -509,7 +509,7 @@ class TimesFM_2p5_200M_flax(timesfm_2p5_base.TimesFM_2p5):
         self.model.o,
         new_horizon := math.ceil(fc.max_horizon / self.model.o) * self.model.o,
       )
-      forecast_config = dataclasses.replace(fc, max_horizon=new_horizon)
+      fc = dataclasses.replace(fc, max_horizon=new_horizon)
     if fc.max_context + fc.max_horizon > self.model.config.context_limit:
       raise ValueError(
         "Context + horizon must be less than the context limit."
