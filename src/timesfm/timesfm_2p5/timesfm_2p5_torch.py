@@ -13,6 +13,7 @@
 # limitations under the License.
 """TimesFM models."""
 
+import dataclasses
 import logging
 import math
 import os
@@ -54,12 +55,10 @@ class TimesFM_2p5_200M_torch_module(nn.Module):
 
     # Layers.
     self.tokenizer = dense.ResidualBlock(self.config.tokenizer)
-    self.stacked_xf = nn.ModuleList(
-      [
-        transformer.Transformer(self.config.stacked_transformers.transformer)
-        for _ in range(self.x)
-      ]
-    )
+    self.stacked_xf = nn.ModuleList([
+      transformer.Transformer(self.config.stacked_transformers.transformer)
+      for _ in range(self.x)
+    ])
     self.output_projection_point = dense.ResidualBlock(
       self.config.output_projection_point
     )
@@ -271,7 +270,7 @@ class TimesFM_2p5_200M_torch(timesfm_2p5_base.TimesFM_2p5, ModelHubMixin):
   def _from_pretrained(
     cls,
     *,
-    model_id: str,
+    model_id: str = "google/timesfm-2.5-200m-pytorch",
     revision: Optional[str],
     cache_dir: Optional[Union[str, Path]],
     force_download: bool,
@@ -349,7 +348,7 @@ class TimesFM_2p5_200M_torch(timesfm_2p5_base.TimesFM_2p5, ModelHubMixin):
         self.model.p,
         new_context := math.ceil(fc.max_context / self.model.p) * self.model.p,
       )
-      fc.max_context = new_context
+      fc = dataclasses.replace(fc, max_context=new_context)
     if fc.max_horizon % self.model.o != 0:
       logging.info(
         "When compiling, max horizon needs to be multiple of the output patch"
@@ -357,7 +356,7 @@ class TimesFM_2p5_200M_torch(timesfm_2p5_base.TimesFM_2p5, ModelHubMixin):
         self.model.o,
         new_horizon := math.ceil(fc.max_horizon / self.model.o) * self.model.o,
       )
-      fc.max_horizon = new_horizon
+      fc = dataclasses.replace(fc, max_horizon=new_horizon)
     if fc.max_context + fc.max_horizon > self.model.config.context_limit:
       raise ValueError(
         "Context + horizon must be less than the context limit."

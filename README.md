@@ -58,13 +58,10 @@ will be under construction over the next few weeks to
     # Activate the environment
     source .venv/bin/activate
     
-    # Install the dependencies
-    uv pip install -r requirements.txt
-    ```
-
-3.  (Optional) If you plan to modify the source code, install the package in editable mode:
-    ```shell
-    uv pip install -e .
+    # Install the package in editable mode with torch
+    uv pip install -e .[torch]
+    # Or with flax
+    uv pip install -e .[flax]
     ```
 
 ### Code Example
