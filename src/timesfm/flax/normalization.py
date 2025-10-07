@@ -32,21 +32,18 @@ class RMSNorm(nnx.Module):
   __data__ = ("scale",)
 
   def __init__(
-      self,
-      num_features: int,
-      *,
-      epsilon: float = 1e-6,
-      rngs=nnx.Rngs(42),
+    self,
+    num_features: int,
+    *,
+    epsilon: float = 1e-6,
+    rngs=nnx.Rngs(42),
   ):
     del rngs
     self.scale = nnx.Param(jnp.zeros(shape=(num_features,)))
     self.num_features = num_features
     self.epsilon = epsilon
 
-  def __call__(
-      self, inputs: Float[Array, "b ... d"]
-  ) -> Float[Array, "b ... d"]:
-
+  def __call__(self, inputs: Float[Array, "b ... d"]) -> Float[Array, "b ... d"]:
     var = jnp.mean(jnp.square(inputs), axis=-1, keepdims=True)
     normed_inputs = inputs * jax.lax.rsqrt(var + self.epsilon)
     normed_inputs *= self.scale
@@ -58,18 +55,14 @@ class LayerNorm(nnx.Module):
 
   __data__ = ("scale", "bias")
 
-  def __init__(
-      self, num_features: int, *, epsilon: float = 1e-6, rngs=nnx.Rngs(42)
-  ):
+  def __init__(self, num_features: int, *, epsilon: float = 1e-6, rngs=nnx.Rngs(42)):
     del rngs
     self.scale = nnx.Param(jnp.ones(shape=(num_features,)))
     self.bias = nnx.Param(jnp.zeros(shape=(num_features,)))
     self.num_features = num_features
     self.epsilon = epsilon
 
-  def __call__(
-      self, inputs: Float[Array, "b ... d"]
-  ) -> Float[Array, "b ... d"]:
+  def __call__(self, inputs: Float[Array, "b ... d"]) -> Float[Array, "b ... d"]:
     mean = jnp.mean(inputs, axis=-1, keepdims=True)
     var = jnp.mean(jnp.square(inputs - mean), axis=-1, keepdims=True)
     normed_inputs = (inputs - mean) * jax.lax.rsqrt(var + self.epsilon)

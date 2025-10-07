@@ -37,22 +37,22 @@ class ResidualBlock(nnx.Module):
   def __init__(self, config: ResidualBlockConfig, *, rngs=nnx.Rngs(42)):
     self.config = config
     self.hidden_layer = nnx.Linear(
-        in_features=config.input_dims,
-        out_features=config.hidden_dims,
-        use_bias=config.use_bias,
-        rngs=rngs,
+      in_features=config.input_dims,
+      out_features=config.hidden_dims,
+      use_bias=config.use_bias,
+      rngs=rngs,
     )
     self.output_layer = nnx.Linear(
-        in_features=config.hidden_dims,
-        out_features=config.output_dims,
-        use_bias=config.use_bias,
-        rngs=rngs,
+      in_features=config.hidden_dims,
+      out_features=config.output_dims,
+      use_bias=config.use_bias,
+      rngs=rngs,
     )
     self.residual_layer = nnx.Linear(
-        in_features=config.input_dims,
-        out_features=config.output_dims,
-        use_bias=config.use_bias,
-        rngs=rngs,
+      in_features=config.input_dims,
+      out_features=config.output_dims,
+      use_bias=config.use_bias,
+      rngs=rngs,
     )
     if config.activation == "relu":
       self.activation = jax.nn.relu
@@ -65,7 +65,7 @@ class ResidualBlock(nnx.Module):
 
   def __call__(self, x: Float[Array, "b ... i"]) -> Float[Array, "b ... o"]:
     return self.output_layer(
-        self.activation(self.hidden_layer(x))
+      self.activation(self.hidden_layer(x))
     ) + self.residual_layer(x)
 
 
@@ -79,22 +79,22 @@ class RandomFourierFeatures(nnx.Module):
 
     if config.output_dims % 4 != 0:
       raise ValueError(
-          f"Output dims must be a multiple of 4: {config.output_dims} % 4 != 0."
+        f"Output dims must be a multiple of 4: {config.output_dims} % 4 != 0."
       )
     num_projected_features = config.output_dims // 4
 
     self.phase_shifts = nnx.Param(jnp.zeros(shape=(2, num_projected_features)))
     self.projection_layer = nnx.Linear(
-        in_features=config.input_dims,
-        out_features=num_projected_features,
-        use_bias=config.use_bias,
-        rngs=rngs,
+      in_features=config.input_dims,
+      out_features=num_projected_features,
+      use_bias=config.use_bias,
+      rngs=rngs,
     )
     self.residual_layer = nnx.Linear(
-        in_features=config.input_dims,
-        out_features=config.output_dims,
-        use_bias=config.use_bias,
-        rngs=rngs,
+      in_features=config.input_dims,
+      out_features=config.output_dims,
+      use_bias=config.use_bias,
+      rngs=rngs,
     )
 
   def __call__(self, x: Float[Array, "b ... i"]) -> Float[Array, "b ... o"]:
@@ -104,7 +104,7 @@ class RandomFourierFeatures(nnx.Module):
     sq_wave_1 = jnp.sign(jnp.sin(projected + self.phase_shifts[0, :]))
     sq_wave_2 = jnp.sign(jnp.sin(projected + self.phase_shifts[1, :]))
     fourier_features = jnp.concatenate(
-        [cos_features, sin_features, sq_wave_1, sq_wave_2], axis=-1
+      [cos_features, sin_features, sq_wave_1, sq_wave_2], axis=-1
     )
     residual = self.residual_layer(x)
     return fourier_features + residual

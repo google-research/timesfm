@@ -19,7 +19,6 @@ import functools
 import jax
 import jax.numpy as jnp
 import jaxtyping
-import typeguard
 
 Float = jaxtyping.Float
 Array = jaxtyping.Array
@@ -42,38 +41,38 @@ class DecodeCache:
 
 @jax.jit
 def update_running_stats(
-    n: Float[Array, "b"],
-    mu: Float[Array, "b"],
-    sigma: Float[Array, "b"],
-    x: Float[Array, "b p"],
-    mask: Bool[Array, "b p"],
+  n: Float[Array, "b"],
+  mu: Float[Array, "b"],
+  sigma: Float[Array, "b"],
+  x: Float[Array, "b p"],
+  mask: Bool[Array, "b p"],
 ) -> tuple[
-    tuple[Float[Array, "b"], Float[Array, "b"], Float[Array, "b"]],
-    tuple[Float[Array, "b"], Float[Array, "b"], Float[Array, "b"]],
+  tuple[Float[Array, "b"], Float[Array, "b"], Float[Array, "b"]],
+  tuple[Float[Array, "b"], Float[Array, "b"], Float[Array, "b"]],
 ]:
   """Updates the running stats."""
   is_legit = jnp.logical_not(mask)
   inc_n = jnp.sum(is_legit.astype(jnp.float32), axis=-1, keepdims=False)
   inc_mu = jnp.where(
-      inc_n == 0, 0.0, jnp.mean(x, axis=-1, keepdims=False, where=is_legit)
+    inc_n == 0, 0.0, jnp.mean(x, axis=-1, keepdims=False, where=is_legit)
   )
   inc_sigma = jnp.where(
-      inc_n == 0, 0.0, jnp.std(x, axis=-1, keepdims=False, where=is_legit)
+    inc_n == 0, 0.0, jnp.std(x, axis=-1, keepdims=False, where=is_legit)
   )
   new_n = n + inc_n
   new_mu = jnp.where(new_n == 0, 0.0, (n * mu + inc_mu * inc_n) / new_n)
   new_sigma = jnp.sqrt(
-      jnp.where(
-          new_n == 0,
-          0.0,
-          (
-              n * sigma * sigma
-              + inc_n * inc_sigma * inc_sigma
-              + n * (mu - new_mu) * (mu - new_mu)
-              + inc_n * (inc_mu - new_mu) * (inc_mu - new_mu)
-          )
-          / new_n,
+    jnp.where(
+      new_n == 0,
+      0.0,
+      (
+        n * sigma * sigma
+        + inc_n * inc_sigma * inc_sigma
+        + n * (mu - new_mu) * (mu - new_mu)
+        + inc_n * (inc_mu - new_mu) * (inc_mu - new_mu)
       )
+      / new_n,
+    )
   )
   return (w := (new_n, new_mu, new_sigma), w)
 
@@ -83,17 +82,17 @@ def scan_along_axis(f, init, xs, axis: int, **kwargs):
   moved_xs = jax.tree_util.tree_map(lambda x: jnp.moveaxis(x, axis, 0), xs)
   carry, moved_ys = jax.lax.scan(f, init, moved_xs, **kwargs)
   return (
-      carry,
-      jax.tree_util.tree_map(lambda x: jnp.moveaxis(x, 0, axis), moved_ys),
+    carry,
+    jax.tree_util.tree_map(lambda x: jnp.moveaxis(x, 0, axis), moved_ys),
   )
 
 
 @functools.partial(jax.jit, static_argnames=("reverse",))
 def revin(
-    x: Float[Array, "b ..."],
-    mu: Float[Array, "b ..."],
-    sigma: Float[Array, "b ..."],
-    reverse: bool = False,
+  x: Float[Array, "b ..."],
+  mu: Float[Array, "b ..."],
+  sigma: Float[Array, "b ..."],
+  reverse: bool = False,
 ):
   """Reversible per-instance normalization."""
   if len(mu.shape) == len(x.shape) - 1:

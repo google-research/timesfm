@@ -40,14 +40,14 @@ DecodeCache = util.DecodeCache
 
 
 @functools.partial(
-    jax.jit,
-    static_argnames=("query_length", "kv_length"),
+  jax.jit,
+  static_argnames=("query_length", "kv_length"),
 )
 def make_attn_mask(
-    query_length: int,
-    num_all_masked_kv: Integer[Array, "b"],
-    query_index_offset: Integer[Array, "b"] | None = None,
-    kv_length: int = 0,
+  query_length: int,
+  num_all_masked_kv: Integer[Array, "b"],
+  query_index_offset: Integer[Array, "b"] | None = None,
+  kv_length: int = 0,
 ) -> Bool[Array, "b 1 q n"]:
   """Makes attention mask."""
 
@@ -59,8 +59,8 @@ def make_attn_mask(
     q_index += query_index_offset[:, None, None, None]
   kv_index = jnp.arange(kv_length)[None, None, None, :]
   return jnp.logical_and(
-      q_index >= kv_index,
-      kv_index >= num_all_masked_kv[:, None, None, None],
+    q_index >= kv_index,
+    kv_index >= num_all_masked_kv[:, None, None, None],
   )
 
 
@@ -68,31 +68,30 @@ class RotaryPositionalEmbedding(nnx.Module):
   """Rotary positional embedding."""
 
   def __init__(
-      self,
-      embedding_dims: int,
-      min_timescale: int = 1,
-      max_timescale: int = 10000,
+    self,
+    embedding_dims: int,
+    min_timescale: int = 1,
+    max_timescale: int = 10000,
   ):
     self.embedding_dims = embedding_dims
     self.min_timescale = min_timescale
     self.max_timescale = max_timescale
 
   def __call__(
-      self,
-      inputs: Float[Array, "b ... d"],
-      position: Array | None = None,
+    self,
+    inputs: Float[Array, "b ... d"],
+    position: Array | None = None,
   ):
     """Generates a JTensor of sinusoids with different frequencies."""
     if self.embedding_dims != inputs.shape[-1]:
       raise ValueError(
-          "The embedding dims of the rotary position embedding"
-          "must match the hidden dimension of the inputs."
+        "The embedding dims of the rotary position embedding"
+        "must match the hidden dimension of the inputs."
       )
     half_embedding_dim = self.embedding_dims // 2
     fraction = 2 * jnp.arange(0, half_embedding_dim) / self.embedding_dims
     timescale = (
-        self.min_timescale
-        * (self.max_timescale / self.min_timescale) ** fraction
+      self.min_timescale * (self.max_timescale / self.min_timescale) ** fraction
     )
     if position is None:
       seq_length = inputs.shape[1]
@@ -128,9 +127,7 @@ class PerDimScale(nnx.Module):
 
   def __call__(self, x: Float[Array, "b ... d"]) -> Float[Array, "b ... d"]:
     return x * (
-        1.442695041
-        / jnp.sqrt(self.num_dims)
-        * jax.nn.softplus(self.per_dim_scale)
+      1.442695041 / jnp.sqrt(self.num_dims) * jax.nn.softplus(self.per_dim_scale)
     )
 
 
@@ -138,17 +135,17 @@ class MultiHeadAttention(nnx.Module):
   """Multi-head attention."""
 
   def __init__(
-      self,
-      num_heads: int,
-      in_features: int,
-      *,
-      use_per_dim_scale: bool = True,
-      use_rotary_position_embeddings: bool = True,
-      use_bias: bool = False,
-      deterministic: bool | None = None,
-      attention_fn: Callable[..., Array] = nnx.dot_product_attention,
-      qk_norm: str = "rms",
-      rngs=nnx.Rngs(42),
+    self,
+    num_heads: int,
+    in_features: int,
+    *,
+    use_per_dim_scale: bool = True,
+    use_rotary_position_embeddings: bool = True,
+    use_bias: bool = False,
+    deterministic: bool | None = None,
+    attention_fn: Callable[..., Array] = nnx.dot_product_attention,
+    qk_norm: str = "rms",
+    rngs=nnx.Rngs(42),
   ):
     self.num_heads = num_heads
     self.in_features = in_features
@@ -162,15 +159,15 @@ class MultiHeadAttention(nnx.Module):
 
     if self.qkv_features % self.num_heads != 0:
       raise ValueError(
-          f"Memory dimension ({self.qkv_features}) must be divisible by "
-          f"'num_heads' heads ({self.num_heads})."
+        f"Memory dimension ({self.qkv_features}) must be divisible by "
+        f"'num_heads' heads ({self.num_heads})."
       )
     self.head_dim = self.qkv_features // self.num_heads
 
     linear_general = functools.partial(
-        LinearGeneral,
-        out_features=(self.num_heads, self.head_dim),
-        use_bias=self.use_bias,
+      LinearGeneral,
+      out_features=(self.num_heads, self.head_dim),
+      use_bias=self.use_bias,
     )
     # project inputs_q to multi-headed q/k/v
     # dimensions are then [batch..., length, n_heads, n_features_per_head]
@@ -186,18 +183,18 @@ class MultiHeadAttention(nnx.Module):
       self.key_ln = None
 
     self.out = LinearGeneral(
-        in_features=(self.num_heads, self.head_dim),
-        out_features=self.out_features,
-        axis=(-2, -1),
-        use_bias=self.use_bias,
-        rngs=rngs,
+      in_features=(self.num_heads, self.head_dim),
+      out_features=self.out_features,
+      axis=(-2, -1),
+      use_bias=self.use_bias,
+      rngs=rngs,
     )
 
     self.use_per_dim_scale = use_per_dim_scale
     self.use_rotary_position_embeddings = use_rotary_position_embeddings
     if self.use_rotary_position_embeddings:
       self.rotary_position_embedding = RotaryPositionalEmbedding(
-          embedding_dims=self.head_dim,
+        embedding_dims=self.head_dim,
       )
     else:
       self.rotary_position_embedding = None
@@ -208,20 +205,20 @@ class MultiHeadAttention(nnx.Module):
       self.per_dim_scale = None
 
   def __call__(
-      self,
-      inputs_q: Array,
-      *,
-      decode_cache: DecodeCache | None = None,
-      patch_mask: Array | None = None,
-      deterministic: bool | None = None,
-      sow_weights: bool = False,
+    self,
+    inputs_q: Array,
+    *,
+    decode_cache: DecodeCache | None = None,
+    patch_mask: Array | None = None,
+    deterministic: bool | None = None,
+    sow_weights: bool = False,
   ) -> tuple[Float[Array, "b ... o"], DecodeCache | None]:
     """Applies multi-head dot product attention on the input data."""
     _, n_patches, input_in_features = inputs_q.shape
     if input_in_features != self.in_features:
       raise ValueError(
-          f"Incompatible input dimension, got {input_in_features} "
-          f"but module expects {self.in_features}."
+        f"Incompatible input dimension, got {input_in_features} "
+        f"but module expects {self.in_features}."
       )
     if patch_mask is None:
       patch_mask = jnp.zeros_like(inputs_q.shape[:-1], dtype=jnp.bool)
@@ -232,22 +229,20 @@ class MultiHeadAttention(nnx.Module):
     value = self.value(inputs_q)
 
     if decode_cache is None:
-      num_masked = jnp.sum(
-          patch_mask.astype(jnp.int32), axis=-1, keepdims=False
-      )
+      num_masked = jnp.sum(patch_mask.astype(jnp.int32), axis=-1, keepdims=False)
       next_index = jnp.zeros_like(num_masked, dtype=jnp.int32)
     else:
       num_masked = (
-          jnp.sum(patch_mask.astype(jnp.int32), axis=-1, keepdims=False)
-          + decode_cache.num_masked
+        jnp.sum(patch_mask.astype(jnp.int32), axis=-1, keepdims=False)
+        + decode_cache.num_masked
       )
       next_index = decode_cache.next_index
 
     if self.use_rotary_position_embeddings:
       position = (
-          jnp.arange(n_patches, dtype=jnp.int32)[None, :]
-          + next_index[:, None]
-          - num_masked[:, None]
+        jnp.arange(n_patches, dtype=jnp.int32)[None, :]
+        + next_index[:, None]
+        - num_masked[:, None]
       )
       query = self.rotary_position_embedding(query, position)
       key = self.rotary_position_embedding(key, position)
@@ -270,25 +265,23 @@ class MultiHeadAttention(nnx.Module):
       decode_cache.next_index = next_index + n_patches
       decode_cache.num_masked = num_masked
       attn_mask = make_attn_mask(
-          query_length=n_patches,
-          num_all_masked_kv=num_masked,
-          query_index_offset=next_index,
-          kv_length=decode_cache_size,
+        query_length=n_patches,
+        num_all_masked_kv=num_masked,
+        query_index_offset=next_index,
+        kv_length=decode_cache_size,
       )
     else:
       # Training
-      attn_mask = make_attn_mask(
-          query_length=n_patches, num_all_masked_kv=num_masked
-      )
+      attn_mask = make_attn_mask(query_length=n_patches, num_all_masked_kv=num_masked)
 
     # apply attention
     x = self.attention_fn(
-        query * jnp.sqrt(self.head_dim),
-        key,
-        value,
-        mask=attn_mask,
-        deterministic=deterministic,
-        module=self if sow_weights else None,
+      query * jnp.sqrt(self.head_dim),
+      key,
+      value,
+      mask=attn_mask,
+      deterministic=deterministic,
+      module=self if sow_weights else None,
     )
     # back to the original inputs dimensions
     out = self.out(x)
@@ -308,12 +301,12 @@ class Transformer(nnx.Module):
       raise ValueError(f"Layer norm: {config.attention_norm} not supported.")
 
     self.attn = MultiHeadAttention(
-        num_heads=config.num_heads,
-        in_features=config.model_dims,
-        use_per_dim_scale=True,
-        use_rotary_position_embeddings=config.use_rotary_position_embeddings,
-        qk_norm=config.qk_norm,
-        rngs=rngs,
+      num_heads=config.num_heads,
+      in_features=config.model_dims,
+      use_per_dim_scale=True,
+      use_rotary_position_embeddings=config.use_rotary_position_embeddings,
+      qk_norm=config.qk_norm,
+      rngs=rngs,
     )
 
     if config.feedforward_norm == "rms":
@@ -322,16 +315,16 @@ class Transformer(nnx.Module):
     else:
       raise ValueError(f"Layer norm: {config.feedforward_norm} not supported.")
     self.ff0 = nnx.Linear(
-        in_features=config.model_dims,
-        out_features=config.hidden_dims,
-        use_bias=config.use_bias,
-        rngs=rngs,
+      in_features=config.model_dims,
+      out_features=config.hidden_dims,
+      use_bias=config.use_bias,
+      rngs=rngs,
     )
     self.ff1 = nnx.Linear(
-        in_features=config.hidden_dims,
-        out_features=config.model_dims,
-        use_bias=config.use_bias,
-        rngs=rngs,
+      in_features=config.hidden_dims,
+      out_features=config.model_dims,
+      use_bias=config.use_bias,
+      rngs=rngs,
     )
     if config.ff_activation == "relu":
       self.activation = jax.nn.relu
@@ -343,23 +336,21 @@ class Transformer(nnx.Module):
       raise ValueError(f"Activation: {config.ff_activation} not supported.")
 
   def __call__(
-      self,
-      input_embeddings: Float[Array, "b n d"],
-      patch_mask: Bool[Array, "b n"],
-      decode_cache: DecodeCache | None = None,
+    self,
+    input_embeddings: Float[Array, "b n d"],
+    patch_mask: Bool[Array, "b n"],
+    decode_cache: DecodeCache | None = None,
   ) -> tuple[Float[Array, "b n d"], DecodeCache | None]:
     attn_output, decode_cache = self.attn(
-        inputs_q=self.pre_attn_ln(input_embeddings),
-        decode_cache=decode_cache,
-        patch_mask=patch_mask,
-        sow_weights=False,
-        deterministic=True,
+      inputs_q=self.pre_attn_ln(input_embeddings),
+      decode_cache=decode_cache,
+      patch_mask=patch_mask,
+      sow_weights=False,
+      deterministic=True,
     )
     attn_output = self.post_attn_ln(attn_output) + input_embeddings
     output_embeddings = (
-        self.post_ff_ln(
-            self.ff1(self.activation(self.ff0(self.pre_ff_ln(attn_output))))
-        )
-        + attn_output
+      self.post_ff_ln(self.ff1(self.activation(self.ff0(self.pre_ff_ln(attn_output)))))
+      + attn_output
     )
     return output_embeddings, decode_cache

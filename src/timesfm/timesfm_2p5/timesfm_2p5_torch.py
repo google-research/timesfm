@@ -55,12 +55,10 @@ class TimesFM_2p5_200M_torch_module(nn.Module):
 
     # Layers.
     self.tokenizer = dense.ResidualBlock(self.config.tokenizer)
-    self.stacked_xf = nn.ModuleList(
-      [
-        transformer.Transformer(self.config.stacked_transformers.transformer)
-        for _ in range(self.x)
-      ]
-    )
+    self.stacked_xf = nn.ModuleList([
+      transformer.Transformer(self.config.stacked_transformers.transformer)
+      for _ in range(self.x)
+    ])
     self.output_projection_point = dense.ResidualBlock(
       self.config.output_projection_point
     )
@@ -272,7 +270,7 @@ class TimesFM_2p5_200M_torch(timesfm_2p5_base.TimesFM_2p5, ModelHubMixin):
   def _from_pretrained(
     cls,
     *,
-    model_id: str,
+    model_id: str = "google/timesfm-2.5-200m-pytorch",
     revision: Optional[str],
     cache_dir: Optional[Union[str, Path]],
     force_download: bool,
