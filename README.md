@@ -44,14 +44,29 @@ will be under construction over the next few weeks to
 
 ### Install
 
-TODO(siriuz42): Package timesfm==2.0.0 and upload to PyPI .
+**Step 1** (Prerequisite)
 
-Run
+Install your preferred `torch` / `jax` backend based on your OS and accelerators
+(CPU, GPU, TPU or Apple Silicon).
+
+-   [Install PyTorch](https://pytorch.org/get-started/locally/).
+-   [Install Jax](https://docs.jax.dev/en/latest/installation.html#installation)
+    for Flax.
+
+**Step 2** (Install `timesfm`)
+
+You can now install locally.
 
 ```shell
 git clone https://github.com/google-research/timesfm.git
 cd timesfm
-pip install -e .
+pip install -e ".[torch]"
+```
+
+```shell
+git clone https://github.com/google-research/timesfm.git
+cd timesfm
+pip install -e ".[flax]"
 ```
 
 ### Code Example

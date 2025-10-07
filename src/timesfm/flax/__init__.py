@@ -11,19 +11,3 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-"""TimesFM API."""
-
-from .configs import ForecastConfig
-
-try:
-  from .timesfm_2p5 import timesfm_2p5_torch
-  TimesFM_2p5_200M_torch = timesfm_2p5_torch.TimesFM_2p5_200M_torch
-except ImportError:
-  pass
-
-try:
-  from .timesfm_2p5 import timesfm_2p5_flax
-  TimesFM_2p5_200M_flax = timesfm_2p5_flax.TimesFM_2p5_200M_flax
-except ImportError:
-  pass
