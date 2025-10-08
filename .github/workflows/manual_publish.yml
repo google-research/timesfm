@@ -18,10 +18,12 @@ jobs:
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
       - name: Create virtual environment
         run: uv venv
-      - name: Install Poetry and dependencies
-        run: |
-          uv pip install poetry ".[torch,flax]"
-      - name: Build and Publish to PyPI
-        run: |
-          poetry config pypi-token.pypi ${{ secrets.PYPI_API_TOKEN }}
-          poetry publish --build
+      - name: Install build dependencies
+        run: uv pip install build twine
+      - name: Build package
+        run: uv run python -m build
+      - name: Publish to PyPI
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+        run: uv run twine upload dist/*
