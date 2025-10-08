@@ -44,30 +44,32 @@ will be under construction over the next few weeks to
 
 ### Install
 
-**Step 1** (Prerequisite)
+1.  Clone the repository:
+    ```shell
+    git clone https://github.com/google-research/timesfm.git
+    cd timesfm
+    ```
 
-Install your preferred `torch` / `jax` backend based on your OS and accelerators
-(CPU, GPU, TPU or Apple Silicon).
+2.  Create a virtual environment and install dependencies using `uv`:
+    ```shell
+    # Create a virtual environment
+    uv venv
+    
+    # Activate the environment
+    source .venv/bin/activate
+    
+    # Install the package in editable mode with torch
+    uv pip install -e .[torch]
+    # Or with flax
+    uv pip install -e .[flax]
+    ```
+
+3. [Optional] Install your preferred `torch` / `jax` backend based on your OS and accelerators
+(CPU, GPU, TPU or Apple Silicon).:
 
 -   [Install PyTorch](https://pytorch.org/get-started/locally/).
 -   [Install Jax](https://docs.jax.dev/en/latest/installation.html#installation)
     for Flax.
-
-**Step 2** (Install `timesfm`)
-
-You can now install locally.
-
-```shell
-git clone https://github.com/google-research/timesfm.git
-cd timesfm
-pip install -e ".[torch]"
-```
-
-```shell
-git clone https://github.com/google-research/timesfm.git
-cd timesfm
-pip install -e ".[flax]"
-```
 
 ### Code Example
 

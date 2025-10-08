@@ -1,13 +1,10 @@
-name: Python package build
+name: Manual PyPI Publish
 
 on:
-  push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+  workflow_dispatch:
 
 jobs:
-  build:
+  build-and-publish:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -22,7 +19,11 @@ jobs:
       - name: Create virtual environment
         run: uv venv
       - name: Install build dependencies
-        run: |
-          uv pip install build ".[torch,flax]"
+        run: uv pip install build twine
       - name: Build package
         run: uv run python -m build
+      - name: Publish to PyPI
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+        run: uv run twine upload dist/*

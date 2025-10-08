@@ -6,3 +6,4 @@ wandb/
 datasets/
 results/
 timesfm_jax.egg-info/
+development_setup.md
