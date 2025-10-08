@@ -523,7 +523,7 @@ class TimesFM_2p5_200M_flax(timesfm_2p5_base.TimesFM_2p5):
         f"Continuous quantile head is not supported for horizons > {self.model.os}."
       )
 
-    self.forecast_config = forecast_config
+    self.forecast_config = fc
     self.model.compile(
       context=self.forecast_config.max_context,
       horizon=self.forecast_config.max_horizon,
