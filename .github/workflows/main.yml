@@ -25,4 +25,4 @@ jobs:
         run: |
           uv pip install build ".[torch,flax]"
       - name: Build package
-        run: python -m build
+        run: uv run python -m build
