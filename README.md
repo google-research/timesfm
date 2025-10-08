@@ -64,6 +64,13 @@ will be under construction over the next few weeks to
     uv pip install -e .[flax]
     ```
 
+3. [Optional] Install your preferred `torch` / `jax` backend based on your OS and accelerators
+(CPU, GPU, TPU or Apple Silicon).:
+
+-   [Install PyTorch](https://pytorch.org/get-started/locally/).
+-   [Install Jax](https://docs.jax.dev/en/latest/installation.html#installation)
+    for Flax.
+
 ### Code Example
 
 ```python

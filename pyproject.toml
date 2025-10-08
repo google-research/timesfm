@@ -28,7 +28,7 @@ flax = [
     "einshape",
     "orbax-checkpoint",
     "jaxtyping",
-    "jax[cuda12]"
+    "jax[cuda]"
 ]
 
 [tool.ruff]
