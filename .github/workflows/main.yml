@@ -21,6 +21,6 @@ jobs:
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
       - name: Install build dependencies
         run: |
-          uv pip install build
+          uv pip install build ".[torch,flax]"
       - name: Build package
         run: python -m build

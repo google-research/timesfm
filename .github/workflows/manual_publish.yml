@@ -16,9 +16,9 @@ jobs:
         run: |
           curl -LsSf https://astral.sh/uv/install.sh | sh
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-      - name: Install Poetry
+      - name: Install Poetry and dependencies
         run: |
-          uv pip install poetry
+          uv pip install poetry ".[torch,flax]"
       - name: Build and Publish to PyPI
         run: |
           poetry config pypi-token.pypi ${{ secrets.PYPI_API_TOKEN }}
