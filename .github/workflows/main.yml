@@ -19,6 +19,8 @@ jobs:
         run: |
           curl -LsSf https://astral.sh/uv/install.sh | sh
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+      - name: Create virtual environment
+        run: uv venv
       - name: Install build dependencies
         run: |
           uv pip install build ".[torch,flax]"
