@@ -30,6 +30,10 @@ flax = [
     "jaxtyping",
     "jax[cuda]"
 ]
+xreg = [
+    "jax[cuda]",
+    "scikit-learn",
+]
 
 [tool.ruff]
 line-length = 88
