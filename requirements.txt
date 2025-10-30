@@ -16,7 +16,7 @@ idna==3.10
     # via requests
 inquirerpy==0.3.4
     # via huggingface-hub
-numpy==2.3.3
+numpy==2.2.6
     # via timesfm (pyproject.toml)
 packaging==25.0
     # via huggingface-hub
