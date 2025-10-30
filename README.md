@@ -22,6 +22,11 @@ This open version is not an officially supported Google product.
     install timesfm==1.3.0` to install an older version of this package to load
     them.
 
+## Update - Oct. 29, 2025
+
+Added back the covariate support through XReg for TimesFM 2.5.
+
+
 ## Update - Sept. 15, 2025
 
 TimesFM 2.5 is out!
@@ -62,6 +67,8 @@ will be under construction over the next few weeks to
     uv pip install -e .[torch]
     # Or with flax
     uv pip install -e .[flax]
+    # Or XReg is needed
+    uv pip install -e .[xreg]
     ```
 
 3. [Optional] Install your preferred `torch` / `jax` backend based on your OS and accelerators
