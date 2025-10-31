@@ -275,11 +275,11 @@ class TimesFM_2p5_200M_torch(timesfm_2p5_base.TimesFM_2p5, ModelHubMixin):
     model_id: str = "google/timesfm-2.5-200m-pytorch",
     revision: Optional[str],
     cache_dir: Optional[Union[str, Path]],
-    force_download: bool,
-    proxies: Optional[Dict],
-    resume_download: Optional[bool],
+    force_download: bool = True,
+    proxies: Optional[Dict] = None,
+    resume_download: Optional[bool] = None,
     local_files_only: bool,
-    token: Optional[str],
+    token: Optional[Union[str, bool]],
     **model_kwargs,
   ):
     """
