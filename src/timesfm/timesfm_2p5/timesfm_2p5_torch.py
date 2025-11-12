@@ -290,12 +290,12 @@ class TimesFM_2p5_200M_torch(timesfm_2p5_base.TimesFM_2p5, ModelHubMixin):
     # Create an instance of the model wrapper class.
     instance = cls(**model_kwargs)
     # Download the config file for hf tracking.
-    _ = hf_hub_download(
-      repo_id="google/timesfm-2.5-200m-pytorch",
-      filename="config.json",
-      force_download=True,
-    )
-    print("Downloaded.")
+    # _ = hf_hub_download(
+    #   repo_id="google/timesfm-2.5-200m-pytorch",
+    #   filename="config.json",
+    #   force_download=True,
+    # )
+    # print("Downloaded.")
 
     # Determine the path to the model weights.
     model_file_path = ""
