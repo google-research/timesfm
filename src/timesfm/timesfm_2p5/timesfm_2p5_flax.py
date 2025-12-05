@@ -491,7 +491,12 @@ class TimesFM_2p5_200M_flax(timesfm_2p5_base.TimesFM_2p5):
     instance.model = nnx.merge(graph, state)
     return instance
 
-  def compile(self, forecast_config: configs.ForecastConfig, **kwargs):
+  def compile(
+    self,
+    forecast_config: configs.ForecastConfig,
+    dryrun: bool = True,
+    **kwargs
+  ):
     # Acrobym used during validation.
     print("Compiling model...")
 
@@ -584,13 +589,14 @@ class TimesFM_2p5_200M_flax(timesfm_2p5_base.TimesFM_2p5):
       compiled_decode_kernel, self.forecast_config
     )
 
-    _ = self.compiled_decode(
-      self.forecast_config.max_horizon,
-      jnp.zeros(
-        (self.global_batch_size, self.forecast_config.max_context), dtype=jnp.float32
-      ),
-      jnp.zeros(
-        (self.global_batch_size, self.forecast_config.max_context), dtype=jnp.bool
-      ),
-    )
+    if dryrun:
+      _ = self.compiled_decode(
+        self.forecast_config.max_horizon,
+        jnp.zeros(
+          (self.global_batch_size, self.forecast_config.max_context), dtype=jnp.float32
+        ),
+        jnp.zeros(
+          (self.global_batch_size, self.forecast_config.max_context), dtype=jnp.bool
+        ),
+      )
     print("Compiling done.")
