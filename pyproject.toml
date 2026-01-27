@@ -11,7 +11,7 @@ authors = [
 ]
 license = {text = "Apache-2.0"}
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.10"
 dependencies = [
     "numpy>=1.26.4",
     "huggingface_hub[cli]>=0.23.0",
