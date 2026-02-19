@@ -275,7 +275,7 @@ class TimesFM_2p5_200M_torch(timesfm_2p5_base.TimesFM_2p5, ModelHubMixin):
     model_id: str = "google/timesfm-2.5-200m-pytorch",
     revision: Optional[str],
     cache_dir: Optional[Union[str, Path]],
-    force_download: bool = True,
+    force_download: bool = False,
     proxies: Optional[Dict] = None,
     resume_download: Optional[bool] = None,
     local_files_only: bool,
@@ -289,13 +289,21 @@ class TimesFM_2p5_200M_torch(timesfm_2p5_base.TimesFM_2p5, ModelHubMixin):
     """
     # Create an instance of the model wrapper class.
     instance = cls(**model_kwargs)
-    # Download the config file for hf tracking.
-    _ = hf_hub_download(
-      repo_id="google/timesfm-2.5-200m-pytorch",
-      filename="config.json",
-      force_download=True,
-    )
-    print("Downloaded.")
+
+    # Only download config.json for HF Hub tracking when loading remotely.
+    # Skip entirely for local directories — hf_hub_download doesn't apply.
+    if not os.path.isdir(model_id):
+      _ = hf_hub_download(
+        repo_id=model_id,
+        filename="config.json",
+        revision=revision,
+        cache_dir=cache_dir,
+        force_download=force_download,
+        proxies=proxies,
+        resume_download=resume_download,
+        token=token,
+        local_files_only=local_files_only,
+      )
 
     # Determine the path to the model weights.
     model_file_path = ""
