@@ -190,13 +190,13 @@ def _masked_mean_std(inputs: JTensor,
 
   num_valid_elements = jnp.where(num_valid_elements == 0, 1, num_valid_elements)
 
-  # Calculate the masked sum and squared sum of M
+  # Calculate the masked sum for mean and centered squared sum for variance.
   masked_sum = jnp.sum(arr * mask, axis=1)
-  masked_squared_sum = jnp.sum((arr * mask)**2, axis=1)
 
   # Calculate the masked mean and standard deviation
   masked_mean = masked_sum / num_valid_elements
-  masked_var = masked_squared_sum / num_valid_elements - masked_mean**2
+  centered = (arr - masked_mean[:, None]) * mask
+  masked_var = jnp.sum(centered**2, axis=1) / num_valid_elements
   masked_var = jnp.where(masked_var < 0.0, 0.0, masked_var)
   masked_std = jnp.sqrt(masked_var)
 
@@ -295,7 +295,7 @@ class PatchedTimeSeriesDecoder(base_layer.BaseLayer):
       patched_pads: JTensor) -> Tuple[JTensor, Tuple[JTensor, JTensor]]:
     """Input is of shape [B, N, P]."""
     mu, sigma = _masked_mean_std(inputs, patched_pads)
-    sigma = jnp.where(sigma < _TOLERANCE, 1.0, sigma)
+    sigma = jnp.maximum(sigma, _TOLERANCE)
     # Normalize each patch.
     outputs = (inputs - mu[:, None, None]) / sigma[:, None, None]
     outputs = jnp.where(
