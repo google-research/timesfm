@@ -222,8 +222,9 @@ class TimesFM_2p5:
       static_numerical_covariates: A dict of static numerical covariates.
       static_categorical_covariates: A dict of static categorical covariates.
       xreg_mode: one of "xreg + timesfm" or "timesfm + xreg". "xreg + timesfm"
-        fits a model on the residuals of the TimesFM forecast. "timesfm + xreg"
-        fits a model on the targets then forecasts on the residuals via TimesFM.
+        first fits an XReg model on the targets, then uses TimesFM to forecast
+        the residuals. "timesfm + xreg" first runs TimesFM to get a forecast,
+        then fits an XReg model on the residuals of that forecast.
       normalize_xreg_target_per_input: whether to normalize the xreg target per
         input in the given batch.
       ridge: ridge penalty for the linear model.
@@ -285,7 +286,7 @@ class TimesFM_2p5:
 
       if test_lens[-1] > self.forecast_config.max_horizon:
         raise ValueError(
-          "Forecast horizon length inferred from the dynamic covaraites is longer than the"
+          "Forecast horizon length inferred from the dynamic covariates is longer than the"
           f"max_horizon defined in the forecast config: {test_lens[-1]} > {self.forecast_config.max_horizon=}."
         )
 
