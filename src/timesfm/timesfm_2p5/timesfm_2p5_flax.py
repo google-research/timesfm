@@ -40,6 +40,8 @@ jax_einshape = einshape.jax_einshape
 scan = util.scan_along_axis
 revin = util.revin
 
+_DEFAULT_QUANTILES = configs.DEFAULT_QUANTILES
+
 Float = jaxtyping.Float
 Bool = jaxtyping.Bool
 Array = jaxtyping.Array
@@ -540,6 +542,18 @@ class TimesFM_2p5_200M_flax(timesfm_2p5_base.TimesFM_2p5):
       self.forecast_config.per_core_batch_size * self.model.num_devices
     )
 
+    # Validate output_quantiles and compute output tensor indices.
+    if fc.output_quantiles is not None:
+      invalid = [q for q in fc.output_quantiles if q not in _DEFAULT_QUANTILES]
+      if invalid:
+        raise ValueError(
+          f"output_quantiles contains values not in DEFAULT_QUANTILES "
+          f"{list(_DEFAULT_QUANTILES)}: {invalid}"
+        )
+      quantile_indices = [list(_DEFAULT_QUANTILES).index(q) + 1 for q in fc.output_quantiles]
+    else:
+      quantile_indices = list(range(10))
+
     def compiled_decode_kernel(fc, horizon, inputs, masks):
       inputs = jnp.array(inputs, dtype=jnp.float32)
       masks = jnp.array(masks, dtype=jnp.bool)
@@ -583,7 +597,7 @@ class TimesFM_2p5_200M_flax(timesfm_2p5_base.TimesFM_2p5):
       try_gc()
       if to_trim > 0:
         full_forecast_np = full_forecast_np[..., :-to_trim, :]
-      return full_forecast_np[..., 5], full_forecast_np
+      return full_forecast_np[..., 5], full_forecast_np[..., quantile_indices]
 
     self.compiled_decode = functools.partial(
       compiled_decode_kernel, self.forecast_config

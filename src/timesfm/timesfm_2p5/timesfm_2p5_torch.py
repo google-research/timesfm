@@ -32,6 +32,8 @@ from . import timesfm_2p5_base
 
 revin = util.revin
 
+_DEFAULT_QUANTILES = configs.DEFAULT_QUANTILES
+
 
 class TimesFM_2p5_200M_torch_module(nn.Module):
   """TimesFM 2.5 with 200M parameters."""
@@ -350,6 +352,18 @@ class TimesFM_2p5_200M_torch(timesfm_2p5_base.TimesFM_2p5, ModelHubMixin):
     # Shortcut.
     fc = forecast_config
 
+    # Validate output_quantiles and compute output tensor indices.
+    if fc.output_quantiles is not None:
+      invalid = [q for q in fc.output_quantiles if q not in _DEFAULT_QUANTILES]
+      if invalid:
+        raise ValueError(
+          f"output_quantiles contains values not in DEFAULT_QUANTILES "
+          f"{list(_DEFAULT_QUANTILES)}: {invalid}"
+        )
+      quantile_indices = [list(_DEFAULT_QUANTILES).index(q) + 1 for q in fc.output_quantiles]
+    else:
+      quantile_indices = list(range(10))
+
     if fc.max_context % self.model.p != 0:
       logging.info(
         "When compiling, max context needs to be multiple of the patch size"
@@ -467,6 +481,6 @@ class TimesFM_2p5_200M_torch(timesfm_2p5_base.TimesFM_2p5, ModelHubMixin):
         )
 
       full_forecast = full_forecast.detach().cpu().numpy()
-      return full_forecast[..., 5], full_forecast
+      return full_forecast[..., 5], full_forecast[..., quantile_indices]
 
     self.compiled_decode = _compiled_decode
