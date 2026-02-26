@@ -4,10 +4,12 @@ description: >
   Zero-shot time series forecasting with Google's TimesFM foundation model. Use this
   skill when forecasting ANY univariate time series — sales, sensor readings, stock prices,
   energy demand, patient vitals, weather, or scientific measurements — without training a
-  custom model. Automatically checks system RAM/GPU before loading the model, supports
-  CSV/DataFrame/array inputs, and returns point forecasts with calibrated prediction
-  intervals. Includes a preflight system checker script that MUST be run before first use
-  to verify the machine can load the model.
+  custom model. Supports both basic forecasting and advanced covariate forecasting (XReg)
+  with dynamic and static exogenous variables. Automatically checks system RAM/GPU before
+  loading the model, validates dataset fit before processing, supports CSV/DataFrame/array
+  inputs, and returns point forecasts with calibrated prediction intervals. Includes a
+  preflight system checker script that MUST be run before first use to verify the machine
+  can load the model and handle your specific dataset.
 license: Apache-2.0
 metadata:
   author: Clayton Young (@borealBytes)
@@ -40,6 +42,8 @@ Use this skill when:
 - You have time series of **any length** (the model handles 1–16,384 context points)
 - You need to **batch-forecast** hundreds or thousands of series efficiently
 - You want a **foundation model** approach instead of hand-tuning ARIMA/ETS parameters
+- You need **covariate forecasting** with exogenous variables (price, promotions, holidays, day-of-week effects) → use `forecast_with_covariates()` (TimesFM 2.5 + `pip install timesfm[xreg]`)
+
 
 Do **not** use this skill when:
 
@@ -47,6 +51,8 @@ Do **not** use this skill when:
 - You need time series classification or clustering → use `aeon`
 - You need multivariate vector autoregression or Granger causality → use `statsmodels`
 - Your data is tabular (not temporal) → use `scikit-learn`
+- You cannot install optional dependencies → XReg requires scikit-learn and JAX
+
 
 > **Note on Anomaly Detection**: TimesFM does not have built-in anomaly detection, but you
 > can use the **quantile forecasts as prediction intervals** — values outside the 90% CI
@@ -86,6 +92,39 @@ flowchart TD
     cpu_ok --> disk
     disk -->|"Yes"| ready["✅ READY<br/>Safe to load model"]
     disk -->|"No"| block_disk["🛑 BLOCKED<br/>Need space for weights"]
+```
+
+### Dataset Preflight (NEW)
+
+Before loading your actual data, verify it will fit in memory:
+
+```bash
+# Quick estimate for your dataset
+python scripts/check_system.py \
+  --num-series 1000 \
+  --context-length 1024 \
+  --horizon 24 \
+  --batch-size 32 \
+  --estimate-only
+```
+
+This will show you the estimated memory requirements and warn if your dataset is too large.
+
+**Memory Estimation Formula**:
+`RAM ≈ 0.8 GB (model) + 0.5 GB (overhead) + (0.2 MB × num_series × context_length / 1000)`
+
+**Example Outputs**:
+
+✅ **Dataset Fits**:
+```
+Total CPU memory: 2.34 GB
+Total GPU memory: 2.15 GB
+```
+
+⚠️ **Dataset Too Large**:
+```
+Dataset requires ~12.5 GB RAM but system has 8.0 GB.
+Try: context_length=512 or process in chunks of 50 series.
 ```
 
 ### Hardware Requirements by Model Version
@@ -336,10 +375,34 @@ for i in range(0, len(inputs), CHUNK):
 ### `scripts/check_system.py`
 
 Mandatory preflight checker — run before first model load.
+Now includes **dataset-aware memory estimation** to prevent OOM errors before loading your data.
 
 ```bash
+# Basic system check
 python scripts/check_system.py
+
+# Check if your specific dataset will fit
+python scripts/check_system.py \
+  --num-series 1000 \
+  --context-length 1024 \
+  --horizon 24 \
+  --batch-size 32
+
+# Quick memory estimate without system checks
+python scripts/check_system.py \
+  --num-series 5000 \
+  --context-length 2048 \
+  --estimate-only
 ```
+
+**What it checks**:
+
+1. **Available RAM** — warns if below 4 GB, blocks if below 2 GB
+2. **GPU availability** — detects CUDA/MPS devices and VRAM
+3. **Disk space** — verifies room for the ~800 MB model download
+4. **Python version** — requires 3.10+
+5. **Existing installation** — checks if `timesfm` and `torch` are installed
+6. **Dataset fit** (NEW) — estimates memory for your specific dataset and warns if it won't fit
 
 ### `scripts/forecast_csv.py`
 

@@ -221,6 +221,70 @@ Where `B` = batch size (number of input series), `H` = forecast horizon.
 
 ---
 
+---
+
+## Memory Estimation
+
+Before running forecasts on large datasets, estimate memory requirements:
+
+### Formula
+
+```mermaid
+block-beta
+    columns 3
+    ram["Total RAM Required"] model["Model Weights<br/>~0.8 GB"] overhead["Runtime Overhead<br/>~0.5 GB"] buffers["I/O Buffers<br/>~0.2 MB per 1000 series<br/>per 1000 context"]
+    
+    ram --> model
+    ram --> overhead
+    ram --> buffers
+```
+
+**Formula**:  
+`RAM (GB) ≈ 0.8 + 0.5 + (0.0002 × num_series × context_length)`
+
+**Variables**:
+- `num_series`: Number of time series in your batch
+- `context_length`: Your `max_context` value (or max series length)
+- `batch_size`: Your `per_core_batch_size` (affects parallel processing overhead)
+
+### Quick Reference
+
+| Dataset Size | Context=512 | Context=1024 | Context=2048 |
+|--------------|-------------|--------------|--------------|
+| 100 series | ~1.4 GB | ~1.5 GB | ~1.7 GB |
+| 1,000 series | ~1.9 GB | ~2.3 GB | ~3.1 GB |
+| 10,000 series| ~9.0 GB | ~17.0 GB | ~33.0 GB |
+
+### Using the Preflight Checker
+
+```bash
+python scripts/check_system.py \
+  --num-series 1000 \
+  --context-length 1024 \
+  --batch-size 32
+```
+
+This validates both system requirements AND dataset fit before loading the model.
+
+### Reducing Memory Usage
+
+If your dataset is too large:
+
+1. **Reduce context length**: Use `max_context=512` instead of 1024+ (50% reduction)
+2. **Process in chunks**: Split large batches into smaller groups:
+
+```python
+CHUNK_SIZE = 100
+for i in range(0, len(inputs), CHUNK_SIZE):
+    chunk = inputs[i:i+CHUNK_SIZE]
+    point, quantiles = model.forecast(horizon=H, inputs=chunk)
+    # Save chunk results
+```
+
+3. **Reduce batch size**: Lower `per_core_batch_size` (slower but less memory)
+4. **Use CPU**: If GPU OOM, the model will automatically fall back to CPU
+
+
 ## Error Handling
 
 | Error | Cause | Fix |

@@ -25,6 +25,7 @@ import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
+import math
 
 
 # ---------------------------------------------------------------------------
@@ -424,6 +425,168 @@ def recommend_batch_size(report: SystemReport) -> int:
             return 4
 
 
+def estimate_memory_gb(
+    num_series: int,
+    context_length: int,
+    horizon: int = 0,
+    batch_size: int = 32,
+    model_version: str = "v2.5",
+) -> dict[str, float]:
+    """Estimate memory requirements for a dataset.
+
+    Args:
+        num_series: Number of time series in the dataset
+        context_length: Length of each time series context window
+        horizon: Forecast horizon (optional, for output storage)
+        batch_size: Batch size for inference
+        model_version: Model version being used
+
+    Returns:
+        Dictionary with memory estimates in GB for different components
+    """
+    # Base model memory (weights + overhead)
+    model_memory_gb = 0.8  # ~800MB for model weights
+    overhead_gb = 0.5  # Python overhead, libraries, etc.
+
+    # Input data memory: each value is float32 (4 bytes)
+    # Formula: num_series * context_length * 4 bytes / (1024^3)
+    input_gb = (num_series * context_length * 4) / (1024**3)
+
+    # Batch processing memory (peak during inference)
+    # Each batch needs: batch_size * context_length * 4 bytes
+    batch_input_gb = (batch_size * context_length * 4) / (1024**3)
+
+    # Output memory: horizon * num_series * quantiles * 4 bytes
+    # Default is 10 quantiles (mean + 9 quantiles)
+    num_quantiles = 10
+    output_gb = (num_series * horizon * num_quantiles * 4) / (1024**3) if horizon > 0 else 0
+
+    # Total memory with some headroom for intermediate computations
+    total_gb = model_memory_gb + overhead_gb + input_gb + batch_input_gb + output_gb
+
+    # Add 20% buffer for intermediate tensors and OS overhead
+    total_with_buffer = total_gb * 1.2
+
+    return {
+        "model_weights": model_memory_gb,
+        "overhead": overhead_gb,
+        "input_data": input_gb,
+        "batch_processing": batch_input_gb,
+        "output_data": output_gb,
+        "total": total_gb,
+        "total_with_buffer": total_with_buffer,
+    }
+
+
+def check_dataset_fit(
+    num_series: int,
+    context_length: int,
+    horizon: int = 0,
+    batch_size: int = 32,
+    model_version: str = "v2.5",
+) -> tuple[bool, str, dict[str, float]]:
+    """Check if a dataset will fit in available memory.
+
+    Args:
+        num_series: Number of time series in the dataset
+        context_length: Length of each time series context window
+        horizon: Forecast horizon (optional)
+        batch_size: Batch size for inference
+        model_version: Model version being used
+
+    Returns:
+        Tuple of (fits: bool, message: str, memory_details: dict)
+    """
+    memory = estimate_memory_gb(num_series, context_length, horizon, batch_size, model_version)
+    total_ram = _get_total_ram_gb()
+    available_ram = _get_available_ram_gb()
+
+    required = memory["total_with_buffer"]
+
+    # Leave 10% headroom for OS and other processes
+    usable_ram = total_ram * 0.9
+    usable_available = available_ram * 0.9 if available_ram > 0 else usable_ram
+
+    if required > total_ram:
+        return (
+            False,
+            f"Dataset requires {required:.1f} GB but system only has {total_ram:.1f} GB RAM. "
+            f"Consider processing in chunks or using a machine with more RAM.",
+            memory,
+        )
+    elif required > usable_available:
+        return (
+            False,
+            f"Dataset requires {required:.1f} GB but only {available_ram:.1f} GB is available. "
+            f"Close other applications or restart to free memory.",
+            memory,
+        )
+    elif required > usable_ram * 0.8:
+        return (
+            True,
+            f"Dataset will fit ({required:.1f} GB needed, {total_ram:.1f} GB total) "
+            f"but memory usage will be high. Consider reducing batch_size.",
+            memory,
+        )
+    else:
+        return (
+            True,
+            f"Dataset fits comfortably: {required:.1f} GB needed, {total_ram:.1f} GB available.",
+            memory,
+        )
+
+
+def print_memory_estimate(
+    num_series: int,
+    context_length: int,
+    horizon: int = 0,
+    batch_size: int = 32,
+    model_version: str = "v2.5",
+) -> None:
+    """Print a detailed memory estimate for a dataset.
+
+    Args:
+        num_series: Number of time series in the dataset
+        context_length: Length of each time series context window
+        horizon: Forecast horizon (optional)
+        batch_size: Batch size for inference
+        model_version: Model version being used
+    """
+    memory = estimate_memory_gb(num_series, context_length, horizon, batch_size, model_version)
+    total_ram = _get_total_ram_gb()
+    available_ram = _get_available_ram_gb()
+
+    print(f"\n{'=' * 50}")
+    print(f" Memory Estimate for Dataset")
+    print(f"{'=' * 50}")
+    print(f"  Dataset: {num_series:,} series × {context_length} context length")
+    if horizon > 0:
+        print(f"  Horizon: {horizon} steps")
+    print(f"  Batch size: {batch_size}")
+    print(f"  Model: {model_version}")
+    print(f"{'-' * 50}")
+    print(f"  Model weights:     {memory['model_weights']:.2f} GB")
+    print(f"  Overhead:          {memory['overhead']:.2f} GB")
+    print(f"  Input data:        {memory['input_data']:.2f} GB")
+    print(f"  Batch processing:  {memory['batch_processing']:.2f} GB")
+    if horizon > 0:
+        print(f"  Output data:       {memory['output_data']:.2f} GB")
+    print(f"{'-' * 50}")
+    print(f"  Total (raw):       {memory['total']:.2f} GB")
+    print(f"  Total (+20% buf):  {memory['total_with_buffer']:.2f} GB")
+    print(f"{'-' * 50}")
+    print(f"  System RAM:        {total_ram:.1f} GB")
+    print(f"  Available RAM:     {available_ram:.1f} GB")
+    print(f"{'=' * 50}")
+
+    fits, message, _ = check_dataset_fit(
+        num_series, context_length, horizon, batch_size, model_version
+    )
+    status_icon = "✅" if fits else "🛑"
+    print(f"  {status_icon} {message}")
+    print(f"{'=' * 50}\n")
+
+
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
@@ -490,7 +653,7 @@ def print_report(report: SystemReport) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Check system requirements for TimesFM."
+        description="Check system requirements for TimesFM.",
     )
     parser.add_argument(
         "--model",
@@ -503,9 +666,64 @@ def main() -> None:
         action="store_true",
         help="Output results as JSON (machine-readable)",
     )
+    # Dataset preflight options (NEW)
+    dataset_group = parser.add_argument_group("dataset preflight (optional)")
+    dataset_group.add_argument(
+        "--num-series",
+        type=int,
+        metavar="N",
+        help="Number of time series in your dataset (for memory estimation)",
+    )
+    dataset_group.add_argument(
+        "--context-length",
+        type=int,
+        metavar="LEN",
+        help="Length of each input time series (max_context value)",
+    )
+    dataset_group.add_argument(
+        "--horizon",
+        type=int,
+        metavar="H",
+        default=24,
+        help="Forecast horizon length (default: 24)",
+    )
+    dataset_group.add_argument(
+        "--batch-size",
+        type=int,
+        metavar="SIZE",
+        default=32,
+        help="per_core_batch_size from ForecastConfig (default: 32)",
+    )
+    dataset_group.add_argument(
+        "--estimate-only",
+        action="store_true",
+        help="Only show memory estimate, skip system checks",
+    )
     args = parser.parse_args()
 
+    # Handle dataset estimation only mode
+    if args.estimate_only and args.num_series and args.context_length:
+        print_memory_estimate(
+            args.num_series,
+            args.context_length,
+            args.horizon,
+            args.batch_size,
+            args.model,
+        )
+        sys.exit(0)
+
+    # Run system checks
     report = run_checks(args.model)
+
+    # Add dataset check if parameters provided
+    if args.num_series and args.context_length:
+        print_memory_estimate(
+            args.num_series,
+            args.context_length,
+            args.horizon,
+            args.batch_size,
+            args.model,
+        )
 
     if args.json:
         print(json.dumps(report.to_dict(), indent=2))

@@ -5,6 +5,33 @@
 TimesFM can run on a variety of hardware configurations. This guide helps you
 choose the right setup and tune performance for your machine.
 
+### How Context Limits Are Determined
+
+The `max_context` values in each tier are **conservative recommendations** based on memory-performance tradeoffs, not hard limits. TimesFM 2.5 supports up to 16,384 context points, but smaller values are recommended for most use cases.
+
+**Why 512 and 1024?**
+
+| Factor | 512 Context | 1024 Context |
+|--------|-------------|--------------|
+| **Memory per 1000 series** | ~100 MB | ~200 MB |
+| **Typical Use Case** | Daily data, ~1-2 years | Daily data, ~2-3 years |
+| **Inference Speed** | Faster | Moderate |
+| **Hardware** | 4-8 GB RAM | 16 GB RAM or GPU |
+
+**Memory Formula**: `RAM ≈ model_weights + 0.5 GB + (0.2 MB × num_series × context_length / 1000)`
+
+Where:
+- `model_weights` = ~800 MB (TimesFM 2.5)
+- `context_length` = your `max_context` value
+- `num_series` = number of time series in your batch
+
+**You can use larger contexts** if your hardware supports it:
+- **Up to 2048**: Requires ~16 GB RAM for moderate batch sizes
+- **Up to 4096**: Requires GPU or 32+ GB RAM
+- **Up to 16384**: Maximum supported, requires significant memory
+
+See [Data Preparation Guide](data_preparation.md) for context length recommendations by data frequency.
+
 ### Tier 1: Minimal (CPU-Only, 4–8 GB RAM)
 
 - **Use case**: Light exploration, single-series forecasting, prototyping
