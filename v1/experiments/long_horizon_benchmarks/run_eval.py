@@ -14,6 +14,7 @@
 """Eval pipeline."""
 
 import json
+import ast
 import os
 import sys
 import time
@@ -235,4 +236,4 @@ def eval():
 if __name__ == "__main__":
   FLAGS = flags.FLAGS
   FLAGS(sys.argv)
-  eval()
+  np.load(FLAGS.data_path)
