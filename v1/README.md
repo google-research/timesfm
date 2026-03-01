@@ -44,7 +44,7 @@ timesfm-2.0-500m is our second open model checkpoint:
 
 ## Benchmarking
 
-TimesFM 2.0 has been added to [GIFT-Eval](https://huggingface.co/spaces/Salesforce/GIFT-Eval) which is one of the most comprehensive time-series bechmarks available. It takes the top spot in terms of aggregated MASE and CRPS, where it is 6\% better than the next best model in terms of aggregated MASE.
+TimesFM 2.0 has been added to [GIFT-Eval](https://huggingface.co/spaces/Salesforce/GIFT-Eval) which is one of the most comprehensive time-series benchmarks available. It takes the top spot in terms of aggregated MASE and CRPS, where it is 6\% better than the next best model in terms of aggregated MASE.
 
 ## Installation
 
@@ -67,7 +67,7 @@ poetry lock
 poetry install -E  pax
 ```
 
-After than you can run the timesfm under `poetry shell` or do `poetry run python3 ...`.
+After then you can run the timesfm under `poetry shell` or do `poetry run python3 ...`.
 
 ### For PyTorch version installation do the following.
 
@@ -78,7 +78,7 @@ poetry lock
 poetry install -E  torch
 ```
 
-After than you can run the timesfm under `poetry shell` or do `poetry run python3 ...`.
+After then you can run the timesfm under `poetry shell` or do `poetry run python3 ...`.
 
 **Additional Note**: 
 
@@ -284,10 +284,10 @@ In this example, besides the `Daily_sales`, we also have covariates `Category`, 
 - In our example, `Category` is a **static categorical covariate**, 
 - `Base_price` is a **static numerical covariates**.
 
-**Dynamic covariates** are covaraites for each time stamps.
+**Dynamic covariates** are covariates for each time stamps.
 - Date / time related features can be usually treated as dynamic covariates.
 - In our example, `Weekday` and `Has_promotion` are **dynamic categorical covariates**.
-- `Daily_temperate` is a **dynamic numerical covariate**.
+- `Daily_temperature` is a **dynamic numerical covariate**.
 
 **Notice:** Here we make it mandatory that the dynamic covariates need to cover both the forecasting context and horizon. For example, all dynamic covariates in the example have 14 values: the first 7 correspond to the observed 7 days, and the last 7 correspond to the next 7 days.
 
