@@ -341,7 +341,7 @@ class TimesFMAttention(nn.Module):
     self.q_size = self.num_heads * self.head_dim
     self.kv_size = self.num_kv_heads * self.head_dim
     self.scaling = nn.Parameter(
-        torch.empty((self.head_dim,), dtype=torch.float32),)
+        torch.randn((self.head_dim,), dtype=torch.float32),)
 
     self.qkv_proj = nn.Linear(
         self.hidden_size,
