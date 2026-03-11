@@ -22,7 +22,7 @@ from typing import Optional, Sequence, Union
 
 import numpy as np
 import torch
-from huggingface_hub import PytorchModelHubMixin, hf_hub_download
+from huggingface_hub import PyTorchModelHubMixin, hf_hub_download
 from safetensors.torch import load_file, save_file
 from torch import nn
 
@@ -265,7 +265,7 @@ class TimesFM_2p5_200M_torch_module(nn.Module):
 
 class TimesFM_2p5_200M_torch(
   timesfm_2p5_base.TimesFM_2p5,
-  PytorchModelHubMixin,
+  PyTorchModelHubMixin,
   library_name="timesfm",
   repo_url="https://github.com/google-research/timesfm",
   paper_url="https://arxiv.org/abs/2310.10688",
@@ -305,7 +305,7 @@ class TimesFM_2p5_200M_torch(
     """
     Loads a PyTorch safetensors TimesFM model from a local path or the Hugging
     Face Hub. This method is the backend for the `from_pretrained` class
-    method provided by `ModelHubMixin`.
+    method provided by `PyTorchModelHubMixin`.
     """
     # Determine the path to the model weights.
     model_file_path = ""
@@ -341,7 +341,7 @@ class TimesFM_2p5_200M_torch(
   def _save_pretrained(self, save_directory: Union[str, Path]):
     """
     Saves the model's state dictionary to a safetensors file. This method
-    is called by the `save_pretrained` method from `ModelHubMixin`.
+    is called by the `save_pretrained` method from `PyTorchModelHubMixin`.
     """
     if not os.path.exists(save_directory):
       os.makedirs(save_directory)
