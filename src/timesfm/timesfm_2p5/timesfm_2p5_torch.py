@@ -22,7 +22,7 @@ from typing import Optional, Sequence, Union
 
 import numpy as np
 import torch
-from huggingface_hub import ModelHubMixin, hf_hub_download
+from huggingface_hub import PytorchModelHubMixin, hf_hub_download
 from safetensors.torch import load_file, save_file
 from torch import nn
 
@@ -265,7 +265,7 @@ class TimesFM_2p5_200M_torch_module(nn.Module):
 
 class TimesFM_2p5_200M_torch(
   timesfm_2p5_base.TimesFM_2p5,
-  ModelHubMixin,
+  PytorchModelHubMixin,
   library_name="timesfm",
   repo_url="https://github.com/google-research/timesfm",
   paper_url="https://arxiv.org/abs/2310.10688",
