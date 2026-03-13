@@ -17,6 +17,10 @@
 import dataclasses
 from typing import Literal
 
+# The 9 quantiles that the TimesFM 2.5 model was trained to output.
+# These correspond to output tensor indices 1–9 (index 0 is the point head output).
+DEFAULT_QUANTILES: tuple[float, ...] = (0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9)
+
 
 @dataclasses.dataclass(frozen=True)
 class ForecastConfig:
@@ -58,6 +62,11 @@ class ForecastConfig:
   infer_is_positive: bool = True
   fix_quantile_crossing: bool = False
   return_backcast: bool = False
+  output_quantiles: tuple[float, ...] | None = None
+  """Subset of quantiles to return. Must be a subset of DEFAULT_QUANTILES
+  i.e. (0.1, 0.2, ..., 0.9). If None, all 9 default quantiles are returned.
+  The point forecast (index 5 / median) is always returned regardless of this
+  setting."""
 
 
 @dataclasses.dataclass(frozen=True)
