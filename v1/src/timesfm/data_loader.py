@@ -149,11 +149,15 @@ class TimeSeriesdata(object):
     else:
       epoch_len = self.epoch_len
     for idx in perm[0:epoch_len]:
-      for _ in range(num_ts // self.batch_size + 1):
+      if self.permute:
+        batch_idx_starts = [None] * (num_ts // self.batch_size + 1)
+      else:
+        batch_idx_starts = range(0, num_ts, self.batch_size)
+      for batch_idx in batch_idx_starts:
         if self.permute:
           tsidx = np.random.choice(num_ts, size=self.batch_size, replace=False)
         else:
-          tsidx = np.arange(num_ts)
+          tsidx = np.arange(batch_idx, min(batch_idx + self.batch_size, num_ts))
         dtimes = np.arange(idx - hist_len, idx + self.pred_len)
         (
             bts_train,
