@@ -339,12 +339,20 @@ class BatchedInContextXRegBase:
       x_train = np.concatenate(x_train, axis=1)
       x_test = np.concatenate(x_test, axis=1)
 
-      # Normalize for robustness.
-      x_mean = np.mean(x_train, axis=0, keepdims=True)
-      x_std = np.where((w := np.std(x_train, axis=0, keepdims=True)) > _TOL, w,
-                       1.0)
-      x_train = [(x_train - x_mean) / x_std]
-      x_test = [(x_test - x_mean) / x_std]
+      # Normalize per-input for robustness (batch-wide normalization
+      # would make each input's result depend on batch composition).
+      train_splits = np.cumsum(self.train_lens)[:-1]
+      test_splits = np.cumsum(self.test_lens)[:-1]
+      train_parts = np.split(x_train, train_splits, axis=0)
+      test_parts = np.split(x_test, test_splits, axis=0)
+      norm_train, norm_test = [], []
+      for tr, te in zip(train_parts, test_parts):
+        m = np.mean(tr, axis=0, keepdims=True)
+        s = np.where((w := np.std(tr, axis=0, keepdims=True)) > _TOL, w, 1.0)
+        norm_train.append((tr - m) / s)
+        norm_test.append((te - m) / s)
+      x_train = [np.concatenate(norm_train, axis=0)]
+      x_test = [np.concatenate(norm_test, axis=0)]
 
     # Categorical features. Encode one by one.
     one_hot_encoder = preprocessing.OneHotEncoder(
