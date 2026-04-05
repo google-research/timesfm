@@ -23,11 +23,11 @@ class ForecastConfig:
   """Options for forecasting.
 
   Attributes:
-    max_context: The maximum context length. This is used by the complied decode
+    max_context: The maximum context length. This is used by the compiled decode
       function at inference time during batched inference. Any input time series
       with length less than max_context will be padded with zeros, and with
       length greater than max_context will be truncated.
-    max_horizon: The maximum horizon length. This is used by the complied decode
+    max_horizon: The maximum horizon length. This is used by the compiled decode
       function at inference time during batched inference. The compiled cached
       decoding function will by default forecast till max_horizon.
     normalize_inputs: Whether to normalize the inputs. This is useful when the
