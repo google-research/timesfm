@@ -85,7 +85,7 @@ class TimesFM_2p5_200M_torch_module(nn.Module):
     if "torch_compile" in kwargs:
       torch_compile = kwargs["torch_compile"]
     if torch_compile:
-      print("Compiling model...")
+      logging.info("Compiling model...")
       self = torch.compile(self)
 
     self.eval()
