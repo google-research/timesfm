@@ -22,6 +22,13 @@ This open version is not an officially supported Google product.
     install timesfm==1.3.0` to install an older version of this package to load
     them.
 
+## Update - Apr. 8, 2026
+
+Added PEFT (LoRA/DoRA) fine-tuning pipeline for TimesFM 2.5 with multi-GPU
+support. See [`peft/`](peft/) for docs and usage. Also added unit tests
+(`tests/`), fixed per-input ridge regression in XReg to prevent data leakage,
+and incorporated several community fixes.
+
 ## Update - Mar. 19, 2026
 
 Huge shoutout to [@borealBytes](https://github.com/borealBytes) for adding the support for [AGENTS](https://github.com/google-research/timesfm/blob/master/AGENTS.md)! TimesFM [SKILL.md](https://github.com/google-research/timesfm/blob/master/timesfm-forecasting/SKILL.md) is out.
@@ -44,12 +51,13 @@ Comparing to TimesFM 2.0, this new 2.5 model:
 -   gets rid of the `frequency` indicator.
 -   has a couple of new forecasting flags.
 
-Along with the model upgrade we have also upgraded the inference API. This repo
-will be under construction over the next few weeks to
+Since the Sept. 2025 launch, the following improvements have been completed:
 
-1.  add support for an upcoming Flax version of the model (faster inference).
-2.  add back covariate support.
-3.  populate more docstrings, docs and notebook.
+1.  ✅ Flax version of the model for faster inference.
+2.  ✅ Covariate support via XReg (see Oct. 2025 update).
+3.  ✅ Documentation, examples, and agent skill (see `timesfm-forecasting/`).
+4.  ✅ PEFT fine-tuning pipeline with LoRA/DoRA and multi-GPU support (see `peft/`).
+5.  ✅ Unit tests for core layers, configs, and utilities (see `tests/`).
 
 ### Install
 
