@@ -297,6 +297,8 @@ class TimesFM_2p5_200M_torch(
     revision: Optional[str],
     cache_dir: Optional[Union[str, Path]],
     force_download: bool = False,
+    proxies: Optional[dict] = None,
+    resume_download: Optional[bool] = None,
     local_files_only: bool,
     token: Optional[Union[str, bool]],
     config: Optional[dict] = None,
@@ -324,6 +326,8 @@ class TimesFM_2p5_200M_torch(
         revision=revision,
         cache_dir=cache_dir,
         force_download=force_download,
+        proxies=proxies,
+        resume_download=resume_download,
         token=token,
         local_files_only=local_files_only,
       )
