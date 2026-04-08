@@ -1,9 +1,11 @@
 .venv/
 dist/
 __pycache__/
+*.egg-info/
 checkpoints/
+peft_checkpoints/
 wandb/
 datasets/
 results/
-timesfm_jax.egg-info/
+uv.lock
 development_setup.md
