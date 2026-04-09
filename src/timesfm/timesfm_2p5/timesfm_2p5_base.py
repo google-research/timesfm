@@ -42,6 +42,8 @@ def strip_leading_nans(arr):
   """
 
   isnan = np.isnan(arr)
+  if isnan.all():
+    return arr[:0]
   first_valid_index = np.argmax(~isnan)
   return arr[first_valid_index:]
 
@@ -73,10 +75,7 @@ def linear_interpolation(arr):
   try:
     arr[nans] = np.interp(nans_indices, non_nans_indices, non_nans_values)
   except ValueError:
-    if non_nans_values:
-      mu = np.nanmean(arr)
-    else:
-      mu = 0.0
+    mu = np.nanmean(arr) if non_nans_values.size > 0 else 0.0
     arr = np.where(np.isfinite(arr), arr, mu)
   return arr
 
