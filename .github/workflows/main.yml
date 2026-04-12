@@ -1,28 +1,38 @@
-name: Python package build
+name: Build and Test
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master"]
   pull_request:
-    branches: [ "master" ]
+    branches: ["master"]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+        extra: ["torch", "flax-cpu", "xreg-cpu"]
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: ${{ matrix.python-version }}
       - name: Install uv
+        uses: astral-sh/setup-uv@v4
+      - name: Install package
+        run: uv pip install --system ".[${{ matrix.extra }}]"
+      - name: Smoke test import
         run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
-          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-      - name: Create virtual environment
-        run: uv venv
-      - name: Install build dependencies
+          if [[ "${{ matrix.extra }}" == "torch" ]]; then
+            python -c "from timesfm.timesfm_2p5 import timesfm_2p5_torch; print('torch import OK')"
+          elif [[ "${{ matrix.extra }}" == "flax-cpu" ]]; then
+            python -c "from timesfm.timesfm_2p5 import timesfm_2p5_flax; print('flax import OK')"
+          elif [[ "${{ matrix.extra }}" == "xreg-cpu" ]]; then
+            python -c "from timesfm.utils import xreg_lib; print('xreg import OK')"
+          fi
+      - name: Build sdist and wheel
         run: |
-          uv pip install build ".[torch,flax]"
-      - name: Build package
-        run: uv run python -m build
+          uv pip install --system build
+          python -m build

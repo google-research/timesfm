@@ -53,34 +53,61 @@ will be under construction over the next few weeks to
 
 ### Install
 
+**Not sure which backend to pick?** Run the hardware detector — it checks your GPU and prints the exact command:
+```shell
+pip install timesfm
+python -m timesfm
+```
+
+#### Quick install from PyPI
+
+**PyTorch** (CPU default):
+```shell
+pip install timesfm[torch]
+```
+PyTorch with NVIDIA GPU:
+```shell
+pip install timesfm[torch] --index-url https://download.pytorch.org/whl/cu124
+```
+
+**Flax / JAX** — pick your accelerator:
+```shell
+pip install timesfm[flax-auto]    # auto-selects Metal on Apple Silicon, CPU elsewhere
+pip install timesfm[flax-cpu]     # CPU only
+pip install timesfm[flax-cuda]    # NVIDIA GPU (CUDA 12)
+pip install timesfm[flax-tpu]     # Google TPU
+pip install timesfm[flax-metal]   # Apple Silicon (experimental)
+```
+
+**XReg covariates**:
+```shell
+pip install timesfm[xreg-cpu]     # CPU only
+pip install timesfm[xreg-cuda]    # NVIDIA GPU (CUDA 12)
+```
+
+> **Note:** PyTorch's CUDA variant cannot be expressed as a pip extra — use `--index-url` as shown above.
+> NVIDIA GPU users should use `flax-cuda` explicitly (GPU presence is not detectable at install time).
+
+#### Local / editable install from source
+
 1.  Clone the repository:
     ```shell
     git clone https://github.com/google-research/timesfm.git
     cd timesfm
     ```
 
-2.  Create a virtual environment and install dependencies using `uv`:
+2.  Create a virtual environment with `uv`:
     ```shell
-    # Create a virtual environment
     uv venv
-    
-    # Activate the environment
     source .venv/bin/activate
-    
-    # Install the package in editable mode with torch
-    uv pip install -e .[torch]
-    # Or with flax
-    uv pip install -e .[flax]
-    # Or XReg is needed
-    uv pip install -e .[xreg]
     ```
 
-3. [Optional] Install your preferred `torch` / `jax` backend based on your OS and accelerators
-(CPU, GPU, TPU or Apple Silicon).:
-
--   [Install PyTorch](https://pytorch.org/get-started/locally/).
--   [Install Jax](https://docs.jax.dev/en/latest/installation.html#installation)
-    for Flax.
+3.  Install in editable mode (replace the extra with your chosen backend from above):
+    ```shell
+    uv pip install -e .[torch]
+    # or
+    uv pip install -e .[flax-cuda]
+    ```
 
 ### Code Example
 

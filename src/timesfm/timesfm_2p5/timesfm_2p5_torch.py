@@ -72,6 +72,9 @@ class TimesFM_2p5_200M_torch_module(nn.Module):
     if torch.cuda.is_available():
       self.device = torch.device("cuda:0")
       self.device_count = torch.cuda.device_count()
+    elif torch.backends.mps.is_available():
+      self.device = torch.device("mps")
+      self.device_count = 1
     else:
       self.device = torch.device("cpu")
       self.device_count = 1
