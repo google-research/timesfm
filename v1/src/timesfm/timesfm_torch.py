@@ -20,6 +20,7 @@ from typing import Any, Sequence
 import numpy as np
 import torch
 from huggingface_hub import snapshot_download
+
 from timesfm import timesfm_base
 
 from . import pytorch_patched_decoder as ppd

@@ -10,8 +10,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from PIL import Image
@@ -241,7 +241,7 @@ def main() -> None:
     # Get file size
     size_kb = OUTPUT_FILE.stat().st_size / 1024
     print(f"   File size: {size_kb:.1f} KB")
-    print(f"\n✅ Done!")
+    print("\n✅ Done!")
 
 
 if __name__ == "__main__":

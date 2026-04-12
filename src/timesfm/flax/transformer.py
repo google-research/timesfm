@@ -17,12 +17,12 @@
 import functools
 from typing import Callable
 
-from flax import nnx
-from flax.nnx.nn import linear
 import jax
-from jax import lax
 import jax.numpy as jnp
 import jaxtyping
+from flax import nnx
+from flax.nnx.nn import linear
+from jax import lax
 
 from .. import configs
 from . import normalization, util

@@ -7,6 +7,16 @@ on:
     branches: [ "master" ]
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv python install 3.11
+      - run: uv pip install ruff
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+
   build:
     runs-on: ubuntu-latest
     steps:

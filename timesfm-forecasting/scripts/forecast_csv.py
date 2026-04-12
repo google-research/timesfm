@@ -49,6 +49,7 @@ def run_preflight() -> dict:
 def load_model(batch_size: int = 32):
     """Load and compile the TimesFM model."""
     import torch
+
     import timesfm
 
     torch.set_float32_matmul_precision("high")

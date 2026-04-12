@@ -15,18 +15,18 @@
 import os
 from time import time
 from typing import List, Optional, Tuple
-from dotenv import load_dotenv
+
+import pandas as pd
 from gluonts.time_feature.seasonality import get_seasonality as _get_seasonality
 from nixtla import NixtlaClient
-import pandas as pd
 from tqdm import tqdm
 from utilsforecast.processing import (
-    backtest_splits,
-    drop_index_if_pandas,
-    join,
-    maybe_compute_sort_indices,
-    take_rows,
-    vertical_concat,
+  backtest_splits,
+  drop_index_if_pandas,
+  join,
+  maybe_compute_sort_indices,
+  take_rows,
+  vertical_concat,
 )
 
 

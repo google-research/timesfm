@@ -9,24 +9,21 @@ python script.py --training_mode=multi --gpu_ids=0,1,2
 """
 
 import os
-from dataclasses import asdict
 from os import path
 from typing import Optional, Tuple
 
 import numpy as np
-import pandas as pd
 import torch
 import torch.multiprocessing as mp
 import yfinance as yf
 from absl import app, flags
 from huggingface_hub import snapshot_download
 from safetensors.torch import load_file
+from timesfm.pytorch_patched_decoder import PatchedTimeSeriesDecoder, TimesFMConfig
 from torch.utils.data import Dataset
 
 from finetuning.finetuning_torch import FinetuningConfig, TimesFMFinetuner
 from timesfm import TimesFm, TimesFmCheckpoint, TimesFmHparams
-from timesfm.pytorch_patched_decoder import (PatchedTimeSeriesDecoder,
-                                             TimesFMConfig)
 
 FLAGS = flags.FLAGS
 
@@ -259,7 +256,7 @@ def get_data(context_len: int,
       train_split=0.8,
   )
 
-  print(f"Created datasets:")
+  print("Created datasets:")
   print(f"- Training samples: {len(train_dataset)}")
   print(f"- Validation samples: {len(val_dataset)}")
   print(f"- Using frequency type: {freq_type}")

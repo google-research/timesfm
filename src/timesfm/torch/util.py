@@ -15,6 +15,7 @@
 """PyTorch utility functions for TimesFM layers."""
 
 import dataclasses
+
 import torch
 
 _TOLERANCE = 1e-6

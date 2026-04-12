@@ -537,7 +537,7 @@ def main() -> None:
     size_kb = OUTPUT_FILE.stat().st_size / 1024
     print(f"\n✅ Generated: {OUTPUT_FILE}")
     print(f"   File size: {size_kb:.1f} KB")
-    print(f"   Fully self-contained — no external dependencies")
+    print("   Fully self-contained — no external dependencies")
 
 
 if __name__ == "__main__":

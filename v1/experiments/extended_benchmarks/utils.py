@@ -14,21 +14,23 @@
 
 """Forked from https://github.com/Nixtla/nixtla/blob/main/experiments/amazon-chronos/src/utils.py."""
 
-from functools import partial
-from itertools import repeat
 import multiprocessing
 import os
+from functools import partial
+from itertools import repeat
 from pathlib import Path
 from typing import List
 
-from gluonts.dataset import Dataset
-from gluonts.dataset.repository.datasets import (
-    dataset_names as gluonts_datasets,
-    get_dataset,
-)
-from gluonts.time_feature.seasonality import get_seasonality
 import numpy as np
 import pandas as pd
+from gluonts.dataset import Dataset
+from gluonts.dataset.repository.datasets import (
+  dataset_names as gluonts_datasets,
+)
+from gluonts.dataset.repository.datasets import (
+  get_dataset,
+)
+from gluonts.time_feature.seasonality import get_seasonality
 from utilsforecast.evaluation import evaluate
 from utilsforecast.losses import mae, mase, smape
 
@@ -113,6 +115,7 @@ class ExperimentHandler:
       m5_raw_dir = Path.home() / ".gluonts" / "m5"
       if not m5_raw_dir.exists():
         import zipfile
+
         from datasetsforecast.m5 import M5
         from datasetsforecast.utils import download_file
 

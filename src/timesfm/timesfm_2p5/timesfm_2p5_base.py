@@ -14,10 +14,10 @@
 
 """TimesFM 2p5 base implementation."""
 
+import collections
 import dataclasses
 from typing import Any, Callable, Sequence
 
-import collections
 import numpy as np
 
 from .. import configs
