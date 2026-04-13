@@ -22,7 +22,7 @@ inputs = [
 
 ## Loading from Common Formats
 
-### CSV — Single Series (Long Format)
+### CSV - Single Series (Long Format)
 
 ```python
 import pandas as pd
@@ -33,14 +33,14 @@ values = df["value"].values.astype(np.float32)
 inputs = [values]
 ```
 
-### CSV — Multiple Series (Wide Format)
+### CSV - Multiple Series (Wide Format)
 
 ```python
 df = pd.read_csv("data.csv", parse_dates=["date"], index_col="date")
 inputs = [df[col].dropna().values.astype(np.float32) for col in df.columns]
 ```
 
-### CSV — Long Format with ID Column
+### CSV - Long Format with ID Column
 
 ```python
 df = pd.read_csv("data.csv", parse_dates=["date"])
@@ -121,7 +121,7 @@ Linearly interpolated:
 
 ### Trailing NaNs
 
-**Not handled** — drop them before passing to the model:
+**Not handled** - drop them before passing to the model:
 
 ```python
 values = df["value"].values.astype(np.float32)
@@ -237,7 +237,7 @@ Constant series may produce NaN or zero-width prediction intervals:
 ```python
 for i, arr in enumerate(inputs):
     if np.std(arr[~np.isnan(arr)]) < 1e-10:
-        print(f"⚠️ Series {i} is constant — forecast will be flat")
+        print(f"⚠️ Series {i} is constant - forecast will be flat")
 ```
 
 ### Issue: Extreme outliers
@@ -264,7 +264,7 @@ inputs = [
     weekly_revenue,   # 52 points
     monthly_users,    # 24 points
 ]
-# All forecasted in one batch — TimesFM handles different lengths
+# All forecasted in one batch - TimesFM handles different lengths
 point, q = model.forecast(horizon=12, inputs=inputs)
 ```
 

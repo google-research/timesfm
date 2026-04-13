@@ -72,22 +72,18 @@ class TimesFM_2p5_200M_torch_module(nn.Module):
     if torch.cuda.is_available():
       self.device = torch.device("cuda:0")
       self.device_count = torch.cuda.device_count()
+    elif torch.backends.mps.is_available():
+      self.device = torch.device("mps")
+      self.device_count = 1
     else:
       self.device = torch.device("cpu")
       self.device_count = 1
 
-  def load_checkpoint(self, path: str, **kwargs):
+  def load_checkpoint(self, path: str):
     """Loads a PyTorch TimesFM model from a checkpoint."""
     tensors = load_file(path)
     self.load_state_dict(tensors, strict=True)
     self.to(self.device)
-    torch_compile = True
-    if "torch_compile" in kwargs:
-      torch_compile = kwargs["torch_compile"]
-    if torch_compile:
-      print("Compiling model...")
-      self = torch.compile(self)
-
     self.eval()
 
   def forward(
@@ -132,21 +128,10 @@ class TimesFM_2p5_200M_torch_module(nn.Module):
       patched_inputs = torch.reshape(inputs, (batch_size, -1, self.p))
       patched_masks = torch.reshape(masks, (batch_size, -1, self.p))
 
-      # running stats
-      n = torch.zeros(batch_size, device=inputs.device)
-      mu = torch.zeros(batch_size, device=inputs.device)
-      sigma = torch.zeros(batch_size, device=inputs.device)
-      patch_mu = []
-      patch_sigma = []
-      for i in range(num_input_patches):
-        (n, mu, sigma), _ = util.update_running_stats(
-          n, mu, sigma, patched_inputs[:, i], patched_masks[:, i]
-        )
-        patch_mu.append(mu)
-        patch_sigma.append(sigma)
-      last_n, last_mu, last_sigma = n, mu, sigma
-      context_mu = torch.stack(patch_mu, dim=1)
-      context_sigma = torch.stack(patch_sigma, dim=1)
+      # Vectorized cumulative running stats across patches (no Python loop).
+      last_n, last_mu, last_sigma, context_mu, context_sigma = (
+        util.compute_cumulative_stats(patched_inputs, patched_masks)
+      )
 
       decode_caches = [
         util.DecodeCache(
@@ -333,9 +318,7 @@ class TimesFM_2p5_200M_torch(
 
     logging.info("Loading checkpoint from: %s", model_file_path)
     # Load the weights into the model.
-    instance.model.load_checkpoint(
-      model_file_path, torch_compile=instance.torch_compile
-    )
+    instance.model.load_checkpoint(model_file_path)
     return instance
 
   def _save_pretrained(self, save_directory: Union[str, Path]):
@@ -392,6 +375,10 @@ class TimesFM_2p5_200M_torch(
         f"Continuous quantile head is not supported for horizons > {self.model.os}."
       )
     self.forecast_config = fc
+
+    if self.torch_compile:
+      logging.info("Compiling model with torch.compile...")
+      self.model = torch.compile(self.model)
 
     def _compiled_decode(horizon, inputs, masks):
       if horizon > fc.max_horizon:

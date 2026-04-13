@@ -41,7 +41,8 @@ class ForecastConfig:
       head to avoid quantile collapsing.
     force_flip_invariance: Whether to force flip invariance. TimesFM guarantees
       that TimesFM(aX + b) = a * TimesFM(x) + b for a >= 0 by default. This flag
-      extends it to a < 0 as well.
+      extends it to a < 0 as well. NOTE: enabling this runs the model twice,
+      doubling inference cost. Disable for speed-critical applications.
     infer_is_positive: Whether to guarantee nonnegativity of the output if the
       input is nonnegative.
     fix_quantile_crossing: Whether to fix quantile crossing.

@@ -147,7 +147,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <div class="container">
         <header>
             <h1>TimesFM Forecast Evolution</h1>
-            <p class="subtitle">Watch the forecast evolve as more data is added — forecasts extend to 2025-12</p>
+            <p class="subtitle">Watch the forecast evolve as more data is added - forecasts extend to 2025-12</p>
         </header>
         
         <div class="chart-container">
@@ -537,7 +537,7 @@ def main() -> None:
     size_kb = OUTPUT_FILE.stat().st_size / 1024
     print(f"\n✅ Generated: {OUTPUT_FILE}")
     print(f"   File size: {size_kb:.1f} KB")
-    print(f"   Fully self-contained — no external dependencies")
+    print(f"   Fully self-contained - no external dependencies")
 
 
 if __name__ == "__main__":

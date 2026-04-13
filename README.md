@@ -53,34 +53,153 @@ will be under construction over the next few weeks to
 
 ### Install
 
-1.  Clone the repository:
-    ```shell
-    git clone https://github.com/google-research/timesfm.git
-    cd timesfm
-    ```
+TimesFM separates the base package from the heavy ML backends so you only
+download what your hardware can use.
 
-2.  Create a virtual environment and install dependencies using `uv`:
-    ```shell
-    # Create a virtual environment
-    uv venv
-    
-    # Activate the environment
-    source .venv/bin/activate
-    
-    # Install the package in editable mode with torch
-    uv pip install -e .[torch]
-    # Or with flax
-    uv pip install -e .[flax]
-    # Or XReg is needed
-    uv pip install -e .[xreg]
-    ```
+**Three optional backends:**
 
-3. [Optional] Install your preferred `torch` / `jax` backend based on your OS and accelerators
-(CPU, GPU, TPU or Apple Silicon).:
+| Backend | What it gives you | Size |
+|---|---|---|
+| `torch` | PyTorch inference - the primary backend | ~2.5 GB (CUDA) / ~800 MB (CPU) |
+| `flax` | JAX/Flax inference - faster on TPU, alternative on GPU | ~300 MB + JAX |
+| `xreg` | Covariate / XReg support (requires JAX) | small |
 
--   [Install PyTorch](https://pytorch.org/get-started/locally/).
--   [Install Jax](https://docs.jax.dev/en/latest/installation.html#installation)
-    for Flax.
+You need at least one of `torch` or `flax` to run the model.
+`xreg` is only needed if you use in-context covariates.
+
+---
+
+#### Installing from PyPI
+
+**Step 1 - install the base package:**
+
+```shell
+pip install timesfm
+```
+
+**Step 2 - let the hardware detector install the right backend:**
+
+`python -m timesfm` detects your GPU, CUDA version, and platform, then installs
+the correct extras automatically - no copy-pasting required.
+
+```shell
+python -m timesfm --install          # detects hardware, installs torch (prompts once)
+python -m timesfm --install --yes    # same, skips the confirmation prompt
+```
+
+Running without `--install` is always safe - it only prints what *would* be
+installed and exits without changing anything:
+
+```
+timesfm hardware detection
+========================================
+OS       : win32 / AMD64
+Python   : 3.12.13
+Torch    : NVIDIA GeForce RTX 5070 (12.0 GB VRAM)
+JAX      : jax not installed
+Backend  : cuda
+
+Recommended install commands:
+----------------------------------------
+  # torch  (NVIDIA CUDA):
+  pip install timesfm[torch] --index-url https://download.pytorch.org/whl/cu128
+
+  # flax   (NVIDIA CUDA 12):
+  pip install timesfm[flax-cuda]
+
+  # xreg   (NVIDIA CUDA 12):
+  pip install timesfm[xreg-cuda]
+```
+
+To install all three backends at once:
+
+```shell
+python -m timesfm --install --backend all --yes
+```
+
+To install a specific backend only:
+
+```shell
+python -m timesfm --install --backend flax --yes
+python -m timesfm --install --backend xreg --yes
+```
+
+**Hardware coverage:**
+
+| Hardware | Detected by | torch | flax | xreg |
+|---|---|---|---|---|
+| NVIDIA GPU (CUDA 12) | `nvidia-smi` or torch query | `[torch]` + cu128 index | `[flax-cuda]` | `[xreg-cuda]` |
+| NVIDIA GPU (CUDA 11) | torch query | `[torch]` + cu118 index | `[flax-cuda]` | `[xreg-cuda]` |
+| Apple Silicon (MPS) | `sys.platform` + `arm64` | `[torch]` (MPS built-in) | `[flax-metal]` | `[xreg-cpu]` |
+| Google Cloud TPU | `TPU_NAME` env var | - | `[flax-tpu]` | `[xreg-cpu]` |
+| AMD GPU (ROCm) | `rocm-smi` on PATH | `[torch]` + rocm6.2 index | `[flax-cpu]`* | `[xreg-cpu]` |
+| CPU only | fallback | `[torch]` | `[flax-cpu]` | `[xreg-cpu]` |
+
+\* JAX ROCm support is experimental. The installer uses `flax-cpu` as a safe
+default. For ROCm JAX, follow the
+[JAX ROCm instructions](https://jax.readthedocs.io/en/latest/installation.html)
+manually.
+
+> **Note for NVIDIA users:** PyTorch CUDA wheels are ~2.5 GB. `uv` caches them
+> in `~/.cache/uv` so re-installs across new envs or CI runs are instant after
+> the first download.
+
+If you prefer to pick the extras yourself, skip to [Manual install](#manual-install-from-pypi).
+
+---
+
+#### Local development install from source
+
+This path uses [uv](https://docs.astral.sh/uv/) to manage the virtual environment
+and dev tools (pytest, ruff, mypy).
+
+```shell
+git clone https://github.com/google-research/timesfm.git
+cd timesfm
+uv sync --all-groups          # creates .venv and installs dev tools
+```
+
+Install the ML backend. Because `uv sync` creates an isolated venv, always prefix
+with `uv run` so the command runs inside it:
+
+```shell
+uv run python -m timesfm --install --yes          # torch for your hardware
+uv run python -m timesfm --install --backend all --yes  # torch + flax + xreg
+```
+
+Run tests to verify the setup:
+
+```shell
+uv run pytest
+```
+
+---
+
+#### Manual install from PyPI
+
+If you prefer to control the extras yourself:
+
+**PyTorch:**
+```shell
+pip install timesfm[torch]                                                        # CPU
+pip install timesfm[torch] --index-url https://download.pytorch.org/whl/cu128   # CUDA 12
+pip install timesfm[torch] --index-url https://download.pytorch.org/whl/cu118   # CUDA 11
+```
+
+**Flax / JAX:**
+```shell
+pip install timesfm[flax-cpu]     # CPU only
+pip install timesfm[flax-cuda]    # NVIDIA GPU (CUDA 12)
+pip install timesfm[flax-tpu]     # Google TPU
+pip install timesfm[flax-metal]   # Apple Silicon (experimental)
+pip install timesfm[flax-auto]    # auto-selects Metal on Apple Silicon, CPU elsewhere
+```
+
+**XReg covariates:**
+```shell
+pip install timesfm[xreg-cpu]     # CPU only
+pip install timesfm[xreg-cuda]    # NVIDIA GPU (CUDA 12)
+```
 
 ### Code Example
 

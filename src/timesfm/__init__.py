@@ -14,16 +14,40 @@
 
 """TimesFM API."""
 
+import warnings
+from importlib.metadata import PackageNotFoundError, version
+
 from .configs import ForecastConfig
+
+try:
+  __version__ = version("timesfm")
+except PackageNotFoundError:
+  __version__ = "unknown"
 
 try:
   from .timesfm_2p5 import timesfm_2p5_torch
   TimesFM_2p5_200M_torch = timesfm_2p5_torch.TimesFM_2p5_200M_torch
-except ImportError:
-  pass
+except ImportError as _e:
+  if "torch" not in str(_e).lower() and "No module named" not in str(_e):
+    warnings.warn(
+      f"timesfm[torch] is installed but failed to import: {_e}",
+      ImportWarning,
+      stacklevel=2,
+    )
 
 try:
   from .timesfm_2p5 import timesfm_2p5_flax
   TimesFM_2p5_200M_flax = timesfm_2p5_flax.TimesFM_2p5_200M_flax
-except ImportError:
-  pass
+except ImportError as _e:
+  if "flax" not in str(_e).lower() and "jax" not in str(_e).lower() and "No module named" not in str(_e):
+    warnings.warn(
+      f"timesfm[flax] is installed but failed to import: {_e}",
+      ImportWarning,
+      stacklevel=2,
+    )
+
+__all__ = ["__version__", "ForecastConfig"]
+if "TimesFM_2p5_200M_torch" in dir():
+  __all__.append("TimesFM_2p5_200M_torch")
+if "TimesFM_2p5_200M_flax" in dir():
+  __all__.append("TimesFM_2p5_200M_flax")

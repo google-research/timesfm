@@ -89,7 +89,7 @@ model.compile(timesfm.ForecastConfig(
 ))
 ```
 
-### Tier 4: Legacy Models (v1.0/v2.0 — 500M parameters)
+### Tier 4: Legacy Models (v1.0/v2.0 - 500M parameters)
 
 - **⚠️ WARNING**: TimesFM v2.0 (500M) requires **≥ 16 GB RAM** (CPU) or **≥ 8 GB VRAM** (GPU)
 - **⚠️ WARNING**: TimesFM v1.0 legacy JAX version may require **≥ 32 GB RAM**

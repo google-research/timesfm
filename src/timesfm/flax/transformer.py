@@ -110,8 +110,6 @@ class RotaryPositionalEmbedding(nnx.Module):
     first_half, second_half = jnp.split(inputs, 2, axis=-1)
     first_part = first_half * cos - second_half * sin
     second_part = second_half * cos + first_half * sin
-    first_part = first_part.astype(None)
-    second_part = second_part.astype(None)
     return jnp.concatenate([first_part, second_part], axis=-1)
 
 

@@ -1,6 +1,6 @@
 [project]
 name = "timesfm"
-version = "2.0.0"
+version = "2.1.0"
 description = "A time series foundation model."
 authors = [
     {name = "Rajat Sen", email = "senrajat@google.com"},
@@ -8,17 +8,35 @@ authors = [
     {name = "Abhimanyu Das", email = "abhidas@google.com"},
     {name = "Petros Mol", email = "pmol@google.com"},
     {name = "Michael Chertushkin", email = "chertushkinmichael@gmail.com"},
+    {name = "Justin Guese", email = "guese.justin@gmail.com"}
 ]
 license = {text = "Apache-2.0"}
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.13"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
 dependencies = [
     "numpy>=1.26.4",
-    "huggingface_hub[cli]>=0.23.0",
+    "huggingface_hub>=0.23.0",
     "safetensors>=0.5.3",
 ]
 
+[project.urls]
+Homepage = "https://github.com/google-research/timesfm"
+Repository = "https://github.com/google-research/timesfm"
+"Bug Tracker" = "https://github.com/google-research/timesfm/issues"
+
 [project.optional-dependencies]
+# --- Frameworks (accelerator-agnostic) ---
 torch = [
     "torch>=2.0.0",
 ]
@@ -28,18 +46,62 @@ flax = [
     "einshape",
     "orbax-checkpoint",
     "jaxtyping",
-    "jax[cuda]"
 ]
 xreg = [
-    "jax[cuda]",
+    "jax",
     "scikit-learn",
 ]
+
+# --- JAX accelerator variants (pick one) ---
+jax-cpu = ["jax[cpu]"]
+jax-cuda = ["jax[cuda12]"]
+jax-tpu = ["jax[tpu]"]
+jax-metal = ["jax[metal]"]
+
+# --- Convenience combos: Flax + accelerator ---
+flax-cpu = ["timesfm[flax]", "jax[cpu]"]
+flax-cuda = ["timesfm[flax]", "jax[cuda12]"]
+flax-tpu = ["timesfm[flax]", "jax[tpu]"]
+flax-metal = ["timesfm[flax]", "jax[metal]"]
+# Auto-selects metal on Apple Silicon, cpu everywhere else.
+# CUDA users should use flax-cuda explicitly (GPU not detectable at install time).
+flax-auto = [
+    "timesfm[flax]",
+    "jax[metal]; sys_platform == 'darwin' and platform_machine == 'arm64'",
+    "jax[cpu]; sys_platform != 'darwin' or platform_machine != 'arm64'",
+]
+
+# --- Convenience combos: XReg + accelerator ---
+xreg-cpu = ["timesfm[xreg]", "jax[cpu]"]
+xreg-cuda = ["timesfm[xreg]", "jax[cuda12]"]
+
+# --- PyTorch: CUDA requires --index-url (see README) ---
+torch-cpu = ["timesfm[torch]"]
+torch-cuda = ["timesfm[torch]"]
+
+# --- Development ---
+dev = ["timesfm[torch,flax]", "ruff", "pytest", "mypy"]
+
+# ---------------------------------------------------------------------------
+# uv dependency groups (used by `uv sync --all-groups`)
+# Keeps dev tools separate from the distributable package extras above.
+# ---------------------------------------------------------------------------
+[dependency-groups]
+dev = ["pytest>=7", "ruff>=0.1", "mypy>=1.0"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
 
 [tool.ruff]
 line-length = 88
 indent-width = 2
 
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+warn_return_any = true
+warn_unused_ignores = true
+
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
-

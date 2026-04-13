@@ -64,8 +64,8 @@ point_forecast, quantile_forecast = model.forecast(
 
 **Returns**: `tuple[np.ndarray, np.ndarray]`
 
-- `point_forecast`: shape `(batch_size, horizon)` — median (0.5 quantile)
-- `quantile_forecast`: shape `(batch_size, horizon, 10)` — [mean, q10, q20, ..., q90]
+- `point_forecast`: shape `(batch_size, horizon)` - median (0.5 quantile)
+- `quantile_forecast`: shape `(batch_size, horizon, 10)` - [mean, q10, q20, ..., q90]
 
 **Raises**: `RuntimeError` if model is not compiled.
 
@@ -166,7 +166,7 @@ Use the 30M-parameter continuous quantile head for better interval calibration.
 
 Ensures the model satisfies `f(-x) = -f(x)`.
 
-- **True** (RECOMMENDED): Mathematical consistency — forecasts are invariant to sign flip
+- **True** (RECOMMENDED): Mathematical consistency - forecasts are invariant to sign flip
 - **False**: Slightly faster but may produce asymmetric forecasts
 
 #### `infer_is_positive` (bool, default=True)

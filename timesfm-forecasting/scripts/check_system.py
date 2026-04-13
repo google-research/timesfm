@@ -296,7 +296,7 @@ def check_gpu() -> CheckResult:
         return CheckResult(
             name="GPU",
             status="warn",
-            detail="PyTorch not installed — cannot check GPU. Install torch first.",
+            detail="PyTorch not installed - cannot check GPU. Install torch first.",
             value="Unknown (torch not installed)",
         )
 
@@ -406,7 +406,7 @@ def recommend_batch_size(report: SystemReport) -> int:
         except (ValueError, IndexError):
             return 32
     elif gpu_check and "MPS" in gpu_check.value:
-        # Apple Silicon — use unified memory heuristic
+        # Apple Silicon - use unified memory heuristic
         if total_ram >= 32:
             return 64
         elif total_ram >= 16:
