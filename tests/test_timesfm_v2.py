@@ -179,6 +179,7 @@ def test_no_spurious_import_warning_on_clean_import():
 def test_xreg_padding_multiple_of_64():
   """_pad_dim should round up to the nearest multiple of 64."""
   pytest.importorskip("jax", reason="jax not installed")
+  pytest.importorskip("sklearn", reason="sklearn not installed")
   from timesfm.utils.xreg_lib import _pad_dim, _PAD_MULTIPLE
 
   for n in [1, 63, 64, 65, 127, 128, 129, 1025, 4096, 4097]:
@@ -187,6 +188,30 @@ def test_xreg_padding_multiple_of_64():
     assert result % _PAD_MULTIPLE == 0, f"_pad_dim({n}) = {result} not multiple of {_PAD_MULTIPLE}"
     # Should not waste more than one full multiple
     assert result <= n + _PAD_MULTIPLE, f"_pad_dim({n}) = {result} wastes too much"
+
+
+# ---------------------------------------------------------------------------
+# XReg solve vs pinv closeness
+# ---------------------------------------------------------------------------
+
+@pytest.mark.parametrize("ridge", [0.0, 0.1, 1.0])
+def test_xreg_solve_matches_pinv(ridge):
+  """jnp.linalg.solve(A, b) should match pinv(A) @ b for ridge regression."""
+  jnp = pytest.importorskip("jax.numpy", reason="jax not installed")
+  import jax.numpy as jnp  # noqa: F811
+
+  rng = np.random.default_rng(0)
+  n, d = 50, 5
+  x_train = jnp.array(rng.standard_normal((n, d)))
+  flat_targets = jnp.array(rng.standard_normal(n))
+
+  A = x_train.T @ x_train + ridge * jnp.eye(d)
+  b = x_train.T @ flat_targets
+
+  beta_pinv = jnp.linalg.pinv(A, hermitian=True) @ b
+  beta_solve = jnp.linalg.solve(A, b)
+
+  np.testing.assert_allclose(np.array(beta_solve), np.array(beta_pinv), rtol=1e-4, atol=1e-4)
 
 
 # ---------------------------------------------------------------------------
