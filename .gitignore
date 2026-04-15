@@ -16,4 +16,6 @@ results/
 .mypy_cache/
 .env
 .env.*
+uv.lock
 development_setup.md
+debug.log

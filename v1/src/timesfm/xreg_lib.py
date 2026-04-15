@@ -339,12 +339,20 @@ class BatchedInContextXRegBase:
       x_train = np.concatenate(x_train, axis=1)
       x_test = np.concatenate(x_test, axis=1)
 
-      # Normalize for robustness.
-      x_mean = np.mean(x_train, axis=0, keepdims=True)
-      x_std = np.where((w := np.std(x_train, axis=0, keepdims=True)) > _TOL, w,
-                       1.0)
-      x_train = [(x_train - x_mean) / x_std]
-      x_test = [(x_test - x_mean) / x_std]
+      # Normalize per-input for robustness (batch-wide normalization
+      # would make each input's result depend on batch composition).
+      train_splits = np.cumsum(self.train_lens)[:-1]
+      test_splits = np.cumsum(self.test_lens)[:-1]
+      train_parts = np.split(x_train, train_splits, axis=0)
+      test_parts = np.split(x_test, test_splits, axis=0)
+      norm_train, norm_test = [], []
+      for tr, te in zip(train_parts, test_parts):
+        m = np.mean(tr, axis=0, keepdims=True)
+        s = np.where((w := np.std(tr, axis=0, keepdims=True)) > _TOL, w, 1.0)
+        norm_train.append((tr - m) / s)
+        norm_test.append((te - m) / s)
+      x_train = [np.concatenate(norm_train, axis=0)]
+      x_test = [np.concatenate(norm_test, axis=0)]
 
     # Categorical features. Encode one by one.
     one_hot_encoder = preprocessing.OneHotEncoder(
@@ -431,56 +439,55 @@ class BatchedInContextXRegLinear(BatchedInContextXRegBase):
         assert_covariate_shapes=assert_covariate_shapes,
     )
 
-    x_train = x_train_raw.copy()
-    if max_rows_per_col:
-      nrows, ncols = x_train.shape
-      if nrows > (w := ncols * max_rows_per_col):
-        subsample = jax.random.choice(
-            jax.random.PRNGKey(max_rows_per_col_sample_seed),
-            nrows,
-            (w,),
-            replace=False,
-        )
-        x_train = x_train[subsample]
-        flat_targets = flat_targets[subsample]
-
     device = jax.devices("cpu")[0] if force_on_cpu else None
-    # Runs jitted version of the solvers which are quicker at the cost of
-    # running jitting during the first time calling. Re-jitting happens whenever
-    # new (padded) shapes are encountered.
-    # Ocassionally it helps with the speed and the accuracy if we force single
-    # thread execution on cpu for accelerator machines:
-    # 1. Avoid moving data to accelarator memory.
-    # 2. Avoid precision loss if any.
-    with jax.default_device(device):
-      x_train_raw = _to_padded_jax_array(x_train_raw)
-      x_train = _to_padded_jax_array(x_train)
-      flat_targets = _to_padded_jax_array(flat_targets)
-      x_test = _to_padded_jax_array(x_test)
-      beta_hat = (jnp.linalg.pinv(
-          x_train.T @ x_train + ridge * jnp.eye(x_train.shape[1]),
-          hermitian=True,
-      ) @ x_train.T @ flat_targets)
-      y_hat = x_test @ beta_hat
-      y_hat_context = x_train_raw @ beta_hat if debug_info else None
 
+    # Fit per-input regressions to prevent data leakage across batch items.
     outputs = []
     outputs_context = []
+    train_idx, test_idx = 0, 0
 
-    # Reconstruct the ragged 2-dim batched forecasts from flattened linear fits.
-    train_index, test_index = 0, 0
-    for train_index_delta, test_index_delta in zip(self.train_lens,
-                                                   self.test_lens):
-      outputs.append(np.array(y_hat[test_index:(test_index +
-                                                test_index_delta)]))
-      if debug_info:
-        outputs_context.append(
-            np.array(y_hat_context[train_index:(train_index +
-                                                train_index_delta)]))
-      train_index += train_index_delta
-      test_index += test_index_delta
+    with jax.default_device(device):
+      for trl, tel in zip(self.train_lens, self.test_lens):
+        x_tr = x_train_raw[train_idx : train_idx + trl]
+        x_te = x_test[test_idx : test_idx + tel]
+        y_tr = flat_targets[train_idx : train_idx + trl]
+
+        x_tr_fit = x_tr.copy()
+        if max_rows_per_col:
+          nrows, ncols = x_tr_fit.shape
+          if nrows > (w := ncols * max_rows_per_col):
+            subsample = jax.random.choice(
+                jax.random.PRNGKey(max_rows_per_col_sample_seed),
+                nrows,
+                (w,),
+                replace=False,
+            )
+            x_tr_fit = x_tr_fit[subsample]
+            y_tr = y_tr[subsample]
+
+        x_tr_raw_j = _to_padded_jax_array(x_tr)
+        x_tr_j = _to_padded_jax_array(x_tr_fit)
+        y_tr_j = _to_padded_jax_array(y_tr)
+        x_te_j = _to_padded_jax_array(x_te)
+
+        beta_hat = (jnp.linalg.pinv(
+            x_tr_j.T @ x_tr_j + ridge * jnp.eye(x_tr_j.shape[1]),
+            hermitian=True,
+        ) @ x_tr_j.T @ y_tr_j)
+        outputs.append(np.array(x_te_j @ beta_hat))
+        if debug_info:
+          outputs_context.append(np.array(x_tr_raw_j @ beta_hat))
+
+        train_idx += trl
+        test_idx += tel
 
     if debug_info:
-      return outputs, outputs_context, flat_targets, x_train, x_test
+      return (
+          outputs,
+          outputs_context,
+          _to_padded_jax_array(flat_targets),
+          _to_padded_jax_array(x_train_raw),
+          _to_padded_jax_array(x_test),
+      )
     else:
       return outputs

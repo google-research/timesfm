@@ -9,8 +9,10 @@ model developed by Google Research for time-series forecasting.
 *   All checkpoints:
     [TimesFM Hugging Face Collection](https://huggingface.co/collections/google/timesfm-release-66e4be5fdb56e960c1e482a6).
 *   [Google Research blog](https://research.google/blog/a-decoder-only-foundation-model-for-time-series-forecasting/).
-*   [TimesFM in BigQuery](https://cloud.google.com/bigquery/docs/timesfm-model):
-    an official Google product.
+*   TimesFM in Google 1P Products:
+    *   [BigQuery ML](https://cloud.google.com/bigquery/docs/timesfm-model): Enterprise level SQL queries for scalability and reliability.
+    *   [Google Sheets](https://workspaceupdates.googleblog.com/2026/02/forecast-data-in-connected-sheets-BigQueryML-TimesFM.html): For your daily spreadsheet. 
+    *   [Vertex Model Garden](https://pantheon.corp.google.com/vertex-ai/publishers/google/model-garden/timesfm): Dockerized endpoint for agentic calling.
 
 This open version is not an officially supported Google product.
 
@@ -21,6 +23,14 @@ This open version is not an officially supported Google product.
 -   1.0 and 2.0: relevant code archived in the sub directory `v1`. You can `pip
     install timesfm==1.3.0` to install an older version of this package to load
     them.
+
+## Update - Apr. 9, 2026
+
+Added fine-tuning example using HuggingFace Transformers + PEFT (LoRA) — see
+[`timesfm-forecasting/examples/finetuning/`](timesfm-forecasting/examples/finetuning/).
+Also added unit tests (`tests/`) and incorporated several community fixes.
+
+Shoutout to [@kashif](https://github.com/kashif) and [@darkpowerxo](https://github.com/darkpowerxo). 
 
 ## Update - Mar. 19, 2026
 
@@ -44,12 +54,13 @@ Comparing to TimesFM 2.0, this new 2.5 model:
 -   gets rid of the `frequency` indicator.
 -   has a couple of new forecasting flags.
 
-Along with the model upgrade we have also upgraded the inference API. This repo
-will be under construction over the next few weeks to
+Since the Sept. 2025 launch, the following improvements have been completed:
 
-1.  add support for an upcoming Flax version of the model (faster inference).
-2.  add back covariate support.
-3.  populate more docstrings, docs and notebook.
+1.  ✅ Flax version of the model for faster inference.
+2.  ✅ Covariate support via XReg (see Oct. 2025 update).
+3.  ✅ Documentation, examples, and agent skill (see `timesfm-forecasting/`).
+4.  ✅ Fine-tuning example with LoRA via HuggingFace Transformers + PEFT (see `timesfm-forecasting/examples/finetuning/`).
+5.  ✅ Unit tests for core layers, configs, and utilities (see `tests/`).
 
 ### Install
 

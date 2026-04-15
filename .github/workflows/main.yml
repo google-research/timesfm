@@ -2,9 +2,9 @@ name: Build and Test
 
 on:
   push:
-    branches: ["master"]
+    branches: [ "master" ]
   pull_request:
-    branches: ["master"]
+    branches: [ "master" ]
 
 jobs:
   build:
@@ -12,39 +12,40 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.11", "3.12"]
-        extra: ["torch", "flax-cpu", "xreg-cpu"]
+        python-version: [ "3.10", "3.11", "3.12" ]
+        extra: [ "torch", "flax-cpu", "xreg-cpu" ]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install uv
-        uses: astral-sh/setup-uv@v4
-      - name: Cache uv
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/uv
-          key: uv-${{ runner.os }}-${{ matrix.python-version }}-${{ matrix.extra }}-${{ hashFiles('pyproject.toml') }}
-          restore-keys: |
-            uv-${{ runner.os }}-${{ matrix.python-version }}-${{ matrix.extra }}-
-            uv-${{ runner.os }}-${{ matrix.python-version }}-
-      - name: Install package
-        run: uv sync --all-groups --extra ${{ matrix.extra }}
-      - name: Lint
-        run: uv run ruff check src/
-      - name: Smoke test import
-        run: |
-          if [[ "${{ matrix.extra }}" == "torch" ]]; then
-            python -c "from timesfm.timesfm_2p5 import timesfm_2p5_torch; print('torch import OK')"
-          elif [[ "${{ matrix.extra }}" == "flax-cpu" ]]; then
-            python -c "from timesfm.timesfm_2p5 import timesfm_2p5_flax; print('flax import OK')"
-          elif [[ "${{ matrix.extra }}" == "xreg-cpu" ]]; then
-            python -c "from timesfm.utils import xreg_lib; print('xreg import OK')"
-          fi
-      - name: Run tests
-        run: uv run pytest tests/ -x -q --tb=short
-      - name: Build sdist and wheel
-        run: |
-          uv pip install --system build
-          python -m build
+    - uses: actions/checkout@v6
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install uv
+      uses: astral-sh/setup-uv@v4
+    - name: Cache uv
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/uv
+        key: uv-${{ runner.os }}-${{ matrix.python-version }}-${{ matrix.extra }}-${{ hashFiles('pyproject.toml') }}
+        restore-keys: |
+          uv-${{ runner.os }}-${{ matrix.python-version }}-${{ matrix.extra }}-
+          uv-${{ runner.os }}-${{ matrix.python-version }}-
+    - name: Install package
+      run: uv sync --all-groups --extra ${{ matrix.extra }}
+    - name: Lint
+      run: uv run ruff check src/
+    - name: Smoke test import
+      run: |
+        if [[ "${{ matrix.extra }}" == "torch" ]]; then
+          python -c "from timesfm.timesfm_2p5 import timesfm_2p5_torch; print('torch import OK')"
+        elif [[ "${{ matrix.extra }}" == "flax-cpu" ]]; then
+          python -c "from timesfm.timesfm_2p5 import timesfm_2p5_flax; print('flax import OK')"
+        elif [[ "${{ matrix.extra }}" == "xreg-cpu" ]]; then
+          python -c "from timesfm.utils import xreg_lib; print('xreg import OK')"
+        fi
+    - name: Run tests
+      run: uv run pytest tests/ -x -q --tb=short
+    - name: Build sdist and wheel
+      run: |
+        uv pip install --system build
+        python -m build
