@@ -79,14 +79,12 @@ class TimesFM_2p5_200M_torch_module(nn.Module):
       self.device = torch.device("cpu")
       self.device_count = 1
 
-  def load_checkpoint(self, path: str):
+  def load_checkpoint(self, path: str, **kwargs):
     """Loads a PyTorch TimesFM model from a checkpoint."""
     tensors = load_file(path)
     self.load_state_dict(tensors, strict=True)
     self.to(self.device)
-    torch_compile = True
-    if "torch_compile" in kwargs:
-      torch_compile = kwargs["torch_compile"]
+    torch_compile = kwargs.get("torch_compile", True)
     if torch_compile:
       logging.info("Compiling model...")
       self = torch.compile(self)
