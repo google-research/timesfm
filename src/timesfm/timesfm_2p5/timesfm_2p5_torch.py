@@ -184,6 +184,14 @@ class TimesFM_2p5_200M_torch_module(nn.Module):
         (batch_size, -1, self.os, self.q),
       )[:, -1, ...]
 
+      # Guard against NaN/Inf in prefill outputs before feeding into AR loop.
+      renormed_outputs = torch.nan_to_num(
+        renormed_outputs, nan=0.0, posinf=0.0, neginf=0.0
+      )
+      renormed_quantile_spread = torch.nan_to_num(
+        renormed_quantile_spread, nan=0.0, posinf=0.0, neginf=0.0
+      )
+
       # Autogressive decode
       ar_outputs = []
       last_renormed_output = renormed_outputs[:, -1, :, self.aridx]
@@ -214,6 +222,11 @@ class TimesFM_2p5_200M_torch_module(nn.Module):
         new_renormed_output = torch.reshape(
           revin(new_normed_output, new_mu, new_sigma, reverse=True),
           (batch_size, self.m, self.o, self.q),
+        )
+        # Guard against NaN/Inf in autoregressive outputs which can cascade
+        # through subsequent decode steps and corrupt the entire forecast.
+        new_renormed_output = torch.nan_to_num(
+          new_renormed_output, nan=0.0, posinf=0.0, neginf=0.0
         )
         ar_outputs.append(new_renormed_output[:, -1, ...])
         last_renormed_output = new_renormed_output[:, -1, :, self.aridx]
