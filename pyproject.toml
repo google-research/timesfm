@@ -97,13 +97,9 @@ line-length = 88
 indent-width = 2
 
 [tool.ruff.lint]
-# F722: jaxtyping annotations (e.g. Float[Array, "b ... d"]) are not valid
-# Python expressions but are intentional — suppress false positives.
-ignore = ["F722"]
-
-[tool.ruff.lint.per-file-ignores]
-# F821 false positives from jaxtyping dimension variables (e.g. "b", "n", "h", "d")
-"src/timesfm/flax/*.py" = ["F821"]
+# F722/F821: false positives from jaxtyping annotations (e.g. Float[Array, "b ... d"]).
+# Suppressing per jaxtyping FAQ: https://docs.kidger.site/jaxtyping/faq/
+ignore = ["F722", "F821"]
 
 [tool.mypy]
 python_version = "3.10"

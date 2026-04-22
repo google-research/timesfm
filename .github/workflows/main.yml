@@ -37,15 +37,15 @@ jobs:
     - name: Smoke test import
       run: |
         if [[ "${{ matrix.extra }}" == "torch" ]]; then
-          python -c "from timesfm.timesfm_2p5 import timesfm_2p5_torch; print('torch import OK')"
+          uv run python -c "from timesfm.timesfm_2p5 import timesfm_2p5_torch; print('torch import OK')"
         elif [[ "${{ matrix.extra }}" == "flax-cpu" ]]; then
-          python -c "from timesfm.timesfm_2p5 import timesfm_2p5_flax; print('flax import OK')"
+          uv run python -c "from timesfm.timesfm_2p5 import timesfm_2p5_flax; print('flax import OK')"
         elif [[ "${{ matrix.extra }}" == "xreg-cpu" ]]; then
-          python -c "from timesfm.utils import xreg_lib; print('xreg import OK')"
+          uv run python -c "from timesfm.utils import xreg_lib; print('xreg import OK')"
         fi
     - name: Run tests
       run: uv run pytest tests/ -x -q --tb=short
     - name: Build sdist and wheel
       run: |
         uv pip install --system build
-        python -m build
+        uv run python -m build
