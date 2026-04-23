@@ -34,7 +34,6 @@ xreg = [
     "jax[cuda]",
     "scikit-learn",
 ]
-
 [tool.ruff]
 line-length = 88
 indent-width = 2
