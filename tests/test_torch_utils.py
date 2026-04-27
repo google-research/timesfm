@@ -20,9 +20,10 @@ long horizons, making them especially hard to diagnose from forecast
 output alone.
 """
 
-import torch
 import numpy as np
 import pytest
+
+torch = pytest.importorskip("torch")
 
 from timesfm.torch.util import (
   DecodeCache,
