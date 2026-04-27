@@ -69,20 +69,12 @@ class TestStripLeadingNans:
     result = strip_leading_nans(arr)
     np.testing.assert_array_equal(result, np.array([42.0]))
 
-  def test_all_nans_returns_full_array(self):
-    """When every element is NaN, ``np.argmax`` on an all-False mask
-    returns 0 — so the implementation returns the original array, not an
-    empty one.
-
-    This documents the *actual* behavior (which differs from the
-    docstring claim of returning an empty array). Downstream code
-    (``linear_interpolation``) is designed to handle this case.
-    """
+  def test_all_nans_returns_empty_array(self):
+    """When every element is NaN, an empty array is returned (matches docstring)."""
     arr = np.array([np.nan, np.nan, np.nan])
     result = strip_leading_nans(arr)
-    # Actual behavior: argmax(~isnan) = 0 when all NaN → returns full array.
-    assert len(result) == 3
-    assert np.all(np.isnan(result))
+    assert len(result) == 0
+    assert result.dtype == arr.dtype
 
   def test_preserves_dtype(self):
     """Output dtype must match input dtype (float32 stays float32)."""

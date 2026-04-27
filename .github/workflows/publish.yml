@@ -1,0 +1,58 @@
+name: Publish to PyPI
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  # Run tests before publishing to ensure the release is healthy.
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        extra: ["torch", "flax-cpu", "xreg-cpu"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+      - name: Install package
+        run: uv sync --all-groups --extra ${{ matrix.extra }}
+      - name: Lint
+        run: uv run ruff check src/
+      - name: Run tests
+        run: uv run pytest tests/ -x -q --tb=short
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+      - name: Build package
+        run: |
+          uv pip install --system build
+          python -m build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1

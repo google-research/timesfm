@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-TimesFM Anomaly Detection Example — Two-Phase Method
+TimesFM Anomaly Detection Example - Two-Phase Method
 
 Phase 1 (context): Linear detrend + Z-score on 36 months of real NOAA
   temperature anomaly data (2022-01 through 2024-12).
@@ -186,11 +186,11 @@ def plot_results(
 
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(15, 10), gridspec_kw={"hspace": 0.42})
     fig.suptitle(
-        "TimesFM Anomaly Detection — Two-Phase Method", fontsize=14, fontweight="bold"
+        "TimesFM Anomaly Detection - Two-Phase Method", fontsize=14, fontweight="bold"
     )
 
     # -----------------------------------------------------------------------
-    # Panel 1 — full timeline
+    # Panel 1 - full timeline
     # -----------------------------------------------------------------------
     ctx_x = [pd.Timestamp(d) for d in context_dates]
     fut_x = [pd.Timestamp(d) for d in future_dates]
@@ -292,7 +292,7 @@ def plot_results(
     ax1.grid(True, alpha=0.22)
 
     # -----------------------------------------------------------------------
-    # Panel 2 — deviation bars across all 48 months
+    # Panel 2 - deviation bars across all 48 months
     # -----------------------------------------------------------------------
     all_labels: list[str] = []
     bar_colors: list[str] = []
@@ -390,7 +390,7 @@ def plot_results(
 
 def main() -> None:
     print("=" * 68)
-    print("  TIMESFM ANOMALY DETECTION — TWO-PHASE METHOD")
+    print("  TIMESFM ANOMALY DETECTION - TWO-PHASE METHOD")
     print("=" * 68)
 
     # --- Load context data ---------------------------------------------------

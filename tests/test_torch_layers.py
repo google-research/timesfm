@@ -21,8 +21,9 @@ regressions during refactors.  All tests use small dimensions and run
 on CPU — no model checkpoint or GPU required.
 """
 
-import torch
 import pytest
+
+torch = pytest.importorskip("torch")
 
 from timesfm.configs import RandomFourierFeaturesConfig, ResidualBlockConfig
 from timesfm.torch.dense import RandomFourierFeatures, ResidualBlock

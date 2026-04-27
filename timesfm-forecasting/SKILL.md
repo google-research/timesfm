@@ -2,8 +2,8 @@
 name: timesfm-forecasting
 description: >
   Zero-shot time series forecasting with Google's TimesFM foundation model. Use this
-  skill when forecasting ANY univariate time series — sales, sensor readings, stock prices,
-  energy demand, patient vitals, weather, or scientific measurements — without training a
+  skill when forecasting ANY univariate time series - sales, sensor readings, stock prices,
+  energy demand, patient vitals, weather, or scientific measurements - without training a
   custom model. Supports both basic forecasting and advanced covariate forecasting (XReg)
   with dynamic and static exogenous variables. Automatically checks system RAM/GPU before
   loading the model, validates dataset fit before processing, supports CSV/DataFrame/array
@@ -21,7 +21,7 @@ metadata:
 ## Overview
 
 TimesFM (Time Series Foundation Model) is a pretrained decoder-only foundation model
-developed by Google Research for time-series forecasting. It works **zero-shot** — feed it
+developed by Google Research for time-series forecasting. It works **zero-shot** - feed it
 any univariate time series and it returns point forecasts with calibrated quantile
 prediction intervals, no training required.
 
@@ -55,12 +55,12 @@ Do **not** use this skill when:
 
 
 > **Note on Anomaly Detection**: TimesFM does not have built-in anomaly detection, but you
-> can use the **quantile forecasts as prediction intervals** — values outside the 90% CI
+> can use the **quantile forecasts as prediction intervals** - values outside the 90% CI
 > (q10–q90) are statistically unusual. See `examples/anomaly-detection/` for a full example.
 
 ## ⚠️ Mandatory Preflight: System Requirements Check
 
-**CRITICAL — ALWAYS run the system checker before loading the model for the first time.**
+**CRITICAL - ALWAYS run the system checker before loading the model for the first time.**
 
 ```bash
 python scripts/check_system.py
@@ -68,11 +68,11 @@ python scripts/check_system.py
 
 This script checks:
 
-1. **Available RAM** — warns if below 4 GB, blocks if below 2 GB
-2. **GPU availability** — detects CUDA/MPS devices and VRAM
-3. **Disk space** — verifies room for the ~800 MB model download
-4. **Python version** — requires 3.10+
-5. **Existing installation** — checks if `timesfm` and `torch` are installed
+1. **Available RAM** - warns if below 4 GB, blocks if below 2 GB
+2. **GPU availability** - detects CUDA/MPS devices and VRAM
+3. **Disk space** - verifies room for the ~800 MB model download
+4. **Python version** - requires 3.10+
+5. **Existing installation** - checks if `timesfm` and `torch` are installed
 
 > **Note:** Model weights are **NOT stored in this repository**. TimesFM weights (~800 MB)
 > download on-demand from HuggingFace on first use and cache in `~/.cache/huggingface/`.
@@ -193,8 +193,8 @@ model.compile(timesfm.ForecastConfig(
 point, quantiles = model.forecast(horizon=24, inputs=[
     np.sin(np.linspace(0, 20, 200)),  # any 1-D array
 ])
-# point.shape == (1, 24)         — median forecast
-# quantiles.shape == (1, 24, 10) — 10th–90th percentile bands
+# point.shape == (1, 24)         - median forecast
+# quantiles.shape == (1, 24, 10) - 10th–90th percentile bands
 ```
 
 ### Forecast with Covariates (XReg)
@@ -236,8 +236,8 @@ anomalies = (actual < lower_90) | (actual > upper_90)
 
 TimesFM returns `(point_forecast, quantile_forecast)`:
 
-- **`point_forecast`**: shape `(batch, horizon)` — the median (0.5 quantile)
-- **`quantile_forecast`**: shape `(batch, horizon, 10)` — ten quantile slices:
+- **`point_forecast`**: shape `(batch, horizon)` - the median (0.5 quantile)
+- **`quantile_forecast`**: shape `(batch, horizon, 10)` - ten quantile slices:
 
 | Index | Quantile | Use |
 | ----- | -------- | --- |
@@ -264,7 +264,7 @@ All forecasting behavior is controlled by `timesfm.ForecastConfig`:
 timesfm.ForecastConfig(
     max_context=1024,                    # Max context window
     max_horizon=256,                     # Max forecast horizon
-    normalize_inputs=True,               # RECOMMENDED — prevents scale instability
+    normalize_inputs=True,               # RECOMMENDED - prevents scale instability
     per_core_batch_size=32,              # Tune for memory
     use_continuous_quantile_head=True,   # Better quantile accuracy for long horizons
     force_flip_invariance=True,          # Ensures f(-x) = -f(x)
@@ -374,7 +374,7 @@ for i in range(0, len(inputs), CHUNK):
 
 ### `scripts/check_system.py`
 
-Mandatory preflight checker — run before first model load.
+Mandatory preflight checker - run before first model load.
 Now includes **dataset-aware memory estimation** to prevent OOM errors before loading your data.
 
 ```bash
@@ -397,12 +397,12 @@ python scripts/check_system.py \
 
 **What it checks**:
 
-1. **Available RAM** — warns if below 4 GB, blocks if below 2 GB
-2. **GPU availability** — detects CUDA/MPS devices and VRAM
-3. **Disk space** — verifies room for the ~800 MB model download
-4. **Python version** — requires 3.10+
-5. **Existing installation** — checks if `timesfm` and `torch` are installed
-6. **Dataset fit** (NEW) — estimates memory for your specific dataset and warns if it won't fit
+1. **Available RAM** - warns if below 4 GB, blocks if below 2 GB
+2. **GPU availability** - detects CUDA/MPS devices and VRAM
+3. **Disk space** - verifies room for the ~800 MB model download
+4. **Python version** - requires 3.10+
+5. **Existing installation** - checks if `timesfm` and `torch` are installed
+6. **Dataset fit** (NEW) - estimates memory for your specific dataset and warns if it won't fit
 
 ### `scripts/forecast_csv.py`
 
@@ -456,7 +456,7 @@ cd examples/covariates-forecasting && python demo_covariates.py
 | 1.0 | 200M | 2,048 | Archived | `google/timesfm-1.0-200m-pytorch` |
 
 - TimesFM 1.0/2.0: must pass `freq=[0]` for monthly data
-- TimesFM 2.5: no frequency flag — it was removed
+- TimesFM 2.5: no frequency flag - it was removed
 
 ## Resources
 
@@ -469,28 +469,28 @@ cd examples/covariates-forecasting && python demo_covariates.py
 
 Run after every TimesFM task before declaring success:
 
-- [ ] **Output shape** — `point_fc` is `(n_series, horizon)`, `quant_fc` is `(n_series, horizon, 10)`
-- [ ] **Quantile indices** — index 0 = mean, 1 = q10 ... 9 = q90. NOT 0 = q0.
-- [ ] **Frequency flag** — TimesFM 1.0/2.0: pass `freq=[0]` for monthly. TimesFM 2.5: omit.
-- [ ] **Series length** — context must be ≥ 32 data points.
-- [ ] **No NaN** — `np.isnan(point_fc).any()` must be False.
-- [ ] **Axes** — multiple panels sharing data must use `sharex=True`.
-- [ ] **`matplotlib.use('Agg')`** — before any pyplot import when running headless.
-- [ ] **`infer_is_positive`** — set False for temperature, financial returns, negatives.
+- [ ] **Output shape** - `point_fc` is `(n_series, horizon)`, `quant_fc` is `(n_series, horizon, 10)`
+- [ ] **Quantile indices** - index 0 = mean, 1 = q10 ... 9 = q90. NOT 0 = q0.
+- [ ] **Frequency flag** - TimesFM 1.0/2.0: pass `freq=[0]` for monthly. TimesFM 2.5: omit.
+- [ ] **Series length** - context must be ≥ 32 data points.
+- [ ] **No NaN** - `np.isnan(point_fc).any()` must be False.
+- [ ] **Axes** - multiple panels sharing data must use `sharex=True`.
+- [ ] **`matplotlib.use('Agg')`** - before any pyplot import when running headless.
+- [ ] **`infer_is_positive`** - set False for temperature, financial returns, negatives.
 
 ## Common Mistakes
 
-1. **Quantile index off-by-one** — `quant_fc[..., 0]` is the **mean**, not q0. q10 = index 1, q90 = index 9. Define: `IDX_Q10, IDX_Q90 = 1, 9`.
+1. **Quantile index off-by-one** - `quant_fc[..., 0]` is the **mean**, not q0. q10 = index 1, q90 = index 9. Define: `IDX_Q10, IDX_Q90 = 1, 9`.
 
-2. **Variable shadowing in covariate loops** — don't use the outer loop variable as a comprehension variable when building per-series covariate dicts.
+2. **Variable shadowing in covariate loops** - don't use the outer loop variable as a comprehension variable when building per-series covariate dicts.
 
-3. **Wrong CSV column name** — global-temperature CSV uses `anomaly_c`, not `anomaly`. Print `df.columns` first.
+3. **Wrong CSV column name** - global-temperature CSV uses `anomaly_c`, not `anomaly`. Print `df.columns` first.
 
-4. **TimesFM 2.5 required for `forecast_with_covariates()`** — TimesFM 1.0 does NOT have this method.
+4. **TimesFM 2.5 required for `forecast_with_covariates()`** - TimesFM 1.0 does NOT have this method.
 
-5. **Future covariates must span the full horizon** — dynamic covariates need values for BOTH context AND forecast windows.
+5. **Future covariates must span the full horizon** - dynamic covariates need values for BOTH context AND forecast windows.
 
-6. **Context anomaly detection uses residuals** — detrend first, then Z-score. Raw Z-scores mislead on trending data.
+6. **Context anomaly detection uses residuals** - detrend first, then Z-score. Raw Z-scores mislead on trending data.
 
 ## Validation & Verification
 

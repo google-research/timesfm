@@ -74,6 +74,59 @@ def update_running_stats(
   return (w := (new_n, new_mu, new_sigma), w)
 
 
+def compute_cumulative_stats(
+    inputs: torch.Tensor,
+    masks: torch.Tensor,
+) -> tuple[
+    torch.Tensor,
+    torch.Tensor,
+    torch.Tensor,
+    torch.Tensor,
+    torch.Tensor,
+]:
+  """Computes cumulative running statistics across the patch dimension.
+
+  Replaces the sequential Python for-loop over patches with fully vectorized
+  cumulative-sum operations. Uses the E[X^2] - E[X]^2 formula for variance,
+  which is numerically adequate for inference.
+
+  Args:
+    inputs: Float tensor of shape (batch, n_patches, patch_len).
+    masks:  Bool tensor of shape (batch, n_patches, patch_len), True = masked.
+
+  Returns:
+    last_n:       (batch,) – total valid element count across all patches.
+    last_mu:      (batch,) – global mean across all patches.
+    last_sigma:   (batch,) – global std across all patches.
+    context_mu:   (batch, n_patches) – cumulative mean after each patch.
+    context_sigma:(batch, n_patches) – cumulative std after each patch.
+  """
+  is_legit = ~masks  # True where value is valid
+  legit_f = is_legit.to(inputs.dtype)
+
+  valid_per_patch = legit_f.sum(dim=-1)                    # (b, n)
+  sum_per_patch = (inputs * legit_f).sum(dim=-1)            # (b, n)
+  sum_sq_per_patch = (inputs.pow(2) * legit_f).sum(dim=-1)  # (b, n)
+
+  cum_count = torch.cumsum(valid_per_patch, dim=1)   # (b, n)
+  cum_sum = torch.cumsum(sum_per_patch, dim=1)        # (b, n)
+  cum_sum_sq = torch.cumsum(sum_sq_per_patch, dim=1)  # (b, n)
+
+  safe_count = torch.where(cum_count == 0, torch.ones_like(cum_count), cum_count)
+  context_mu = cum_sum / safe_count
+  context_mu = torch.where(cum_count == 0, torch.zeros_like(context_mu), context_mu)
+
+  # Clamp to avoid tiny negatives from floating-point subtraction.
+  context_var = torch.clamp(cum_sum_sq / safe_count - context_mu.pow(2), min=0.0)
+  context_sigma = torch.sqrt(context_var)
+
+  last_n = cum_count[:, -1]
+  last_mu = context_mu[:, -1]
+  last_sigma = context_sigma[:, -1]
+
+  return last_n, last_mu, last_sigma, context_mu, context_sigma
+
+
 def revin(
     x: torch.Tensor,
     mu: torch.Tensor,
