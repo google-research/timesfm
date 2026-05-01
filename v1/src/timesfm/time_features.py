@@ -19,23 +19,22 @@ Extract time covariates from datetime.
 
 import numpy as np
 import pandas as pd
-from pandas.tseries.holiday import EasterMonday
-from pandas.tseries.holiday import GoodFriday
-from pandas.tseries.holiday import Holiday
-from pandas.tseries.holiday import SU
-from pandas.tseries.holiday import TH
-from pandas.tseries.holiday import USColumbusDay
-from pandas.tseries.holiday import USLaborDay
-from pandas.tseries.holiday import USMartinLutherKingJr
-from pandas.tseries.holiday import USMemorialDay
-from pandas.tseries.holiday import USPresidentsDay
-from pandas.tseries.holiday import USThanksgivingDay
-from pandas.tseries.offsets import DateOffset
-from pandas.tseries.offsets import Day
-from pandas.tseries.offsets import Easter
+from pandas.tseries.holiday import (
+  SU,
+  TH,
+  EasterMonday,
+  GoodFriday,
+  Holiday,
+  USColumbusDay,
+  USLaborDay,
+  USMartinLutherKingJr,
+  USMemorialDay,
+  USPresidentsDay,
+  USThanksgivingDay,
+)
+from pandas.tseries.offsets import DateOffset, Day, Easter
 from sklearn.preprocessing import StandardScaler
 from tqdm import tqdm
-
 
 # This is 183 to cover half a year (in both directions), also for leap years
 # + 17 as Eastern can be between March, 22 - April, 25

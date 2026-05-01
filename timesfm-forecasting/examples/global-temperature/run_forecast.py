@@ -135,7 +135,7 @@ print("=" * 60)
 print(
     f"\n📅 Forecast period: {forecast_dates[0].strftime('%Y-%m')} to {forecast_dates[-1].strftime('%Y-%m')}"
 )
-print(f"\n🌡️  Temperature Anomaly Forecast (°C above 1951-1980 baseline):")
+print("\n🌡️  Temperature Anomaly Forecast (°C above 1951-1980 baseline):")
 print(f"\n   {'Month':<10} {'Point':>8} {'80% CI':>15} {'90% CI':>15}")
 print(f"   {'-' * 10} {'-' * 8} {'-' * 15} {'-' * 15}")
 for i, (date, pt, q10, q90, q05, q95) in enumerate(
@@ -152,7 +152,7 @@ for i, (date, pt, q10, q90, q05, q95) in enumerate(
         f"   {date:<10} {pt:>8.3f} [{q10:>6.3f}, {q90:>6.3f}] [{q05:>6.3f}, {q95:>6.3f}]"
     )
 
-print(f"\n📊 Summary Statistics:")
+print("\n📊 Summary Statistics:")
 print(f"   Mean forecast:  {point.mean():.3f}°C")
 print(
     f"   Max forecast:   {point.max():.3f}°C (Month: {forecast_dates[point.argmax()].strftime('%Y-%m')})"
@@ -162,6 +162,6 @@ print(
 )
 print(f"   vs 2024 mean:   {point.mean() - df['anomaly_c'].iloc[-12:].mean():+.3f}°C")
 
-print(f"\n✅ Output saved to:")
+print("\n✅ Output saved to:")
 print(f"   {output_dir / 'forecast_output.csv'}")
 print(f"   {output_dir / 'forecast_output.json'}")

@@ -39,6 +39,17 @@ xreg = [
 line-length = 88
 indent-width = 2
 
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+# F722/F821: false positives from jaxtyping annotations (e.g. Float[Array, "b n h d"])
+ignore = ["E501", "E402", "E731", "E722", "E741", "F841", "F403", "F405", "F722", "F821"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+
+[tool.uv]
+# Install with: uv sync --extra torch  (or --extra flax)
+
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"

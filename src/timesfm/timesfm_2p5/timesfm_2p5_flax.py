@@ -24,13 +24,13 @@ from pathlib import Path
 from typing import Any, Callable, Dict
 
 import einshape
-from flax import nnx
 import huggingface_hub
 import jax
 import jax.numpy as jnp
 import jaxtyping
 import numpy as np
 import orbax.checkpoint as ocp
+from flax import nnx
 
 from .. import configs
 from ..flax import dense, transformer, util

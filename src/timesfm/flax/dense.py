@@ -14,10 +14,10 @@
 
 """Dense layers for TimesFM."""
 
-from flax import nnx
 import jax
 import jax.numpy as jnp
 import jaxtyping
+from flax import nnx
 
 from .. import configs
 

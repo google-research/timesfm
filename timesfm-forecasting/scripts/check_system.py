@@ -18,15 +18,12 @@ from __future__ import annotations
 import argparse
 import json
 import os
-import platform
 import shutil
 import struct
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
-import math
-
 
 # ---------------------------------------------------------------------------
 # Model requirement profiles
@@ -557,7 +554,7 @@ def print_memory_estimate(
     available_ram = _get_available_ram_gb()
 
     print(f"\n{'=' * 50}")
-    print(f" Memory Estimate for Dataset")
+    print(" Memory Estimate for Dataset")
     print(f"{'=' * 50}")
     print(f"  Dataset: {num_series:,} series × {context_length} context length")
     if horizon > 0:
@@ -637,7 +634,7 @@ def run_checks(model_version: str = "v2.5") -> SystemReport:
 def print_report(report: SystemReport) -> None:
     """Print a human-readable report to stdout."""
     print(f"\n{'=' * 50}")
-    print(f"  TimesFM System Requirements Check")
+    print("  TimesFM System Requirements Check")
     print(f"  Model: {report.model}")
     print(f"{'=' * 50}\n")
 

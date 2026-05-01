@@ -27,14 +27,13 @@ import numpy as np
 import pandas as pd
 import typer
 import wandb
-from jax import numpy as jnp
+from adapter.utils import get_adapter_params, load_adapter_layer
 from paxml import checkpoint_types, checkpoints, learners, tasks_lib, trainer_lib
 from praxis import optimizers, pax_fiddle, py_utils, schedules
 from rich import print
 from tqdm import tqdm
 from typing_extensions import Annotated
 
-from adapter.utils import get_adapter_params, load_adapter_layer
 from timesfm import TimesFm, data_loader, patched_decoder
 
 NestedMap = py_utils.NestedMap

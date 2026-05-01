@@ -16,11 +16,12 @@
 The expected input format is csv file with a datetime index.
 """
 
-from absl import logging
 import numpy as np
 import pandas as pd
-from sklearn.preprocessing import StandardScaler
 import tensorflow as tf
+from absl import logging
+from sklearn.preprocessing import StandardScaler
+
 from . import time_features
 
 

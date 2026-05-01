@@ -16,6 +16,7 @@
 
 import dataclasses
 import functools
+
 import jax
 import jax.numpy as jnp
 import jaxtyping

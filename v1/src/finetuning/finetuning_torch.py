@@ -11,11 +11,10 @@ from typing import Any, Callable, Dict, List, Optional
 import torch
 import torch.distributed as dist
 import torch.nn as nn
+import wandb
+from timesfm.pytorch_patched_decoder import create_quantiles
 from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.utils.data import DataLoader, Dataset
-from timesfm.pytorch_patched_decoder import create_quantiles
-
-import wandb
 
 
 class MetricsLogger(ABC):

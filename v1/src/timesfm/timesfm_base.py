@@ -17,11 +17,10 @@ import collections
 import dataclasses
 import logging
 import multiprocessing
-from typing import Any, Literal, Sequence, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Literal, Sequence
 
 import numpy as np
 import pandas as pd
-
 from utilsforecast.processing import make_future_dataframe
 
 if TYPE_CHECKING:

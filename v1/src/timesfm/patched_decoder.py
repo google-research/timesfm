@@ -20,20 +20,17 @@ import dataclasses
 from typing import Optional, Tuple
 
 import einshape as es
-from jax import lax
 import jax.numpy as jnp
-from praxis import base_layer
-from praxis import base_model
-from praxis import layers
-from praxis import pax_fiddle
-from praxis import py_utils
-from praxis import pytypes
-from praxis.layers import activations
-from praxis.layers import embedding_softmax
-from praxis.layers import linears
-from praxis.layers import normalizations
-from praxis.layers import stochastics
-from praxis.layers import transformers
+from jax import lax
+from praxis import base_layer, base_model, layers, pax_fiddle, py_utils, pytypes
+from praxis.layers import (
+  activations,
+  embedding_softmax,
+  linears,
+  normalizations,
+  stochastics,
+  transformers,
+)
 
 # PAX shortcuts
 NestedMap = py_utils.NestedMap
