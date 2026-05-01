@@ -72,6 +72,9 @@ class TimesFM_2p5_200M_torch_module(nn.Module):
     if torch.cuda.is_available():
       self.device = torch.device("cuda:0")
       self.device_count = torch.cuda.device_count()
+    elif torch.backends.mps.is_available():
+      self.device = torch.device("mps")
+      self.device_count = 1
     else:
       self.device = torch.device("cpu")
       self.device_count = 1
@@ -414,9 +417,9 @@ class TimesFM_2p5_200M_torch(
         )
 
       inputs = (
-        torch.from_numpy(np.array(inputs)).to(self.model.device).to(torch.float32)
+        torch.from_numpy(np.array(inputs)).to(torch.float32).to(self.model.device)
       )
-      masks = torch.from_numpy(np.array(masks)).to(self.model.device).to(torch.bool)
+      masks = torch.from_numpy(np.array(masks)).to(torch.bool).to(self.model.device)
       batch_size = inputs.shape[0]
 
       if fc.infer_is_positive:
