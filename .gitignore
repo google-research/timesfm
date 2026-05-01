@@ -9,3 +9,5 @@ results/
 uv.lock
 development_setup.md
 debug.log
+test_mac.py
+test_output.txt
