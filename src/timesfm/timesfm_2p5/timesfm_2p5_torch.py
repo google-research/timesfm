@@ -328,6 +328,11 @@ class TimesFM_2p5_200M_torch(
         local_files_only=local_files_only,
       )
 
+    # huggingface_hub forwards download kwargs (proxies, resume_download, ...)
+    # via **model_kwargs; strip them so they don't reach cls.__init__.
+    for k in ("proxies", "resume_download"):
+      model_kwargs.pop(k, None)
+
     # Create an instance of the model wrapper class.
     instance = cls(config=config, **model_kwargs)
 
