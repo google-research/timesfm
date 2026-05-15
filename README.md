@@ -80,6 +80,8 @@ Since the Sept. 2025 launch, the following improvements have been completed:
     
     # Install the package in editable mode with torch
     uv pip install -e .[torch]
+    # On zsh (macos), quote extra specifier like '.[torch]' or ".[flax]"
+    uv pip install -e '.[torch]'
     # Or with flax
     uv pip install -e .[flax]
     # Or XReg is needed
