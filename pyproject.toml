@@ -43,3 +43,6 @@ indent-width = 2
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools.package-data]
+timesfm = ["py.typed"]
+
