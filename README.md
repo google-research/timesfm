@@ -25,7 +25,7 @@ This open version is not an officially supported Google product.
     them.
 ## Update - June 5, 2026
 
-Updated PyPI to `timesfm=2.0.0`. See [Install](https://github.com/google-research/timesfm/edit/master/README.md#from-pypi).
+Updated PyPI to `timesfm=2.0.0`. See [Install](https://github.com/google-research/timesfm#from-pypi).
 
 ## Update - Apr. 9, 2026
 
