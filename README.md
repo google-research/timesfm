@@ -23,6 +23,9 @@ This open version is not an officially supported Google product.
 -   1.0 and 2.0: relevant code archived in the sub directory `v1`. You can `pip
     install timesfm==1.3.0` to install an older version of this package to load
     them.
+## Update - June 5, 2026
+
+Updated PyPI to `timesfm=2.0.0`. See [Install](https://github.com/google-research/timesfm/edit/master/README.md#from-pypi).
 
 ## Update - Apr. 9, 2026
 
@@ -64,6 +67,19 @@ Since the Sept. 2025 launch, the following improvements have been completed:
 
 ### Install
 
+#### From `PyPI`
+
+```shell
+# Install the package with torch
+pip install "timesfm[torch]"=2.0.0
+# Or with Flax
+pip install "timesfm[flax]"=2.0.0
+# And when XReg is needed
+pip install "timesfm[xreg]"=2.0.0
+```
+
+#### Local Install
+
 1.  Clone the repository:
     ```shell
     git clone https://github.com/google-research/timesfm.git
@@ -82,7 +98,7 @@ Since the Sept. 2025 launch, the following improvements have been completed:
     uv pip install -e .[torch]
     # Or with flax
     uv pip install -e .[flax]
-    # Or XReg is needed
+    # And when XReg is needed
     uv pip install -e .[xreg]
     ```
 
