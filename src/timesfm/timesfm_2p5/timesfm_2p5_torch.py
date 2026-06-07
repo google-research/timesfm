@@ -257,7 +257,7 @@ class TimesFM_2p5_200M_torch_module(nn.Module):
       to_concat = [t_pf[:, -1, ...]]
       if t_ar is not None:
         to_concat.append(t_ar.reshape(1, -1, self.q))
-      torch_forecast = torch.cat(to_concat, dim=1)[..., :horizon]
+      torch_forecast = torch.cat(to_concat, dim=1)[:, :horizon, :]
       torch_forecast = torch_forecast.squeeze(0)
       outputs.append(torch_forecast.detach().cpu().numpy())
     return outputs
@@ -283,11 +283,25 @@ class TimesFM_2p5_200M_torch(
     self,
     torch_compile: bool = True,
     config: Optional[dict] = None,
+    **kwargs,
   ):
     self.model = TimesFM_2p5_200M_torch_module()
     self.torch_compile = torch_compile
     if config is not None:
       self._hub_mixin_config = config
+
+  def load_checkpoint(self, path: str, **kwargs):
+    """Loads a TimesFM model from a checkpoint directory or file."""
+    if os.path.isdir(path):
+      model_file_path = os.path.join(path, self.WEIGHTS_FILENAME)
+      if not os.path.exists(model_file_path):
+        raise FileNotFoundError(
+          f"{self.WEIGHTS_FILENAME} not found in directory {path}"
+        )
+    else:
+      model_file_path = path
+
+    self.model.load_checkpoint(model_file_path, **kwargs)
 
   @classmethod
   def _from_pretrained(
@@ -333,7 +347,7 @@ class TimesFM_2p5_200M_torch(
 
     logging.info("Loading checkpoint from: %s", model_file_path)
     # Load the weights into the model.
-    instance.model.load_checkpoint(
+    instance.load_checkpoint(
       model_file_path, torch_compile=instance.torch_compile
     )
     return instance
