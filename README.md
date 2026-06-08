@@ -71,11 +71,11 @@ Since the Sept. 2025 launch, the following improvements have been completed:
 
 ```shell
 # Install the package with torch
-pip install "timesfm[torch]"=2.0.0
+pip install timesfm[torch]
 # Or with Flax
-pip install "timesfm[flax]"=2.0.0
+pip install timesfm[flax]
 # And when XReg is needed
-pip install "timesfm[xreg]"=2.0.0
+pip install timesfm[xreg]
 ```
 
 #### Local Install
