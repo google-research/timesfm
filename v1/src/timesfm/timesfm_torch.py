@@ -123,15 +123,21 @@ class TimesFmTorch(timesfm_base.TimesFmBase):
       mean_outputs = []
       full_outputs = []
       for i in range(input_ts.shape[0] // self.global_batch_size):
-        t_input_ts = torch.Tensor(input_ts[i * self.global_batch_size:(i + 1) *
-                                           self.global_batch_size]).to(
-                                               self._device)
-        t_input_padding = torch.Tensor(
-            input_padding[i * self.global_batch_size:(i + 1) *
-                          self.global_batch_size]).to(self._device)
-        t_inp_freq = torch.LongTensor(
-            inp_freq[i * self.global_batch_size:(i + 1) *
-                     self.global_batch_size, :]).to(self._device)
+        batch_start = i * self.global_batch_size
+        batch_end = (i + 1) * self.global_batch_size
+        t_input_ts = torch.as_tensor(
+            input_ts[batch_start:batch_end], dtype=torch.float32, device=self._device
+        )
+        t_input_padding = torch.as_tensor(
+            input_padding[batch_start:batch_end],
+            dtype=torch.float32,
+            device=self._device,
+        )
+        t_inp_freq = torch.as_tensor(
+            inp_freq[batch_start:batch_end, :],
+            dtype=torch.long,
+            device=self._device,
+        )
 
         mean_output, full_output = self._model.decode(
             input_ts=t_input_ts,

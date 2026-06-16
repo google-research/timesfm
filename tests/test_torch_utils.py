@@ -334,3 +334,32 @@ class TestDecodeCache:
     )
     assert cache.key.shape == cache.value.shape
     assert cache.key.shape == (batch, seq, heads, head_dim)
+
+
+# ---------------------------------------------------------------------------
+# numpy -> torch conversion (forecast input path)
+# ---------------------------------------------------------------------------
+
+
+class TestForecastNumpyTorchConversion:
+  """Regression for issue #166: forecast inputs must convert to torch safely."""
+
+  def test_as_tensor_accepts_list_of_ndarrays(self):
+    """torch.Tensor(ndarray) can fail when numpy builds differ; as_tensor does not."""
+    forecast_input = [
+        np.sin(np.linspace(0, 20, 100)),
+        np.sin(np.linspace(0, 20, 100)),
+        np.sin(np.linspace(0, 20, 100)),
+    ]
+    inputs = [np.array(ts) for ts in forecast_input]
+    input_ts = np.stack(inputs, axis=0)
+    input_padding = np.zeros_like(input_ts)
+    inp_freq = np.array([0, 1, 2], dtype=np.int32).reshape(-1, 1)
+
+    t_input_ts = torch.as_tensor(input_ts, dtype=torch.float32)
+    t_input_padding = torch.as_tensor(input_padding, dtype=torch.float32)
+    t_inp_freq = torch.as_tensor(inp_freq, dtype=torch.long)
+
+    assert t_input_ts.shape == (3, 100)
+    assert t_input_padding.shape == (3, 100)
+    assert t_inp_freq.shape == (3, 1)
