@@ -1,38 +1,58 @@
 [project]
 name = "timesfm"
-version = "2.0.1"
+version = "2.0.0"
 description = "A time series foundation model."
 authors = [
-    {name = "Rajat Sen", email = "senrajat@google.com"},
-    {name = "Yichen Zhou", email = "yichenzhou@google.com"},
-    {name = "Abhimanyu Das", email = "abhidas@google.com"},
-    {name = "Petros Mol", email = "pmol@google.com"},
-    {name = "Michael Chertushkin", email = "chertushkinmichael@gmail.com"},
+  {name = "Rajat Sen", email = "senrajat@google.com"},
+  {name = "Yichen Zhou", email = "yichenzhou@google.com"},
+  {name = "Abhimanyu Das", email = "abhidas@google.com"},
+  {name = "Petros Mol", email = "pmol@google.com"},
+  {name = "Michael Chertushkin", email = "chertushkinmichael@gmail.com"},
 ]
 license = {text = "Apache-2.0"}
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "numpy>=1.26.4",
-    "huggingface_hub[cli]>=0.23.0",
-    "safetensors>=0.5.3",
+  "numpy>=1.26.4",
+  "huggingface_hub[cli]>=0.23.0",
+  "safetensors>=0.5.3",
 ]
 
 [project.optional-dependencies]
 torch = [
-    "torch>=2.0.0",
+  "torch>=2.0.0",
 ]
+
+# CPU-compatible flax install (works on any machine)
 flax = [
-    "flax",
-    "optax",
-    "einshape",
-    "orbax-checkpoint",
-    "jaxtyping",
-    "jax[cuda]"
+  "flax",
+  "optax",
+  "einshape",
+  "orbax-checkpoint",
+  "jaxtyping",
+  "jax",
 ]
+
+# GPU flax install (CUDA 12)
+flax-cuda = [
+  "flax",
+  "optax",
+  "einshape",
+  "orbax-checkpoint",
+  "jaxtyping",
+  "jax[cuda12]",
+]
+
+# CPU-compatible xreg install
 xreg = [
-    "jax[cuda]",
-    "scikit-learn",
+  "jax",
+  "scikit-learn",
+]
+
+# GPU xreg install (CUDA 12)
+xreg-cuda = [
+  "jax[cuda12]",
+  "scikit-learn",
 ]
 
 [tool.ruff]
@@ -42,4 +62,3 @@ indent-width = 2
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
-
