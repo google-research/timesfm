@@ -21,8 +21,10 @@ jobs:
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
       - name: Create virtual environment
         run: uv venv
-      - name: Install build dependencies
+      - name: Install dependencies
         run: |
-          uv pip install build ".[torch,flax]"
+          uv pip install -e ".[dev,torch,flax]"
+      - name: Run tests
+        run: pytest tests/ -v
       - name: Build package
         run: uv run python -m build

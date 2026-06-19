@@ -30,7 +30,9 @@ Archived v1/v2 code and notebooks are in `v1/`.
 Run tests:
 
 ```bash
-pytest v1/tests/
+pytest tests/
 ```
 
-See `README.md` for full developer setup.
+For archived v1/v2 models, use `pytest v1/tests/` instead.
+
+See `development_setup.md` and `README.md` for full developer setup.
