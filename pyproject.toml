@@ -1,6 +1,6 @@
 [project]
 name = "timesfm"
-version = "2.0.0"
+version = "2.0.1"
 description = "A time series foundation model."
 authors = [
   {name = "Rajat Sen", email = "senrajat@google.com"},
