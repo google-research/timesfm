@@ -1,6 +1,6 @@
 # TimesFM Forecast Report: Global Temperature Anomaly (2025)
 
-**Model:** TimesFM 1.0 (200M) PyTorch  
+**Model:** TimesFM 2.5 (200M) PyTorch  
 **Generated:** 2026-02-21  
 **Source:** NOAA GISTEMP Global Land-Ocean Temperature Index
 
@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-TimesFM forecasts a mean temperature anomaly of **1.19°C** for 2025, slightly below the 2024 average of 1.25°C. The model predicts continued elevated temperatures with a peak of 1.30°C in March 2025 and a minimum of 1.06°C in December 2025.
+TimesFM forecasts a mean temperature anomaly of **1.24°C** for 2025, slightly below the 2024 average of 1.25°C. The model predicts continued elevated temperatures with a peak of 1.29°C in March 2025 and a minimum of 1.20°C in December 2025.
 
 ---
 
@@ -44,24 +44,24 @@ TimesFM forecasts a mean temperature anomaly of **1.19°C** for 2025, slightly b
 
 | Month | Point | 80% CI | 90% CI |
 |-------|-------|--------|--------|
-| 2025-01 | 1.259 | [1.141, 1.297] | [1.248, 1.324] |
-| 2025-02 | 1.286 | [1.141, 1.340] | [1.277, 1.375] |
-| 2025-03 | 1.295 | [1.127, 1.355] | [1.287, 1.404] |
-| 2025-04 | 1.221 | [1.035, 1.290] | [1.208, 1.331] |
-| 2025-05 | 1.170 | [0.969, 1.239] | [1.153, 1.289] |
-| 2025-06 | 1.146 | [0.942, 1.218] | [1.128, 1.270] |
-| 2025-07 | 1.170 | [0.950, 1.248] | [1.151, 1.300] |
-| 2025-08 | 1.203 | [0.971, 1.284] | [1.186, 1.341] |
-| 2025-09 | 1.191 | [0.959, 1.283] | [1.178, 1.335] |
-| 2025-10 | 1.149 | [0.908, 1.240] | [1.126, 1.287] |
-| 2025-11 | 1.080 | [0.836, 1.176] | [1.062, 1.228] |
-| 2025-12 | 1.061 | [0.802, 1.153] | [1.037, 1.217] |
+| 2025-01 | 1.222 | [1.161, 1.293] | [1.123, 1.340] |
+| 2025-02 | 1.256 | [1.189, 1.336] | [1.148, 1.388] |
+| 2025-03 | 1.286 | [1.214, 1.373] | [1.169, 1.427] |
+| 2025-04 | 1.240 | [1.169, 1.324] | [1.119, 1.381] |
+| 2025-05 | 1.203 | [1.128, 1.289] | [1.078, 1.347] |
+| 2025-06 | 1.210 | [1.135, 1.294] | [1.081, 1.353] |
+| 2025-07 | 1.225 | [1.147, 1.311] | [1.092, 1.373] |
+| 2025-08 | 1.242 | [1.160, 1.330] | [1.104, 1.395] |
+| 2025-09 | 1.270 | [1.187, 1.358] | [1.124, 1.425] |
+| 2025-10 | 1.250 | [1.163, 1.338] | [1.096, 1.410] |
+| 2025-11 | 1.214 | [1.122, 1.309] | [1.055, 1.380] |
+| 2025-12 | 1.203 | [1.111, 1.291] | [1.041, 1.370] |
 
 ### JSON Output
 
 ```json
 {
-  "model": "TimesFM 1.0 (200M) PyTorch",
+  "model": "TimesFM 2.5 (200M) PyTorch",
   "input": {
     "source": "NOAA GISTEMP Global Temperature Anomaly",
     "n_observations": 36,
@@ -72,13 +72,13 @@ TimesFM forecasts a mean temperature anomaly of **1.19°C** for 2025, slightly b
     "horizon": 12,
     "dates": ["2025-01", "2025-02", "2025-03", "2025-04", "2025-05", "2025-06",
               "2025-07", "2025-08", "2025-09", "2025-10", "2025-11", "2025-12"],
-    "point": [1.259, 1.286, 1.295, 1.221, 1.170, 1.146, 1.170, 1.203, 1.191, 1.149, 1.080, 1.061]
+    "point": [1.222, 1.256, 1.286, 1.240, 1.203, 1.210, 1.225, 1.242, 1.270, 1.250, 1.214, 1.203]
   },
   "summary": {
-    "forecast_mean_c": 1.186,
-    "forecast_max_c": 1.295,
-    "forecast_min_c": 1.061,
-    "vs_last_year_mean": -0.067
+    "forecast_mean_c": 1.235,
+    "forecast_max_c": 1.286,
+    "forecast_min_c": 1.203,
+    "vs_last_year_mean": -0.017
   }
 }
 ```
@@ -138,7 +138,7 @@ TimesFM forecasts a mean temperature anomaly of **1.19°C** for 2025, slightly b
 uv pip install "timesfm[torch]" matplotlib pandas numpy
 
 # Run the complete example
-cd scientific-skills/timesfm-forecasting/examples/global-temperature
+cd timesfm-forecasting/examples/global-temperature
 ./run_example.sh
 ```
 
@@ -146,32 +146,31 @@ cd scientific-skills/timesfm-forecasting/examples/global-temperature
 
 ## Technical Notes
 
-### API Discovery
+### TimesFM 2.5 API
 
-The TimesFM PyTorch API differs from the GitHub README documentation:
-
-**Documented (GitHub README):**
 ```python
-model = timesfm.TimesFm(
-    context_len=512,
-    horizon_len=128,
-    backend="gpu",
+import timesfm
+
+model = timesfm.TimesFM_2p5_200M_torch.from_pretrained(
+    "google/timesfm-2.5-200m-pytorch",
+    torch_compile=False,
 )
-model.load_from_google_repo("google/timesfm-2.5-200m-pytorch")
+model.compile(timesfm.ForecastConfig(
+    max_context=512,
+    max_horizon=12,
+    normalize_inputs=True,
+    use_continuous_quantile_head=True,
+    fix_quantile_crossing=True,
+))
+
+point_forecast, quantile_forecast = model.forecast(
+    horizon=12,
+    inputs=[input_series],
+)
 ```
 
-**Actual Working API:**
-```python
-hparams = timesfm.TimesFmHparams(horizon_len=12)
-checkpoint = timesfm.TimesFmCheckpoint(
-    huggingface_repo_id="google/timesfm-1.0-200m-pytorch"
-)
-model = timesfm.TimesFm(hparams=hparams, checkpoint=checkpoint)
-```
-
-### TimesFM 2.5 PyTorch Issue
-
-The `google/timesfm-2.5-200m-pytorch` checkpoint downloads as `model.safetensors`, but the TimesFM loader expects `torch_model.ckpt`. This causes a `FileNotFoundError` at model load time. Using TimesFM 1.0 PyTorch resolves this issue.
+Quantile columns are `[mean, q10, q20, …, q90]` (10 columns). See
+`timesfm-forecasting/references/api_reference.md`.
 
 ---
 

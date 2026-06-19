@@ -419,16 +419,25 @@ def main() -> None:
         print(f"      {r['date']}  {r['value']:+.3f} C  z={r['z_score']:+.2f}")
 
     # --- Load TimesFM --------------------------------------------------------
-    print("\n  Loading TimesFM 1.0 ...")
+    print("\n  Loading TimesFM 2.5 ...")
     import timesfm
 
-    hparams = timesfm.TimesFmHparams(horizon_len=HORIZON)
-    checkpoint = timesfm.TimesFmCheckpoint(
-        huggingface_repo_id="google/timesfm-1.0-200m-pytorch"
+    model = timesfm.TimesFM_2p5_200M_torch.from_pretrained(
+        "google/timesfm-2.5-200m-pytorch",
+        torch_compile=False,
     )
-    model = timesfm.TimesFm(hparams=hparams, checkpoint=checkpoint)
+    model.compile(timesfm.ForecastConfig(
+        max_context=512,
+        max_horizon=HORIZON,
+        normalize_inputs=True,
+        use_continuous_quantile_head=True,
+        fix_quantile_crossing=True,
+    ))
 
-    point_out, quant_out = model.forecast([context_values], freq=[0])
+    point_out, quant_out = model.forecast(
+        horizon=HORIZON,
+        inputs=[context_values],
+    )
     point_fc = point_out[0]  # shape (HORIZON,)
     quant_fc = quant_out[0].T  # shape (10, HORIZON)
 

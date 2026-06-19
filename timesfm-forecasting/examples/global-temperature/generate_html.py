@@ -216,7 +216,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         </div>
         
         <footer>
-            <p>TimesFM 1.0 (200M) PyTorch • <a href="https://github.com/google-research/timesfm">Google Research</a></p>
+            <p>TimesFM 2.5 (200M) PyTorch • <a href="https://github.com/google-research/timesfm">Google Research</a></p>
         </footer>
     </div>
 

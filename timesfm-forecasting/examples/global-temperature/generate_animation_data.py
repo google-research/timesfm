@@ -47,12 +47,18 @@ def main() -> None:
     print(f"   Animation steps: {len(all_values) - MIN_CONTEXT + 1}")
 
     # Load TimesFM with max horizon (will truncate output for shorter forecasts)
-    print(f"\n🤖 Loading TimesFM 1.0 (200M) PyTorch (horizon={MAX_HORIZON})...")
-    hparams = timesfm.TimesFmHparams(horizon_len=MAX_HORIZON)
-    checkpoint = timesfm.TimesFmCheckpoint(
-        huggingface_repo_id="google/timesfm-1.0-200m-pytorch"
+    print(f"\n🤖 Loading TimesFM 2.5 (200M) PyTorch (horizon={MAX_HORIZON})...")
+    model = timesfm.TimesFM_2p5_200M_torch.from_pretrained(
+        "google/timesfm-2.5-200m-pytorch",
+        torch_compile=False,
     )
-    model = timesfm.TimesFm(hparams=hparams, checkpoint=checkpoint)
+    model.compile(timesfm.ForecastConfig(
+        max_context=512,
+        max_horizon=MAX_HORIZON,
+        normalize_inputs=True,
+        use_continuous_quantile_head=True,
+        fix_quantile_crossing=True,
+    ))
 
     # Generate forecasts for each step
     animation_steps = []
@@ -72,15 +78,14 @@ def main() -> None:
         historical_values = all_values[:n_points]
         historical_dates = all_dates[:n_points]
 
-        # Run forecast (model outputs MAX_HORIZON, we truncate to actual horizon)
-        point, quantiles = model.forecast(
-            [historical_values],
-            freq=[0],
+        # Run forecast (model outputs up to MAX_HORIZON, we truncate to actual horizon)
+        point_out, quant_out = model.forecast(
+            horizon=horizon,
+            inputs=[historical_values],
         )
 
-        # Truncate to actual horizon
-        point = point[0][:horizon]
-        quantiles = quantiles[0, :horizon, :]
+        point = point_out[0][:horizon]
+        quantiles = quant_out[0][:horizon, :]
 
         # Determine forecast dates
         last_date = historical_dates[-1]
@@ -100,10 +105,10 @@ def main() -> None:
             "historical_values": historical_values.tolist(),
             "forecast_dates": [d.strftime("%Y-%m") for d in forecast_dates],
             "point_forecast": point.tolist(),
-            "q10": quantiles[:, 0].tolist(),
-            "q20": quantiles[:, 1].tolist(),
-            "q80": quantiles[:, 7].tolist(),
-            "q90": quantiles[:, 8].tolist(),
+            "q10": quantiles[:, 1].tolist(),
+            "q20": quantiles[:, 2].tolist(),
+            "q80": quantiles[:, 8].tolist(),
+            "q90": quantiles[:, 9].tolist(),
         }
 
         animation_steps.append(step_data)
@@ -116,7 +121,7 @@ def main() -> None:
     # Create output
     output = {
         "metadata": {
-            "model": "TimesFM 1.0 (200M) PyTorch",
+            "model": "TimesFM 2.5 (200M) PyTorch",
             "total_steps": len(animation_steps),
             "min_context": MIN_CONTEXT,
             "max_horizon": MAX_HORIZON,
