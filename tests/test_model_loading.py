@@ -16,6 +16,7 @@
 
 import os
 import tempfile
+import types
 
 from timesfm.timesfm_2p5.timesfm_2p5_torch import TimesFM_2p5_200M_torch
 from timesfm.timesfm_2p5.timesfm_2p5_flax import TimesFM_2p5_200M_flax
@@ -58,6 +59,33 @@ class TestModelLoading:
       forecasts = tfm3.model.forecast_naive(horizon=10, inputs=inputs)
       assert len(forecasts) == 1
       assert forecasts[0].shape == (10, 10)
+
+  def test_torch_compile_wraps_forward(self):
+    """Verifies that torch_compile=True compiles model.forward, not a no-op."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+      tfm = TimesFM_2p5_200M_torch(torch_compile=False)
+      tfm._save_pretrained(tmpdir)
+
+      tfm_compiled = TimesFM_2p5_200M_torch(torch_compile=True)
+      tfm_compiled.load_checkpoint(tmpdir)
+
+      # forward should be a compiled callable, not a plain bound method
+      assert not isinstance(tfm_compiled.model.forward, types.MethodType), (
+          "model.forward should be compiled after load_checkpoint with torch_compile=True"
+      )
+
+  def test_torch_no_compile_leaves_forward_unchanged(self):
+    """Verifies that torch_compile=False leaves model.forward as a plain method."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+      tfm = TimesFM_2p5_200M_torch(torch_compile=False)
+      tfm._save_pretrained(tmpdir)
+
+      tfm_no_compile = TimesFM_2p5_200M_torch(torch_compile=False)
+      tfm_no_compile.load_checkpoint(tmpdir)
+
+      assert isinstance(tfm_no_compile.model.forward, types.MethodType), (
+          "model.forward should remain a plain bound method when torch_compile=False"
+      )
 
   def test_flax_model_init_kwargs(self):
     """Verifies that Flax model wrapper constructor accepts arbitrary kwargs."""

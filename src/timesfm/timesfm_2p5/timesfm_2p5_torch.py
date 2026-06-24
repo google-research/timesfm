@@ -294,8 +294,9 @@ class TimesFM_2p5_200M_torch(
     else:
       model_file_path = path
 
+    torch_compile = kwargs.pop("torch_compile", self.torch_compile)
     self.model.load_checkpoint(model_file_path, **kwargs)
-    if self.torch_compile:
+    if torch_compile:
       logging.info("Compiling model...")
       self.model.forward = torch.compile(self.model.forward)
 
