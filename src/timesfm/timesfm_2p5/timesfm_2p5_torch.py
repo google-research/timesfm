@@ -81,13 +81,6 @@ class TimesFM_2p5_200M_torch_module(nn.Module):
     tensors = load_file(path)
     self.load_state_dict(tensors, strict=True)
     self.to(self.device)
-    torch_compile = True
-    if "torch_compile" in kwargs:
-      torch_compile = kwargs["torch_compile"]
-    if torch_compile:
-      logging.info("Compiling model...")
-      self = torch.compile(self)
-
     self.eval()
 
   def forward(
@@ -302,6 +295,9 @@ class TimesFM_2p5_200M_torch(
       model_file_path = path
 
     self.model.load_checkpoint(model_file_path, **kwargs)
+    if self.torch_compile:
+      logging.info("Compiling model...")
+      self.model.forward = torch.compile(self.model.forward)
 
   @classmethod
   def _from_pretrained(
