@@ -278,6 +278,7 @@ class TimesFM_2p5_200M_torch(
 
   DEFAULT_REPO_ID = "google/timesfm-2.5-200m-pytorch"
   WEIGHTS_FILENAME = "model.safetensors"
+  CONFIG_FILENAME = "config.json"
 
   def __init__(
     self,
@@ -322,6 +323,19 @@ class TimesFM_2p5_200M_torch(
     method provided by `PyTorchModelHubMixin`.
     """
     # Determine the path to the model weights.
+    try:
+      hf_hub_download(
+          repo_id=model_id,
+          filename=cls.CONFIG_FILENAME,
+          revision=revision,
+          cache_dir=cache_dir,
+          force_download=force_download,
+          local_files_only=local_files_only,
+          token=token,
+      )
+    except Exception:
+      pass
+    
     model_file_path = ""
     if os.path.isdir(model_id):
       logging.info("Loading checkpoint from local directory: %s", model_id)
