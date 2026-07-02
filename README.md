@@ -23,9 +23,9 @@ This open version is not an officially supported Google product.
 -   1.0 and 2.0: relevant code archived in the sub directory `v1`. You can `pip
     install timesfm==1.3.0` to install an older version of this package to load
     them.
-## Update - June 5, 2026
+## Update - July 2, 2026
 
-Updated PyPI to `timesfm=2.0.0`. See [Install](https://github.com/google-research/timesfm#from-pypi).
+Updated PyPI to `timesfm=2.0.2`. See [Install](https://github.com/google-research/timesfm#from-pypi).
 
 ## Update - Apr. 9, 2026
 
