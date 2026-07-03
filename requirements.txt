@@ -22,7 +22,7 @@ httpx==0.28.1
     # via huggingface-hub
 huggingface-hub==1.0.1
     # via timesfm (pyproject.toml)
-idna==3.10
+idna==3.15
     # via
     #   anyio
     #   httpx
