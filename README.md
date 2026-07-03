@@ -96,6 +96,8 @@ pip install timesfm[xreg]
     
     # Install the package in editable mode with torch
     uv pip install -e .[torch]
+    # On zsh (macos), quote extra specifier like '.[torch]' or ".[flax]"
+    uv pip install -e '.[torch]'
     # Or with flax
     uv pip install -e .[flax]
     # And when XReg is needed
