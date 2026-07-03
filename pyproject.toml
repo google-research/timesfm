@@ -22,16 +22,36 @@ dependencies = [
 torch = [
     "torch>=2.0.0",
 ]
+
+# CPU-compatible (works on any machine)
 flax = [
     "flax",
     "optax",
     "einshape",
     "orbax-checkpoint",
     "jaxtyping",
-    "jax[cuda]"
+    "jax",
 ]
+
+# GPU only (CUDA 12)
+flax-cuda = [
+    "flax",
+    "optax",
+    "einshape",
+    "orbax-checkpoint",
+    "jaxtyping",
+    "jax[cuda12]",
+]
+
+# CPU-compatible
 xreg = [
-    "jax[cuda]",
+    "jax",
+    "scikit-learn",
+]
+
+# GPU only (CUDA 12)
+xreg-cuda = [
+    "jax[cuda12]",
     "scikit-learn",
 ]
 
@@ -42,4 +62,3 @@ indent-width = 2
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
-
