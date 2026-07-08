@@ -128,7 +128,7 @@ def _smape(y_pred, y_true):
   return abs_diff / abs_val
 
 
-def eval():
+def run_eval():
   """Eval pipeline."""
   dataset = _DATASET.value
   data_path = DATA_DICT[dataset]["data_path"]
@@ -235,4 +235,4 @@ def eval():
 if __name__ == "__main__":
   FLAGS = flags.FLAGS
   FLAGS(sys.argv)
-  eval()
+  run_eval()
