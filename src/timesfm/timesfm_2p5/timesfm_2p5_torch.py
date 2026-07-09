@@ -461,7 +461,10 @@ class TimesFM_2p5_200M_torch(
         flipped_pf_outputs = flip_quantile_fn(flipped_pf_outputs)
         to_cat = [flipped_pf_outputs[:, -1, ...]]
         if flipped_ar_outputs is not None:
-          to_cat.append(flipped_ar_outputs.reshape(batch_size, -1, self.model.q))
+          flipped_ar_outputs = flip_quantile_fn(
+            flipped_ar_outputs.reshape(batch_size, -1, self.model.q)
+          )
+          to_cat.append(flipped_ar_outputs)
         flipped_full_forecast = torch.cat(to_cat, dim=1)
         quantile_spreads = (quantile_spreads - flipped_quantile_spreads) / 2
         pf_outputs = (pf_outputs - flipped_pf_outputs) / 2
