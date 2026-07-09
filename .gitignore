@@ -1,0 +1,11 @@
+.venv/
+dist/
+__pycache__/
+*.egg-info/
+checkpoints/
+wandb/
+datasets/
+results/
+uv.lock
+development_setup.md
+debug.log
