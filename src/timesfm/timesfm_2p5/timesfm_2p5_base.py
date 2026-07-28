@@ -165,7 +165,9 @@ class TimesFM_2p5:
     context = self.forecast_config.max_context
     num_inputs = len(inputs)
     if (w := num_inputs % self.global_batch_size) != 0:
-      inputs += [np.array([0.0] * 3)] * (self.global_batch_size - w)
+      inputs += [np.array([0.0] * 3, dtype=np.float32)] * (
+        self.global_batch_size - w
+      )
 
     output_points = []
     output_quantiles = []
