@@ -7,6 +7,7 @@ authors = [
     {name = "Yichen Zhou", email = "yichenzhou@google.com"},
     {name = "Abhimanyu Das", email = "abhidas@google.com"},
     {name = "Petros Mol", email = "pmol@google.com"},
+    {name = "Ayush Jain", email="ayuj@google.com"},
     {name = "Michael Chertushkin", email = "chertushkinmichael@gmail.com"},
 ]
 license = {text = "Apache-2.0"}
@@ -39,7 +40,11 @@ xreg = [
 line-length = 88
 indent-width = 2
 
+[tool.setuptools.packages.find]
+where = ["src"]
+
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
+
 
