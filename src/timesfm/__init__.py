@@ -27,3 +27,8 @@ try:
   TimesFM_2p5_200M_flax = timesfm_2p5_flax.TimesFM_2p5_200M_flax
 except ImportError:
   pass
+
+try:
+  from timesfm3 import TimesFM3Forecaster, TimesFM3Torch
+except ImportError:
+  pass
