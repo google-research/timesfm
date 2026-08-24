@@ -11,16 +11,16 @@ from . import util
 
 
 def cpm_iterative_revin_refine(
-    raw_logits: torch.Tensor,
-    revin_n: torch.Tensor,
-    revin_mu: torch.Tensor,
-    revin_sigma: torch.Tensor,
-    patch_cpm_mask: torch.Tensor,
-    median_q_idx: int,
-    rolls: int,
-    patch_len: int,
-    num_quantiles: int,
-    value_clip: float = 1e9,
+  raw_logits: torch.Tensor,
+  revin_n: torch.Tensor,
+  revin_mu: torch.Tensor,
+  revin_sigma: torch.Tensor,
+  patch_cpm_mask: torch.Tensor,
+  median_q_idx: int,
+  rolls: int,
+  patch_len: int,
+  num_quantiles: int,
+  value_clip: float = 1e9,
 ) -> tuple[torch.Tensor, torch.Tensor]:
   """Refines RevIN stats at CPM-masked patches via iterative estimation.
 
@@ -57,16 +57,16 @@ def cpm_iterative_revin_refine(
   # Reshape and slice raw_logits to keep only the median quantile.
   # (b, v, n, oq) -> (b, v, n, rolls, patch_len, num_quantiles)
   # -> (b, v, n, rolls, patch_len)
-  median_logits = raw_logits.reshape(
-      b, v, n_patches, rolls, patch_len, num_quantiles
-  )[:, :, :, :, :, median_q_idx]
+  median_logits = raw_logits.reshape(b, v, n_patches, rolls, patch_len, num_quantiles)[
+    :, :, :, :, :, median_q_idx
+  ]
 
   # Initialise carry with zeros.
   carry_n = torch.zeros((b, v), dtype=torch.float32, device=device)
   carry_mu = torch.zeros((b, v), dtype=torch.float32, device=device)
   carry_sigma = torch.zeros((b, v), dtype=torch.float32, device=device)
   anchor_predicted_values = torch.zeros(
-      (b, v, rolls, patch_len), dtype=torch.float32, device=device
+    (b, v, rolls, patch_len), dtype=torch.float32, device=device
   )
   block_offset = torch.zeros((b,), dtype=torch.long, device=device)
 
@@ -84,16 +84,16 @@ def cpm_iterative_revin_refine(
 
     # Select the block_offset[b]-th patch for each batch element
     offset_onehot = torch.eq(
-        torch.arange(rolls, device=device).unsqueeze(0),
-        block_offset.unsqueeze(1),
+      torch.arange(rolls, device=device).unsqueeze(0),
+      block_offset.unsqueeze(1),
     ).float()
     predicted_values_step = torch.einsum(
-        "br,bvrp->bvp", offset_onehot, anchor_predicted_values
+      "br,bvrp->bvp", offset_onehot, anchor_predicted_values
     )
 
     # Update running stats with the estimated patch.
     new_n, new_mu, new_sigma = util.update_running_stats(
-        carry_n, carry_mu, carry_sigma, predicted_values_step, step_masks
+      carry_n, carry_mu, carry_sigma, predicted_values_step, step_masks
     )
 
     out_n = torch.where(is_cpm, new_n, actual_n)
@@ -102,25 +102,23 @@ def cpm_iterative_revin_refine(
 
     # Advance block_offset: +1 (mod rolls) for CPM, reset to 0 for non-CPM.
     new_block_offset = torch.where(
-        is_cpm.squeeze(-1),
-        (block_offset + 1) % rolls,
-        torch.zeros_like(block_offset),
+      is_cpm.squeeze(-1),
+      (block_offset + 1) % rolls,
+      torch.zeros_like(block_offset),
     )
 
     should_update_anchor = torch.eq(new_block_offset, 0)
 
     # Pre-calculate predicted values for the new anchor.
     step_predicted_values = util.revin(
-        current_step_logits, out_mu, out_sigma, reverse=True
+      current_step_logits, out_mu, out_sigma, reverse=True
     )
-    step_predicted_values = torch.clamp(
-        step_predicted_values, -value_clip, value_clip
-    )
+    step_predicted_values = torch.clamp(step_predicted_values, -value_clip, value_clip)
 
     new_anchor_predicted_values = torch.where(
-        should_update_anchor.view(b, 1, 1, 1),
-        step_predicted_values,
-        anchor_predicted_values,
+      should_update_anchor.view(b, 1, 1, 1),
+      step_predicted_values,
+      anchor_predicted_values,
     )
 
     carry_n = out_n

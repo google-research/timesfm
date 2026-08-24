@@ -16,6 +16,7 @@
 
 import unittest
 from unittest import mock
+
 import numpy as np
 import torch
 
@@ -32,13 +33,13 @@ class FakeModel(torch.nn.Module):
     self.quantiles = quantiles
 
   def decode(
-      self,
-      target,
-      autoregressive_index=0,
-      horizon=8,
-      past_only_covariates=None,
-      past_future_covariates=None,
-      mask=None,
+    self,
+    target,
+    autoregressive_index=0,
+    horizon=8,
+    past_only_covariates=None,
+    past_future_covariates=None,
+    mask=None,
   ):
     del autoregressive_index, past_only_covariates, past_future_covariates, mask
     b, v, _ = target.shape
@@ -47,15 +48,14 @@ class FakeModel(torch.nn.Module):
 
 
 class TimesFM3ForecasterTest(unittest.TestCase):
-
   def setUp(self):
     super().setUp()
     self.config = timesfm3_forecaster._ModelConfig(
-        checkpoint_path="/fake/path",
-        per_core_batch_size=2,
-        input_patch_length=8,
-        output_patch_length=8,
-        median_quantile_index=1,
+      checkpoint_path="/fake/path",
+      per_core_batch_size=2,
+      input_patch_length=8,
+      output_patch_length=8,
+      median_quantile_index=1,
     )
 
   def test_strip_leading_nans_1d(self):
@@ -64,15 +64,19 @@ class TimesFM3ForecasterTest(unittest.TestCase):
     np.testing.assert_array_equal(res, np.array([1.0, 2.0, np.nan]))
 
   def test_strip_leading_nans_2d(self):
-    arr = np.array([
+    arr = np.array(
+      [
         [np.nan, 1.0, 2.0],
         [np.nan, np.nan, 3.0],
-    ])
+      ]
+    )
     res = timesfm3_forecaster.strip_leading_nans(arr)
-    expected = np.array([
+    expected = np.array(
+      [
         [1.0, 2.0],
         [np.nan, 3.0],
-    ])
+      ]
+    )
     np.testing.assert_array_equal(res, expected)
 
   def test_linear_interpolation(self):
@@ -93,7 +97,7 @@ class TimesFM3ForecasterTest(unittest.TestCase):
     self.assertFalse(timesfm3_forecaster._is_nonnegative(arr_neg))
 
   @mock.patch.object(
-      timesfm3_forecaster.TimesFM3Forecaster, "_init_model", autospec=True
+    timesfm3_forecaster.TimesFM3Forecaster, "_init_model", autospec=True
   )
   def test_univariate_predict(self, _):
     forecaster = timesfm3_forecaster.TimesFM3Forecaster(self.config)
@@ -106,29 +110,77 @@ class TimesFM3ForecasterTest(unittest.TestCase):
     np.testing.assert_array_equal(out.forecast, np.full((4,), 2.0))
 
   @mock.patch.object(
-      timesfm3_forecaster.TimesFM3Forecaster, "_init_model", autospec=True
+    timesfm3_forecaster.TimesFM3Forecaster, "_init_model", autospec=True
   )
   def test_multivariate_predict_with_covariates(self, _):
     forecaster = timesfm3_forecaster.TimesFM3Forecaster(self.config)
     forecaster.model = FakeModel()
     forecaster.device = torch.device("cpu")
 
-    ctx = np.array([
+    ctx = np.array(
+      [
         [1.0, 2.0, 3.0, 4.0],
         [5.0, 6.0, 7.0, 8.0],
-    ])
+      ]
+    )
     po_cov = np.array([1.0, 1.0, 1.0, 1.0])
     pf_cov = np.array([2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0])
 
     out = forecaster.predict(
-        ctx,
-        horizon=4,
-        past_only_covariates=po_cov,
-        past_future_covariates=pf_cov,
-        return_quantiles=True,
+      ctx,
+      horizon=4,
+      past_only_covariates=po_cov,
+      past_future_covariates=pf_cov,
+      return_quantiles=True,
     )
     self.assertEqual(out.forecast.shape, (2, 4))
     self.assertEqual(out.quantiles.shape, (2, 4, 3))
+
+  def test_from_pretrained_local_directory(self):
+    import tempfile
+
+    from . import configs
+    from . import model as torch_model_lib
+
+    resblock_config = configs.ResidualBlockConfig(
+      hidden_dims=16,
+      output_dims=16,
+      use_bias=False,
+      activation="relu",
+    )
+    transformer_config = configs.StackedTransformersConfig(
+      num_layers=1,
+      transformer=configs.TransformerConfig(
+        model_dims=16,
+        hidden_dims=16,
+        num_heads=2,
+        attention_norm="rms",
+        feedforward_norm="rms",
+        qk_norm="rms",
+        use_rope_seq=True,
+        use_rope_var=False,
+        use_bias=False,
+        ff_activation="relu",
+        deterministic=True,
+      ),
+    )
+    model = torch_model_lib.TimesFM3Torch(
+      input_patch_len=8,
+      output_patch_len=16,
+      quantiles=[0.1, 0.5, 0.9],
+      residual_block_config=resblock_config,
+      transformer_config=transformer_config,
+    )
+    with tempfile.TemporaryDirectory() as tmpdir:
+      model.save_pretrained(tmpdir)
+      forecaster = timesfm3_forecaster.TimesFM3Forecaster.from_pretrained(
+        tmpdir, device="cpu"
+      )
+      self.assertEqual(forecaster.config.input_patch_length, 8)
+      self.assertEqual(forecaster.config.output_patch_length, 16)
+      ctx = np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0])
+      out = forecaster.predict(ctx, horizon=8)
+      self.assertEqual(out.forecast.shape, (8,))
 
 
 if __name__ == "__main__":

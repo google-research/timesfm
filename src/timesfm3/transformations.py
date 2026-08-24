@@ -6,7 +6,8 @@ Each transformation is a callable with signature (x, reverse=False) -> x'.
 
 from __future__ import annotations
 
-from typing import Callable, Protocol
+from collections.abc import Callable
+from typing import Protocol
 
 import torch
 
@@ -14,8 +15,7 @@ import torch
 class TransformFn(Protocol):
   """Protocol for a reversible transformation function."""
 
-  def __call__(self, x: torch.Tensor, *, reverse: bool = False) -> torch.Tensor:
-    ...
+  def __call__(self, x: torch.Tensor, *, reverse: bool = False) -> torch.Tensor: ...
 
 
 def signed_log(x: torch.Tensor, *, reverse: bool = False) -> torch.Tensor:
@@ -51,12 +51,12 @@ def _max_output_identity(value_clip: float) -> torch.Tensor:
 
 
 _REGISTRY: dict[
-    str,
-    tuple[TransformFn, Callable[[float], torch.Tensor]],
+  str,
+  tuple[TransformFn, Callable[[float], torch.Tensor]],
 ] = {
-    "signed_log": (signed_log, _max_output_signed_log),
-    "signed_sqrt": (signed_sqrt, _max_output_signed_sqrt),
-    "identity": (identity, _max_output_identity),
+  "signed_log": (signed_log, _max_output_signed_log),
+  "signed_sqrt": (signed_sqrt, _max_output_signed_sqrt),
+  "identity": (identity, _max_output_identity),
 }
 
 

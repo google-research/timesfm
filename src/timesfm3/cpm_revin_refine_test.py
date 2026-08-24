@@ -15,6 +15,7 @@
 """Tests for PyTorch cpm_iterative_revin_refine."""
 
 import unittest
+
 import numpy as np
 import torch
 
@@ -22,7 +23,6 @@ from . import cpm_revin_refine as torch_lib
 
 
 class CpmRevinRefineTest(unittest.TestCase):
-
   def test_shape(self):
     b, v, n = 2, 3, 8
     rolls, patch_len, num_q = 2, 2, 3
@@ -34,15 +34,15 @@ class CpmRevinRefineTest(unittest.TestCase):
     patch_cpm_mask = torch.zeros((b, n), dtype=torch.bool)
 
     refined_mu, refined_sigma = torch_lib.cpm_iterative_revin_refine(
-        raw_logits=raw_logits,
-        revin_n=revin_n,
-        revin_mu=revin_mu,
-        revin_sigma=revin_sigma,
-        patch_cpm_mask=patch_cpm_mask,
-        median_q_idx=num_q // 2,
-        rolls=rolls,
-        patch_len=patch_len,
-        num_quantiles=num_q,
+      raw_logits=raw_logits,
+      revin_n=revin_n,
+      revin_mu=revin_mu,
+      revin_sigma=revin_sigma,
+      patch_cpm_mask=patch_cpm_mask,
+      median_q_idx=num_q // 2,
+      rolls=rolls,
+      patch_len=patch_len,
+      num_quantiles=num_q,
     )
     self.assertEqual(refined_mu.shape, (b, v, n))
     self.assertEqual(refined_sigma.shape, (b, v, n))
@@ -59,24 +59,24 @@ class CpmRevinRefineTest(unittest.TestCase):
     patch_cpm_mask = torch.zeros((b, n), dtype=torch.bool)
 
     refined_mu, refined_sigma = torch_lib.cpm_iterative_revin_refine(
-        raw_logits=raw_logits,
-        revin_n=revin_n,
-        revin_mu=revin_mu,
-        revin_sigma=revin_sigma,
-        patch_cpm_mask=patch_cpm_mask,
-        median_q_idx=num_q // 2,
-        rolls=rolls,
-        patch_len=patch_len,
-        num_quantiles=num_q,
+      raw_logits=raw_logits,
+      revin_n=revin_n,
+      revin_mu=revin_mu,
+      revin_sigma=revin_sigma,
+      patch_cpm_mask=patch_cpm_mask,
+      median_q_idx=num_q // 2,
+      rolls=rolls,
+      patch_len=patch_len,
+      num_quantiles=num_q,
     )
     np.testing.assert_allclose(refined_mu.numpy(), revin_mu.numpy())
     np.testing.assert_allclose(refined_sigma.numpy(), revin_sigma.numpy())
 
   def test_cpm_mask_modifies_cpm_positions_only(self):
     for b, v, n, rolls, patch_len, num_q in [
-        (1, 1, 8, 2, 4, 3),
-        (2, 3, 16, 2, 32, 9),
-        (2, 2, 12, 4, 8, 5),
+      (1, 1, 8, 2, 4, 3),
+      (2, 3, 16, 2, 32, 9),
+      (2, 2, 12, 4, 8, 5),
     ]:
       torch.manual_seed(42)
       oq = rolls * patch_len * num_q
@@ -93,23 +93,23 @@ class CpmRevinRefineTest(unittest.TestCase):
       median_q_idx = num_q // 2
 
       refined_mu, refined_sigma = torch_lib.cpm_iterative_revin_refine(
-          raw_logits=raw_logits,
-          revin_n=revin_n,
-          revin_mu=revin_mu,
-          revin_sigma=revin_sigma,
-          patch_cpm_mask=patch_cpm_mask,
-          median_q_idx=median_q_idx,
-          rolls=rolls,
-          patch_len=patch_len,
-          num_quantiles=num_q,
+        raw_logits=raw_logits,
+        revin_n=revin_n,
+        revin_mu=revin_mu,
+        revin_sigma=revin_sigma,
+        patch_cpm_mask=patch_cpm_mask,
+        median_q_idx=median_q_idx,
+        rolls=rolls,
+        patch_len=patch_len,
+        num_quantiles=num_q,
       )
 
       # Non-CPM positions should be identical to inputs
       np.testing.assert_allclose(
-          refined_mu[:, :, :4].numpy(), revin_mu[:, :, :4].numpy()
+        refined_mu[:, :, :4].numpy(), revin_mu[:, :, :4].numpy()
       )
       np.testing.assert_allclose(
-          refined_sigma[:, :, :4].numpy(), revin_sigma[:, :, :4].numpy()
+        refined_sigma[:, :, :4].numpy(), revin_sigma[:, :, :4].numpy()
       )
 
       # Refined outputs should be finite
