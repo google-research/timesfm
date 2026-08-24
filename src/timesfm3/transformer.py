@@ -12,20 +12,18 @@ from __future__ import annotations
 import math
 
 import torch
-from torch import nn
 import torch.nn.functional as F
+from torch import nn
 
-from . import configs
-from . import normalization
-from . import util
+from . import configs, normalization, util
 
 
 def make_attn_mask(
-    query_length: int,
-    num_all_masked_kv: torch.Tensor,
-    query_index_offset: torch.Tensor | None = None,
-    kv_length: int = 0,
-    causal: bool = True,
+  query_length: int,
+  num_all_masked_kv: torch.Tensor,
+  query_index_offset: torch.Tensor | None = None,
+  kv_length: int = 0,
+  causal: bool = True,
 ) -> torch.Tensor:
   """Makes attention mask. True = attend, False = mask.
 
@@ -54,7 +52,7 @@ def make_attn_mask(
 
 
 def make_segment_mask(
-    segment_ids: torch.Tensor,
+  segment_ids: torch.Tensor,
 ) -> torch.Tensor:
   """Makes a segment mask from segment ids.
 
@@ -75,10 +73,10 @@ class RotaryPositionalEmbedding(nn.Module):
   """
 
   def __init__(
-      self,
-      embedding_dims: int,
-      min_timescale: int = 1,
-      max_timescale: int = 10000,
+    self,
+    embedding_dims: int,
+    min_timescale: int = 1,
+    max_timescale: int = 10000,
   ):
     super().__init__()
     self.embedding_dims = embedding_dims
@@ -86,21 +84,14 @@ class RotaryPositionalEmbedding(nn.Module):
     self.max_timescale = max_timescale
 
     half_dim = embedding_dims // 2
-    fraction = (
-        2.0
-        * torch.arange(half_dim, dtype=torch.float32)
-        / embedding_dims
-    )
-    timescale = (
-        min_timescale
-        * (max_timescale / min_timescale) ** fraction
-    )
+    fraction = 2.0 * torch.arange(half_dim, dtype=torch.float32) / embedding_dims
+    timescale = min_timescale * (max_timescale / min_timescale) ** fraction
     self.register_buffer("timescale", timescale, persistent=False)
 
   def forward(
-      self,
-      inputs: torch.Tensor,
-      position: torch.Tensor | None = None,
+    self,
+    inputs: torch.Tensor,
+    position: torch.Tensor | None = None,
   ) -> torch.Tensor:
     """Applies rotary positional embeddings.
 
@@ -113,15 +104,15 @@ class RotaryPositionalEmbedding(nn.Module):
     """
     if self.embedding_dims != inputs.shape[-1]:
       raise ValueError(
-          "The embedding dims of the rotary position embedding "
-          "must match the hidden dimension of the inputs."
+        "The embedding dims of the rotary position embedding "
+        "must match the hidden dimension of the inputs."
       )
     timescale = self.timescale.to(inputs.device)
 
     if position is None:
       seq_length = inputs.shape[1]
       position = torch.arange(
-          seq_length, device=inputs.device, dtype=torch.float32
+        seq_length, device=inputs.device, dtype=torch.float32
       ).unsqueeze(0)
 
     if inputs.dim() == 4:
@@ -152,17 +143,17 @@ class MultiHeadAttention(nn.Module):
   """
 
   def __init__(
-      self,
-      num_heads: int,
-      in_features: int,
-      use_per_dim_scale: bool = True,
-      use_rotary_position_embeddings: bool = True,
-      causal_attention: bool = True,
-      use_bias: bool = False,
-      qk_norm: str = "rms",
-      v_norm: str = "none",
-      use_sdpa: bool = False,
-      rescale_logits: bool = False,
+    self,
+    num_heads: int,
+    in_features: int,
+    use_per_dim_scale: bool = True,
+    use_rotary_position_embeddings: bool = True,
+    causal_attention: bool = True,
+    use_bias: bool = False,
+    qk_norm: str = "rms",
+    v_norm: str = "none",
+    use_sdpa: bool = False,
+    rescale_logits: bool = False,
   ):
     super().__init__()
     self.num_heads = num_heads
@@ -204,7 +195,7 @@ class MultiHeadAttention(nn.Module):
     # RoPE
     if use_rotary_position_embeddings:
       self.rotary_position_embedding = RotaryPositionalEmbedding(
-          embedding_dims=self.head_dim
+        embedding_dims=self.head_dim
       )
     else:
       self.rotary_position_embedding = None
@@ -216,13 +207,13 @@ class MultiHeadAttention(nn.Module):
       self.per_dim_scale = None
 
   def forward(
-      self,
-      inputs_q: torch.Tensor,
-      *,
-      segment_ids: torch.Tensor | None = None,
-      segment_pos: torch.Tensor | None = None,
-      decode_cache: util.DecodeCache | None = None,
-      patch_mask: torch.Tensor | None = None,
+    self,
+    inputs_q: torch.Tensor,
+    *,
+    segment_ids: torch.Tensor | None = None,
+    segment_pos: torch.Tensor | None = None,
+    decode_cache: util.DecodeCache | None = None,
+    patch_mask: torch.Tensor | None = None,
   ) -> tuple[torch.Tensor, util.DecodeCache | None, torch.Tensor]:
     """Applies multi-head attention.
 
@@ -243,25 +234,21 @@ class MultiHeadAttention(nn.Module):
     device = inputs_q.device
 
     if patch_mask is None:
-      patch_mask = torch.zeros(
-          batch_size, n_patches, dtype=torch.bool, device=device
-      )
+      patch_mask = torch.zeros(batch_size, n_patches, dtype=torch.bool, device=device)
 
     # Project Q, K, V and reshape to (b, n, h, hd)
     query = self.query_proj(inputs_q).view(
-        batch_size, n_patches, self.num_heads, self.head_dim
+      batch_size, n_patches, self.num_heads, self.head_dim
     )
     key = self.key_proj(inputs_q).view(
-        batch_size, n_patches, self.num_heads, self.head_dim
+      batch_size, n_patches, self.num_heads, self.head_dim
     )
     value = self.value_proj(inputs_q).view(
-        batch_size, n_patches, self.num_heads, self.head_dim
+      batch_size, n_patches, self.num_heads, self.head_dim
     )
 
     if decode_cache is None:
-      num_front_masked = torch.sum(
-          torch.cumprod(patch_mask.int(), dim=-1), dim=-1
-      )
+      num_front_masked = torch.sum(torch.cumprod(patch_mask.int(), dim=-1), dim=-1)
       next_index = torch.zeros_like(num_front_masked, dtype=torch.int32)
     else:
       num_front_masked = decode_cache.num_front_masked
@@ -270,9 +257,9 @@ class MultiHeadAttention(nn.Module):
     # Apply RoPE
     if self.rotary_position_embedding is not None:
       if segment_pos is None:
-        position = torch.arange(
-            n_patches, device=device, dtype=torch.int32
-        ).unsqueeze(0) + next_index.unsqueeze(-1)
+        position = torch.arange(n_patches, device=device, dtype=torch.int32).unsqueeze(
+          0
+        ) + next_index.unsqueeze(-1)
       else:
         position = segment_pos
       query = self.rotary_position_embedding(query, position)
@@ -302,25 +289,25 @@ class MultiHeadAttention(nn.Module):
       value = decode_cache.value
 
       decode_cache = util.DecodeCache(
-          next_index=next_index + n_patches,
-          num_front_masked=num_front_masked,
-          key=key,
-          value=value,
+        next_index=next_index + n_patches,
+        num_front_masked=num_front_masked,
+        key=key,
+        value=value,
       )
 
       attn_mask = make_attn_mask(
-          query_length=n_patches,
-          num_all_masked_kv=num_front_masked,
-          query_index_offset=next_index,
-          kv_length=cache_size,
-          causal=self.causal_attention,
+        query_length=n_patches,
+        num_all_masked_kv=num_front_masked,
+        query_index_offset=next_index,
+        kv_length=cache_size,
+        causal=self.causal_attention,
       )
     else:
       # Training / full-sequence mode
       attn_mask = make_attn_mask(
-          query_length=n_patches,
-          num_all_masked_kv=torch.zeros_like(num_front_masked),
-          causal=self.causal_attention,
+        query_length=n_patches,
+        num_all_masked_kv=torch.zeros_like(num_front_masked),
+        causal=self.causal_attention,
       )
       # Apply patch_mask to K/V positions
       attn_mask = attn_mask & (~patch_mask[:, None, None, :])
@@ -345,20 +332,20 @@ class MultiHeadAttention(nn.Module):
         # → no internal division → net scale = √d.
         attn_scale = math.sqrt(self.head_dim)
       x = F.scaled_dot_product_attention(
-          query,
-          key,
-          value,
-          attn_mask=attn_mask.expand(-1, self.num_heads, -1, -1),
-          scale=attn_scale,
+        query,
+        key,
+        value,
+        attn_mask=attn_mask.expand(-1, self.num_heads, -1, -1),
+        scale=attn_scale,
       )
     else:
       # --- Manual attention path ---
       # Convert mask: True=attend -> 0.0, False=mask -> -1e9 (matching Flax
       # MEA bias).
       float_mask = torch.where(
-          attn_mask.expand(-1, self.num_heads, -1, -1),
-          torch.tensor(0.0, device=device),
-          torch.tensor(-1e9, device=device),
+        attn_mask.expand(-1, self.num_heads, -1, -1),
+        torch.tensor(0.0, device=device),
+        torch.tensor(-1e9, device=device),
       )
       if self.rescale_logits:
         # MEA=False equivalent: Q*√d then divide by √d → net scale = 1.0.
@@ -366,9 +353,8 @@ class MultiHeadAttention(nn.Module):
         # internally, so the pre-multiplication and rescaling cancel out.
         query = query * math.sqrt(self.head_dim)
         attn_logits = (
-            torch.matmul(query, key.transpose(-2, -1))
-            / math.sqrt(self.head_dim)
-            + float_mask
+          torch.matmul(query, key.transpose(-2, -1)) / math.sqrt(self.head_dim)
+          + float_mask
         )
       else:
         # MEA=True equivalent: Q*√d, no internal division → net scale = √d.
@@ -402,9 +388,9 @@ class MixingTransformer(nn.Module):
   """
 
   def __init__(
-      self,
-      config: configs.TransformerConfig,
-      use_variate_attention: bool = True,
+    self,
+    config: configs.TransformerConfig,
+    use_variate_attention: bool = True,
   ):
     super().__init__()
     self.config = config
@@ -419,16 +405,16 @@ class MixingTransformer(nn.Module):
     #   net scale=1.0).
     rescale_logits = not getattr(config, "use_memory_efficient_attention", False)
     self.seq_attn = MultiHeadAttention(
-        num_heads=config.num_heads,
-        in_features=config.model_dims,
-        use_per_dim_scale=True,
-        use_rotary_position_embeddings=config.use_rope_seq,
-        qk_norm=config.qk_norm,
-        v_norm=getattr(config, "v_norm", "none"),
-        causal_attention=getattr(config, "causal_attention", True),
-        use_bias=config.use_bias,
-        use_sdpa=config.use_sdpa,
-        rescale_logits=rescale_logits,
+      num_heads=config.num_heads,
+      in_features=config.model_dims,
+      use_per_dim_scale=True,
+      use_rotary_position_embeddings=config.use_rope_seq,
+      qk_norm=config.qk_norm,
+      v_norm=getattr(config, "v_norm", "none"),
+      causal_attention=getattr(config, "causal_attention", True),
+      use_bias=config.use_bias,
+      use_sdpa=config.use_sdpa,
+      rescale_logits=rescale_logits,
     )
 
     # Variate attention norms + module
@@ -436,37 +422,33 @@ class MixingTransformer(nn.Module):
       self.pre_var_attn_ln = nn.RMSNorm(config.model_dims)
       self.post_var_attn_ln = nn.RMSNorm(config.model_dims)
       self.var_attn = MultiHeadAttention(
-          num_heads=config.num_heads,
-          in_features=config.model_dims,
-          use_per_dim_scale=True,
-          use_rotary_position_embeddings=config.use_rope_var,
-          qk_norm=config.qk_norm,
-          v_norm=getattr(config, "v_norm", "none"),
-          causal_attention=False,
-          use_bias=config.use_bias,
-          use_sdpa=config.use_sdpa,
-          rescale_logits=rescale_logits,
+        num_heads=config.num_heads,
+        in_features=config.model_dims,
+        use_per_dim_scale=True,
+        use_rotary_position_embeddings=config.use_rope_var,
+        qk_norm=config.qk_norm,
+        v_norm=getattr(config, "v_norm", "none"),
+        causal_attention=False,
+        use_bias=config.use_bias,
+        use_sdpa=config.use_sdpa,
+        rescale_logits=rescale_logits,
       )
 
     # FFN norms + layers
     self.pre_ff_ln = nn.RMSNorm(config.model_dims)
     self.post_ff_ln = nn.RMSNorm(config.model_dims)
-    self.ff0 = nn.Linear(
-        config.model_dims, config.hidden_dims, bias=config.use_bias
-    )
-    self.ff1 = nn.Linear(
-        config.hidden_dims, config.model_dims, bias=config.use_bias
-    )
+    self.ff0 = nn.Linear(config.model_dims, config.hidden_dims, bias=config.use_bias)
+    self.ff1 = nn.Linear(config.hidden_dims, config.model_dims, bias=config.use_bias)
     self.activation = util.get_activation_fn(config.ff_activation)
 
   def forward(
-      self,
-      input_embeddings: torch.Tensor,
-      patch_mask: torch.Tensor,
-      segment_ids: torch.Tensor | None = None,
-      segment_pos: torch.Tensor | None = None,
-      decode_cache: util.DecodeCache | None = None,
-      var_segment_pos: torch.Tensor | None = None,
+    self,
+    input_embeddings: torch.Tensor,
+    patch_mask: torch.Tensor,
+    segment_ids: torch.Tensor | None = None,
+    segment_pos: torch.Tensor | None = None,
+    decode_cache: util.DecodeCache | None = None,
+    var_segment_pos: torch.Tensor | None = None,
   ) -> tuple[torch.Tensor, util.DecodeCache | None, torch.Tensor]:
     """Forward pass.
 
@@ -501,11 +483,11 @@ class MixingTransformer(nn.Module):
       seq_seg_pos_flat = seg_pos_bvn.reshape(b * v, n)
 
     seq_attn_out_flat, decode_cache, seq_attn_mask = self.seq_attn(
-        seq_attn_in_flat,
-        segment_ids=seq_seg_ids_flat,
-        segment_pos=seq_seg_pos_flat,
-        decode_cache=decode_cache,
-        patch_mask=patch_mask_flat,
+      seq_attn_in_flat,
+      segment_ids=seq_seg_ids_flat,
+      segment_pos=seq_seg_pos_flat,
+      decode_cache=decode_cache,
+      patch_mask=patch_mask_flat,
     )
     seq_attn_out = seq_attn_out_flat.view(b, v, n, d)
     h1 = self.post_seq_attn_ln(seq_attn_out) + input_embeddings
@@ -519,10 +501,10 @@ class MixingTransformer(nn.Module):
       var_patch_mask = patch_mask.permute(0, 2, 1).reshape(b * n, v)
 
       var_attn_out_flat, _, _ = self.var_attn(
-          var_attn_in_flat,
-          segment_pos=var_segment_pos,
-          decode_cache=None,
-          patch_mask=var_patch_mask,
+        var_attn_in_flat,
+        segment_pos=var_segment_pos,
+        decode_cache=None,
+        patch_mask=var_patch_mask,
       )
       # (b*n, v, d) -> (b, n, v, d) -> (b, v, n, d)
       var_attn_out = var_attn_out_flat.view(b, n, v, d).permute(0, 2, 1, 3)
@@ -541,28 +523,30 @@ class StackedMixingTransformer(nn.Module):
   """Stacked MixingTransformer layers."""
 
   def __init__(
-      self,
-      config: configs.StackedTransformersConfig,
-      use_variate_attention: bool = True,
+    self,
+    config: configs.StackedTransformersConfig,
+    use_variate_attention: bool = True,
   ):
     super().__init__()
     self.config = config
-    self.layers = nn.ModuleList([
+    self.layers = nn.ModuleList(
+      [
         MixingTransformer(
-            config=config.transformer,
-            use_variate_attention=use_variate_attention,
+          config=config.transformer,
+          use_variate_attention=use_variate_attention,
         )
         for _ in range(config.num_layers)
-    ])
+      ]
+    )
 
   def forward(
-      self,
-      input_embeddings: torch.Tensor,
-      patch_mask: torch.Tensor,
-      segment_ids: torch.Tensor | None = None,
-      segment_pos: torch.Tensor | None = None,
-      decode_cache: list[util.DecodeCache] | None = None,
-      var_segment_pos: torch.Tensor | None = None,
+    self,
+    input_embeddings: torch.Tensor,
+    patch_mask: torch.Tensor,
+    segment_ids: torch.Tensor | None = None,
+    segment_pos: torch.Tensor | None = None,
+    decode_cache: list[util.DecodeCache] | None = None,
+    var_segment_pos: torch.Tensor | None = None,
   ) -> tuple[torch.Tensor, list[util.DecodeCache] | None, list[torch.Tensor]]:
     """Forward pass through all layers.
 
@@ -586,12 +570,12 @@ class StackedMixingTransformer(nn.Module):
 
     for i, layer in enumerate(self.layers):
       output, layer_cache, layer_mask = layer(
-          output,
-          patch_mask,
-          segment_ids,
-          segment_pos,
-          decode_cache[i],  # pyrefly: ignore[unsupported-operation]
-          var_segment_pos,
+        output,
+        patch_mask,
+        segment_ids,
+        segment_pos,
+        decode_cache[i],  # pyrefly: ignore[unsupported-operation]
+        var_segment_pos,
       )
       new_caches.append(layer_cache)
       attn_masks.append(layer_mask)

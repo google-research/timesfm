@@ -4,12 +4,11 @@ from __future__ import annotations
 
 import dataclasses
 import os
-import tempfile
-from typing import Callable
+from collections.abc import Callable
 
-from safetensors import torch as safetensors_torch
 import torch
 import torch.nn.functional as F
+from safetensors import torch as safetensors_torch
 
 _TOLERANCE = 1e-6
 
@@ -39,15 +38,15 @@ class DecodeCache:
 
   @classmethod
   def init_decode_cache(
-      cls,
-      num_layers: int,
-      batch_size: int,
-      num_variates: int,
-      num_total_input_patches: int,
-      num_heads: int,
-      head_dim: int,
-      device: torch.device | None = None,
-  ) -> list["DecodeCache"]:
+    cls,
+    num_layers: int,
+    batch_size: int,
+    num_variates: int,
+    num_total_input_patches: int,
+    num_heads: int,
+    head_dim: int,
+    device: torch.device | None = None,
+  ) -> list[DecodeCache]:
     """Initializes a list of decode caches for stacked layers.
 
     Args:
@@ -64,38 +63,34 @@ class DecodeCache:
     """
     leading_size = batch_size * num_variates
     return [
-        cls(
-            next_index=torch.zeros(
-                leading_size, dtype=torch.int32, device=device
-            ),
-            num_front_masked=torch.zeros(
-                leading_size, dtype=torch.int32, device=device
-            ),
-            key=torch.zeros(
-                leading_size,
-                num_total_input_patches,
-                num_heads,
-                head_dim,
-                device=device,
-            ),
-            value=torch.zeros(
-                leading_size,
-                num_total_input_patches,
-                num_heads,
-                head_dim,
-                device=device,
-            ),
-        )
-        for _ in range(num_layers)
+      cls(
+        next_index=torch.zeros(leading_size, dtype=torch.int32, device=device),
+        num_front_masked=torch.zeros(leading_size, dtype=torch.int32, device=device),
+        key=torch.zeros(
+          leading_size,
+          num_total_input_patches,
+          num_heads,
+          head_dim,
+          device=device,
+        ),
+        value=torch.zeros(
+          leading_size,
+          num_total_input_patches,
+          num_heads,
+          head_dim,
+          device=device,
+        ),
+      )
+      for _ in range(num_layers)
     ]
 
 
 def update_running_stats(
-    n: torch.Tensor,
-    mu: torch.Tensor,
-    sigma: torch.Tensor,
-    x: torch.Tensor,
-    mask: torch.Tensor,
+  n: torch.Tensor,
+  mu: torch.Tensor,
+  sigma: torch.Tensor,
+  x: torch.Tensor,
+  mask: torch.Tensor,
 ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
   """Updates running stats with a new patch of data.
 
@@ -120,45 +115,43 @@ def update_running_stats(
 
   # std of valid elements in patch
   x_diff_sq = torch.where(
-      is_legit, (x - inc_mu.unsqueeze(-1)) ** 2, torch.zeros_like(x)
+    is_legit, (x - inc_mu.unsqueeze(-1)) ** 2, torch.zeros_like(x)
   )
   inc_var = torch.where(
-      inc_n == 0,
-      torch.zeros_like(inc_sum),
-      x_diff_sq.sum(dim=-1) / inc_n,
+    inc_n == 0,
+    torch.zeros_like(inc_sum),
+    x_diff_sq.sum(dim=-1) / inc_n,
   )
   inc_sigma = torch.sqrt(inc_var)
 
   new_n = n + inc_n
   new_mu = torch.where(
-      new_n == 0,
-      torch.zeros_like(mu),
-      (n * mu + inc_mu * inc_n) / new_n,
+    new_n == 0,
+    torch.zeros_like(mu),
+    (n * mu + inc_mu * inc_n) / new_n,
   )
   new_sigma = torch.sqrt(
-      torch.where(
-          new_n == 0,
-          torch.zeros_like(sigma),
-          (
-              n * sigma * sigma
-              + inc_n * inc_sigma * inc_sigma
-              + n * (mu - new_mu) * (mu - new_mu)
-              + inc_n * (inc_mu - new_mu) * (inc_mu - new_mu)
-          )
-          / new_n,
+    torch.where(
+      new_n == 0,
+      torch.zeros_like(sigma),
+      (
+        n * sigma * sigma
+        + inc_n * inc_sigma * inc_sigma
+        + n * (mu - new_mu) * (mu - new_mu)
+        + inc_n * (inc_mu - new_mu) * (inc_mu - new_mu)
       )
+      / new_n,
+    )
   )
   return new_n, new_mu, new_sigma
 
 
 def get_running_stats(
-    values: torch.Tensor,
-    masks: torch.Tensor,
-    *,
-    segment_ids: torch.Tensor | None = None,
-    initial_stats: (
-        tuple[torch.Tensor, torch.Tensor, torch.Tensor] | None
-    ) = None,
+  values: torch.Tensor,
+  masks: torch.Tensor,
+  *,
+  segment_ids: torch.Tensor | None = None,
+  initial_stats: (tuple[torch.Tensor, torch.Tensor, torch.Tensor] | None) = None,
 ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
   """Computes cumulative running statistics patch-by-patch.
 
@@ -204,24 +197,24 @@ def get_running_stats(
     cur_sigma = torch.where(reset, init_sigma, cur_sigma)
 
     cur_n, cur_mu, cur_sigma = update_running_stats(
-        cur_n, cur_mu, cur_sigma, values[:, :, i, :], masks[:, :, i, :]
+      cur_n, cur_mu, cur_sigma, values[:, :, i, :], masks[:, :, i, :]
     )
     all_n.append(cur_n)
     all_mu.append(cur_mu)
     all_sigma.append(cur_sigma)
 
   return (
-      torch.stack(all_n, dim=2),
-      torch.stack(all_mu, dim=2),
-      torch.stack(all_sigma, dim=2),
+    torch.stack(all_n, dim=2),
+    torch.stack(all_mu, dim=2),
+    torch.stack(all_sigma, dim=2),
   )
 
 
 def revin(
-    x: torch.Tensor,
-    mu: torch.Tensor,
-    sigma: torch.Tensor,
-    reverse: bool = False,
+  x: torch.Tensor,
+  mu: torch.Tensor,
+  sigma: torch.Tensor,
+  reverse: bool = False,
 ) -> torch.Tensor:
   """Reversible per-instance normalization.
 
@@ -251,7 +244,7 @@ def revin(
 
 
 def get_output_patch_via_roll(
-    x: torch.Tensor, rolls: int
+  x: torch.Tensor, rolls: int
 ) -> tuple[torch.Tensor, torch.Tensor]:
   """Creates labels of output_patch length by rolling the patched inputs.
 
@@ -274,7 +267,7 @@ def get_output_patch_via_roll(
 
   for i in range(rolls):
     rolling_mat[:, :, :, i + 1, :] = torch.roll(
-        rolling_mat[:, :, :, i, :], shifts=-1, dims=2
+      rolling_mat[:, :, :, i, :], shifts=-1, dims=2
     )
 
   # Take [1:] along the roll axis and flatten
@@ -290,30 +283,30 @@ def get_output_patch_via_roll(
 
 
 _ACTIVATIONS: dict[str, Callable[[torch.Tensor], torch.Tensor]] = {
-    "relu": F.relu,
-    "swish": F.silu,
-    "silu": F.silu,
-    "swiglu": F.silu,
-    "none": lambda x: x,
+  "relu": F.relu,
+  "swish": F.silu,
+  "silu": F.silu,
+  "swiglu": F.silu,
+  "none": lambda x: x,
 }
 
 
 def get_activation_fn(
-    activation_name: str,
+  activation_name: str,
 ) -> Callable[[torch.Tensor], torch.Tensor]:
   """Returns the activation function for the given name."""
   try:
     return _ACTIVATIONS[activation_name]
   except KeyError:
     raise ValueError(
-        f"Activation: {activation_name} not supported. Supported "
-        f"activations: {list(_ACTIVATIONS.keys())}"
+      f"Activation: {activation_name} not supported. Supported "
+      f"activations: {list(_ACTIVATIONS.keys())}"
     ) from None
 
 
 def load_safetensors(
-    pytorch_safetensors_path: str,
-    device: str | torch.device = "cpu",
+  pytorch_safetensors_path: str,
+  device: str | torch.device = "cpu",
 ) -> dict[str, torch.Tensor]:
   """Loads a PyTorch state dict from a safetensors file.
 
@@ -329,8 +322,8 @@ def load_safetensors(
 
 
 def stitch_patches(
-    patch_preds: torch.Tensor,
-    patch_len: int,
+  patch_preds: torch.Tensor,
+  patch_len: int,
 ) -> torch.Tensor:
   """Stitches overlapping patch predictions.
 
@@ -354,7 +347,7 @@ def stitch_patches(
     return patch_preds[:, :, 0, :, :]
 
   stitch_weights = torch.linspace(
-      1.0, 0.0, overlap, device=patch_preds.device, dtype=patch_preds.dtype
+    1.0, 0.0, overlap, device=patch_preds.device, dtype=patch_preds.dtype
   )
   stitch_weights = stitch_weights[None, None, None, :, None]
 
@@ -367,8 +360,7 @@ def stitch_patches(
   next_overlaps = next_patches[:, :, :, :overlap, :]
 
   stitched_overlaps = (
-      stitch_weights * prev_overlaps
-      + (1.0 - stitch_weights) * next_overlaps
+    stitch_weights * prev_overlaps + (1.0 - stitch_weights) * next_overlaps
   )
 
   middles = next_patches[:, :, :, overlap:patch_len, :]
@@ -380,4 +372,3 @@ def stitch_patches(
   tail = patch_preds[:, :, -1, patch_len:, :]
 
   return torch.cat([first_chunk, mid, tail], dim=2)
-

@@ -28,8 +28,8 @@ class PerDimScale(nn.Module):
   def forward(self, x: torch.Tensor) -> torch.Tensor:
     """Applies per-dim scaling to the last dimension of x."""
     return (
-        x
-        * _RECIPROCAL_OF_SOFTPLUS_0
-        / math.sqrt(self.num_dims)
-        * torch.nn.functional.softplus(self.per_dim_scale)
+      x
+      * _RECIPROCAL_OF_SOFTPLUS_0
+      / math.sqrt(self.num_dims)
+      * torch.nn.functional.softplus(self.per_dim_scale)
     )

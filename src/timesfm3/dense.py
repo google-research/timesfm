@@ -5,8 +5,7 @@ from __future__ import annotations
 import torch
 from torch import nn
 
-from . import configs
-from . import util
+from . import configs, util
 
 
 class ResidualBlock(nn.Module):
@@ -30,23 +29,23 @@ class ResidualBlock(nn.Module):
     # the first forward pass (using `set_input_dims()`) before the matrix
     # multiplication is evaluated, avoiding shape mismatch errors.
     self.hidden_layer = nn.Linear(
-        in_features=config.hidden_dims,  # placeholder, set in first forward
-        out_features=config.hidden_dims,
-        bias=config.use_bias,
+      in_features=config.hidden_dims,  # placeholder, set in first forward
+      out_features=config.hidden_dims,
+      bias=config.use_bias,
     )
     self.output_layer = nn.Linear(
-        in_features=config.hidden_dims,
-        out_features=config.output_dims,
-        bias=config.use_bias,
+      in_features=config.hidden_dims,
+      out_features=config.output_dims,
+      bias=config.use_bias,
     )
 
     if config.identity_skip:
       self.residual_layer = None
     else:
       self.residual_layer = nn.Linear(
-          in_features=config.hidden_dims,  # placeholder
-          out_features=config.output_dims,
-          bias=config.use_bias,
+        in_features=config.hidden_dims,  # placeholder
+        out_features=config.output_dims,
+        bias=config.use_bias,
       )
 
     self.activation = util.get_activation_fn(config.activation)
@@ -67,16 +66,16 @@ class ResidualBlock(nn.Module):
     dtype = self.hidden_layer.weight.dtype
 
     self.hidden_layer = nn.Linear(
-        input_dim, self.config.hidden_dims, bias=self.config.use_bias
+      input_dim, self.config.hidden_dims, bias=self.config.use_bias
     ).to(device=device, dtype=dtype)
     self.output_layer = nn.Linear(
-        self.config.hidden_dims,
-        self.config.output_dims,
-        bias=self.config.use_bias,
+      self.config.hidden_dims,
+      self.config.output_dims,
+      bias=self.config.use_bias,
     ).to(device=device, dtype=dtype)
     if self.residual_layer is not None:
       self.residual_layer = nn.Linear(
-          input_dim, self.config.output_dims, bias=self.config.use_bias
+        input_dim, self.config.output_dims, bias=self.config.use_bias
       ).to(device=device, dtype=dtype)
     if self.pre_norm is not None:
       self.pre_norm = nn.RMSNorm(input_dim).to(device=device, dtype=dtype)

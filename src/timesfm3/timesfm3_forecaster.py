@@ -4,17 +4,16 @@ from __future__ import annotations
 
 import dataclasses
 import gc
-import logging
 import math
 import os
-from typing import Any, Iterator
+from collections.abc import Iterator
+from typing import Any
 
 import numpy as np
 import torch
 
-from . import configs
+from . import configs, util
 from . import model as torch_model_lib
-from . import util
 
 _MAX_CONTEXT_LENGTH = 16384
 _SIGMA_THRESHOLD: float = 1e-7
@@ -25,8 +24,8 @@ _GC_MEMORY_THRESHOLD: float = 0.9
 class _ModelConfig:
   """Configuration for a PyTorch TimesFM3 forecaster."""
 
-  # Path to checkpoint file (.pth or .safetensors).
-  checkpoint_path: str = "~/models/tfm3/timesfm3_torch_1944000.safetensors"
+  # Path to checkpoint file (.pth or .safetensors) or Hugging Face repo ID.
+  checkpoint_path: str = "google/timesfm-3.0-pytorch"
 
   # Batch size to use for inference.
   per_core_batch_size: int = 4
@@ -39,7 +38,7 @@ class _ModelConfig:
 
   # Quantiles to predict.
   quantiles: list[float] = dataclasses.field(
-      default_factory=lambda: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+    default_factory=lambda: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
   )
 
   # Median quantile index for the forecast.
@@ -97,8 +96,8 @@ class ForecastOutput:
 
 
 def try_gc(
-    device: torch.device | str | None = None,
-    gc_memory_threshold: float = _GC_MEMORY_THRESHOLD,
+  device: torch.device | str | None = None,
+  gc_memory_threshold: float = _GC_MEMORY_THRESHOLD,
 ) -> None:
   """Trigger Python GC and empty CUDA cache if memory exceeds threshold."""
   if device is not None and torch.cuda.is_available():
@@ -193,26 +192,28 @@ class _Query:
   def context_length(self) -> int:
     return self.targets.shape[-1]
 
-  def format(self, global_context: int) -> tuple[
-      int,
-      np.ndarray,
-      np.ndarray,
-      np.ndarray | None,
-      np.ndarray | None,
-      bool,
+  def format(
+    self, global_context: int
+  ) -> tuple[
+    int,
+    np.ndarray,
+    np.ndarray,
+    np.ndarray | None,
+    np.ndarray | None,
+    bool,
   ]:
     """Formats and left-pads/truncates the query to global_context length."""
     targets = np.atleast_2d(self.targets)
     masks = np.zeros((self.context_length,), dtype=bool)
     past_only_covariates = (
-        np.atleast_2d(self.past_only_covariates)
-        if self.past_only_covariates is not None
-        else None
+      np.atleast_2d(self.past_only_covariates)
+      if self.past_only_covariates is not None
+      else None
     )
     past_future_covariates = (
-        np.atleast_2d(self.past_future_covariates)
-        if self.past_future_covariates is not None
-        else None
+      np.atleast_2d(self.past_future_covariates)
+      if self.past_future_covariates is not None
+      else None
     )
 
     if self.context_length > global_context:
@@ -222,99 +223,99 @@ class _Query:
         past_only_covariates = past_only_covariates[:, -global_context:]
       if past_future_covariates is not None:
         past_future_covariates = past_future_covariates[
-            :, -(global_context + self.horizon) :
+          :, -(global_context + self.horizon) :
         ]
     elif self.context_length < global_context:
       pad_len = global_context - self.context_length
       targets = np.pad(
-          targets,
-          [(0, 0), (pad_len, 0)],
-          mode="constant",
-          constant_values=0.0,
+        targets,
+        [(0, 0), (pad_len, 0)],
+        mode="constant",
+        constant_values=0.0,
       )
       masks = np.pad(
-          masks,
-          [(pad_len, 0)],
-          mode="constant",
-          constant_values=True,
+        masks,
+        [(pad_len, 0)],
+        mode="constant",
+        constant_values=True,
       )
       if self.padded:
         masks = np.ones_like(masks, dtype=bool)
       if past_only_covariates is not None:
         past_only_covariates = np.pad(
-            past_only_covariates,
-            [(0, 0), (pad_len, 0)],
-            mode="constant",
-            constant_values=0.0,
+          past_only_covariates,
+          [(0, 0), (pad_len, 0)],
+          mode="constant",
+          constant_values=0.0,
         )
       if past_future_covariates is not None:
         past_future_covariates = np.pad(
-            past_future_covariates,
-            [(0, 0), (pad_len, 0)],
-            mode="constant",
-            constant_values=0.0,
+          past_future_covariates,
+          [(0, 0), (pad_len, 0)],
+          mode="constant",
+          constant_values=0.0,
         )
 
     return (
-        self.horizon,
-        targets,
-        masks,
-        past_only_covariates,
-        past_future_covariates,
-        self.padded,
+      self.horizon,
+      targets,
+      masks,
+      past_only_covariates,
+      past_future_covariates,
+      self.padded,
     )
 
 
 def _make_torch_model(
-    config: _ModelConfig,
+  config: _ModelConfig,
 ) -> torch_model_lib.TimesFM3Torch:
   """Builds a PyTorch model using ModelConfig."""
   resblock_config = (
-      config.residual_block_config
-      if config.residual_block_config is not None
-      else configs.ResidualBlockConfig(
-          hidden_dims=1280,
-          output_dims=1280,
-          use_bias=False,
-          activation="relu",
-      )
+    config.residual_block_config
+    if config.residual_block_config is not None
+    else configs.ResidualBlockConfig(
+      hidden_dims=1280,
+      output_dims=1280,
+      use_bias=False,
+      activation="relu",
+    )
   )
 
   transformer_config = (
-      config.transformer_config
-      if config.transformer_config is not None
-      else configs.StackedTransformersConfig(
-          num_layers=20,
-          transformer=configs.TransformerConfig(
-              model_dims=1280,
-              hidden_dims=1280,
-              num_heads=16,
-              attention_norm="rms",
-              feedforward_norm="rms",
-              qk_norm="rms",
-              use_rope_seq=True,
-              use_rope_var=True,
-              use_bias=False,
-              ff_activation="relu",
-              deterministic=True,
-          ),
-      )
+    config.transformer_config
+    if config.transformer_config is not None
+    else configs.StackedTransformersConfig(
+      num_layers=20,
+      transformer=configs.TransformerConfig(
+        model_dims=1280,
+        hidden_dims=1280,
+        num_heads=16,
+        attention_norm="rms",
+        feedforward_norm="rms",
+        qk_norm="rms",
+        use_rope_seq=True,
+        use_rope_var=True,
+        use_bias=False,
+        ff_activation="relu",
+        deterministic=True,
+      ),
+    )
   )
 
   t_model = torch_model_lib.TimesFM3Torch(
-      input_patch_len=config.input_patch_length,
-      output_patch_len=config.output_patch_length,
-      quantiles=config.quantiles,
-      use_variate_attention=config.use_variate_attention,
-      value_clip=config.value_clip,
-      input_transform=config.input_transform,
-      use_stitching=config.use_stitching,
-      use_linear_detrending=config.use_linear_detrending,
-      linear_detrending_threshold=config.linear_detrending_threshold,
-      use_iterative_cpm_revin=config.use_iterative_cpm_revin,
-      use_frozen_running_stats=config.use_frozen_running_stats,
-      residual_block_config=resblock_config,
-      transformer_config=transformer_config,
+    input_patch_len=config.input_patch_length,
+    output_patch_len=config.output_patch_length,
+    quantiles=config.quantiles,
+    use_variate_attention=config.use_variate_attention,
+    value_clip=config.value_clip,
+    input_transform=config.input_transform,
+    use_stitching=config.use_stitching,
+    use_linear_detrending=config.use_linear_detrending,
+    linear_detrending_threshold=config.linear_detrending_threshold,
+    use_iterative_cpm_revin=config.use_iterative_cpm_revin,
+    use_frozen_running_stats=config.use_frozen_running_stats,
+    residual_block_config=resblock_config,
+    transformer_config=transformer_config,
   )
   t_model.eval()
   input_dim = 2 * (t_model.input_patch_len + t_model.output_patch_len)
@@ -334,12 +335,27 @@ class TimesFM3Forecaster:
       self.config = config
     self._init_model()
 
+  @classmethod
+  def from_pretrained(
+    cls,
+    pretrained_model_name_or_path: str = "google/timesfm-3.0-pytorch",
+    device: str | None = None,
+    **kwargs: Any,
+  ) -> TimesFM3Forecaster:
+    """Instantiates a TimesFM3Forecaster from a pretrained HF repo or directory."""
+    config = _ModelConfig(
+      checkpoint_path=pretrained_model_name_or_path,
+      device=device,
+      **kwargs,
+    )
+    return cls(config=config)
+
   @property
   def global_context(self) -> int:
     """Max context length rounded up to the nearest input patch boundary."""
     return (
-        math.ceil(_MAX_CONTEXT_LENGTH / self.config.input_patch_length)
-        * self.config.input_patch_length
+      math.ceil(_MAX_CONTEXT_LENGTH / self.config.input_patch_length)
+      * self.config.input_patch_length
     )
 
   def _init_model(self):
@@ -349,87 +365,117 @@ class TimesFM3Forecaster:
     else:
       self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    self.model = _make_torch_model(self.config)
-
     checkpoint_path = os.path.expanduser(self.config.checkpoint_path)
-    if os.path.exists(checkpoint_path):
+
+    # If checkpoint_path is a directory with config.json or a Hugging Face repo ID:
+    is_local_dir = os.path.isdir(checkpoint_path)
+    is_local_file = os.path.isfile(checkpoint_path)
+
+    if is_local_dir or not is_local_file:
+      # Load via PyTorchModelHubMixin.from_pretrained (downloads config.json and weights)
+      self.model = torch_model_lib.TimesFM3Torch.from_pretrained(
+        checkpoint_path,
+      )
+      # Synchronize forecaster config with the loaded model config
+      median_q_idx = self.config.median_quantile_index
+      if median_q_idx >= len(self.model.quantiles):
+        median_q_idx = len(self.model.quantiles) // 2
+
+      self.config = dataclasses.replace(
+        self.config,
+        input_patch_length=self.model.input_patch_len,
+        output_patch_length=self.model.output_patch_len,
+        quantiles=list(self.model.quantiles),
+        median_quantile_index=median_q_idx,
+        residual_block_config=self.model.residual_block_config,
+        transformer_config=self.model.transformer_config,
+        use_variate_attention=self.model.use_variate_attention,
+        value_clip=self.model.value_clip,
+        use_stitching=self.model.use_stitching,
+        use_linear_detrending=self.model.use_linear_detrending,
+        linear_detrending_threshold=self.model.linear_detrending_threshold,
+        use_iterative_cpm_revin=self.model.use_iterative_cpm_revin,
+        use_frozen_running_stats=self.model.use_frozen_running_stats,
+        input_transform=self.model.input_transform,
+      )
+    else:
+      # Local file (.safetensors or .pth / .pt)
+      self.model = _make_torch_model(self.config)
       if checkpoint_path.endswith(".safetensors"):
         state_dict = util.load_safetensors(checkpoint_path, device=self.device)
         self.model.load_state_dict(state_dict)
-      elif checkpoint_path.endswith(".pth") or checkpoint_path.endswith(".pt"):
+      elif checkpoint_path.endswith((".pth", ".pt")):
         state_dict = torch.load(checkpoint_path, map_location=self.device)
         self.model.load_state_dict(state_dict)
       else:
         raise ValueError(
-            f"Unsupported checkpoint path format: {checkpoint_path}. "
-            "Expected .safetensors or .pth / .pt file."
+          f"Unsupported checkpoint path format: {checkpoint_path}. "
+          "Expected .safetensors or .pth / .pt file."
         )
 
     self.model.to(self.device)
     self.model.eval()
 
   def predict(
-      self,
-      context: np.ndarray,
-      horizon: int,
-      past_only_covariates: np.ndarray | None = None,
-      past_future_covariates: np.ndarray | None = None,
-      ts_id: str | None = None,
-      return_quantiles: bool = False,
-      use_symmetric_averaging: bool = False,
-      make_positive: bool = False,
-      use_znorm: bool = False,
-      padding_mode: str = "none",
+    self,
+    context: np.ndarray,
+    horizon: int,
+    past_only_covariates: np.ndarray | None = None,
+    past_future_covariates: np.ndarray | None = None,
+    ts_id: str | None = None,
+    return_quantiles: bool = False,
+    use_symmetric_averaging: bool = False,
+    make_positive: bool = False,
+    use_znorm: bool = False,
+    padding_mode: str = "none",
   ) -> ForecastOutput:
     """Convenience wrapper: runs inference on a single time series."""
     results = list(
-        self.predict_batch(
-            contexts=[context],
-            horizon=horizon,
-            past_only_covariates=[past_only_covariates],
-            past_future_covariates=[past_future_covariates],
-            ts_ids=[ts_id] if ts_id is not None else None,
-            return_quantiles=return_quantiles,
-            use_symmetric_averaging=use_symmetric_averaging,
-            make_positive=make_positive,
-            use_znorm=use_znorm,
-            padding_mode=padding_mode,
-        )
+      self.predict_batch(
+        contexts=[context],
+        horizon=horizon,
+        past_only_covariates=[past_only_covariates],
+        past_future_covariates=[past_future_covariates],
+        ts_ids=[ts_id] if ts_id is not None else None,
+        return_quantiles=return_quantiles,
+        use_symmetric_averaging=use_symmetric_averaging,
+        make_positive=make_positive,
+        use_znorm=use_znorm,
+        padding_mode=padding_mode,
+      )
     )
     return results[0]
 
   def predict_batch(
-      self,
-      contexts: list[np.ndarray],
-      horizon: int,
-      past_only_covariates: list[np.ndarray | None] | None = None,
-      past_future_covariates: list[np.ndarray | None] | None = None,
-      ts_ids: list[str] | None = None,
-      return_quantiles: bool = False,
-      use_symmetric_averaging: bool = False,
-      make_positive: bool = False,
-      use_znorm: bool = False,
-      padding_mode: str = "none",
+    self,
+    contexts: list[np.ndarray],
+    horizon: int,
+    past_only_covariates: list[np.ndarray | None] | None = None,
+    past_future_covariates: list[np.ndarray | None] | None = None,
+    ts_ids: list[str] | None = None,
+    return_quantiles: bool = False,
+    use_symmetric_averaging: bool = False,
+    make_positive: bool = False,
+    use_znorm: bool = False,
+    padding_mode: str = "none",
   ) -> Iterator[ForecastOutput]:
     """Runs inference on a batch of time series with optional covariates."""
     global_horizon = (
-        math.ceil(horizon / self.config.output_patch_length)
-        * self.config.output_patch_length
+      math.ceil(horizon / self.config.output_patch_length)
+      * self.config.output_patch_length
     )
     num_original_ts = len(contexts)
-    original_ts_ids = (
-        list(ts_ids) if ts_ids is not None else [None] * num_original_ts
-    )
+    original_ts_ids = list(ts_ids) if ts_ids is not None else [None] * num_original_ts
 
     po_cov_list = (
-        list(past_only_covariates)
-        if past_only_covariates is not None
-        else [None] * num_original_ts
+      list(past_only_covariates)
+      if past_only_covariates is not None
+      else [None] * num_original_ts
     )
     pf_cov_list = (
-        list(past_future_covariates)
-        if past_future_covariates is not None
-        else [None] * num_original_ts
+      list(past_future_covariates)
+      if past_future_covariates is not None
+      else [None] * num_original_ts
     )
 
     contexts_2d: list[np.ndarray] = []
@@ -466,9 +512,9 @@ class TimesFM3Forecaster:
     for idx, ctx in enumerate(contexts_2d):
       if ctx.shape[0] != num_targets_in:
         raise ValueError(
-            "All contexts must have the same number of target variates, but"
-            f" contexts[0] has {num_targets_in} and contexts[{idx}] has"
-            f" {ctx.shape[0]}."
+          "All contexts must have the same number of target variates, but"
+          f" contexts[0] has {num_targets_in} and contexts[{idx}] has"
+          f" {ctx.shape[0]}."
         )
 
     is_univariate = num_targets_in == 1
@@ -546,12 +592,12 @@ class TimesFM3Forecaster:
     queries: list[_Query] = []
     for idx, ctx in enumerate(contexts_2d):
       queries.append(
-          _Query(
-              horizon=global_horizon,
-              targets=ctx,
-              past_only_covariates=po_2d[idx],
-              past_future_covariates=pf_2d[idx],
-          )
+        _Query(
+          horizon=global_horizon,
+          targets=ctx,
+          past_only_covariates=po_2d[idx],
+          past_future_covariates=pf_2d[idx],
+        )
       )
 
     if not queries:
@@ -572,48 +618,48 @@ class TimesFM3Forecaster:
       formatted_batch = [q.format(self.global_context) for q in query_batch]
 
       (
-          batched_hor,
-          batched_tgt,
-          batched_mask,
-          batched_po,
-          batched_pf,
-          _,
+        batched_hor,
+        batched_tgt,
+        batched_mask,
+        batched_po,
+        batched_pf,
+        _,
       ) = tuple(list(w) for w in zip(*formatted_batch))
 
       tgt_torch = torch.from_numpy(np.stack(batched_tgt, axis=0)).to(
-          self.device, dtype=torch.float32
+        self.device, dtype=torch.float32
       )
       mask_torch = torch.from_numpy(np.stack(batched_mask, axis=0)).to(
-          self.device, dtype=torch.bool
+        self.device, dtype=torch.bool
       )
 
       po_torch = None
       if any(po is not None for po in batched_po):
         po_arrs = [
-            po if po is not None else np.zeros_like(batched_tgt[j])
-            for j, po in enumerate(batched_po)
+          po if po is not None else np.zeros_like(batched_tgt[j])
+          for j, po in enumerate(batched_po)
         ]
         po_torch = torch.from_numpy(np.stack(po_arrs, axis=0)).to(
-            self.device, dtype=torch.float32
+          self.device, dtype=torch.float32
         )
 
       pf_torch = None
       if any(pf is not None for pf in batched_pf):
         pf_arrs = [
-            pf if pf is not None else np.zeros_like(batched_tgt[j])
-            for j, pf in enumerate(batched_pf)
+          pf if pf is not None else np.zeros_like(batched_tgt[j])
+          for j, pf in enumerate(batched_pf)
         ]
         pf_torch = torch.from_numpy(np.stack(pf_arrs, axis=0)).to(
-            self.device, dtype=torch.float32
+          self.device, dtype=torch.float32
         )
 
       with torch.no_grad():
         out_logits = self.model.decode(
-            target=tgt_torch,
-            horizon=batched_hor[0],
-            past_only_covariates=po_torch,
-            past_future_covariates=pf_torch,
-            mask=mask_torch,
+          target=tgt_torch,
+          horizon=batched_hor[0],
+          past_only_covariates=po_torch,
+          past_future_covariates=pf_torch,
+          mask=mask_torch,
         )
       ys.append(out_logits.cpu().numpy())
       try_gc(self.device)
@@ -621,11 +667,9 @@ class TimesFM3Forecaster:
     all_raw_outputs = np.concatenate(ys, axis=0)
 
     num_relevant_outputs = (
-        2 * num_original_ts if use_symmetric_averaging else num_original_ts
+      2 * num_original_ts if use_symmetric_averaging else num_original_ts
     )
-    all_raw_outputs = all_raw_outputs[
-        :num_relevant_outputs, :num_targets_in, :, :
-    ]
+    all_raw_outputs = all_raw_outputs[:num_relevant_outputs, :num_targets_in, :, :]
 
     if use_symmetric_averaging:
       ys_pos = all_raw_outputs[0::2]
@@ -659,13 +703,13 @@ class TimesFM3Forecaster:
       if is_univariate:
         raw = raw[0]
         yield ForecastOutput(
-            ts_id=original_ts_ids[i],
-            forecast=raw[:horizon, self.config.median_quantile_index],
-            quantiles=raw[:horizon, :] if return_quantiles else None,
+          ts_id=original_ts_ids[i],
+          forecast=raw[:horizon, self.config.median_quantile_index],
+          quantiles=raw[:horizon, :] if return_quantiles else None,
         )
       else:
         yield ForecastOutput(
-            ts_id=original_ts_ids[i],
-            forecast=raw[:, :horizon, self.config.median_quantile_index],
-            quantiles=raw[:, :horizon, :] if return_quantiles else None,
+          ts_id=original_ts_ids[i],
+          forecast=raw[:, :horizon, self.config.median_quantile_index],
+          quantiles=raw[:, :horizon, :] if return_quantiles else None,
         )

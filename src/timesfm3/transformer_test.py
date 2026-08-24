@@ -15,7 +15,7 @@
 """Tests for TimesFM3 PyTorch transformer layers."""
 
 import unittest
-import numpy as np
+
 import torch
 
 from . import configs
@@ -24,12 +24,11 @@ from . import util as torch_util
 
 
 class MaskTest(unittest.TestCase):
-
   def test_make_attn_mask_causal(self):
     query_len = 4
     num_masked = torch.tensor([1])
     mask = torch_trans.make_attn_mask(
-        query_length=query_len, num_all_masked_kv=num_masked, causal=True
+      query_length=query_len, num_all_masked_kv=num_masked, causal=True
     )
     # Shape: (1, 1, 4, 4)
     self.assertEqual(mask.shape, (1, 1, 4, 4))
@@ -49,7 +48,6 @@ class MaskTest(unittest.TestCase):
 
 
 class RotaryEmbeddingTest(unittest.TestCase):
-
   def test_rope_forward(self):
     rope = torch_trans.RotaryPositionalEmbedding(embedding_dims=16)
     x = torch.randn(2, 8, 16)
@@ -65,57 +63,53 @@ class RotaryEmbeddingTest(unittest.TestCase):
 
 
 class MultiHeadAttentionTest(unittest.TestCase):
-
   def test_mha_forward_and_cache(self):
     mha = torch_trans.MultiHeadAttention(
-        num_heads=4,
-        in_features=64,
-        qk_norm="rms",
-        use_bias=False,
-        use_sdpa=True,
+      num_heads=4,
+      in_features=64,
+      qk_norm="rms",
+      use_bias=False,
+      use_sdpa=True,
     )
     b, n, d = 2, 8, 64
     x = torch.randn(b, n, d)
     patch_mask = torch.zeros(b, n, dtype=torch.bool)
 
     # Full forward pass
-    out, cache, mask = mha(x, patch_mask=patch_mask)
+    out, cache, _ = mha(x, patch_mask=patch_mask)
     self.assertEqual(out.shape, (b, n, d))
     self.assertIsNone(cache)
 
     # Decode mode with cache
     decode_cache = torch_util.DecodeCache(
-        next_index=torch.zeros(b, dtype=torch.int32),
-        num_front_masked=torch.zeros(b, dtype=torch.int32),
-        key=torch.zeros(b, 16, 4, 16),
-        value=torch.zeros(b, 16, 4, 16),
+      next_index=torch.zeros(b, dtype=torch.int32),
+      num_front_masked=torch.zeros(b, dtype=torch.int32),
+      key=torch.zeros(b, 16, 4, 16),
+      value=torch.zeros(b, 16, 4, 16),
     )
     q_x = torch.randn(b, 1, d)
     q_mask = torch.zeros(b, 1, dtype=torch.bool)
-    out_step, updated_cache, _ = mha(
-        q_x, patch_mask=q_mask, decode_cache=decode_cache
-    )
+    out_step, updated_cache, _ = mha(q_x, patch_mask=q_mask, decode_cache=decode_cache)
     self.assertEqual(out_step.shape, (b, 1, d))
     self.assertIsNotNone(updated_cache)
     self.assertEqual(updated_cache.next_index[0].item(), 1)
 
 
 class MixingTransformerTest(unittest.TestCase):
-
   def test_mixing_transformer_forward(self):
     cfg = configs.TransformerConfig(
-        model_dims=64,
-        hidden_dims=64,
-        num_heads=4,
-        attention_norm="rms",
-        feedforward_norm="rms",
-        qk_norm="rms",
-        use_rope_seq=True,
-        use_rope_var=True,
-        use_bias=False,
-        ff_activation="relu",
-        deterministic=True,
-        use_sdpa=True,
+      model_dims=64,
+      hidden_dims=64,
+      num_heads=4,
+      attention_norm="rms",
+      feedforward_norm="rms",
+      qk_norm="rms",
+      use_rope_seq=True,
+      use_rope_var=True,
+      use_bias=False,
+      ff_activation="relu",
+      deterministic=True,
+      use_sdpa=True,
     )
     layer = torch_trans.MixingTransformer(config=cfg, use_variate_attention=True)
     b, v, n, d = 2, 3, 8, 64
@@ -128,35 +122,34 @@ class MixingTransformerTest(unittest.TestCase):
 
 
 class StackedMixingTransformerTest(unittest.TestCase):
-
   def test_stacked_transformer(self):
     sub_cfg = configs.TransformerConfig(
-        model_dims=64,
-        hidden_dims=64,
-        num_heads=4,
-        attention_norm="rms",
-        feedforward_norm="rms",
-        qk_norm="rms",
-        use_rope_seq=True,
-        use_rope_var=True,
-        use_bias=False,
-        ff_activation="relu",
-        deterministic=True,
-        use_sdpa=True,
+      model_dims=64,
+      hidden_dims=64,
+      num_heads=4,
+      attention_norm="rms",
+      feedforward_norm="rms",
+      qk_norm="rms",
+      use_rope_seq=True,
+      use_rope_var=True,
+      use_bias=False,
+      ff_activation="relu",
+      deterministic=True,
+      use_sdpa=True,
     )
     stack_cfg = configs.StackedTransformersConfig(
-        num_layers=2,
-        use_remat=False,
-        transformer=sub_cfg,
+      num_layers=2,
+      use_remat=False,
+      transformer=sub_cfg,
     )
     stack = torch_trans.StackedMixingTransformer(
-        config=stack_cfg, use_variate_attention=True
+      config=stack_cfg, use_variate_attention=True
     )
     b, v, n, d = 2, 2, 4, 64
     inputs = torch.randn(b, v, n, d)
     patch_mask = torch.zeros(b, v, n, dtype=torch.bool)
 
-    out, caches, _ = stack(inputs, patch_mask=patch_mask)
+    out, _, _ = stack(inputs, patch_mask=patch_mask)
     self.assertEqual(out.shape, (b, v, n, d))
 
 
