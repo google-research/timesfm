@@ -78,6 +78,13 @@ class _ModelConfig:
   residual_block_config: configs.ResidualBlockConfig | None = None
   transformer_config: configs.StackedTransformersConfig | None = None
 
+  # Hugging Face Hub download options
+  cache_dir: str | None = None
+  force_download: bool = False
+  token: str | bool | None = None
+  revision: str | None = None
+  local_files_only: bool = False
+
 
 # Public alias
 ModelConfig = _ModelConfig
@@ -375,6 +382,11 @@ class TimesFM3Forecaster:
       # Load via PyTorchModelHubMixin.from_pretrained (downloads config.json and weights)
       self.model = torch_model_lib.TimesFM3Torch.from_pretrained(
         checkpoint_path,
+        cache_dir=self.config.cache_dir,
+        force_download=self.config.force_download,
+        token=self.config.token,
+        revision=self.config.revision,
+        local_files_only=self.config.local_files_only,
       )
       # Synchronize forecaster config with the loaded model config
       median_q_idx = self.config.median_quantile_index
