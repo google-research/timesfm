@@ -15,7 +15,7 @@ import torch
 from . import configs, util
 from . import model as torch_model_lib
 
-_MAX_CONTEXT_LENGTH = 16384
+_MAX_CONTEXT_LENGTH = 15360
 _SIGMA_THRESHOLD: float = 1e-7
 _GC_MEMORY_THRESHOLD: float = 0.9
 
@@ -119,26 +119,6 @@ def try_gc(
   gc.collect()
 
 
-def strip_leading_nans(arr: np.ndarray) -> np.ndarray:
-  """Removes contiguous NaN values from the beginning of a NumPy array."""
-  if arr.size == 0:
-    return arr
-
-  was_1d = arr.ndim == 1
-  arr2d = np.atleast_2d(arr)
-
-  isnan = np.atleast_1d(np.isnan(arr2d).all(axis=0))
-  first_valid_index = int(np.argmax(~isnan))
-
-  if first_valid_index == 0 and isnan[0]:
-    if was_1d:
-      return np.array([], dtype=arr.dtype)
-    return np.empty((arr2d.shape[0], 0), dtype=arr.dtype)
-
-  result = arr2d[:, first_valid_index:]
-  return result[0] if was_1d else result
-
-
 def linear_interpolation(arr: np.ndarray) -> np.ndarray:
   """Performs linear interpolation to fill NaN values in a NumPy array."""
   was_1d = arr.ndim == 1
@@ -154,9 +134,18 @@ def linear_interpolation(arr: np.ndarray) -> np.ndarray:
       row = result[r]
       valid_mask = ~nan_mask[r]
       nan_indices = nan_mask[r].nonzero()[0]
-      valid_indices = valid_mask.nonzero()[0]
-      valid_values = row[valid_mask]
-      row[nan_mask[r]] = np.interp(nan_indices, valid_indices, valid_values)
+      non_nan_indices = valid_mask.nonzero()[0]
+      non_nan_values = row[valid_mask]
+      try:
+        row[nan_mask[r]] = np.interp(
+          nan_indices, non_nan_indices, non_nan_values
+        )
+      except ValueError:
+        if non_nan_values.size > 0:
+          mu = np.nanmean(row)
+        else:
+          mu = 0.0
+        row[nan_mask[r]] = mu
 
   return result[0] if was_1d else result
 
@@ -187,29 +176,27 @@ def _is_nonnegative(arr: np.ndarray) -> bool | np.ndarray:
 
 @dataclasses.dataclass(frozen=True)
 class _Query:
-  """A single forecast query."""
+  """Represents a single formatted forecast query."""
 
   horizon: int
   targets: np.ndarray
   past_only_covariates: np.ndarray | None = None
   past_future_covariates: np.ndarray | None = None
-  padded: bool = False
 
   @property
   def context_length(self) -> int:
     return self.targets.shape[-1]
 
   def format(
-    self, global_context: int
+    self, context_len: int
   ) -> tuple[
     int,
     np.ndarray,
     np.ndarray,
     np.ndarray | None,
     np.ndarray | None,
-    bool,
   ]:
-    """Formats and left-pads/truncates the query to global_context length."""
+    """Formats and left-pads/truncates the query to context_len length."""
     targets = np.atleast_2d(self.targets)
     masks = np.zeros((self.context_length,), dtype=bool)
     past_only_covariates = (
@@ -223,17 +210,17 @@ class _Query:
       else None
     )
 
-    if self.context_length > global_context:
-      targets = targets[:, -global_context:]
-      masks = masks[-global_context:]
+    if self.context_length > context_len:
+      targets = targets[:, -context_len:]
+      masks = masks[-context_len:]
       if past_only_covariates is not None:
-        past_only_covariates = past_only_covariates[:, -global_context:]
+        past_only_covariates = past_only_covariates[:, -context_len:]
       if past_future_covariates is not None:
         past_future_covariates = past_future_covariates[
-          :, -(global_context + self.horizon) :
+          :, -(context_len + self.horizon) :
         ]
-    elif self.context_length < global_context:
-      pad_len = global_context - self.context_length
+    elif self.context_length < context_len:
+      pad_len = context_len - self.context_length
       targets = np.pad(
         targets,
         [(0, 0), (pad_len, 0)],
@@ -246,8 +233,6 @@ class _Query:
         mode="constant",
         constant_values=True,
       )
-      if self.padded:
-        masks = np.ones_like(masks, dtype=bool)
       if past_only_covariates is not None:
         past_only_covariates = np.pad(
           past_only_covariates,
@@ -269,7 +254,6 @@ class _Query:
       masks,
       past_only_covariates,
       past_future_covariates,
-      self.padded,
     )
 
 
@@ -438,6 +422,7 @@ class TimesFM3Forecaster:
     return_quantiles: bool = False,
     use_symmetric_averaging: bool = False,
     make_positive: bool = False,
+    sort_quantiles: bool = True,
     use_znorm: bool = False,
     padding_mode: str = "none",
   ) -> ForecastOutput:
@@ -452,6 +437,7 @@ class TimesFM3Forecaster:
         return_quantiles=return_quantiles,
         use_symmetric_averaging=use_symmetric_averaging,
         make_positive=make_positive,
+        sort_quantiles=sort_quantiles,
         use_znorm=use_znorm,
         padding_mode=padding_mode,
       )
@@ -468,6 +454,7 @@ class TimesFM3Forecaster:
     return_quantiles: bool = False,
     use_symmetric_averaging: bool = False,
     make_positive: bool = False,
+    sort_quantiles: bool = True,
     use_znorm: bool = False,
     padding_mode: str = "none",
   ) -> Iterator[ForecastOutput]:
@@ -477,7 +464,12 @@ class TimesFM3Forecaster:
       * self.config.output_patch_length
     )
     num_original_ts = len(contexts)
-    original_ts_ids = list(ts_ids) if ts_ids is not None else [None] * num_original_ts
+    original_ts_ids = (
+      list(ts_ids) if ts_ids is not None else [None] * num_original_ts
+    )
+
+    if not contexts:
+      return
 
     po_cov_list = (
       list(past_only_covariates)
@@ -495,30 +487,53 @@ class TimesFM3Forecaster:
     pf_2d: list[np.ndarray | None] = []
 
     for idx, ctx in enumerate(contexts):
-      arr = np.atleast_2d(np.array(ctx, dtype=np.float64))
-      arr = strip_leading_nans(arr)
-      arr = linear_interpolation(arr)
-      contexts_2d.append(arr)
-
+      target_clean = np.atleast_2d(np.array(ctx, dtype=np.float32))
       po = po_cov_list[idx]
-      if po is not None:
-        po_arr = np.atleast_2d(np.array(po, dtype=np.float64))
-        po_arr = strip_leading_nans(po_arr)
+      po_arr = (
+        np.atleast_2d(np.array(po, dtype=np.float32))
+        if po is not None
+        else None
+      )
+      pf = pf_cov_list[idx]
+      pf_arr = (
+        np.atleast_2d(np.array(pf, dtype=np.float32))
+        if pf is not None
+        else None
+      )
+
+      isnan = np.isnan(target_clean).all(axis=0)
+      if isnan.all():
+        first_valid_index = target_clean.shape[-1]
+      else:
+        first_valid_index = int(np.argmax(~isnan))
+
+      if first_valid_index > 0 and first_valid_index < target_clean.shape[-1]:
+        target_clean = target_clean[:, first_valid_index:]
+        if po_arr is not None:
+          po_arr = po_arr[:, first_valid_index:]
+        if pf_arr is not None:
+          pf_arr = pf_arr[:, first_valid_index:]
+      elif first_valid_index == target_clean.shape[-1]:
+        if target_clean.shape[-1] == 0:
+          pass
+        else:
+          target_clean = np.zeros_like(target_clean)
+
+      target_clean = linear_interpolation(target_clean)
+      contexts_2d.append(target_clean)
+
+      if po_arr is not None:
         po_arr = linear_interpolation(po_arr)
         po_2d.append(po_arr)
       else:
         po_2d.append(None)
 
-      pf = pf_cov_list[idx]
-      if pf is not None:
-        pf_arr = np.atleast_2d(np.array(pf, dtype=np.float64))
-        pf_arr = strip_leading_nans(pf_arr)
+      if pf_arr is not None:
         pf_arr = linear_interpolation(pf_arr)
         pf_2d.append(pf_arr)
       else:
         pf_2d.append(None)
 
-    original_contexts = list(contexts_2d)
     num_targets_in = contexts_2d[0].shape[0] if contexts_2d else 1
 
     for idx, ctx in enumerate(contexts_2d):
@@ -529,7 +544,7 @@ class TimesFM3Forecaster:
           f" {ctx.shape[0]}."
         )
 
-    is_univariate = num_targets_in == 1
+    was_1d_input = len(contexts) > 0 and np.ndim(contexts[0]) == 1
 
     znorm_per_example: list[list[tuple[float, float]]] = []
     if use_znorm:
@@ -625,9 +640,19 @@ class TimesFM3Forecaster:
 
     for i in range(num_batches):
       query_batch = queries[i * batch_size : (i + 1) * batch_size]
-      while len(query_batch) < batch_size:
-        query_batch.append(dataclasses.replace(query_batch[0], padded=True))
-      formatted_batch = [q.format(self.global_context) for q in query_batch]
+      if not query_batch:
+        continue
+
+      # Dynamic per-batch context length rounded up to patch length boundary
+      max_ctx_in_batch = max(q.context_length for q in query_batch)
+      batch_context = min(
+        math.ceil(max_ctx_in_batch / self.config.input_patch_length)
+        * self.config.input_patch_length,
+        self.global_context,
+      )
+      batch_context = max(batch_context, self.config.input_patch_length)
+
+      formatted_batch = [q.format(batch_context) for q in query_batch]
 
       (
         batched_hor,
@@ -635,7 +660,6 @@ class TimesFM3Forecaster:
         batched_mask,
         batched_po,
         batched_pf,
-        _,
       ) = tuple(list(w) for w in zip(*formatted_batch))
 
       tgt_torch = torch.from_numpy(np.stack(batched_tgt, axis=0)).to(
@@ -665,7 +689,7 @@ class TimesFM3Forecaster:
           self.device, dtype=torch.float32
         )
 
-      with torch.no_grad():
+      with torch.inference_mode():
         out_logits = self.model.decode(
           target=tgt_torch,
           horizon=batched_hor[0],
@@ -674,14 +698,13 @@ class TimesFM3Forecaster:
           mask=mask_torch,
         )
       ys.append(out_logits.cpu().numpy())
-      try_gc(self.device)
 
+    try_gc(self.device)
     all_raw_outputs = np.concatenate(ys, axis=0)
+    all_raw_outputs = all_raw_outputs[:, :num_targets_in, :, :]
 
-    num_relevant_outputs = (
-      2 * num_original_ts if use_symmetric_averaging else num_original_ts
-    )
-    all_raw_outputs = all_raw_outputs[:num_relevant_outputs, :num_targets_in, :, :]
+    if sort_quantiles:
+      all_raw_outputs = np.sort(all_raw_outputs, axis=-1)
 
     if use_symmetric_averaging:
       ys_pos = all_raw_outputs[0::2]
@@ -700,11 +723,11 @@ class TimesFM3Forecaster:
 
     if make_positive:
       for i in range(num_original_ts):
-        if is_univariate:
-          if _is_nonnegative(original_contexts[i]):
+        if was_1d_input:
+          if _is_nonnegative(contexts[i]):
             all_raw_outputs[i] = np.maximum(all_raw_outputs[i], 0.0)
         else:
-          nonneg = _is_nonnegative(original_contexts[i])
+          nonneg = _is_nonnegative(contexts[i])
           assert isinstance(nonneg, np.ndarray)
           for r in range(num_targets_in):
             if nonneg[r]:
@@ -712,7 +735,7 @@ class TimesFM3Forecaster:
 
     for i in range(num_original_ts):
       raw = all_raw_outputs[i]
-      if is_univariate:
+      if was_1d_input:
         raw = raw[0]
         yield ForecastOutput(
           ts_id=original_ts_ids[i],
