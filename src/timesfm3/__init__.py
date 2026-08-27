@@ -15,6 +15,7 @@
 """TimesFM3 PyTorch API."""
 
 from .configs import ResidualBlockConfig, StackedTransformersConfig, TransformerConfig
+from .evaluator import TimesFM3Evaluator
 from .model import TimesFM3Torch
 from .timesfm3_forecaster import (
   ForecastOutput,
@@ -28,6 +29,7 @@ __all__ = [
   "ModelConfig",
   "ResidualBlockConfig",
   "StackedTransformersConfig",
+  "TimesFM3Evaluator",
   "TimesFM3Forecaster",
   "TimesFM3Torch",
   "TransformerConfig",

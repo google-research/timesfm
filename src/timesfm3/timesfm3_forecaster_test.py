@@ -14,12 +14,14 @@
 
 """Tests for PyTorch TimesFM3Forecaster."""
 
+import tempfile
 import unittest
 from unittest import mock
-
 import numpy as np
 import torch
 
+from . import configs
+from . import model as torch_model_lib
 from . import timesfm3_forecaster
 
 
@@ -58,31 +60,15 @@ class TimesFM3ForecasterTest(unittest.TestCase):
       median_quantile_index=1,
     )
 
-  def test_strip_leading_nans_1d(self):
-    arr = np.array([np.nan, np.nan, 1.0, 2.0, np.nan])
-    res = timesfm3_forecaster.strip_leading_nans(arr)
-    np.testing.assert_array_equal(res, np.array([1.0, 2.0, np.nan]))
-
-  def test_strip_leading_nans_2d(self):
-    arr = np.array(
-      [
-        [np.nan, 1.0, 2.0],
-        [np.nan, np.nan, 3.0],
-      ]
-    )
-    res = timesfm3_forecaster.strip_leading_nans(arr)
-    expected = np.array(
-      [
-        [1.0, 2.0],
-        [np.nan, 3.0],
-      ]
-    )
-    np.testing.assert_array_equal(res, expected)
-
   def test_linear_interpolation(self):
     arr = np.array([1.0, np.nan, 3.0])
     res = timesfm3_forecaster.linear_interpolation(arr)
     np.testing.assert_array_equal(res, np.array([1.0, 2.0, 3.0]))
+
+  def test_linear_interpolation_all_nan(self):
+    arr = np.array([np.nan, np.nan, np.nan])
+    res = timesfm3_forecaster.linear_interpolation(arr)
+    np.testing.assert_array_equal(res, np.array([0.0, 0.0, 0.0]))
 
   def test_znorm_stats(self):
     arr = np.array([1.0, 2.0, 3.0])
@@ -136,12 +122,37 @@ class TimesFM3ForecasterTest(unittest.TestCase):
     self.assertEqual(out.forecast.shape, (2, 4))
     self.assertEqual(out.quantiles.shape, (2, 4, 3))
 
+  def test_query_format_padding_and_truncation(self):
+    # Test padding when context_length < context_len
+    q_short = timesfm3_forecaster._Query(
+      horizon=4,
+      targets=np.array([[1.0, 2.0]]),
+      past_only_covariates=np.array([[5.0, 6.0]]),
+      past_future_covariates=np.array([[1.0, 2.0, 3.0, 4.0, 5.0, 6.0]]),
+    )
+    hor, tgt, mask, po, pf = q_short.format(context_len=4)
+    self.assertEqual(hor, 4)
+    self.assertEqual(tgt.shape, (1, 4))
+    np.testing.assert_array_equal(tgt, np.array([[0.0, 0.0, 1.0, 2.0]]))
+    np.testing.assert_array_equal(mask, np.array([True, True, False, False]))
+    np.testing.assert_array_equal(po, np.array([[0.0, 0.0, 5.0, 6.0]]))
+    self.assertEqual(pf.shape, (1, 8))  # 4 ctx + 4 horizon
+
+    # Test truncation when context_length > context_len
+    q_long = timesfm3_forecaster._Query(
+      horizon=2,
+      targets=np.array([[1.0, 2.0, 3.0, 4.0]]),
+      past_only_covariates=np.array([[10.0, 20.0, 30.0, 40.0]]),
+      past_future_covariates=np.array([[1.0, 2.0, 3.0, 4.0, 5.0, 6.0]]),
+    )
+    hor, tgt, mask, po, pf = q_long.format(context_len=2)
+    self.assertEqual(hor, 2)
+    self.assertEqual(tgt.shape, (1, 2))
+    np.testing.assert_array_equal(tgt, np.array([[3.0, 4.0]]))
+    np.testing.assert_array_equal(mask, np.array([False, False]))
+    np.testing.assert_array_equal(po, np.array([[30.0, 40.0]]))
+
   def test_from_pretrained_local_directory(self):
-    import tempfile
-
-    from . import configs
-    from . import model as torch_model_lib
-
     resblock_config = configs.ResidualBlockConfig(
       hidden_dims=16,
       output_dims=16,
