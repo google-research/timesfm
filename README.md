@@ -6,9 +6,11 @@ model developed by Google Research for time-series forecasting.
 *   Paper:
     [A decoder-only foundation model for time-series forecasting](https://arxiv.org/abs/2310.10688),
     ICML 2024.
-*   All checkpoints:
+*   Checkpoints (up to 2.5):
     [TimesFM Hugging Face Collection](https://huggingface.co/collections/google/timesfm-release-66e4be5fdb56e960c1e482a6).
-*   [Google Research blog](https://research.google/blog/a-decoder-only-foundation-model-for-time-series-forecasting/).
+*   TimesFM 3.0 Checkpoint:
+    [`google/timesfm-3.0-pytorch`](https://huggingface.co/google/timesfm-3.0-pytorch).
+*   [Google Research blog](https://research.google/blog/a-decoder-only-foundation-model-for-time-series-forecasting/) (New blog post for TimesFM 3.0 coming soon!).
 *   TimesFM in Google 1P Products:
     *   [BigQuery ML](https://cloud.google.com/bigquery/docs/timesfm-model): Enterprise level SQL queries for scalability and reliability.
     *   [Google Sheets](https://workspaceupdates.googleblog.com/2026/02/forecast-data-in-connected-sheets-BigQueryML-TimesFM.html): For your daily spreadsheet. 
@@ -16,13 +18,29 @@ model developed by Google Research for time-series forecasting.
 
 This open version is not an officially supported Google product.
 
-**Latest Model Version:** TimesFM 2.5
+**Latest Model Version:** TimesFM 3.0
+**Previous Model Version:** TimesFM 2.5
 
 **Archived Model Versions:**
+-   1.0 and 2.0: relevant code archived in the subdirectory `v1`. You can `pip install timesfm==1.3.0` to install an older version of this package to load them.
 
--   1.0 and 2.0: relevant code archived in the sub directory `v1`. You can `pip
-    install timesfm==1.3.0` to install an older version of this package to load
-    them.
+---
+
+## Update — August 2026
+
+**TimesFM 3.0 is out!**
+
+TimesFM 3.0 introduces native **multivariate time-series forecasting**, flexible **covariate support** (both past-only and past-and-future covariates), superior zero-shot generalist capabilities, and top performance across all three major time-series foundation model benchmarks.
+
+### Key Highlights:
+- **Native Multivariate & Univariate Forecasting with Covariates**: Seamlessly forecast multi-channel multivariate series as well as individual univariate series, with native support for past-only and past-and-future dynamic covariates without per-task tuning.
+- **Top Benchmark Performance**:
+  - 🥇 **fev-bench**: **Rank #1 overall** across 100 diverse real-world forecasting tasks.
+  - 🥇 **TIME Benchmark**: **Rank #1 overall** across 50 domain datasets and 98 evaluation tasks.
+  - 🥇 **GIFT-Eval**: **Rank #1 among all foundation models**.
+
+---
+
 ## Update - July 2, 2026
 
 Updated PyPI to `timesfm=2.0.2`. See [Install](https://github.com/google-research/timesfm#from-pypi).
@@ -57,7 +75,7 @@ Comparing to TimesFM 2.0, this new 2.5 model:
 -   gets rid of the `frequency` indicator.
 -   has a couple of new forecasting flags.
 
-Since the Sept. 2025 launch, the following improvements have been completed:
+Since the Sept. 2025 launch, the following improvements have been completed for TimesFM 2.5:
 
 1.  ✅ Flax version of the model for faster inference.
 2.  ✅ Covariate support via XReg (see Oct. 2025 update).
@@ -70,74 +88,100 @@ Since the Sept. 2025 launch, the following improvements have been completed:
 #### From `PyPI`
 
 ```shell
-# Install the package with torch
+# Install TimesFM with PyTorch
 pip install timesfm[torch]
-# Or with Flax
-pip install timesfm[flax]
-# And when XReg is needed
-pip install timesfm[xreg]
 ```
 
 #### Local Install
 
-1.  Clone the repository:
-    ```shell
-    git clone https://github.com/google-research/timesfm.git
-    cd timesfm
-    ```
+1. Clone the repository:
+   ```shell
+   git clone https://github.com/google-research/timesfm.git
+   cd timesfm
+   ```
 
-2.  Create a virtual environment and install dependencies using `uv`:
-    ```shell
-    # Create a virtual environment
-    uv venv
-    
-    # Activate the environment
-    source .venv/bin/activate
+2. Create a virtual environment and install with PyTorch:
+   ```shell
+   # Using uv
+   uv venv
+   source .venv/bin/activate
     
     # Install the package in editable mode with torch
-    uv pip install -e .[torch]
-    # Or with flax
-    uv pip install -e .[flax]
-    # And when XReg is needed
-    uv pip install -e .[xreg]
-    ```
+   uv pip install -e .[torch]
+   ```
 
-3. [Optional] Install your preferred `torch` / `jax` backend based on your OS and accelerators
-(CPU, GPU, TPU or Apple Silicon).:
+---
 
--   [Install PyTorch](https://pytorch.org/get-started/locally/).
--   [Install Jax](https://docs.jax.dev/en/latest/installation.html#installation)
-    for Flax.
+### Code Examples: TimesFM 3.0
 
-### Code Example
+#### 1. Univariate Forecasting (Variable Lengths)
+Pass a batch of 1D NumPy arrays of different context lengths to forecast univariate time series:
 
 ```python
-import torch
 import numpy as np
-import timesfm
+from timesfm3 import TimesFM3Evaluator, ModelConfig
 
-torch.set_float32_matmul_precision("high")
+# Initialize TimesFM 3.0
+config = ModelConfig(
+    checkpoint_path="google/timesfm-3.0-pytorch",
+    per_core_batch_size=32,
+    device="cuda"
+)
+forecaster = TimesFM3Evaluator(config)
 
-model = timesfm.TimesFM_2p5_200M_torch.from_pretrained("google/timesfm-2.5-200m-pytorch")
+# Two univariate series of different lengths (100 and 72 steps)
+ts1 = np.linspace(0, 1, 100).astype(np.float32)
+ts2 = np.sin(np.linspace(0, 24, 72)).astype(np.float32)
 
-model.compile(
-    timesfm.ForecastConfig(
-        max_context=1024,
-        max_horizon=256,
-        normalize_inputs=True,
-        use_continuous_quantile_head=True,
-        force_flip_invariance=True,
-        infer_is_positive=True,
-        fix_quantile_crossing=True,
+# Generate forecast (point predictions + 9 quantiles: 0.1 to 0.9)
+outputs = list(forecaster.predict_batch([ts1, ts2], horizon=12, return_quantiles=True, use_symmetric_averaging=False))
+
+print("Series 1 forecast shape:", outputs[0].forecast.shape)   # (12,)
+print("Series 1 quantiles shape:", outputs[0].quantiles.shape) # (12, 9)
+
+print("Series 2 forecast shape:", outputs[1].forecast.shape)   # (12,)
+print("Series 2 quantiles shape:", outputs[1].quantiles.shape) # (12, 9)
+```
+
+#### 2. Multivariate Forecasting with Covariates
+Pass a 2D array of shape `(num_variates, context_length)` along with optional past-only and past-and-future covariates:
+
+```python
+import numpy as np
+from timesfm3 import TimesFM3Evaluator, ModelConfig
+
+# Initialize TimesFM 3.0
+config = ModelConfig(
+    checkpoint_path="google/timesfm-3.0-pytorch",
+    per_core_batch_size=16,
+    device="cuda"
+)
+forecaster = TimesFM3Evaluator(config)
+
+context_len = 128
+horizon = 24
+
+# 3 target variates across past context: (3, 128)
+target = np.random.randn(3, context_len).astype(np.float32)
+
+# 1 past-only covariate channel across past context: (1, 128)
+past_only_cov = np.random.randn(1, context_len).astype(np.float32)
+
+# 2 past-and-future covariate channels across context + horizon: (2, 152)
+past_future_cov = np.random.randn(2, context_len + horizon).astype(np.float32)
+
+# Generate joint forecast across all 3 target variates
+outputs = list(
+    forecaster.predict_batch(
+        contexts=[target],
+        horizon=horizon,
+        past_only_covariates=[past_only_cov],
+        past_future_covariates=[past_future_cov],
+        return_quantiles=True,
+        use_symmetric_averaging=False,
     )
 )
-point_forecast, quantile_forecast = model.forecast(
-    horizon=12,
-    inputs=[
-        np.linspace(0, 1, 100),
-        np.sin(np.linspace(0, 20, 67)),
-    ],  # Two dummy inputs
-)
-point_forecast.shape  # (2, 12)
-quantile_forecast.shape  # (2, 12, 10): mean, then 10th to 90th quantiles.
+
+print("Multivariate forecast shape:", outputs[0].forecast.shape)   # (3, 24)
+print("Multivariate quantiles shape:", outputs[0].quantiles.shape) # (3, 24, 9)
 ```
