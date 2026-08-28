@@ -19,10 +19,10 @@ model developed by Google Research for time-series forecasting.
 This open version is not an officially supported Google product.
 
 **Latest Model Version:** TimesFM 3.0
+**Previous Model Version:** TimesFM 2.5
 
 **Archived Model Versions:**
 -   1.0 and 2.0: relevant code archived in the subdirectory `v1`. You can `pip install timesfm==1.3.0` to install an older version of this package to load them.
--   2.5: relevant code in `src/timesfm/`.
 
 ---
 
@@ -38,7 +38,6 @@ TimesFM 3.0 introduces native **multivariate time-series forecasting**, flexible
   - 🥇 **fev-bench**: **Rank #1 overall** across 100 diverse real-world forecasting tasks.
   - 🥇 **TIME Benchmark**: **Rank #1 overall** across 50 domain datasets and 98 evaluation tasks.
   - 🥇 **GIFT-Eval**: **Rank #1 among all foundation models**.
-- **Google Research Blog Post**: A new dedicated blog post covering TimesFM 3.0 architecture and capabilities is **coming soon**!
 
 ---
 
