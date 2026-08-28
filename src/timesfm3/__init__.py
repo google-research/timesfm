@@ -12,23 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""TimesFM API."""
+"""TimesFM3 PyTorch API."""
 
-from .configs import ForecastConfig
+from .configs import ResidualBlockConfig, StackedTransformersConfig, TransformerConfig
+from .evaluator import TimesFM3Evaluator
+from .model import TimesFM3Torch
+from .timesfm3_forecaster import (
+  ForecastOutput,
+  ModelConfig,
+  TimesFM3Forecaster,
+  _ModelConfig,
+)
 
-try:
-  from .timesfm_2p5 import timesfm_2p5_torch
-  TimesFM_2p5_200M_torch = timesfm_2p5_torch.TimesFM_2p5_200M_torch
-except ImportError:
-  pass
-
-try:
-  from .timesfm_2p5 import timesfm_2p5_flax
-  TimesFM_2p5_200M_flax = timesfm_2p5_flax.TimesFM_2p5_200M_flax
-except ImportError:
-  pass
-
-try:
-  from timesfm3 import TimesFM3Forecaster, TimesFM3Torch
-except ImportError:
-  pass
+__all__ = [
+  "ForecastOutput",
+  "ModelConfig",
+  "ResidualBlockConfig",
+  "StackedTransformersConfig",
+  "TimesFM3Evaluator",
+  "TimesFM3Forecaster",
+  "TimesFM3Torch",
+  "TransformerConfig",
+  "_ModelConfig",
+]
