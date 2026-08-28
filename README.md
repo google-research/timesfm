@@ -19,6 +19,7 @@ model developed by Google Research for time-series forecasting.
 This open version is not an officially supported Google product.
 
 **Latest Model Version:** TimesFM 3.0
+
 **Previous Model Version:** TimesFM 2.5
 
 **Archived Model Versions:**
