@@ -1,4 +1,4 @@
-# Copyright 2025 Google LLC
+# Copyright 2026 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,20 +18,20 @@ from .configs import ResidualBlockConfig, StackedTransformersConfig, Transformer
 from .evaluator import TimesFM3Evaluator
 from .model import TimesFM3Torch
 from .timesfm3_forecaster import (
-  ForecastOutput,
-  ModelConfig,
-  TimesFM3Forecaster,
-  _ModelConfig,
+    ForecastOutput,
+    ModelConfig,
+    TimesFM3Forecaster,
+    _ModelConfig,
 )
 
 __all__ = [
-  "ForecastOutput",
-  "ModelConfig",
-  "ResidualBlockConfig",
-  "StackedTransformersConfig",
-  "TimesFM3Evaluator",
-  "TimesFM3Forecaster",
-  "TimesFM3Torch",
-  "TransformerConfig",
-  "_ModelConfig",
+    "ForecastOutput",
+    "ModelConfig",
+    "ResidualBlockConfig",
+    "StackedTransformersConfig",
+    "TimesFM3Evaluator",
+    "TimesFM3Forecaster",
+    "TimesFM3Torch",
+    "TransformerConfig",
+    "_ModelConfig",
 ]
