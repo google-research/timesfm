@@ -58,7 +58,8 @@ time-series foundation model benchmarks.
 ### License notice for pretrained weights
 
 > **Important:** The TimesFM source code in this repository is licensed under
-> Apache-2.0. However, for the time being, TimesFM 3.0 pretrained weights are distributed under the
+> Apache-2.0, and model weights up to version 2.5 remain Apache-2.0. However,
+> for the time being, TimesFM 3.0 pretrained weights are distributed under the
 > separate `timesfm-non-commercial-license-v1.0` license and are restricted to
 > non-commercial, non-production use. Commercial or production use of the
 > default pretrained weights is **not permitted**.
