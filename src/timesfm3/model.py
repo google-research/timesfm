@@ -37,7 +37,6 @@ from . import cpm_revin_refine as cpm_revin_refine_lib
 class TimesFM3Torch(
   nn.Module,
   PyTorchModelHubMixin,
-  library_name="timesfm",
   repo_url="https://github.com/google-research/timesfm",
 ):
   """PyTorch inference-only implementation of TimesFM3.

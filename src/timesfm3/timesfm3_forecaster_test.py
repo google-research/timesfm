@@ -17,12 +17,12 @@
 import tempfile
 import unittest
 from unittest import mock
+
 import numpy as np
 import torch
 
-from . import configs
+from . import configs, timesfm3_forecaster
 from . import model as torch_model_lib
-from . import timesfm3_forecaster
 
 
 class FakeModel(torch.nn.Module):

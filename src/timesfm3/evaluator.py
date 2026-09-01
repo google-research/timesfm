@@ -23,9 +23,7 @@ import numpy as np
 
 from .timesfm3_forecaster import (
   ForecastOutput,
-  ModelConfig,
   TimesFM3Forecaster,
-  _ModelConfig,
 )
 
 _MAX_VARIATES_PER_FORWARD = 32
