@@ -213,16 +213,20 @@ class _RecordingFakeModel(FakeModel):
     if past_future_covariates is not None:
       horizon = past_future_covariates.shape[-1] - target.shape[-1]
     self.calls.append(
-      dict(
-        target=target.clone(),
-        past_future_covariates=(
-          None if past_future_covariates is None else past_future_covariates.clone()
+      {
+        "target": target.clone(),
+        "past_future_covariates": (
+          None
+          if past_future_covariates is None
+          else past_future_covariates.clone()
         ),
-        past_only_covariates=(
-          None if past_only_covariates is None else past_only_covariates.clone()
+        "past_only_covariates": (
+          None
+          if past_only_covariates is None
+          else past_only_covariates.clone()
         ),
-        horizon=horizon,
-      )
+        "horizon": horizon,
+      }
     )
     return super().decode(target, autoregressive_index, horizon, mask=mask)
 
