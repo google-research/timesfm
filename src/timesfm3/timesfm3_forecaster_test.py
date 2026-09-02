@@ -218,6 +218,9 @@ class _RecordingFakeModel(FakeModel):
         past_future_covariates=(
           None if past_future_covariates is None else past_future_covariates.clone()
         ),
+        past_only_covariates=(
+          None if past_only_covariates is None else past_only_covariates.clone()
+        ),
         horizon=horizon,
       )
     )
@@ -288,6 +291,83 @@ class TimesFM3ForecasterCovariateWindowTest(unittest.TestCase):
       )
     )
     self.assertEqual([o.forecast.shape for o in outputs], [(5,), (5,)])
+
+  def test_mixed_none_and_pf_covariates(self):
+    # A query without past-future covariates batched with one that has
+    # them: the placeholder must have the decode-expected width (matching
+    # the real PF arrays in the batch), or np.stack fails on lengths.
+    forecaster = self._forecaster()
+    long_ctx = np.arange(40, dtype=np.float32)
+    short_ctx = np.arange(100, 112, dtype=np.float32)
+    outputs = list(
+      forecaster.predict_batch(
+        contexts=[long_ctx, short_ctx],
+        horizon=5,
+        past_future_covariates=[np.arange(45, dtype=np.float32), None],
+      )
+    )
+    self.assertEqual([o.forecast.shape for o in outputs], [(5,), (5,)])
+    call = forecaster.model.calls[-1]
+    pf = call["past_future_covariates"]
+    # decode must see a uniform PF width across the batch. The batch
+    # context is capped by _MAX_CONTEXT_LENGTH(16, set in setUp), so the
+    # real PF is context(16) + requested horizon(5) = 21; the placeholder
+    # matches that width.
+    self.assertEqual(pf.shape[0], 2)
+    self.assertEqual(pf.shape[-1], 21)
+    pf_real = pf[0, 0]
+    pf_placeholder = pf[1, 0]
+    self.assertEqual(pf_real.shape[-1], pf_placeholder.shape[-1])
+    # The placeholder's future part (the requested horizon, 5) is zeros;
+    # decode infers horizon 5 from the width.
+    np.testing.assert_array_equal(pf_placeholder[-5:], np.zeros((5,), dtype=np.float32))
+    self.assertEqual(call["horizon"], 5)
+
+  def test_mixed_none_and_multichannel_covariates(self):
+    # Covariate channel count need not equal the number of target variates:
+    # a 2-channel past-future covariate and a 2-channel past-only covariate
+    # batched with a query that has neither must still stack.
+    forecaster = self._forecaster()
+    ctx_a = np.arange(12, dtype=np.float32)
+    ctx_b = np.arange(100, 112, dtype=np.float32)
+    pf_a = np.stack([np.arange(17, dtype=np.float32)] * 2)
+    po_a = np.stack([np.arange(12, dtype=np.float32)] * 2)
+    outputs = list(
+      forecaster.predict_batch(
+        contexts=[ctx_a, ctx_b],
+        horizon=5,
+        past_only_covariates=[po_a, None],
+        past_future_covariates=[pf_a, None],
+      )
+    )
+    self.assertEqual([o.forecast.shape for o in outputs], [(5,), (5,)])
+    call = forecaster.model.calls[-1]
+    # batch context 16 (12 rounded up to the patch), 2 channels, future 5.
+    self.assertEqual(tuple(call["past_future_covariates"].shape), (2, 2, 21))
+    self.assertEqual(tuple(call["past_only_covariates"].shape), (2, 2, 16))
+    np.testing.assert_array_equal(
+      call["past_future_covariates"][1].numpy(), np.zeros((2, 21), np.float32)
+    )
+    np.testing.assert_array_equal(
+      call["past_only_covariates"][1].numpy(), np.zeros((2, 16), np.float32)
+    )
+
+  def test_mixed_none_covariates_multivariate_target(self):
+    # Three target variates with a 2-channel past-future covariate on one
+    # query and none on the other.
+    forecaster = self._forecaster()
+    ctx_a = np.stack([np.arange(12, dtype=np.float32)] * 3)
+    ctx_b = np.stack([np.arange(100, 112, dtype=np.float32)] * 3)
+    pf_a = np.stack([np.arange(17, dtype=np.float32)] * 2)
+    outputs = list(
+      forecaster.predict_batch(
+        contexts=[ctx_a, ctx_b], horizon=5, past_future_covariates=[pf_a, None]
+      )
+    )
+    self.assertEqual([o.forecast.shape for o in outputs], [(3, 5), (3, 5)])
+    call = forecaster.model.calls[-1]
+    self.assertEqual(tuple(call["target"].shape), (2, 3, 16))
+    self.assertEqual(tuple(call["past_future_covariates"].shape), (2, 2, 21))
 
   def test_predict_batch_accepts_2d_array(self):
     forecaster = self._forecaster()

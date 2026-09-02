@@ -151,9 +151,7 @@ def linear_interpolation(arr: np.ndarray) -> np.ndarray:
       non_nan_indices = valid_mask.nonzero()[0]
       non_nan_values = row[valid_mask]
       try:
-        row[nan_mask[r]] = np.interp(
-          nan_indices, non_nan_indices, non_nan_values
-        )
+        row[nan_mask[r]] = np.interp(nan_indices, non_nan_indices, non_nan_values)
       except ValueError:
         if non_nan_values.size > 0:
           mu = np.nanmean(row)
@@ -484,9 +482,7 @@ class TimesFM3Forecaster:
       * self.config.output_patch_length
     )
     num_original_ts = len(contexts)
-    original_ts_ids = (
-      list(ts_ids) if ts_ids is not None else [None] * num_original_ts
-    )
+    original_ts_ids = list(ts_ids) if ts_ids is not None else [None] * num_original_ts
 
     if len(contexts) == 0:
       return
@@ -509,17 +505,9 @@ class TimesFM3Forecaster:
     for idx, ctx in enumerate(contexts):
       target_clean = np.atleast_2d(np.array(ctx, dtype=np.float32))
       po = po_cov_list[idx]
-      po_arr = (
-        np.atleast_2d(np.array(po, dtype=np.float32))
-        if po is not None
-        else None
-      )
+      po_arr = np.atleast_2d(np.array(po, dtype=np.float32)) if po is not None else None
       pf = pf_cov_list[idx]
-      pf_arr = (
-        np.atleast_2d(np.array(pf, dtype=np.float32))
-        if pf is not None
-        else None
-      )
+      pf_arr = np.atleast_2d(np.array(pf, dtype=np.float32)) if pf is not None else None
 
       isnan = np.isnan(target_clean).all(axis=0)
       if isnan.all():
@@ -691,20 +679,27 @@ class TimesFM3Forecaster:
 
       po_torch = None
       if any(po is not None for po in batched_po):
-        po_arrs = [
-          po if po is not None else np.zeros_like(batched_tgt[j])
-          for j, po in enumerate(batched_po)
-        ]
+        # A query without covariates in a batch where others have them gets
+        # a zero placeholder shaped like the real covariate arrays (channel
+        # count and width), not like the target: the covariate channel count
+        # need not equal the number of target variates, and np.stack needs
+        # every entry to have the same shape.
+        po_ref = next(po for po in batched_po if po is not None)
+        po_arrs = [po if po is not None else np.zeros_like(po_ref) for po in batched_po]
         po_torch = torch.from_numpy(np.stack(po_arrs, axis=0)).to(
           self.device, dtype=torch.float32
         )
 
       pf_torch = None
       if any(pf is not None for pf in batched_pf):
-        pf_arrs = [
-          pf if pf is not None else np.zeros_like(batched_tgt[j])
-          for j, pf in enumerate(batched_pf)
-        ]
+        # Same for past-future covariates. decode infers the horizon from
+        # the covariate width (pf.shape[-1] - context) and slices the future
+        # part, so the placeholder must match the real arrays' width as well
+        # as their channel count. Real arrays in one batch already share both:
+        # their context is the batch context and their future part is the
+        # requested horizon.
+        pf_ref = next(pf for pf in batched_pf if pf is not None)
+        pf_arrs = [pf if pf is not None else np.zeros_like(pf_ref) for pf in batched_pf]
         pf_torch = torch.from_numpy(np.stack(pf_arrs, axis=0)).to(
           self.device, dtype=torch.float32
         )
