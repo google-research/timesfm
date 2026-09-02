@@ -18,6 +18,11 @@ import os
 import tempfile
 import types
 
+import pytest
+
+pytest.importorskip("einshape", reason="requires the [flax] extra (einshape)")
+pytest.importorskip("flax", reason="requires the [flax] extra")
+
 from timesfm.timesfm_2p5.timesfm_2p5_torch import TimesFM_2p5_200M_torch
 from timesfm.timesfm_2p5.timesfm_2p5_flax import TimesFM_2p5_200M_flax
 
