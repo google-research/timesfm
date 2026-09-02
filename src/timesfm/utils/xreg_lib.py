@@ -44,14 +44,19 @@ def _repeat(elements: Iterable[Any], counts: Iterable[int]) -> np.ndarray:
 
 
 def _to_padded_jax_array(x: np.ndarray) -> jax.Array:
+  def padding_size(size: int) -> int:
+    if size == 0:
+      return 0
+    return 2 ** math.ceil(math.log2(size)) - size
+
   if x.ndim == 1:
     (i,) = x.shape
-    di = 2 ** math.ceil(math.log2(i)) - i
+    di = padding_size(i)
     return jnp.pad(x, ((0, di),), mode="constant", constant_values=0.0)
   elif x.ndim == 2:
     i, j = x.shape
-    di = 2 ** math.ceil(math.log2(i)) - i
-    dj = 2 ** math.ceil(math.log2(j)) - j
+    di = padding_size(i)
+    dj = padding_size(j)
     return jnp.pad(x, ((0, di), (0, dj)), mode="constant", constant_values=0.0)
   else:
     raise ValueError(f"Unsupported array shape: {x.shape}")
