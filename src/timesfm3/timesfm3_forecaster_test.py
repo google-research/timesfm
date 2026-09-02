@@ -49,6 +49,32 @@ class FakeModel(torch.nn.Module):
     return torch.ones(shape, dtype=torch.float32) * 2.0
 
 
+class WideningQuantileModel(torch.nn.Module):
+  """Fake model with intervals that widen across the horizon."""
+
+  input_patch_len = 8
+  output_patch_len = 8
+  quantiles = 3
+
+  def decode(
+    self,
+    target,
+    autoregressive_index=0,
+    horizon=8,
+    past_only_covariates=None,
+    past_future_covariates=None,
+    mask=None,
+  ):
+    del autoregressive_index, past_only_covariates, past_future_covariates, mask
+    b, v, _ = target.shape
+    center = torch.ones((b, v, horizon), dtype=torch.float32) * 10.0
+    half_width = torch.arange(1, horizon + 1, dtype=torch.float32)
+    half_width = half_width.reshape(1, 1, horizon)
+    return torch.stack(
+      [center - half_width, center, center + half_width], dim=-1
+    )
+
+
 class TimesFM3ForecasterTest(unittest.TestCase):
   def setUp(self):
     super().setUp()
@@ -58,6 +84,7 @@ class TimesFM3ForecasterTest(unittest.TestCase):
       input_patch_length=8,
       output_patch_length=8,
       median_quantile_index=1,
+      quantiles=[0.1, 0.5, 0.9],
     )
 
   def test_linear_interpolation(self):
@@ -121,6 +148,54 @@ class TimesFM3ForecasterTest(unittest.TestCase):
     )
     self.assertEqual(out.forecast.shape, (2, 4))
     self.assertEqual(out.quantiles.shape, (2, 4, 3))
+
+  def test_forecast_confidence_diagnostics(self):
+    forecast = np.array([10.0, 10.0, 10.0, 10.0])
+    quantiles = np.array(
+      [
+        [9.0, 10.0, 11.0],
+        [8.0, 10.0, 12.0],
+        [7.0, 10.0, 13.0],
+        [6.0, 10.0, 14.0],
+      ]
+    )
+
+    diagnostics = timesfm3_forecaster.forecast_confidence_diagnostics(
+      forecast, quantiles, [0.1, 0.5, 0.9]
+    )
+
+    np.testing.assert_array_equal(
+      diagnostics.interval_width, np.array([2.0, 4.0, 6.0, 8.0])
+    )
+    np.testing.assert_array_equal(
+      diagnostics.width_growth, np.array([1.0, 2.0, 3.0, 4.0])
+    )
+    np.testing.assert_array_equal(
+      diagnostics.confidence, np.array(["high", "moderate", "moderate", "low"])
+    )
+    self.assertEqual(diagnostics.lower_quantile, 0.1)
+    self.assertEqual(diagnostics.upper_quantile, 0.9)
+
+  @mock.patch.object(
+    timesfm3_forecaster.TimesFM3Forecaster, "_init_model", autospec=True
+  )
+  def test_predict_can_return_diagnostics_without_quantiles(self, _):
+    forecaster = timesfm3_forecaster.TimesFM3Forecaster(self.config)
+    forecaster.model = WideningQuantileModel()
+    forecaster.device = torch.device("cpu")
+
+    out = forecaster.predict(
+      np.array([1.0, 2.0, 3.0, 4.0]),
+      horizon=4,
+      return_quantiles=False,
+      return_diagnostics=True,
+    )
+
+    self.assertIsNone(out.quantiles)
+    self.assertIsNotNone(out.diagnostics)
+    np.testing.assert_array_equal(
+      out.diagnostics.interval_width, np.array([2.0, 4.0, 6.0, 8.0])
+    )
 
   def test_query_format_padding_and_truncation(self):
     # Test padding when context_length < context_len
