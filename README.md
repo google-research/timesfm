@@ -123,6 +123,9 @@ TimesFM 2.5:
 ```shell
 # Install TimesFM with PyTorch
 pip install timesfm[torch]
+
+# Or, for MLX-native inference on Apple silicon (no PyTorch required)
+pip install timesfm[mlx]
 ```
 
 #### Local Install
@@ -179,6 +182,39 @@ print("Series 1 quantiles shape:", outputs[0].quantiles.shape) # (12, 9)
 print("Series 2 forecast shape:", outputs[1].forecast.shape)   # (12,)
 print("Series 2 quantiles shape:", outputs[1].quantiles.shape) # (12, 9)
 ```
+
+#### Apple Silicon: MLX backend
+
+An MLX-native backend runs TimesFM 3.0 on Apple silicon without PyTorch. It mirrors the PyTorch
+`TimesFM3Forecaster` interface and is numerically matched to it (median forecast max abs error
+`9.5e-7`, quantiles `1.8e-6`, on `google/timesfm-3.0-pytorch`, context 512 → horizon 64).
+
+```python
+import numpy as np
+from timesfm3.mlx import TimesFM3Forecaster
+
+forecaster = TimesFM3Forecaster.from_pretrained("google/timesfm-3.0-pytorch")
+
+context = np.sin(np.linspace(0, 40, 512)).astype(np.float32)
+out = forecaster.predict(context, horizon=64, return_quantiles=True)
+print(out.forecast.shape)    # (64,)      median forecast
+print(out.quantiles.shape)   # (64, 9)    9 deciles
+
+# batch many series through one forward pass
+outs = list(forecaster.predict_batch([context] * 32, horizon=64))
+```
+
+Benchmarks (330M model, Apple M4 Max, context 512, horizon 64, fp32 with `mx.compile`):
+
+| batch | p50 latency | throughput |
+|------:|------------:|-----------:|
+|     1 |     12.4 ms |   80 series/s |
+|     8 |     22.0 ms |  363 series/s |
+|    32 |     55.0 ms |  582 series/s |
+
+Not yet supported by the MLX backend: covariates (`past_only_covariates` /
+`past_future_covariates`), `use_symmetric_averaging`, `use_znorm`, and non-`"none"` `padding_mode`
+— use the PyTorch backend for those.
 
 #### 2. Multivariate Forecasting with Covariates
 
