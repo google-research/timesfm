@@ -230,8 +230,14 @@ class _Query:
       if past_only_covariates is not None:
         past_only_covariates = past_only_covariates[:, -context_len:]
       if past_future_covariates is not None:
+        # Keep the covariate window aligned with the target window: the
+        # future part of `past_future_covariates` may be shorter than
+        # `self.horizon` (the patch-rounded horizon) when padding_mode is
+        # "none", so slice by the covariate's own future length rather than
+        # by `self.horizon`.
+        future_len = past_future_covariates.shape[-1] - self.context_length
         past_future_covariates = past_future_covariates[
-          :, -(context_len + self.horizon) :
+          :, -(context_len + future_len) :
         ]
     elif self.context_length < context_len:
       pad_len = context_len - self.context_length
@@ -482,7 +488,7 @@ class TimesFM3Forecaster:
       list(ts_ids) if ts_ids is not None else [None] * num_original_ts
     )
 
-    if not contexts:
+    if len(contexts) == 0:
       return
 
     po_cov_list = (

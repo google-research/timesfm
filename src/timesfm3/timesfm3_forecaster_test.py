@@ -194,5 +194,110 @@ class TimesFM3ForecasterTest(unittest.TestCase):
       self.assertEqual(out.forecast.shape, (8,))
 
 
+class _RecordingFakeModel(FakeModel):
+  """FakeModel that records decode inputs and infers horizon like the real model."""
+
+  def __init__(self, **kwargs):
+    super().__init__(**kwargs)
+    self.calls = []
+
+  def decode(
+    self,
+    target,
+    autoregressive_index=0,
+    horizon=8,
+    past_only_covariates=None,
+    past_future_covariates=None,
+    mask=None,
+  ):
+    if past_future_covariates is not None:
+      horizon = past_future_covariates.shape[-1] - target.shape[-1]
+    self.calls.append(
+      dict(
+        target=target.clone(),
+        past_future_covariates=(
+          None if past_future_covariates is None else past_future_covariates.clone()
+        ),
+        horizon=horizon,
+      )
+    )
+    return super().decode(target, autoregressive_index, horizon, mask=mask)
+
+
+class TimesFM3ForecasterCovariateWindowTest(unittest.TestCase):
+  """Regression tests for past-future covariate windows under truncation."""
+
+  def setUp(self):
+    super().setUp()
+    self.config = timesfm3_forecaster._ModelConfig(
+      checkpoint_path="/fake/path",
+      per_core_batch_size=2,
+      input_patch_length=8,
+      output_patch_length=8,
+      median_quantile_index=1,
+    )
+    self._max_context = timesfm3_forecaster._MAX_CONTEXT_LENGTH
+    timesfm3_forecaster._MAX_CONTEXT_LENGTH = 16
+
+  def tearDown(self):
+    timesfm3_forecaster._MAX_CONTEXT_LENGTH = self._max_context
+    super().tearDown()
+
+  def _forecaster(self):
+    with mock.patch.object(
+      timesfm3_forecaster.TimesFM3Forecaster, "_init_model", autospec=True
+    ):
+      forecaster = timesfm3_forecaster.TimesFM3Forecaster(self.config)
+    forecaster.model = _RecordingFakeModel()
+    forecaster.device = torch.device("cpu")
+    return forecaster
+
+  def test_truncated_context_keeps_covariate_window_aligned(self):
+    # horizon=5 is not a multiple of output_patch_length=8, and the context
+    # (40) exceeds the model context (16), so the query is truncated.
+    forecaster = self._forecaster()
+    context = np.arange(40, dtype=np.float32)
+    pf_cov = np.arange(45, dtype=np.float32)  # context + horizon
+    outputs = list(
+      forecaster.predict_batch(
+        contexts=[context], horizon=5, past_future_covariates=[pf_cov]
+      )
+    )
+    call = forecaster.model.calls[-1]
+    target = call["target"][0, 0]
+    pf = call["past_future_covariates"][0, 0]
+    # The covariate window must start at the same time step as the target
+    # window and its future part must be exactly the requested horizon.
+    self.assertEqual(float(target[0]), float(pf[0]))
+    self.assertEqual(pf.shape[-1], target.shape[-1] + 5)
+    self.assertEqual(call["horizon"], 5)
+    self.assertEqual(outputs[0].forecast.shape, (5,))
+
+  def test_mixed_length_batch_with_covariates(self):
+    forecaster = self._forecaster()
+    long_ctx = np.arange(40, dtype=np.float32)
+    short_ctx = np.arange(100, 112, dtype=np.float32)
+    outputs = list(
+      forecaster.predict_batch(
+        contexts=[long_ctx, short_ctx],
+        horizon=5,
+        past_future_covariates=[
+          np.arange(45, dtype=np.float32),
+          np.arange(100, 117, dtype=np.float32),
+        ],
+      )
+    )
+    self.assertEqual([o.forecast.shape for o in outputs], [(5,), (5,)])
+
+  def test_predict_batch_accepts_2d_array(self):
+    forecaster = self._forecaster()
+    outputs = list(
+      forecaster.predict_batch(
+        contexts=np.random.rand(3, 12).astype(np.float32), horizon=4
+      )
+    )
+    self.assertEqual(len(outputs), 3)
+
+
 if __name__ == "__main__":
   unittest.main()
