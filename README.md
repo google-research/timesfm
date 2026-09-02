@@ -122,7 +122,7 @@ TimesFM 2.5:
 
 ```shell
 # Install TimesFM with PyTorch
-pip install timesfm[torch]
+pip install "timesfm[torch]"
 ```
 
 #### Local Install
@@ -142,7 +142,7 @@ pip install timesfm[torch]
     source .venv/bin/activate
 
      # Install the package in editable mode with torch
-    uv pip install -e .[torch]
+    uv pip install -e ".[torch]"
     ```
 
 --------------------------------------------------------------------------------

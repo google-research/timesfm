@@ -172,7 +172,7 @@ Works on any CPU with sufficient RAM. Expect 5–20× slower than GPU.
 
 | Package | Purpose | Install |
 | ------- | ------- | ------- |
-| jax | Flax backend | `pip install jax[cuda]` |
+| jax | Flax backend | `pip install "jax[cuda]"` |
 | flax | Flax backend | `pip install flax` |
 | scikit-learn | XReg covariates | `pip install scikit-learn` |
 
