@@ -39,7 +39,7 @@ class RMSNorm(nnx.Module):
     rngs=nnx.Rngs(42),
   ):
     del rngs
-    self.scale = nnx.Param(jnp.zeros(shape=(num_features,)))
+    self.scale = nnx.Param(jnp.ones(shape=(num_features,)))
     self.num_features = num_features
     self.epsilon = epsilon
 
