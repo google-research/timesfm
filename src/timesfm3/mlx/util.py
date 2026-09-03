@@ -39,7 +39,9 @@ def roll_back1(x: mx.array, axis: int) -> mx.array:
   return mx.take(x, idx, axis=axis)
 
 
-def revin(x: mx.array, mu: mx.array, sigma: mx.array, reverse: bool = False) -> mx.array:
+def revin(
+  x: mx.array, mu: mx.array, sigma: mx.array, reverse: bool = False
+) -> mx.array:
   """Reversible per-instance normalization; mu/sigma have 1 or 2 fewer dims than x."""
   if mu.ndim == x.ndim - 1:
     mu, sigma = mu[..., None], sigma[..., None]

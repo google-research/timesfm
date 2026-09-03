@@ -20,7 +20,8 @@ The PyTorch backend lives in ``timesfm3.torch`` and the MLX (Apple Silicon) back
 ``timesfm3`` — or ``timesfm3.mlx`` — does not require PyTorch to be installed.
 """
 
-_TORCH_EXPORTS = frozenset({
+_TORCH_EXPORTS = frozenset(
+  {
     "ForecastOutput",
     "ModelConfig",
     "ResidualBlockConfig",
@@ -30,14 +31,15 @@ _TORCH_EXPORTS = frozenset({
     "TimesFM3Torch",
     "TransformerConfig",
     "_ModelConfig",
-})
+  }
+)
 
 __all__ = sorted(_TORCH_EXPORTS)
 
 
 def __getattr__(name):  # PEP 562: lazily re-export the torch backend at the top level
-    if name in _TORCH_EXPORTS:
-        from . import torch as _torch_backend
+  if name in _TORCH_EXPORTS:
+    from . import torch as _torch_backend
 
-        return getattr(_torch_backend, name)
-    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    return getattr(_torch_backend, name)
+  raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

@@ -17,17 +17,17 @@
 from .configs import TimesFM3MlxConfig
 from .model import TimesFM3Mlx
 from .timesfm3_forecaster import (
-    ForecastOutput,
-    ModelConfig,
-    TimesFM3Forecaster,
-    _ModelConfig,
+  ForecastOutput,
+  ModelConfig,
+  TimesFM3Forecaster,
+  _ModelConfig,
 )
 
 __all__ = [
-    "ForecastOutput",
-    "ModelConfig",
-    "TimesFM3Forecaster",
-    "TimesFM3Mlx",
-    "TimesFM3MlxConfig",
-    "_ModelConfig",
+  "ForecastOutput",
+  "ModelConfig",
+  "TimesFM3Forecaster",
+  "TimesFM3Mlx",
+  "TimesFM3MlxConfig",
+  "_ModelConfig",
 ]

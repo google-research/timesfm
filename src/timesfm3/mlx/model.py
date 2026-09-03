@@ -36,7 +36,9 @@ from .dense import ResidualBlock
 class TimesFM3Mlx(nn.Module):
   """MLX TimesFM3. Use :meth:`from_pretrained` to load real weights from a checkpoint."""
 
-  def __init__(self, config: configs.TimesFM3MlxConfig | None = None, compile: bool = True):
+  def __init__(
+    self, config: configs.TimesFM3MlxConfig | None = None, compile: bool = True
+  ):
     super().__init__()
     cfg = config or configs.TimesFM3MlxConfig()
     self.config = cfg
@@ -67,7 +69,9 @@ class TimesFM3Mlx(nn.Module):
     resblock_in = mx.concatenate([vals_cat, masks_cat.astype(mx.float32)], axis=-1)
     x = self.pre_transformer_resblock(resblock_in.astype(self._compute_dtype))
     patch_mask = masks_cat.astype(mx.float32).min(axis=3) > 0.5
-    eff = mx.cumprod(patch_mask.astype(mx.int32), axis=2) > 0  # mask leading patches only
+    eff = (
+      mx.cumprod(patch_mask.astype(mx.int32), axis=2) > 0
+    )  # mask leading patches only
     x = self.transformer_stack(x, eff)
     raw = self.output_head(x).astype(mx.float32)
     if patch_cpm_mask is not None:
@@ -181,7 +185,7 @@ class TimesFM3Mlx(nn.Module):
     sum_t2 = mx.where(~ctx_masks, t * t, 0.0).sum(axis=-1)
     sum_y = mx.where(~ctx_masks, ctx_vals, 0.0).sum(axis=-1)
     sum_ty = mx.where(~ctx_masks, t * ctx_vals, 0.0).sum(axis=-1)
-    det = n_v * sum_t2 - sum_t ** 2
+    det = n_v * sum_t2 - sum_t**2
     safe = mx.where(det == 0.0, 1.0, det)
     m = mx.where(det == 0.0, 0.0, (n_v * sum_ty - sum_t * sum_y) / safe)
     c = mx.where(
@@ -191,12 +195,12 @@ class TimesFM3Mlx(nn.Module):
     )
     detr = ctx_vals - (m[..., None] * t + c[..., None])
     mean_y = sum_y / mx.maximum(n_v, 1.0)
-    sum_y2 = mx.where(~ctx_masks, ctx_vals ** 2, 0.0).sum(axis=-1)
-    std_orig = mx.sqrt(mx.maximum(sum_y2 / mx.maximum(n_v, 1.0) - mean_y ** 2, 0.0))
+    sum_y2 = mx.where(~ctx_masks, ctx_vals**2, 0.0).sum(axis=-1)
+    std_orig = mx.sqrt(mx.maximum(sum_y2 / mx.maximum(n_v, 1.0) - mean_y**2, 0.0))
     sum_yd = mx.where(~ctx_masks, detr, 0.0).sum(axis=-1)
     mean_yd = sum_yd / mx.maximum(n_v, 1.0)
-    sum_yd2 = mx.where(~ctx_masks, detr ** 2, 0.0).sum(axis=-1)
-    std_det = mx.sqrt(mx.maximum(sum_yd2 / mx.maximum(n_v, 1.0) - mean_yd ** 2, 0.0))
+    sum_yd2 = mx.where(~ctx_masks, detr**2, 0.0).sum(axis=-1)
+    std_det = mx.sqrt(mx.maximum(sum_yd2 / mx.maximum(n_v, 1.0) - mean_yd**2, 0.0))
     apply = std_det < cfg.linear_detrending_threshold * std_orig
     return m, c, apply
 

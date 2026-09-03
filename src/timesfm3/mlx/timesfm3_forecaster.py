@@ -160,7 +160,9 @@ class TimesFM3Forecaster:
       ("use_znorm", use_znorm),
     ):
       if flag:
-        raise NotImplementedError(f"{name}=True is not yet supported by the MLX backend.")
+        raise NotImplementedError(
+          f"{name}=True is not yet supported by the MLX backend."
+        )
     if padding_mode != "none":
       raise NotImplementedError(
         f"padding_mode={padding_mode!r} is not yet supported by the MLX backend."
@@ -195,7 +197,9 @@ class TimesFM3Forecaster:
           quantiles = np.array(q)
           if make_positive:
             quantiles = np.maximum(quantiles, 0.0)
-        results[i] = ForecastOutput(ts_id=ids[i], forecast=forecast, quantiles=quantiles)
+        results[i] = ForecastOutput(
+          ts_id=ids[i], forecast=forecast, quantiles=quantiles
+        )
 
     for r in results:
       yield r

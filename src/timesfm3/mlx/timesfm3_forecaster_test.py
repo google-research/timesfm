@@ -76,9 +76,9 @@ class TimesFM3MlxModelTest(unittest.TestCase):
   def test_batched_decode_matches_single(self):
     # decode() is per-series independent, so a batched call must equal looping series-by-series.
     model = self._tiny_model()
-    ctxs = np.stack(
-      [np.sin(np.linspace(0, 10 + i, 128)) for i in range(3)]
-    ).astype(np.float32)
+    ctxs = np.stack([np.sin(np.linspace(0, 10 + i, 128)) for i in range(3)]).astype(
+      np.float32
+    )
     batched = np.array(model.decode(mx.array(ctxs)[:, None, :], horizon=24))
     for i in range(3):
       single = np.array(model.decode(mx.array(ctxs[i])[None, None, :], horizon=24))
@@ -86,7 +86,8 @@ class TimesFM3MlxModelTest(unittest.TestCase):
 
 
 @unittest.skipUnless(
-  _HAS_MLX and _weights_cached(), "requires the cached google/timesfm-3.0-pytorch checkpoint"
+  _HAS_MLX and _weights_cached(),
+  "requires the cached google/timesfm-3.0-pytorch checkpoint",
 )
 class TimesFM3MlxRealWeightsTest(unittest.TestCase):
   """End-to-end tests on the real pretrained weights."""
@@ -94,7 +95,9 @@ class TimesFM3MlxRealWeightsTest(unittest.TestCase):
   def test_predict_shapes(self):
     forecaster = timesfm3_forecaster.TimesFM3Forecaster.from_pretrained(_CHECKPOINT)
     out = forecaster.predict(
-      np.sin(np.linspace(0, 40, 512)).astype(np.float32), horizon=64, return_quantiles=True
+      np.sin(np.linspace(0, 40, 512)).astype(np.float32),
+      horizon=64,
+      return_quantiles=True,
     )
     self.assertEqual(np.asarray(out.forecast).shape, (64,))
     self.assertEqual(np.asarray(out.quantiles).shape, (64, 9))
@@ -104,17 +107,18 @@ class TimesFM3MlxRealWeightsTest(unittest.TestCase):
     from ..torch import timesfm3_forecaster as torch_forecaster
 
     ctx = np.sin(np.linspace(0, 40, 512)).astype(np.float32)
-    mlx_out = timesfm3_forecaster.TimesFM3Forecaster.from_pretrained(_CHECKPOINT).predict(
-      ctx, horizon=64, return_quantiles=True
-    )
-    torch_out = torch_forecaster.TimesFM3Forecaster.from_pretrained(_CHECKPOINT).predict(
-      ctx, horizon=64, return_quantiles=True
-    )
+    mlx_out = timesfm3_forecaster.TimesFM3Forecaster.from_pretrained(
+      _CHECKPOINT
+    ).predict(ctx, horizon=64, return_quantiles=True)
+    torch_out = torch_forecaster.TimesFM3Forecaster.from_pretrained(
+      _CHECKPOINT
+    ).predict(ctx, horizon=64, return_quantiles=True)
     self.assertLess(
       np.abs(np.asarray(mlx_out.forecast) - np.asarray(torch_out.forecast)).max(), 1e-3
     )
     self.assertLess(
-      np.abs(np.asarray(mlx_out.quantiles) - np.asarray(torch_out.quantiles)).max(), 1e-3
+      np.abs(np.asarray(mlx_out.quantiles) - np.asarray(torch_out.quantiles)).max(),
+      1e-3,
     )
 
 

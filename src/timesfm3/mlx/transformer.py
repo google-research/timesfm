@@ -28,13 +28,17 @@ import mlx.nn as nn
 from . import configs, normalization
 
 
-def rope(x: mx.array, position: mx.array, min_ts: float = 1.0, max_ts: float = 10000.0) -> mx.array:
+def rope(
+  x: mx.array, position: mx.array, min_ts: float = 1.0, max_ts: float = 10000.0
+) -> mx.array:
   """Rotary positional embedding on ``(b, n, h, hd)`` with ``position`` ``(b, n)`` (half-split)."""
   hd = x.shape[-1]
   half = hd // 2
   fraction = 2.0 * mx.arange(half).astype(mx.float32) / hd
   timescale = min_ts * (max_ts / min_ts) ** fraction
-  sinusoid = position[:, :, None, None].astype(mx.float32) / timescale.reshape(1, 1, 1, -1)
+  sinusoid = position[:, :, None, None].astype(mx.float32) / timescale.reshape(
+    1, 1, 1, -1
+  )
   sin, cos = mx.sin(sinusoid), mx.cos(sinusoid)
   first, second = mx.split(x, 2, axis=-1)
   return mx.concatenate(
