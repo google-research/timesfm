@@ -186,8 +186,11 @@ print("Series 2 quantiles shape:", outputs[1].quantiles.shape) # (12, 9)
 #### Apple Silicon: MLX backend
 
 An MLX-native backend runs TimesFM 3.0 on Apple silicon without PyTorch. It mirrors the PyTorch
-`TimesFM3Forecaster` interface and is numerically matched to it (median forecast max abs error
-`9.5e-7`, quantiles `1.8e-6`, on `google/timesfm-3.0-pytorch`, context 512 → horizon 64).
+`TimesFM3Forecaster` interface (`predict` / `predict_batch`, univariate or multivariate, with
+past-only and past-future covariates) and is numerically matched to it on
+`google/timesfm-3.0-pytorch`. Median forecast / quantile max abs error, context 512: `9.5e-7` /
+`1.8e-6` at horizon 64, `2.3e-6` / `2.7e-6` at horizon 128 (longer horizons stitch multiple output
+patches, so they are worth checking on their own).
 
 ```python
 import numpy as np
@@ -195,26 +198,55 @@ from timesfm3.mlx import TimesFM3Forecaster
 
 forecaster = TimesFM3Forecaster.from_pretrained("google/timesfm-3.0-pytorch")
 
+# Univariate, long horizon (>= 128 spans several output patches).
 context = np.sin(np.linspace(0, 40, 512)).astype(np.float32)
-out = forecaster.predict(context, horizon=64, return_quantiles=True)
-print(out.forecast.shape)    # (64,)      median forecast
-print(out.quantiles.shape)   # (64, 9)    9 deciles
+out = forecaster.predict(context, horizon=128, return_quantiles=True)
+print(out.forecast.shape)    # (128,)      median forecast
+print(out.quantiles.shape)   # (128, 9)    9 deciles
 
-# batch many series through one forward pass
-outs = list(forecaster.predict_batch([context] * 32, horizon=64))
+# Batch many series through one forward pass.
+outs = list(forecaster.predict_batch([context] * 32, horizon=128))
+```
+
+Multivariate targets and covariates work the same way as on the PyTorch backend (matched to
+`1.7e-6` on the checkpoint):
+
+```python
+context_len, horizon = 256, 32
+
+# Two target variates: (num_variates, context_len).
+target = np.stack([
+    np.sin(np.linspace(0, 24, context_len)),
+    np.sin(np.linspace(1, 26, context_len)),
+]).astype(np.float32)
+
+past_only = np.random.randn(1, context_len).astype(np.float32)          # (1, 256)
+past_future = np.sin(                                                    # (1, 256 + 32)
+    np.linspace(0, 30, context_len + horizon)
+)[None, :].astype(np.float32)
+
+out = forecaster.predict(
+    target,
+    horizon=horizon,
+    past_only_covariates=past_only,
+    past_future_covariates=past_future,
+    return_quantiles=True,
+)
+print(out.forecast.shape)    # (2, 32)     one forecast per target variate
+print(out.quantiles.shape)   # (2, 32, 9)
 ```
 
 Benchmarks (330M model, Apple M4 Max, context 512, horizon 64, fp32 with `mx.compile`):
 
 | batch | p50 latency | throughput |
 |------:|------------:|-----------:|
-|     1 |     12.4 ms |   80 series/s |
-|     8 |     22.0 ms |  363 series/s |
-|    32 |     55.0 ms |  582 series/s |
+|     1 |     11.1 ms |   90 series/s |
+|     8 |     19.7 ms |  406 series/s |
+|    32 |     48.1 ms |  666 series/s |
 
-Not yet supported by the MLX backend: covariates (`past_only_covariates` /
-`past_future_covariates`), `use_symmetric_averaging`, `use_znorm`, and non-`"none"` `padding_mode`
-— use the PyTorch backend for those.
+Contexts longer than `global_context` (15,360) are truncated to their most recent points before
+decode, matching the PyTorch backend. Not yet supported by the MLX backend: `use_symmetric_averaging`,
+`use_znorm`, and non-`"none"` `padding_mode` — use the PyTorch backend for those.
 
 #### 2. Multivariate Forecasting with Covariates
 
