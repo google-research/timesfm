@@ -108,23 +108,72 @@ class TimesFM3Mlx(nn.Module):
       self._compiled_forward = mx.compile(self._forward_logits)
     return self._compiled_forward
 
-  def decode(self, target: mx.array, horizon: int) -> mx.array:
-    """``target`` ``(b, 1, context)`` -> logits ``(b, 1, horizon, num_quantiles)`` (target-only)."""
+  def decode(
+    self,
+    target: mx.array,
+    horizon: int = 0,
+    past_only_covariates: mx.array | None = None,
+    past_future_covariates: mx.array | None = None,
+    target_mask: mx.array | None = None,
+    past_only_mask: mx.array | None = None,
+    past_future_mask: mx.array | None = None,
+    mask: mx.array | None = None,
+  ) -> mx.array:
+    """Non-autoregressive single-pass decode, mirroring the torch backend.
+
+    Args:
+      target: ``(b, u, context)`` target variates.
+      horizon: forecast horizon; inferred from ``past_future_covariates`` if given.
+      past_only_covariates: ``(b, v_po, context)`` covariates known only in the past.
+      past_future_covariates: ``(b, w, context + horizon)`` covariates known into the future.
+      target_mask / past_only_mask / past_future_mask: optional per-value bool masks
+        (``True`` = masked), same shape as their arrays.
+      mask: optional global ``(b, context)`` bool mask.
+
+    Targets, past-only and past-future covariates are stacked on the variate axis
+    (in that order) and mixed by variate attention. Returns logits
+    ``(b, num_variates, horizon, num_quantiles)``; the caller keeps the target rows.
+    """
     cfg = self.config
-    b, num_target, context = target.shape
     p = cfg.input_patch_len
-    pad = (p - (context % p)) % p
-    mask = mx.zeros((b, context + pad), dtype=mx.bool_)
-    if pad:
-      target = mx.concatenate([mx.zeros((b, num_target, pad)), target], axis=-1)
-      mask = mx.concatenate(
-        [
-          mx.ones((b, pad), dtype=mx.bool_),
-          mx.zeros((b, context), dtype=mx.bool_),
-        ],
-        axis=-1,
+    b, num_target, context = target.shape
+
+    if past_future_covariates is not None:
+      horizon = past_future_covariates.shape[-1] - context
+    if horizon <= 0:
+      raise ValueError(
+        "decode requires horizon > 0 (pass horizon= or past_future_covariates)."
       )
-      context = context + pad
+
+    # 1. Left-pad the context to a whole number of patches.
+    ctx_pad = (p - (context % p)) % p
+
+    def _lpad(x, value):
+      if ctx_pad == 0:
+        return x
+      fill = mx.full((b, x.shape[1], ctx_pad), value, dtype=x.dtype)
+      return mx.concatenate([fill, x], axis=-1)
+
+    if ctx_pad:
+      target = _lpad(target, 0.0)
+      if past_only_covariates is not None:
+        past_only_covariates = _lpad(past_only_covariates, 0.0)
+      if past_future_covariates is not None:
+        past_future_covariates = _lpad(past_future_covariates, 0.0)
+      if target_mask is not None:
+        target_mask = _lpad(target_mask, True)
+      if past_only_mask is not None:
+        past_only_mask = _lpad(past_only_mask, True)
+      if past_future_mask is not None:
+        past_future_mask = _lpad(past_future_mask, True)
+
+    if mask is None:
+      lead = mx.ones((b, ctx_pad), dtype=mx.bool_)
+      body = mx.zeros((b, context), dtype=mx.bool_)
+      mask = mx.concatenate([lead, body], axis=-1) if ctx_pad else body
+    elif ctx_pad:
+      mask = mx.concatenate([mx.ones((b, ctx_pad), dtype=mx.bool_), mask], axis=-1)
+    context = context + ctx_pad
     num_ctx_patches = context // p
 
     extract_len = min(2 * p, cfg.output_patch_len)
@@ -132,10 +181,31 @@ class TimesFM3Mlx(nn.Module):
     num_forecast_patches = max(math.ceil((horizon - overlap) / p), 1)
     num_hor_patches = num_forecast_patches + cfg.rolls - 1
     padded_h = num_hor_patches * p
+    hor_pad = padded_h - horizon
 
-    ctx_masks = mx.broadcast_to(mask[:, None, :], (b, num_target, context))
-    ctx_vals = target
+    # 2. Stack targets + covariates on the variate axis.
+    if target_mask is None:
+      target_mask = mx.zeros_like(target).astype(mx.bool_)
+    gmask = mask[:, None, :]
+    all_ctx_vals = [target]
+    all_ctx_masks = [target_mask | gmask]
+    num_past_only = 0
+    if past_only_covariates is not None:
+      num_past_only = past_only_covariates.shape[1]
+      if past_only_mask is None:
+        past_only_mask = mx.zeros_like(past_only_covariates).astype(mx.bool_)
+      all_ctx_vals.append(past_only_covariates)
+      all_ctx_masks.append(past_only_mask | gmask)
+    if past_future_covariates is not None:
+      if past_future_mask is None:
+        past_future_mask = mx.zeros_like(past_future_covariates).astype(mx.bool_)
+      all_ctx_vals.append(past_future_covariates[..., :context])
+      all_ctx_masks.append(past_future_mask[..., :context] | gmask)
+    ctx_vals = mx.concatenate(all_ctx_vals, axis=1)
+    ctx_masks = mx.concatenate(all_ctx_masks, axis=1)
+    num_variates = ctx_vals.shape[1]
 
+    # 3. Per-variate linear detrend (context part).
     m_trend, c_trend, apply_detrend = self._detrend(ctx_vals, ctx_masks, context)
     if cfg.use_linear_detrending:
       t = mx.arange(-(context - 1), 1).astype(mx.float32)[None, None, :] / context
@@ -143,15 +213,57 @@ class TimesFM3Mlx(nn.Module):
       ctx_vals = mx.where(apply_detrend[..., None], detr, ctx_vals)
     ctx_vals = mx.where(ctx_masks, 0.0, ctx_vals)
 
-    hor_vals = mx.zeros((b, num_target, padded_h))
-    hor_masks = mx.ones((b, num_target, padded_h), dtype=mx.bool_)
+    # 4. Horizon side: targets and past-only are unknown (masked); past-future
+    #    carries its real future values (detrended with that variate's trend).
+    all_hor_vals = [
+      mx.zeros((b, num_target, padded_h)),
+      mx.zeros((b, num_past_only, padded_h)),
+    ]
+    all_hor_masks = [
+      mx.ones((b, num_target, padded_h), dtype=mx.bool_),
+      mx.ones((b, num_past_only, padded_h), dtype=mx.bool_),
+    ]
+    if past_future_covariates is not None:
+      pf_future_vals = past_future_covariates[..., context : context + horizon]
+      pf_future_masks = past_future_mask[..., context : context + horizon]
+      if cfg.use_linear_detrending:
+        base = num_target + num_past_only
+        m_pf = m_trend[:, base:][:, :, None]
+        c_pf = c_trend[:, base:][:, :, None]
+        apply_pf = apply_detrend[:, base:][:, :, None]
+        t_hor = mx.arange(1, horizon + 1).astype(mx.float32)[None, None, :] / context
+        pf_trend = m_pf * t_hor + c_pf
+        pf_future_vals = mx.where(apply_pf, pf_future_vals - pf_trend, pf_future_vals)
+      pf_future_vals = mx.where(pf_future_masks, 0.0, pf_future_vals)
+      if hor_pad > 0:
+        w = pf_future_vals.shape[1]
+        pf_future_vals = mx.concatenate(
+          [pf_future_vals, mx.zeros((b, w, hor_pad))], axis=-1
+        )
+        pf_future_masks = mx.concatenate(
+          [pf_future_masks, mx.ones((b, w, hor_pad), dtype=mx.bool_)], axis=-1
+        )
+      all_hor_vals.append(pf_future_vals)
+      all_hor_masks.append(pf_future_masks)
+    hor_vals = mx.concatenate(all_hor_vals, axis=1)
+    hor_masks = mx.concatenate(all_hor_masks, axis=1)
+
     all_vals = mx.concatenate([ctx_vals, hor_vals], axis=-1)
     all_masks = mx.concatenate([ctx_masks, hor_masks], axis=-1)
 
     n_tot = num_ctx_patches + num_hor_patches
-    values_bvnp = all_vals.reshape(b, num_target, n_tot, p)
-    masks_bvnp = all_masks.reshape(b, num_target, n_tot, p)
-    patch_is_target = mx.ones((b, num_target, n_tot), dtype=mx.bool_)
+    values_bvnp = all_vals.reshape(b, num_variates, n_tot, p)
+    masks_bvnp = all_masks.reshape(b, num_variates, n_tot, p)
+    # Targets and past-only covariates are reconstructed by the model; past-future
+    # covariates are only conditioning, so they are not "target" patches.
+    num_pred = num_target + num_past_only
+    patch_is_target = mx.concatenate(
+      [
+        mx.ones((b, num_pred, n_tot), dtype=mx.bool_),
+        mx.zeros((b, num_variates - num_pred, n_tot), dtype=mx.bool_),
+      ],
+      axis=1,
+    )
 
     horizon_cpm = mx.concatenate(
       [

@@ -156,14 +156,13 @@ class TimesFM3Forecaster:
     use_znorm: bool = False,
     padding_mode: str = "none",
   ) -> Iterator[ForecastOutput]:
-    """Runs inference on a batch of univariate time series."""
-    if any(c is not None for c in (past_only_covariates or [])) or any(
-      c is not None for c in (past_future_covariates or [])
-    ):
-      raise NotImplementedError(
-        "Covariate forecasting is not yet supported by the MLX backend; use the torch backend "
-        "for covariates. Follow-up: add the multivariate/covariate path to the MLX model."
-      )
+    """Runs inference on a batch of series.
+
+    Each context is a 1D univariate series or a 2D ``(num_variates, context)``
+    multivariate series, optionally with per-series past-only and past-future
+    covariates. A 1D input yields ``forecast`` of shape ``(horizon,)``; a 2D
+    input yields ``(num_variates, horizon)``, matching the torch backend.
+    """
     for name, flag in (
       ("use_symmetric_averaging", use_symmetric_averaging),
       ("use_znorm", use_znorm),
@@ -179,34 +178,87 @@ class TimesFM3Forecaster:
     if not contexts:
       return
 
-    ids = list(ts_ids) if ts_ids is not None else [None] * len(contexts)
+    n = len(contexts)
+    ids = list(ts_ids) if ts_ids is not None else [None] * n
+    po_list = past_only_covariates if past_only_covariates is not None else [None] * n
+    pf_list = (
+      past_future_covariates if past_future_covariates is not None else [None] * n
+    )
     median_idx = self.config.median_quantile_index
-
-    # Group same-length contexts so each group runs through a single batched forward pass.
-    # decode() is per-series independent (running stats, RevIN, detrending are per-batch-row), so
-    # batching is numerically identical to looping but scales throughput near-linearly.
     cap = self.config.max_context_length
-    arrs = [np.asarray(c, dtype=np.float32).reshape(-1)[-cap:] for c in contexts]
-    groups: dict[int, list[int]] = {}
-    for i, a in enumerate(arrs):
-      groups.setdefault(a.shape[0], []).append(i)
 
-    results: list[ForecastOutput | None] = [None] * len(arrs)
-    for _length, idxs in groups.items():
-      batch = mx.array(np.stack([arrs[i] for i in idxs]))[:, None, :]  # (B, 1, length)
-      logits = self.model.decode(batch, horizon)  # (B, 1, horizon, num_quantiles)
-      for bi, i in enumerate(idxs):
-        q = logits[bi, 0]  # (horizon, num_quantiles)
-        if sort_quantiles:
-          q = mx.sort(q, axis=-1)
-        forecast = np.array(q[:, median_idx])
-        if make_positive:
-          forecast = np.maximum(forecast, 0.0)
-        quantiles = None
-        if return_quantiles:
-          quantiles = np.array(q)
-          if make_positive:
-            quantiles = np.maximum(quantiles, 0.0)
+    def _shape_output(raw, num_target, was_1d, ctx_2d):
+      # raw: (num_variates, horizon, num_quantiles). Keep only the target rows.
+      tgt = raw[:num_target]
+      if sort_quantiles:
+        tgt = np.sort(tgt, axis=-1)
+      forecast = np.array(tgt[..., median_idx])  # (num_target, horizon)
+      quantiles = np.array(tgt) if return_quantiles else None
+      if make_positive:
+        # Match torch: clamp a variate only when its own input is nonnegative.
+        nonneg = (ctx_2d >= 0).all(axis=1)
+        for r in range(num_target):
+          if nonneg[r]:
+            forecast[r] = np.maximum(forecast[r], 0.0)
+            if quantiles is not None:
+              quantiles[r] = np.maximum(quantiles[r], 0.0)
+      if was_1d:
+        forecast = forecast[0]
+        quantiles = quantiles[0] if quantiles is not None else None
+      return forecast, quantiles
+
+    results: list[ForecastOutput | None] = [None] * n
+    has_cov = any(po is not None for po in po_list) or any(
+      pf is not None for pf in pf_list
+    )
+    all_univariate = all(np.ndim(c) == 1 for c in contexts)
+
+    if not has_cov and all_univariate:
+      # Fast path: univariate, no covariates. Group by length so each group runs
+      # through a single batched forward pass. decode() is per-series independent
+      # (running stats, RevIN, detrending are per row), so this is numerically
+      # identical to looping but scales throughput near-linearly.
+      arrs = [np.asarray(c, dtype=np.float32).reshape(-1)[-cap:] for c in contexts]
+      groups: dict[int, list[int]] = {}
+      for i, a in enumerate(arrs):
+        groups.setdefault(a.shape[0], []).append(i)
+      for _length, idxs in groups.items():
+        batch = mx.array(np.stack([arrs[i] for i in idxs]))[:, None, :]
+        logits = np.array(self.model.decode(batch, horizon))  # (B, 1, h, q)
+        for bi, i in enumerate(idxs):
+          forecast, quantiles = _shape_output(logits[bi], 1, True, arrs[i][None, :])
+          results[i] = ForecastOutput(
+            ts_id=ids[i], forecast=forecast, quantiles=quantiles
+          )
+    else:
+      # General path: multivariate targets and/or covariates, one series at a time.
+      for i, c in enumerate(contexts):
+        was_1d = np.ndim(c) == 1
+        tgt = np.atleast_2d(np.asarray(c, dtype=np.float32))  # (u, ctx)
+        ctx_len = tgt.shape[-1]
+        po = po_list[i]
+        pf = pf_list[i]
+        po = np.atleast_2d(np.asarray(po, dtype=np.float32)) if po is not None else None
+        pf = np.atleast_2d(np.asarray(pf, dtype=np.float32)) if pf is not None else None
+        # global_context truncation, keeping covariate windows aligned with the
+        # target window (as the torch Query.format does).
+        if ctx_len > cap:
+          tgt = tgt[:, -cap:]
+          if po is not None:
+            po = po[:, -cap:]
+          if pf is not None:
+            future_len = pf.shape[-1] - ctx_len
+            pf = pf[:, -(cap + future_len) :]
+          ctx_len = cap
+        logits = np.array(
+          self.model.decode(
+            mx.array(tgt)[None],
+            horizon,
+            past_only_covariates=mx.array(po)[None] if po is not None else None,
+            past_future_covariates=mx.array(pf)[None] if pf is not None else None,
+          )
+        )[0]  # (num_variates, h, q)
+        forecast, quantiles = _shape_output(logits, tgt.shape[0], was_1d, tgt)
         results[i] = ForecastOutput(
           ts_id=ids[i], forecast=forecast, quantiles=quantiles
         )

@@ -84,6 +84,52 @@ class TimesFM3MlxModelTest(unittest.TestCase):
       single = np.array(model.decode(mx.array(ctxs[i])[None, None, :], horizon=24))
       np.testing.assert_allclose(batched[i], single[0], atol=1e-4)
 
+  def test_decode_multivariate_targets_shape(self):
+    # Two target variates in, two forecasts out.
+    model = self._tiny_model()
+    ctx = mx.array(np.random.RandomState(0).randn(1, 2, 128).astype(np.float32))
+    logits = model.decode(ctx, horizon=24)
+    self.assertEqual(logits.shape, (1, 2, 24, 9))
+
+  def test_decode_with_covariates_returns_all_variates(self):
+    # decode() stacks targets, past-only and past-future covariates on the
+    # variate axis, mirroring the torch backend, and returns one row per variate.
+    model = self._tiny_model()
+    rng = np.random.RandomState(0)
+    target = mx.array(rng.randn(1, 2, 128).astype(np.float32))
+    po = mx.array(rng.randn(1, 1, 128).astype(np.float32))
+    pf = mx.array(rng.randn(1, 1, 128 + 24).astype(np.float32))
+    logits = model.decode(
+      target, horizon=24, past_only_covariates=po, past_future_covariates=pf
+    )
+    # 2 targets + 1 past-only + 1 past-future = 4 variates.
+    self.assertEqual(logits.shape, (1, 4, 24, 9))
+
+  def test_past_future_covariate_infers_horizon(self):
+    # When past-future covariates are given, the horizon is read from their width.
+    model = self._tiny_model()
+    rng = np.random.RandomState(1)
+    target = mx.array(rng.randn(1, 1, 128).astype(np.float32))
+    pf = mx.array(rng.randn(1, 1, 128 + 30).astype(np.float32))
+    logits = model.decode(target, past_future_covariates=pf)
+    self.assertEqual(logits.shape[2], 30)
+
+  def test_detrend_activates_on_strong_trend_only(self):
+    # Detrend is data-driven (weight-independent): a near-linear series activates
+    # it; a stationary oscillation does not.
+    model = self._tiny_model()
+    masks = mx.zeros((1, 1, 128), dtype=mx.bool_)
+    trend = (np.linspace(0, 10, 128) + 0.05 * np.sin(np.linspace(0, 20, 128))).astype(
+      np.float32
+    )
+    flat = np.sin(np.linspace(0, 20, 128)).astype(np.float32)
+    self.assertTrue(
+      bool(model._detrend(mx.array(trend)[None, None], masks, 128)[2][0, 0])
+    )
+    self.assertFalse(
+      bool(model._detrend(mx.array(flat)[None, None], masks, 128)[2][0, 0])
+    )
+
 
 @unittest.skipUnless(
   _HAS_MLX and _weights_cached(),
@@ -141,6 +187,85 @@ class TimesFM3MlxRealWeightsTest(unittest.TestCase):
       np.abs(np.asarray(mlx_out.quantiles) - np.asarray(torch_out.quantiles)).max(),
       1e-3,
     )
+
+
+@unittest.skipUnless(
+  _HAS_MLX and _weights_cached() and _torch_available(),
+  "requires the cached checkpoint and torch as the parity oracle",
+)
+class TimesFM3MlxCovariateParityTest(unittest.TestCase):
+  """Parity of the multivariate / covariate / long-horizon paths against torch."""
+
+  @classmethod
+  def setUpClass(cls):
+    from ..torch import timesfm3_forecaster as torch_forecaster
+
+    cls.mlx = timesfm3_forecaster.TimesFM3Forecaster.from_pretrained(_CHECKPOINT)
+    cls.torch = torch_forecaster.TimesFM3Forecaster.from_pretrained(_CHECKPOINT)
+
+  def _assert_parity(self, mlx_out, torch_out, atol=1e-3):
+    np.testing.assert_allclose(
+      np.asarray(mlx_out.forecast), np.asarray(torch_out.forecast), atol=atol
+    )
+    np.testing.assert_allclose(
+      np.asarray(mlx_out.quantiles), np.asarray(torch_out.quantiles), atol=atol
+    )
+
+  def test_parity_long_horizon(self):
+    # Horizon >= 128 exercises multiple output patches + CPM refine + stitching.
+    ctx = np.sin(np.linspace(0, 40, 512)).astype(np.float32)
+    for horizon in (128, 256):
+      mlx_out = self.mlx.predict(ctx, horizon=horizon, return_quantiles=True)
+      torch_out = self.torch.predict(ctx, horizon=horizon, return_quantiles=True)
+      self.assertEqual(np.asarray(mlx_out.forecast).shape, (horizon,))
+      self._assert_parity(mlx_out, torch_out)
+
+  def test_parity_two_targets(self):
+    rng = np.random.RandomState(0)
+    target = np.stack(
+      [
+        np.sin(np.linspace(0, 30, 256)),
+        np.cos(np.linspace(0, 18, 256)) + 0.1 * rng.randn(256),
+      ]
+    ).astype(np.float32)
+    mlx_out = self.mlx.predict(target, horizon=64, return_quantiles=True)
+    torch_out = self.torch.predict(target, horizon=64, return_quantiles=True)
+    self.assertEqual(np.asarray(mlx_out.forecast).shape, (2, 64))
+    self._assert_parity(mlx_out, torch_out)
+
+  def test_parity_two_targets_with_covariates(self):
+    rng = np.random.RandomState(1)
+    ctx_len, horizon = 256, 32
+    target = np.stack(
+      [np.sin(np.linspace(0, 24, ctx_len)), np.sin(np.linspace(1, 26, ctx_len))]
+    ).astype(np.float32)
+    past_only = (0.5 * rng.randn(1, ctx_len)).astype(np.float32)
+    past_future = np.sin(np.linspace(0, 30, ctx_len + horizon))[None, :].astype(
+      np.float32
+    )
+    kw = dict(
+      horizon=horizon,
+      past_only_covariates=past_only,
+      past_future_covariates=past_future,
+      return_quantiles=True,
+    )
+    mlx_out = self.mlx.predict(target, **kw)
+    torch_out = self.torch.predict(target, **kw)
+    self.assertEqual(np.asarray(mlx_out.forecast).shape, (2, horizon))
+    self._assert_parity(mlx_out, torch_out)
+
+  def test_parity_detrend_activated(self):
+    # A strong linear trend activates detrend on both backends; outputs must agree.
+    ctx = (np.linspace(0, 12, 512) + 0.05 * np.sin(np.linspace(0, 40, 512))).astype(
+      np.float32
+    )
+    masks = mx.zeros((1, 1, 512), dtype=mx.bool_)
+    self.assertTrue(
+      bool(self.mlx.model._detrend(mx.array(ctx)[None, None], masks, 512)[2][0, 0])
+    )
+    mlx_out = self.mlx.predict(ctx, horizon=64, return_quantiles=True)
+    torch_out = self.torch.predict(ctx, horizon=64, return_quantiles=True)
+    self._assert_parity(mlx_out, torch_out)
 
 
 if __name__ == "__main__":
