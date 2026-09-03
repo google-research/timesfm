@@ -102,6 +102,27 @@ class TimesFM3MlxRealWeightsTest(unittest.TestCase):
     self.assertEqual(np.asarray(out.forecast).shape, (64,))
     self.assertEqual(np.asarray(out.quantiles).shape, (64, 9))
 
+  def test_global_context_default_matches_torch(self):
+    # The MLX backend must expose the same 15,360-step context cap as the torch
+    # backend so the two are backend-equivalent for very long contexts.
+    forecaster = timesfm3_forecaster.TimesFM3Forecaster.from_pretrained(_CHECKPOINT)
+    self.assertEqual(forecaster.global_context, 15360)
+
+  def test_context_truncated_to_global_context(self):
+    # A context longer than the cap must be truncated to its last
+    # `global_context` points before decode, so forecasting the full series
+    # equals forecasting only that tail.
+    cap = 256
+    forecaster = timesfm3_forecaster.TimesFM3Forecaster.from_pretrained(
+      _CHECKPOINT, max_context_length=cap
+    )
+    self.assertEqual(forecaster.global_context, cap)
+    ctx = np.sin(np.linspace(0, 60, 512)).astype(np.float32)
+    out_full = forecaster.predict(ctx, horizon=32, return_quantiles=True)
+    out_tail = forecaster.predict(ctx[-cap:], horizon=32, return_quantiles=True)
+    np.testing.assert_allclose(out_full.forecast, out_tail.forecast, atol=1e-5)
+    np.testing.assert_allclose(out_full.quantiles, out_tail.quantiles, atol=1e-5)
+
   @unittest.skipUnless(_torch_available(), "requires torch as the parity oracle")
   def test_parity_with_torch_backend(self):
     from ..torch import timesfm3_forecaster as torch_forecaster

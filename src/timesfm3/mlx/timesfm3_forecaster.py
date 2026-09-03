@@ -42,6 +42,10 @@ class _ModelConfig:
   median_quantile_index: int = 4
   # mx.compile the forward pass (fuses kernels, cuts dispatch overhead).
   compile: bool = True
+  # Longest context fed to the model. Contexts beyond this are truncated to
+  # their most recent `max_context_length` points before decode, matching the
+  # torch backend's `global_context` cap (`_MAX_CONTEXT_LENGTH`).
+  max_context_length: int = 15360
   # Hugging Face download options.
   cache_dir: str | None = None
   revision: str | None = None
@@ -100,6 +104,11 @@ class TimesFM3Forecaster:
   @property
   def context_length(self) -> int:
     return self.model.config.input_patch_len
+
+  @property
+  def global_context(self) -> int:
+    """Longest context the model runs on; longer inputs are truncated to it."""
+    return self.config.max_context_length
 
   def predict(
     self,
@@ -176,7 +185,8 @@ class TimesFM3Forecaster:
     # Group same-length contexts so each group runs through a single batched forward pass.
     # decode() is per-series independent (running stats, RevIN, detrending are per-batch-row), so
     # batching is numerically identical to looping but scales throughput near-linearly.
-    arrs = [np.asarray(c, dtype=np.float32).reshape(-1) for c in contexts]
+    cap = self.config.max_context_length
+    arrs = [np.asarray(c, dtype=np.float32).reshape(-1)[-cap:] for c in contexts]
     groups: dict[int, list[int]] = {}
     for i, a in enumerate(arrs):
       groups.setdefault(a.shape[0], []).append(i)
