@@ -194,6 +194,10 @@ print(output.diagnostics.interval_width.shape)  # (12,)
 print(output.diagnostics.confidence)            # high/moderate/low per horizon
 ```
 
+The confidence bucket combines absolute uncertainty
+(`relative_interval_width`) and horizon-to-horizon widening (`width_growth`),
+using the more conservative classification.
+
 #### 2. Multivariate Forecasting with Covariates
 
 Pass a 2D array of shape `(num_variates, context_length)` along with optional

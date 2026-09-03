@@ -171,10 +171,45 @@ class TimesFM3ForecasterTest(unittest.TestCase):
       diagnostics.width_growth, np.array([1.0, 2.0, 3.0, 4.0])
     )
     np.testing.assert_array_equal(
-      diagnostics.confidence, np.array(["high", "moderate", "moderate", "low"])
+      diagnostics.magnitude_confidence,
+      np.array(["high", "moderate", "low", "low"]),
+    )
+    np.testing.assert_array_equal(
+      diagnostics.growth_confidence,
+      np.array(["high", "moderate", "moderate", "low"]),
+    )
+    np.testing.assert_array_equal(
+      diagnostics.confidence, np.array(["high", "moderate", "low", "low"])
     )
     self.assertEqual(diagnostics.lower_quantile, 0.1)
     self.assertEqual(diagnostics.upper_quantile, 0.9)
+
+  def test_confidence_uses_absolute_uncertainty_for_flat_intervals(self):
+    forecast = np.array([10.0, 10.0, 10.0])
+    quantiles = np.array(
+      [
+        [-10.0, 10.0, 30.0],
+        [-10.0, 10.0, 30.0],
+        [-10.0, 10.0, 30.0],
+      ]
+    )
+
+    diagnostics = timesfm3_forecaster.forecast_confidence_diagnostics(
+      forecast, quantiles, [0.1, 0.5, 0.9]
+    )
+
+    np.testing.assert_array_equal(
+      diagnostics.width_growth, np.array([1.0, 1.0, 1.0])
+    )
+    np.testing.assert_array_equal(
+      diagnostics.growth_confidence, np.array(["high", "high", "high"])
+    )
+    np.testing.assert_array_equal(
+      diagnostics.magnitude_confidence, np.array(["low", "low", "low"])
+    )
+    np.testing.assert_array_equal(
+      diagnostics.confidence, np.array(["low", "low", "low"])
+    )
 
   @mock.patch.object(
     timesfm3_forecaster.TimesFM3Forecaster, "_init_model", autospec=True

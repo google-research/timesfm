@@ -132,6 +132,10 @@ class ForecastDiagnostics:
   relative_interval_width: np.ndarray
   # Interval width divided by the first horizon step width.
   width_growth: np.ndarray
+  # Confidence implied by absolute interval width relative to forecast magnitude.
+  magnitude_confidence: np.ndarray
+  # Confidence implied by interval widening across the horizon.
+  growth_confidence: np.ndarray
   # Coarse confidence bucket per horizon step: high, moderate, or low.
   confidence: np.ndarray
   # The quantile levels used as lower and upper bounds.
@@ -144,6 +148,10 @@ def forecast_confidence_diagnostics(
   quantiles: np.ndarray,
   quantile_levels: list[float],
   eps: float = 1e-6,
+  relative_width_moderate_threshold: float = 0.2,
+  relative_width_low_threshold: float = 0.5,
+  growth_moderate_threshold: float = 1.5,
+  growth_low_threshold: float = 3.0,
 ) -> ForecastDiagnostics:
   """Computes simple confidence diagnostics from forecast quantiles.
 
@@ -154,6 +162,14 @@ def forecast_confidence_diagnostics(
       ``(num_variates, horizon, num_quantiles)``.
     quantile_levels: Quantile levels corresponding to the final axis.
     eps: Minimum denominator for ratio metrics.
+    relative_width_moderate_threshold: Relative interval width above which
+      magnitude confidence is labelled moderate.
+    relative_width_low_threshold: Relative interval width above which magnitude
+      confidence is labelled low.
+    growth_moderate_threshold: Width growth above which growth confidence is
+      labelled moderate.
+    growth_low_threshold: Width growth above which growth confidence is labelled
+      low.
 
   Returns:
     ForecastDiagnostics with arrays matching the forecast shape.
@@ -182,14 +198,37 @@ def forecast_confidence_diagnostics(
   )
   first_width = np.take(interval_width, indices=0, axis=-1)
   width_growth = interval_width / np.maximum(np.expand_dims(first_width, -1), eps)
-  confidence = np.full(interval_width.shape, "high", dtype=object)
-  confidence = np.where(width_growth > 1.5, "moderate", confidence)
-  confidence = np.where(width_growth > 3.0, "low", confidence)
+  magnitude_confidence = np.full(interval_width.shape, "high", dtype=object)
+  magnitude_confidence = np.where(
+    relative_interval_width > relative_width_moderate_threshold,
+    "moderate",
+    magnitude_confidence,
+  )
+  magnitude_confidence = np.where(
+    relative_interval_width > relative_width_low_threshold,
+    "low",
+    magnitude_confidence,
+  )
+  growth_confidence = np.full(interval_width.shape, "high", dtype=object)
+  growth_confidence = np.where(
+    width_growth > growth_moderate_threshold, "moderate", growth_confidence
+  )
+  growth_confidence = np.where(
+    width_growth > growth_low_threshold, "low", growth_confidence
+  )
+
+  confidence_rank = {"high": 0, "moderate": 1, "low": 2}
+  confidence_labels = np.array(["high", "moderate", "low"], dtype=object)
+  magnitude_rank = np.vectorize(confidence_rank.__getitem__)(magnitude_confidence)
+  growth_rank = np.vectorize(confidence_rank.__getitem__)(growth_confidence)
+  confidence = confidence_labels[np.maximum(magnitude_rank, growth_rank)]
 
   return ForecastDiagnostics(
     interval_width=interval_width,
     relative_interval_width=relative_interval_width,
     width_growth=width_growth,
+    magnitude_confidence=magnitude_confidence,
+    growth_confidence=growth_confidence,
     confidence=confidence,
     lower_quantile=float(quantile_levels[0]),
     upper_quantile=float(quantile_levels[-1]),
