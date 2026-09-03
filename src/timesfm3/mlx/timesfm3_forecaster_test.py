@@ -114,6 +114,14 @@ class TimesFM3MlxModelTest(unittest.TestCase):
     logits = model.decode(target, past_future_covariates=pf)
     self.assertEqual(logits.shape[2], 30)
 
+  def test_from_hf_config_rejects_frozen_running_stats(self):
+    # The MLX backend does not implement frozen running stats. A checkpoint that
+    # asks for them must fail loudly rather than silently diverge from torch.
+    with self.assertRaises(NotImplementedError):
+      configs.TimesFM3MlxConfig.from_hf_config({"use_frozen_running_stats": True})
+    # The default (absent / False) builds normally.
+    configs.TimesFM3MlxConfig.from_hf_config({"use_frozen_running_stats": False})
+
   def test_detrend_activates_on_strong_trend_only(self):
     # Detrend is data-driven (weight-independent): a near-linear series activates
     # it; a stationary oscillation does not.

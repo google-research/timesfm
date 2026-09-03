@@ -56,6 +56,15 @@ class TimesFM3MlxConfig:
   @classmethod
   def from_hf_config(cls, cfg: dict) -> "TimesFM3MlxConfig":
     """Build a config from a checkpoint's ``config.json`` dictionary."""
+    if cfg.get("use_frozen_running_stats", False):
+      # Torch freezes the running RevIN stats at the context boundary; the MLX
+      # backend does not implement that yet, so a checkpoint that needs it would
+      # diverge on any unmasked horizon input (past-future covariates). The
+      # public 3.0 checkpoint sets this to False. Fail loudly instead.
+      raise NotImplementedError(
+        "The MLX backend does not implement use_frozen_running_stats=True; "
+        "use the torch backend for this checkpoint."
+      )
     transformer = cfg.get("transformer_config", {})
     inner = transformer.get("transformer", {})
     return cls(
