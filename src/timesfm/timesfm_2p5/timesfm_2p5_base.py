@@ -280,7 +280,9 @@ class TimesFM_2p5:
       A tuple of two lists. The first is the outputs of the model. The second is
       the outputs of the xreg.
     """
-    if self.forecast_config is not None and self.forecast_config.window_size > 0:
+    if self.forecast_config is None:
+      raise ValueError("Model is not compiled. Please call compile() first.")
+    elif self.forecast_config.window_size > 0:
       raise ValueError(
         "Decomposed forecasting (window_size > 0) is not supported with"
         " covariates. Use forecast() for decomposed forecasting."
