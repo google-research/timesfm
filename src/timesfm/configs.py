@@ -33,8 +33,13 @@ class ForecastConfig:
     normalize_inputs: Whether to normalize the inputs. This is useful when the
       raw inputs are of extremely large or small magnitudes which may result in
       numerical issues.
-    window_size: The window size for decomposed forecasting.
-      TODO(siriuz42):implement it.
+    window_size: The window size for decomposed forecasting. When set to a
+      positive value, each input time series is decomposed into a moving
+      average trend and a residual component using the given window size.
+      Both series are used as independent model inputs and their resulting
+      forecasts are summed to produce the final forecast. Set to 0 (default)
+      to disable. Only supported in forecast(); raises ValueError if used
+      with forecast_with_covariates().
     per_core_batch_size: The batch size per core. Used at inference time during
       batched inference when multiple GPU / TPU devices are used.
     use_continuous_quantile_head: Whether to use a separate continuous quantile

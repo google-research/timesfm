@@ -25,6 +25,7 @@ import numpy as np
 
 from timesfm.timesfm_2p5.timesfm_2p5_base import (
   linear_interpolation,
+  moving_average,
   strip_leading_nans,
 )
 
@@ -166,3 +167,76 @@ class TestLinearInterpolation:
     arr = np.array([np.nan, 5.0, np.nan])
     result = linear_interpolation(arr)
     np.testing.assert_allclose(result, [5.0, 5.0, 5.0])
+
+
+# ---------------------------------------------------------------------------
+# moving_average — decomposed forecasting helper
+# ---------------------------------------------------------------------------
+
+
+class TestMovingAverage:
+  """Tests for moving_average — decomposes a series into trend and residual."""
+
+  def test_constant_series(self):
+    """For a constant series: after the first window_size elements,
+    trend = constant, residual = 0."""
+    arr = np.array([3.0] * 10)
+    trend, residual = moving_average(arr, 3)
+    # First (window_size-1) MA elements are distorted by zero-padding
+    np.testing.assert_allclose(trend[2:], 3.0)
+    np.testing.assert_allclose(residual[2:], 0.0, atol=1e-15)
+
+  def test_sum_equals_original(self):
+    """Trend + residual = original series (invariant)."""
+    arr = np.array([1.0, 2.0, 3.0, 5.0, 4.0, 6.0, 7.0, 10.0])
+    trend, residual = moving_average(arr, 3)
+    np.testing.assert_allclose(trend + residual, arr)
+
+  def test_trend_is_smoother(self):
+    """Trend is smoother: max diff is less than original series."""
+    arr = np.array([1.0, 10.0, 1.0, 10.0, 1.0, 10.0] * 10)
+    trend, _ = moving_average(arr, 5)
+    assert np.max(np.abs(np.diff(trend))) < np.max(np.abs(np.diff(arr)))
+
+  def test_window_size_one(self):
+    """When window_size=1, trend equals original series, residual = 0."""
+    arr = np.array([1.0, 3.0, 2.0, 5.0])
+    trend, residual = moving_average(arr, 1)
+    np.testing.assert_allclose(trend, arr)
+    np.testing.assert_allclose(residual, 0.0, atol=1e-15)
+
+  def test_window_size_larger_than_array(self):
+    """When window_size >= len(arr), the actual array length is used."""
+    arr = np.array([1.0, 2.0, 3.0])
+    trend, residual = moving_average(arr, 10)
+    np.testing.assert_allclose(trend + residual, arr)
+    assert len(trend) == len(arr)
+
+  def test_empty_array(self):
+    """Empty array returns two empty arrays."""
+    arr = np.array([], dtype=np.float64)
+    trend, residual = moving_average(arr, 3)
+    assert len(trend) == 0
+    assert len(residual) == 0
+
+  def test_output_dtype(self):
+    """Output is float64 (internal MA representation)."""
+    arr = np.array([1.0, 2.0, 3.0, 4.0, 5.0], dtype=np.float64)
+    trend, residual = moving_average(arr, 2)
+    assert trend.dtype == np.float64
+    assert residual.dtype == np.float64
+
+  def test_trend_residual_sum_white_noise(self):
+    """For white noise: MA smoothing weakens trend component."""
+    rng = np.random.RandomState(42)
+    arr = rng.randn(100).astype(np.float64) * 2 + 5
+    trend, residual = moving_average(arr, 10)
+    np.testing.assert_allclose(trend + residual, arr)
+
+  def test_actual_moving_average_values(self):
+    """Check specific trend values for a given known series."""
+    arr = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
+    trend, _ = moving_average(arr, 2)
+    # MA(2) with one zero left-padding:
+    # [0, 1, 2, 3, 4, 5] convolve [0.5, 0.5] → [0.5, 1.5, 2.5, 3.5, 4.5]
+    np.testing.assert_allclose(trend, [0.5, 1.5, 2.5, 3.5, 4.5])
