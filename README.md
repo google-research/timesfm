@@ -17,7 +17,7 @@ model developed by Google Research for time-series forecasting.
         Enterprise level SQL queries for scalability and reliability.
     *   [Google Sheets](https://workspaceupdates.googleblog.com/2026/02/forecast-data-in-connected-sheets-BigQueryML-TimesFM.html):
         For your daily spreadsheet.
-    *   [Vertex Model Garden](https://pantheon.corp.google.com/vertex-ai/publishers/google/model-garden/timesfm):
+    *   [Vertex Model Garden](https://console.cloud.google.com/vertex-ai/publishers/google/model-garden/timesfm):
         Dockerized endpoint for agentic calling.
 
 This open version is not an officially supported Google product.
