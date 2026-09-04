@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Node / UI
+node_modules/
+.next/
+out/
+.turbo/
+
+# Aegis runtime state
+.env
+.env.local
+*.local
+runs/
+artifacts/
+corpora/
+forks/
+*.sqlite
+*.db
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# Secrets — these should NEVER be committed
+*.pem
+*.key
+secrets/

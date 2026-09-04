@@ -1,0 +1,80 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "aegis3"
+version = "0.0.1"
+description = "Local-first offensive security platform for smart contracts and Web3 protocols"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "Proprietary" }
+authors = [{ name = "Saddam Al-Tamimi" }]
+dependencies = [
+  "typer>=0.12",
+  "rich>=13.7",
+  "fastapi>=0.115",
+  "uvicorn[standard]>=0.30",
+  "pydantic>=2.7",
+  "pydantic-settings>=2.3",
+  "sqlalchemy>=2.0",
+  "psycopg[binary]>=3.2",
+  "alembic>=1.13",
+  "redis>=5.0",
+  "rq>=1.16",
+  "jinja2>=3.1",
+  "structlog>=24.1",
+  "httpx>=0.27",
+  "keyring>=25.2",
+  "cryptography>=42.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.2",
+  "pytest-asyncio>=0.23",
+  "ruff>=0.5",
+  "mypy>=1.10",
+  "types-redis",
+]
+llm = [
+  "anthropic>=0.34",
+]
+
+[project.scripts]
+aegis = "aegis3.cli.main:app"
+aegis-api = "aegis3.api.main:run"
+aegis-orchestrator = "aegis3.orchestrator.main:run"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/aegis3"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "ARG"]
+# B008: Typer/FastAPI depend on calling Option()/Depends() in argument defaults.
+ignore = ["E501", "B008"]
+
+[tool.ruff.lint.per-file-ignores]
+# Route/CLI handlers are stubs whose signatures define the API contract; their
+# path/body args are intentionally unused until the handlers are implemented.
+"src/aegis3/api/routes/*.py" = ["ARG001"]
+
+[tool.mypy]
+python_version = "3.12"
+# Pragmatic for a skeleton: enforce typed defs and catch real type errors, but
+# don't require full generic parameterization on the many `dict` placeholders
+# that will be replaced as handlers are implemented.
+ignore_missing_imports = true
+disallow_untyped_defs = true
+check_untyped_defs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+disallow_any_generics = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
