@@ -200,6 +200,8 @@ class TimesFM_2p5:
       decomposed_inputs = []
       for inp in inputs:
         arr = linear_interpolation(strip_leading_nans(np.array(inp)))
+        if len(arr) > context:
+          arr = arr[-context:]
         trend, residual = moving_average(arr, window_size)
         decomposed_inputs.append(trend)
         decomposed_inputs.append(residual)
