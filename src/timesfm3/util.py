@@ -300,7 +300,6 @@ _ACTIVATIONS: dict[str, Callable[[torch.Tensor], torch.Tensor]] = {
   "relu": F.relu,
   "swish": F.silu,
   "silu": F.silu,
-  "swiglu": F.silu,
   "none": lambda x: x,
 }
 
