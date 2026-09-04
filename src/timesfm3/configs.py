@@ -44,7 +44,7 @@ class TransformerConfig:
   use_bias: bool
   use_rope_seq: bool
   use_rope_var: bool
-  ff_activation: Literal["relu", "swish", "none", "swiglu"]
+  ff_activation: Literal["relu", "swish", "none"]
   deterministic: bool
   v_norm: Literal["rms", "none"] = "none"
   causal_attention: bool = True
