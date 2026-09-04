@@ -197,6 +197,8 @@ print(output.diagnostics.confidence)            # high/moderate/low per horizon
 The confidence bucket combines absolute uncertainty
 (`relative_interval_width`) and horizon-to-horizon widening (`width_growth`),
 using the more conservative classification.
+Diagnostic interval endpoints are normalized internally, so crossed raw
+quantiles do not produce negative interval widths when `sort_quantiles=False`.
 
 #### 2. Multivariate Forecasting with Covariates
 

@@ -211,6 +211,32 @@ class TimesFM3ForecasterTest(unittest.TestCase):
       diagnostics.confidence, np.array(["low", "low", "low"])
     )
 
+  def test_confidence_diagnostics_normalize_crossed_interval_endpoints(self):
+    forecast = np.array([10.0, 10.0])
+    quantiles = np.array(
+      [
+        [12.0, 10.0, 8.0],
+        [15.0, 10.0, 5.0],
+      ]
+    )
+
+    diagnostics = timesfm3_forecaster.forecast_confidence_diagnostics(
+      forecast, quantiles, [0.1, 0.5, 0.9]
+    )
+
+    np.testing.assert_array_equal(
+      diagnostics.crossed_interval, np.array([True, True])
+    )
+    np.testing.assert_array_equal(
+      diagnostics.interval_width, np.array([4.0, 10.0])
+    )
+    np.testing.assert_array_equal(
+      diagnostics.relative_interval_width, np.array([0.4, 1.0])
+    )
+    np.testing.assert_array_equal(
+      diagnostics.confidence, np.array(["moderate", "low"])
+    )
+
   @mock.patch.object(
     timesfm3_forecaster.TimesFM3Forecaster, "_init_model", autospec=True
   )

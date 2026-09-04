@@ -123,11 +123,14 @@ class ForecastDiagnostics:
   """Confidence diagnostics computed across forecast horizons.
 
   The diagnostics are derived from the widest available central prediction
-  interval, using the lowest and highest returned quantile levels.
+  interval. Endpoints are normalized independently of the returned quantile
+  array so diagnostics remain meaningful when raw quantile outputs cross.
   """
 
   # Width of the prediction interval at each horizon step.
   interval_width: np.ndarray
+  # Whether the raw interval endpoints were crossed before normalization.
+  crossed_interval: np.ndarray
   # Width normalized by the absolute point forecast at each horizon step.
   relative_interval_width: np.ndarray
   # Interval width divided by the first horizon step width.
@@ -192,7 +195,12 @@ def forecast_confidence_diagnostics(
       f"{len(quantile_levels)} != {quantile_arr.shape[-1]}."
     )
 
-  interval_width = quantile_arr[..., -1] - quantile_arr[..., 0]
+  raw_lower_endpoint = quantile_arr[..., 0]
+  raw_upper_endpoint = quantile_arr[..., -1]
+  lower_endpoint = np.minimum(raw_lower_endpoint, raw_upper_endpoint)
+  upper_endpoint = np.maximum(raw_lower_endpoint, raw_upper_endpoint)
+  crossed_interval = raw_lower_endpoint > raw_upper_endpoint
+  interval_width = upper_endpoint - lower_endpoint
   relative_interval_width = interval_width / np.maximum(
     np.abs(forecast_arr), eps
   )
@@ -225,6 +233,7 @@ def forecast_confidence_diagnostics(
 
   return ForecastDiagnostics(
     interval_width=interval_width,
+    crossed_interval=crossed_interval,
     relative_interval_width=relative_interval_width,
     width_growth=width_growth,
     magnitude_confidence=magnitude_confidence,
