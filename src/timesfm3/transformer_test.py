@@ -94,6 +94,72 @@ class MultiHeadAttentionTest(unittest.TestCase):
     self.assertIsNotNone(updated_cache)
     self.assertEqual(updated_cache.next_index[0].item(), 1)
 
+  def test_mha_decode_heterogeneous_batch(self):
+    """Verifies that heterogeneous sequence offsets within a batch do not corrupt KV cache."""
+    torch.manual_seed(42)
+    heads, d, hd, cache_len = 4, 64, 16, 16
+    mha = torch_trans.MultiHeadAttention(
+      num_heads=heads,
+      in_features=d,
+      causal_attention=True,
+      use_rotary_position_embeddings=True,
+      qk_norm="rms",
+      use_bias=False,
+      use_sdpa=True,
+    )
+    mha.eval()
+
+    # Sequence A has next_index = 1, Sequence B has next_index = 3
+    cache_a = torch_util.DecodeCache(
+      next_index=torch.tensor([1], dtype=torch.int32),
+      num_front_masked=torch.zeros(1, dtype=torch.int32),
+      key=torch.randn(1, cache_len, heads, hd),
+      value=torch.randn(1, cache_len, heads, hd),
+    )
+    cache_b = torch_util.DecodeCache(
+      next_index=torch.tensor([3], dtype=torch.int32),
+      num_front_masked=torch.zeros(1, dtype=torch.int32),
+      key=torch.randn(1, cache_len, heads, hd),
+      value=torch.randn(1, cache_len, heads, hd),
+    )
+
+    q_a = torch.randn(1, 1, d)
+    q_b = torch.randn(1, 1, d)
+    mask_1 = torch.zeros(1, 1, dtype=torch.bool)
+    mask_2 = torch.zeros(2, 1, dtype=torch.bool)
+
+    # Independent forward passes
+    out_a, updated_cache_a, _ = mha(q_a, patch_mask=mask_1, decode_cache=cache_a)
+    out_b, updated_cache_b, _ = mha(q_b, patch_mask=mask_1, decode_cache=cache_b)
+
+    # Batched forward pass
+    batched_cache = torch_util.DecodeCache(
+      next_index=torch.tensor([1, 3], dtype=torch.int32),
+      num_front_masked=torch.zeros(2, dtype=torch.int32),
+      key=torch.cat([cache_a.key, cache_b.key], dim=0),
+      value=torch.cat([cache_a.value, cache_b.value], dim=0),
+    )
+    q_batched = torch.cat([q_a, q_b], dim=0)
+    out_batched, updated_batched_cache, _ = mha(
+      q_batched, patch_mask=mask_2, decode_cache=batched_cache
+    )
+
+    # Batched outputs and caches must match independent outputs and caches
+    torch.testing.assert_close(out_batched[0:1], out_a, rtol=1e-5, atol=1e-5)
+    torch.testing.assert_close(out_batched[1:2], out_b, rtol=1e-5, atol=1e-5)
+    torch.testing.assert_close(
+      updated_batched_cache.key[0:1], updated_cache_a.key, rtol=1e-5, atol=1e-5
+    )
+    torch.testing.assert_close(
+      updated_batched_cache.key[1:2], updated_cache_b.key, rtol=1e-5, atol=1e-5
+    )
+    torch.testing.assert_close(
+      updated_batched_cache.value[0:1], updated_cache_a.value, rtol=1e-5, atol=1e-5
+    )
+    torch.testing.assert_close(
+      updated_batched_cache.value[1:2], updated_cache_b.value, rtol=1e-5, atol=1e-5
+    )
+
 
 class MixingTransformerTest(unittest.TestCase):
   def test_mixing_transformer_forward(self):

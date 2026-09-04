@@ -296,9 +296,15 @@ class MultiHeadAttention(nn.Module):
     if decode_cache is not None:
       # Cached decoding: update cache with new K, V
       cache_size = decode_cache.key.shape[1]
-      idx = next_index[0].item()  # assumes uniform batch
-      decode_cache.key[:, idx : idx + n_patches, :, :] = key
-      decode_cache.value[:, idx : idx + n_patches, :, :] = value
+      if torch.all(next_index == next_index[0]):
+        idx = next_index[0].item()
+        decode_cache.key[:, idx : idx + n_patches, :, :] = key
+        decode_cache.value[:, idx : idx + n_patches, :, :] = value
+      else:
+        for b_idx in range(batch_size):
+          idx_b = next_index[b_idx].item()
+          decode_cache.key[b_idx, idx_b : idx_b + n_patches, :, :] = key[b_idx]
+          decode_cache.value[b_idx, idx_b : idx_b + n_patches, :, :] = value[b_idx]
       key = decode_cache.key
       value = decode_cache.value
 
