@@ -224,3 +224,8 @@ outputs = list(
 print("Multivariate forecast shape:", outputs[0].forecast.shape)   # (3, 24)
 print("Multivariate quantiles shape:", outputs[0].quantiles.shape) # (3, 24, 9)
 ```
+### Training-time Patch Masking (per paper)
+
+To ensure the model sees all effective context lengths during training, apply a random masking strategy to the first input patch of each time series in a batch. Let `p` be the input patch length. For each series, sample `r ∈ {0, 1, …, p−1}` and set the first `r` positions of the first patch as masked (ignored by the model). This starts masking from the beginning of the context window and exposes every context length from 1 up to the maximum training context.
+
+Below is a compact PyTorch reference for sampling and applying the mask. In a full trainer, also propagate this as a padding/attention mask so the model does not attend to masked positions.
