@@ -166,3 +166,12 @@ class TestLinearInterpolation:
     arr = np.array([np.nan, 5.0, np.nan])
     result = linear_interpolation(arr)
     np.testing.assert_allclose(result, [5.0, 5.0, 5.0])
+
+  def test_all_nans_fills_with_zero(self):
+    """An all-NaN series has no interpolation anchors. Fill with 0.0, matching
+    v1 and TimesFM3. The truthiness check on an empty ndarray raises on
+    NumPy 2.x (`ValueError: The truth value of an empty array is ambiguous`).
+    """
+    arr = np.array([np.nan, np.nan, np.nan])
+    result = linear_interpolation(arr)
+    np.testing.assert_array_equal(result, np.array([0.0, 0.0, 0.0]))

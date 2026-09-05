@@ -73,7 +73,7 @@ def linear_interpolation(arr):
   try:
     arr[nans] = np.interp(nans_indices, non_nans_indices, non_nans_values)
   except ValueError:
-    if non_nans_values:
+    if non_nans_values.size > 0:
       mu = np.nanmean(arr)
     else:
       mu = 0.0
