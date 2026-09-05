@@ -46,6 +46,36 @@ def strip_leading_nans(arr):
   return arr[first_valid_index:]
 
 
+def moving_average(arr, window_size):
+  """Decomposes a time series into trend (moving average) and residual.
+
+  Used for decomposed forecasting: splits the series into a smooth trend
+  and a high-frequency residual to improve long-range forecast quality.
+
+  Args:
+    arr: 1D numpy array.
+    window_size: Size of the moving average window.
+
+  Returns:
+    Tuple of two arrays (trend, residual):
+      trend = smoothed_arr
+      residual = arr - smoothed_arr
+  """
+  arr = np.asarray(arr, dtype=np.float64)
+  n = len(arr)
+  if n == 0:
+    return arr.copy(), arr.copy()
+
+  actual_window = min(window_size, n)
+  arr_padded = np.pad(arr, (actual_window - 1, 0), "constant")
+  trend = np.convolve(arr_padded, np.ones(actual_window) / actual_window, "valid")[
+    :n
+  ]
+
+  residual = arr - trend
+  return trend, residual
+
+
 def linear_interpolation(arr):
   """Performs linear interpolation to fill NaN values in a 1D numpy array.
 
@@ -163,8 +193,22 @@ class TimesFM_2p5:
     assert self.forecast_config is not None
 
     context = self.forecast_config.max_context
+    window_size = self.forecast_config.window_size
     num_inputs = len(inputs)
-    if (w := num_inputs % self.global_batch_size) != 0:
+
+    if window_size > 0:
+      decomposed_inputs = []
+      for inp in inputs:
+        arr = linear_interpolation(strip_leading_nans(np.array(inp)))
+        if len(arr) > context:
+          arr = arr[-context:]
+        trend, residual = moving_average(arr, window_size)
+        decomposed_inputs.append(trend)
+        decomposed_inputs.append(residual)
+      inputs = decomposed_inputs
+
+    num_inputs_total = len(inputs)
+    if (w := num_inputs_total % self.global_batch_size) != 0:
       inputs += [np.array([0.0] * 3)] * (self.global_batch_size - w)
 
     output_points = []
@@ -193,6 +237,9 @@ class TimesFM_2p5:
 
     output_points = np.concatenate(output_points, axis=0)
     output_quantiles = np.concatenate(output_quantiles, axis=0)
+    if window_size > 0:
+      output_points = output_points[::2] + output_points[1::2]
+      output_quantiles = output_quantiles[::2] + output_quantiles[1::2]
     return output_points[:num_inputs], output_quantiles[:num_inputs]
 
   def forecast_with_covariates(
@@ -237,6 +284,11 @@ class TimesFM_2p5:
     """
     if self.forecast_config is None:
       raise ValueError("Model is not compiled. Please call compile() first.")
+    elif self.forecast_config.window_size > 0:
+      raise ValueError(
+        "Decomposed forecasting (window_size > 0) is not supported with"
+        " covariates. Use forecast() for decomposed forecasting."
+      )
     elif not self.forecast_config.return_backcast:
       raise ValueError(
         "For XReg, `return_backcast` must be set to True in the forecast config. Please recompile the model."
