@@ -180,6 +180,26 @@ print("Series 2 forecast shape:", outputs[1].forecast.shape)   # (12,)
 print("Series 2 quantiles shape:", outputs[1].quantiles.shape) # (12, 9)
 ```
 
+Set `return_diagnostics=True` to include a confidence report derived from the
+forecast quantile spread:
+
+```python
+output = forecaster.predict(
+    ts1,
+    horizon=12,
+    return_diagnostics=True,
+)
+
+print(output.diagnostics.interval_width.shape)  # (12,)
+print(output.diagnostics.confidence)            # high/moderate/low per horizon
+```
+
+The confidence bucket combines absolute uncertainty
+(`relative_interval_width`) and horizon-to-horizon widening (`width_growth`),
+using the more conservative classification.
+Diagnostic interval endpoints are normalized internally, so crossed raw
+quantiles do not produce negative interval widths when `sort_quantiles=False`.
+
 #### 2. Multivariate Forecasting with Covariates
 
 Pass a 2D array of shape `(num_variates, context_length)` along with optional

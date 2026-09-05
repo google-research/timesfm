@@ -114,6 +114,134 @@ class ForecastOutput:
   forecast: np.ndarray | None = None
   # Full quantile forecasts. Optional.
   quantiles: np.ndarray | None = None
+  # Optional confidence diagnostics derived from quantile dispersion.
+  diagnostics: ForecastDiagnostics | None = None
+
+
+@dataclasses.dataclass(frozen=True)
+class ForecastDiagnostics:
+  """Confidence diagnostics computed across forecast horizons.
+
+  The diagnostics are derived from the widest available central prediction
+  interval. Endpoints are normalized independently of the returned quantile
+  array so diagnostics remain meaningful when raw quantile outputs cross.
+  """
+
+  # Width of the prediction interval at each horizon step.
+  interval_width: np.ndarray
+  # Whether the raw interval endpoints were crossed before normalization.
+  crossed_interval: np.ndarray
+  # Width normalized by the absolute point forecast at each horizon step.
+  relative_interval_width: np.ndarray
+  # Interval width divided by the first horizon step width.
+  width_growth: np.ndarray
+  # Confidence implied by absolute interval width relative to forecast magnitude.
+  magnitude_confidence: np.ndarray
+  # Confidence implied by interval widening across the horizon.
+  growth_confidence: np.ndarray
+  # Coarse confidence bucket per horizon step: high, moderate, or low.
+  confidence: np.ndarray
+  # The quantile levels used as lower and upper bounds.
+  lower_quantile: float
+  upper_quantile: float
+
+
+def forecast_confidence_diagnostics(
+  forecast: np.ndarray,
+  quantiles: np.ndarray,
+  quantile_levels: list[float],
+  eps: float = 1e-6,
+  relative_width_moderate_threshold: float = 0.2,
+  relative_width_low_threshold: float = 0.5,
+  growth_moderate_threshold: float = 1.5,
+  growth_low_threshold: float = 3.0,
+) -> ForecastDiagnostics:
+  """Computes simple confidence diagnostics from forecast quantiles.
+
+  Args:
+    forecast: Point forecast with shape ``(horizon,)`` or
+      ``(num_variates, horizon)``.
+    quantiles: Quantile forecasts with shape ``(horizon, num_quantiles)`` or
+      ``(num_variates, horizon, num_quantiles)``.
+    quantile_levels: Quantile levels corresponding to the final axis.
+    eps: Minimum denominator for ratio metrics.
+    relative_width_moderate_threshold: Relative interval width above which
+      magnitude confidence is labelled moderate.
+    relative_width_low_threshold: Relative interval width above which magnitude
+      confidence is labelled low.
+    growth_moderate_threshold: Width growth above which growth confidence is
+      labelled moderate.
+    growth_low_threshold: Width growth above which growth confidence is labelled
+      low.
+
+  Returns:
+    ForecastDiagnostics with arrays matching the forecast shape.
+  """
+  forecast_arr = np.asarray(forecast, dtype=np.float32)
+  quantile_arr = np.asarray(quantiles, dtype=np.float32)
+
+  if quantile_arr.ndim < 2:
+    raise ValueError("quantiles must include horizon and quantile dimensions.")
+  if quantile_arr.shape[:-1] != forecast_arr.shape:
+    raise ValueError(
+      "quantiles shape before the final axis must match forecast shape: "
+      f"{quantile_arr.shape[:-1]} != {forecast_arr.shape}."
+    )
+  if quantile_arr.shape[-1] < 2:
+    raise ValueError("At least two quantile levels are required for diagnostics.")
+  if len(quantile_levels) != quantile_arr.shape[-1]:
+    raise ValueError(
+      "quantile_levels length must match the quantile dimension: "
+      f"{len(quantile_levels)} != {quantile_arr.shape[-1]}."
+    )
+
+  raw_lower_endpoint = quantile_arr[..., 0]
+  raw_upper_endpoint = quantile_arr[..., -1]
+  lower_endpoint = np.minimum(raw_lower_endpoint, raw_upper_endpoint)
+  upper_endpoint = np.maximum(raw_lower_endpoint, raw_upper_endpoint)
+  crossed_interval = raw_lower_endpoint > raw_upper_endpoint
+  interval_width = upper_endpoint - lower_endpoint
+  relative_interval_width = interval_width / np.maximum(
+    np.abs(forecast_arr), eps
+  )
+  first_width = np.take(interval_width, indices=0, axis=-1)
+  width_growth = interval_width / np.maximum(np.expand_dims(first_width, -1), eps)
+  magnitude_confidence = np.full(interval_width.shape, "high", dtype=object)
+  magnitude_confidence = np.where(
+    relative_interval_width > relative_width_moderate_threshold,
+    "moderate",
+    magnitude_confidence,
+  )
+  magnitude_confidence = np.where(
+    relative_interval_width > relative_width_low_threshold,
+    "low",
+    magnitude_confidence,
+  )
+  growth_confidence = np.full(interval_width.shape, "high", dtype=object)
+  growth_confidence = np.where(
+    width_growth > growth_moderate_threshold, "moderate", growth_confidence
+  )
+  growth_confidence = np.where(
+    width_growth > growth_low_threshold, "low", growth_confidence
+  )
+
+  confidence_rank = {"high": 0, "moderate": 1, "low": 2}
+  confidence_labels = np.array(["high", "moderate", "low"], dtype=object)
+  magnitude_rank = np.vectorize(confidence_rank.__getitem__)(magnitude_confidence)
+  growth_rank = np.vectorize(confidence_rank.__getitem__)(growth_confidence)
+  confidence = confidence_labels[np.maximum(magnitude_rank, growth_rank)]
+
+  return ForecastDiagnostics(
+    interval_width=interval_width,
+    crossed_interval=crossed_interval,
+    relative_interval_width=relative_interval_width,
+    width_growth=width_growth,
+    magnitude_confidence=magnitude_confidence,
+    growth_confidence=growth_confidence,
+    confidence=confidence,
+    lower_quantile=float(quantile_levels[0]),
+    upper_quantile=float(quantile_levels[-1]),
+  )
 
 
 def try_gc(
@@ -438,6 +566,7 @@ class TimesFM3Forecaster:
     past_future_covariates: np.ndarray | None = None,
     ts_id: str | None = None,
     return_quantiles: bool = False,
+    return_diagnostics: bool = False,
     use_symmetric_averaging: bool = False,
     make_positive: bool = False,
     sort_quantiles: bool = True,
@@ -453,6 +582,7 @@ class TimesFM3Forecaster:
         past_future_covariates=[past_future_covariates],
         ts_ids=[ts_id] if ts_id is not None else None,
         return_quantiles=return_quantiles,
+        return_diagnostics=return_diagnostics,
         use_symmetric_averaging=use_symmetric_averaging,
         make_positive=make_positive,
         sort_quantiles=sort_quantiles,
@@ -470,6 +600,7 @@ class TimesFM3Forecaster:
     past_future_covariates: list[np.ndarray | None] | None = None,
     ts_ids: list[str] | None = None,
     return_quantiles: bool = False,
+    return_diagnostics: bool = False,
     use_symmetric_averaging: bool = False,
     make_positive: bool = False,
     sort_quantiles: bool = True,
@@ -752,14 +883,32 @@ class TimesFM3Forecaster:
       raw = all_raw_outputs[i]
       if was_1d_input:
         raw = raw[0]
+        forecast = raw[:horizon, self.config.median_quantile_index]
+        quantiles = raw[:horizon, :]
         yield ForecastOutput(
           ts_id=original_ts_ids[i],
-          forecast=raw[:horizon, self.config.median_quantile_index],
-          quantiles=raw[:horizon, :] if return_quantiles else None,
+          forecast=forecast,
+          quantiles=quantiles if return_quantiles else None,
+          diagnostics=(
+            forecast_confidence_diagnostics(
+              forecast, quantiles, self.config.quantiles
+            )
+            if return_diagnostics
+            else None
+          ),
         )
       else:
+        forecast = raw[:, :horizon, self.config.median_quantile_index]
+        quantiles = raw[:, :horizon, :]
         yield ForecastOutput(
           ts_id=original_ts_ids[i],
-          forecast=raw[:, :horizon, self.config.median_quantile_index],
-          quantiles=raw[:, :horizon, :] if return_quantiles else None,
+          forecast=forecast,
+          quantiles=quantiles if return_quantiles else None,
+          diagnostics=(
+            forecast_confidence_diagnostics(
+              forecast, quantiles, self.config.quantiles
+            )
+            if return_diagnostics
+            else None
+          ),
         )
