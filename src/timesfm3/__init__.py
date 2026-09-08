@@ -12,19 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""TimesFM3 PyTorch API."""
+"""TimesFM3 API.
 
-from .configs import ResidualBlockConfig, StackedTransformersConfig, TransformerConfig
-from .evaluator import TimesFM3Evaluator
-from .model import TimesFM3Torch
-from .timesfm3_forecaster import (
-    ForecastOutput,
-    ModelConfig,
-    TimesFM3Forecaster,
-    _ModelConfig,
-)
+The PyTorch backend lives in ``timesfm3.torch`` and the MLX (Apple Silicon) backend in
+``timesfm3.mlx``. For backward compatibility the PyTorch API is also re-exported at the top level
+(``from timesfm3 import TimesFM3Forecaster``); these names are resolved lazily so that importing
+``timesfm3`` — or ``timesfm3.mlx`` — does not require PyTorch to be installed.
+"""
 
-__all__ = [
+_TORCH_EXPORTS = frozenset(
+  {
     "ForecastOutput",
     "ModelConfig",
     "ResidualBlockConfig",
@@ -34,4 +31,15 @@ __all__ = [
     "TimesFM3Torch",
     "TransformerConfig",
     "_ModelConfig",
-]
+  }
+)
+
+__all__ = sorted(_TORCH_EXPORTS)
+
+
+def __getattr__(name):  # PEP 562: lazily re-export the torch backend at the top level
+  if name in _TORCH_EXPORTS:
+    from . import torch as _torch_backend
+
+    return getattr(_torch_backend, name)
+  raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

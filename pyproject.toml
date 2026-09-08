@@ -23,6 +23,11 @@ dependencies = [
 torch = [
     "torch>=2.0.0",
 ]
+mlx = [
+    "mlx>=0.32",
+    "safetensors>=0.4.0",
+    "huggingface-hub>=0.24.0",
+]
 flax = [
     "flax",
     "optax",

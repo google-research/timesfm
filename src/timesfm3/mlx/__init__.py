@@ -12,11 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Backward-compatibility shim for ``timesfm3.dense``.
+"""TimesFM3 MLX (Apple Silicon) backend."""
 
-The PyTorch backend moved to ``timesfm3.torch.dense``. This re-exports it so that
-existing ``from timesfm3.dense import ...`` imports keep working; new code should
-import from ``timesfm3.torch.dense`` (or the top-level ``timesfm3`` API).
-"""
+from .configs import TimesFM3MlxConfig
+from .model import TimesFM3Mlx
+from .timesfm3_forecaster import (
+  ForecastOutput,
+  ModelConfig,
+  TimesFM3Forecaster,
+  _ModelConfig,
+)
 
-from .torch.dense import *  # noqa: F401,F403
+__all__ = [
+  "ForecastOutput",
+  "ModelConfig",
+  "TimesFM3Forecaster",
+  "TimesFM3Mlx",
+  "TimesFM3MlxConfig",
+  "_ModelConfig",
+]

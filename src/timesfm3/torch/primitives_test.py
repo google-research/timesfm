@@ -163,8 +163,8 @@ class UtilTest(unittest.TestCase):
     swish = torch_util.get_activation_fn("swish")
     np.testing.assert_allclose(swish(x).numpy(), expected_silu.numpy())
 
-    swiglu = torch_util.get_activation_fn("swiglu")
-    np.testing.assert_allclose(swiglu(x).numpy(), expected_silu.numpy())
+    with self.assertRaisesRegex(ValueError, "swiglu"):
+      torch_util.get_activation_fn("swiglu")
 
   def test_decode_cache(self):
     num_layers = 2
