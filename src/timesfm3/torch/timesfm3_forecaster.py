@@ -382,6 +382,7 @@ class TimesFM3Forecaster:
 
     if is_local_dir or not is_local_file:
       # Load via PyTorchModelHubMixin.from_pretrained (downloads config.json and weights)
+      requested_variate_attention = self.config.use_variate_attention
       self.model = torch_model_lib.TimesFM3Torch.from_pretrained(
         checkpoint_path,
         cache_dir=self.config.cache_dir,
@@ -390,6 +391,15 @@ class TimesFM3Forecaster:
         revision=self.config.revision,
         local_files_only=self.config.local_files_only,
       )
+      if requested_variate_attention != self.model.use_variate_attention:
+        raise ValueError(
+          "use_variate_attention="
+          f"{requested_variate_attention} was passed to from_pretrained, but "
+          f"checkpoint {checkpoint_path!r} was built with "
+          f"use_variate_attention={self.model.use_variate_attention}. "
+          "This flag is part of the loaded architecture and cannot be changed "
+          "after from_pretrained."
+        )
       # Synchronize forecaster config with the loaded model config
       median_q_idx = self.config.median_quantile_index
       if median_q_idx >= len(self.model.quantiles):

@@ -193,6 +193,43 @@ class TimesFM3ForecasterTest(unittest.TestCase):
       out = forecaster.predict(ctx, horizon=8)
       self.assertEqual(out.forecast.shape, (8,))
 
+  def test_from_pretrained_rejects_mismatched_variate_attention(self):
+    resblock_config = configs.ResidualBlockConfig(
+      hidden_dims=16,
+      output_dims=16,
+      use_bias=False,
+      activation="relu",
+    )
+    transformer_config = configs.StackedTransformersConfig(
+      num_layers=1,
+      transformer=configs.TransformerConfig(
+        model_dims=16,
+        hidden_dims=16,
+        num_heads=2,
+        attention_norm="rms",
+        feedforward_norm="rms",
+        qk_norm="rms",
+        use_rope_seq=True,
+        use_rope_var=False,
+        use_bias=False,
+        ff_activation="relu",
+        deterministic=True,
+      ),
+    )
+    model = torch_model_lib.TimesFM3Torch(
+      input_patch_len=8,
+      output_patch_len=16,
+      quantiles=[0.1, 0.5, 0.9],
+      residual_block_config=resblock_config,
+      transformer_config=transformer_config,
+    )
+    with tempfile.TemporaryDirectory() as tmpdir:
+      model.save_pretrained(tmpdir)
+      with self.assertRaisesRegex(ValueError, "use_variate_attention"):
+        timesfm3_forecaster.TimesFM3Forecaster.from_pretrained(
+          tmpdir, device="cpu", use_variate_attention=False
+        )
+
 
 class _RecordingFakeModel(FakeModel):
   """FakeModel that records decode inputs and infers horizon like the real model."""
