@@ -42,6 +42,8 @@ def strip_leading_nans(arr):
   """
 
   isnan = np.isnan(arr)
+  if arr.size == 0 or np.all(isnan):
+    return arr[:0]
   first_valid_index = np.argmax(~isnan)
   return arr[first_valid_index:]
 
