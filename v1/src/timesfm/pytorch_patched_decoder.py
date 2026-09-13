@@ -104,7 +104,7 @@ def _masked_mean_std(
   masked_centered_arr = (arr - masked_mean.unsqueeze(-1)) * mask
   masked_var = torch.sum(masked_centered_arr**2, dim=1) / num_valid_elements
   masked_var = torch.clamp(masked_var, min=0.0)
-  masked_std = torch.sqrt(masked_var)
+  masked_std = torch.sqrt(masked_var + 1e-8)
 
   return masked_mean, masked_std
 
