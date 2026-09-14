@@ -652,6 +652,11 @@ def print_report(report: SystemReport) -> None:
 
 
 def main() -> None:
+    # Native Windows consoles may default to a legacy code page that cannot
+    # encode the status icons used in the human-readable report.
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
     parser = argparse.ArgumentParser(
         description="Check system requirements for TimesFM.",
     )
