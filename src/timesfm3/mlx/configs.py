@@ -50,6 +50,10 @@ class TimesFM3MlxConfig:
   use_rope_seq: bool = True
   use_rope_var: bool = False
   use_memory_efficient_attention: bool = True
+  use_bias: bool = False
+  qk_norm: str = "rms"
+  residual_use_bias: bool = False
+  use_frozen_running_stats: bool = False
 
   @property
   def head_dim(self) -> int:
@@ -66,15 +70,6 @@ class TimesFM3MlxConfig:
   @classmethod
   def from_hf_config(cls, cfg: dict) -> "TimesFM3MlxConfig":
     """Build a config from a checkpoint's ``config.json`` dictionary."""
-    if cfg.get("use_frozen_running_stats", False):
-      # Torch freezes the running RevIN stats at the context boundary; the MLX
-      # backend does not implement that yet, so a checkpoint that needs it would
-      # diverge on any unmasked horizon input (past-future covariates). The
-      # public 3.0 checkpoint sets this to False. Fail loudly instead.
-      raise NotImplementedError(
-        "The MLX backend does not implement use_frozen_running_stats=True; "
-        "use the torch backend for this checkpoint."
-      )
     transformer = cfg.get("transformer_config", {})
     inner = transformer.get("transformer", {})
     resblock = cfg.get("residual_block_config", {})
@@ -101,4 +96,8 @@ class TimesFM3MlxConfig:
       use_rope_seq=inner.get("use_rope_seq", True),
       use_rope_var=inner.get("use_rope_var", False),
       use_memory_efficient_attention=inner.get("use_memory_efficient_attention", True),
+      use_bias=inner.get("use_bias", False),
+      qk_norm=inner.get("qk_norm", "rms"),
+      residual_use_bias=resblock.get("use_bias", False),
+      use_frozen_running_stats=cfg.get("use_frozen_running_stats", False),
     )
