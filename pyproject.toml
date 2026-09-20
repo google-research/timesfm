@@ -23,6 +23,15 @@ dependencies = [
 torch = [
     "torch>=2.0.0",
 ]
+mcp-server = [
+    "torch>=2.0.0",
+    "pandas>=2.0.0",
+    "openpyxl>=3.1.0",
+    "xlrd>=2.0.1",
+    "matplotlib>=3.8.0",
+    "mcp>=1.30,<2",
+    "pydantic>=2.0",
+]
 mlx = [
     "mlx>=0.32",
     "safetensors>=0.4.0",
