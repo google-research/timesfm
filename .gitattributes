@@ -1,3 +1,10 @@
 # Git LFS tracking for binary outputs in timesfm-forecasting skill
 timesfm-forecasting/**/*.png filter=lfs diff=lfs merge=lfs -text
 timesfm-forecasting/**/*.gif filter=lfs diff=lfs merge=lfs -text
+
+# These existing generated outputs are regular Git blobs.  Keep them out of
+# LFS so clones do not report missing pointer objects.
+timesfm-forecasting/examples/anomaly-detection/output/anomaly_detection.png -filter -diff -merge -text
+timesfm-forecasting/examples/covariates-forecasting/output/covariates_data.png -filter -diff -merge -text
+timesfm-forecasting/examples/global-temperature/output/forecast_animation.gif -filter -diff -merge -text
+timesfm-forecasting/examples/global-temperature/output/forecast_visualization.png -filter -diff -merge -text
