@@ -161,3 +161,23 @@ predicted move), but not in a way that improves accuracy. Wick and volume
 history adds nothing over the close series for these horizons.
 **Horizon-C2 remains the recommended model.** The C3 code is kept so the
 experiment can be rerun with other inputs.
+
+## Experiment: Horizon-C2.1 (trained on 512-4096 candles of history): no gain, not promoted
+
+C2 was fine-tuned further with a random history length per batch
+(`finetune_ohlcv.py --no_candle --context_choices 512 1024 2048 4096`).
+Test error (% of price) with 512 vs 4096 candles of history:
+
+| interval | C2 @512 | C2.1 @512 | C2 @4096 | C2.1 @4096 |
+|---|---|---|---|---|
+| 1m  | 0.1573 | 0.1574 | 0.1579 | 0.1577 |
+| 5m  | 0.3808 | 0.3808 | 0.3826 | 0.3813 |
+| 15m | 0.6905 | 0.6906 | 0.6932 | 0.6945 |
+| 1h  | 1.2769 | 1.2780 | 1.2860 | 1.2866 |
+
+The 15-min layered routine was identical within 0.3 points. **Use C2 with
+512 candles of history.** More history (or training for more) doesn't help.
+
+Speed on an RTX 5070 Ti: ~0.20 s per call at 512 candles and ~0.47 s at 4096.
+One call with 10 coins takes the same time as one call with 1 coin, so batch
+your coins into a single call.
