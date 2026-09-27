@@ -7,6 +7,7 @@ LoRA adapters (~11 MB each) that specialise it for a domain:
 |-----------|--------------------------------------------|---------|
 | `none`    | the original base model                    | always available |
 | `horizon-c1` | Horizon-C1 (crypto): Binance spot candles, 36 USDT pairs, 1h + 1d | trained, weights in `adapters/horizon-c1/` |
+| `horizon-c2` | Horizon-C2 (crypto intraday): 1m/5m/15m for 10 top pairs + 1h for 36 pairs | trained, weights in `adapters/horizon-c2/` |
 | `stocks`  | TBD, same pipeline, different fetcher       | planned |
 
 ## Setup (Windows, RTX 50-series)
@@ -96,3 +97,42 @@ python3 -m venv .venv && source .venv/bin/activate
 pip install torch transformers accelerate peft pandas pyarrow requests matplotlib safetensors
 python forecast.py --adapter horizon-c1 --symbol BTCUSDT --interval 1h --compare
 ```
+
+## Horizon-C2 (intraday)
+
+```powershell
+.venv\Scripts\python.exe fetch_crypto_minutes.py      # 1m archives -> also builds 5m, 15m
+.venv\Scripts\python.exe fetch_crypto.py --intervals 1m --symbols BTCUSDT ETHUSDT BNBUSDT SOLUSDT XRPUSDT DOGEUSDT ADAUSDT TRXUSDT AVAXUSDT LINKUSDT
+.venv\Scripts\python.exe fetch_crypto_minutes.py --resample_only
+.venv\Scripts\python.exe finetune_domain.py --domain horizon-c2 --data_dir data/crypto --intervals 1m 5m 15m 1h --val_start 2026-05-01 --test_start 2026-07-01 --steps 600
+```
+
+Test period 2026-07-01 to 2026-09-27, 24-step horizon, error as % of last price:
+
+| interval | base MAE | C2 MAE | naive MAE | base pinball | C2 pinball |
+|---|---|---|---|---|---|
+| 1m  | 0.162 | **0.156** | 0.157 | 0.064 | **0.062** |
+| 5m  | 0.389 | **0.369** | 0.369 | 0.154 | **0.149** |
+| 15m | 0.692 | **0.653** | 0.648 | 0.275 | **0.265** |
+| 1h  | 2.141 | **2.027** | 1.748 | 0.891 | **0.852** |
+
+### Layered routine (`evaluate_layered.py`)
+
+This replays "forecast the candle, then re-forecast every step" on ~14.5k candles
+per setup, and compares against a no-model baseline: *is the price right now above the open?*
+
+15-min candle, re-forecast every minute (direction accuracy):
+
+| minutes known | baseline | base | C1 | C2 |
+|---|---|---|---|---|
+| 0  | 50.0% | 51.9% | 51.1% | 52.4% |
+| 2  | 63.6% | 61.7% | 63.2% | 63.9% |
+| 5  | 71.2% | 70.8% | 71.5% | 71.7% |
+| 7  | 76.5% | 75.9% | 76.4% | 76.6% |
+| 10 | 82.3% | 82.1% | 82.6% | 82.7% |
+| 14 | 93.4% | 93.3% | 93.4% | 93.6% |
+
+The accuracy that climbs through the candle comes from the candle already being
+partly finished, not from the model. C2 is the only model that never does worse
+than the baseline, but its edge is only 0.1-0.5 points. 1h candles with 5m updates
+show the same pattern.
