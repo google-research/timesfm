@@ -3,7 +3,7 @@
 
 Examples:
     # Live Binance data, crypto adapter
-    python forecast.py --adapter horizon-c1 --symbol BTCUSDT --interval 1h
+    python forecast.py --adapter horizon-c2 --symbol BTCUSDT --interval 1m
 
     # Same thing with the untouched base model, for comparison
     python forecast.py --adapter none --symbol BTCUSDT --interval 1h
@@ -38,28 +38,26 @@ def pick_device() -> torch.device:
 
 
 def load_model(adapter: str, device):
-  """Returns (model, adapter_config). adapter='none' gives the plain base model."""
-  from transformers import TimesFm2_5ModelForPrediction
+  """Returns (model, candle_encoder_or_None, adapter_config). adapter='none' = plain base model."""
+  from ohlcv import load_horizon
 
-  model = TimesFm2_5ModelForPrediction.from_pretrained(BASE_MODEL_ID, dtype=torch.float32).to(device)
-  cfg = {}
-  if adapter != "none":
-    from peft import PeftModel
-
-    path = Path(__file__).parent / "adapters" / adapter
-    if not path.exists():
-      raise SystemExit(f"No adapter at {path}. Train it with: python finetune_domain.py --domain {adapter}")
-    model = PeftModel.from_pretrained(model, path)
-    cfg_path = path / "training_config.json"
-    cfg = json.loads(cfg_path.read_text()) if cfg_path.exists() else {}
-  return model.eval(), cfg
+  path = Path(__file__).parent / "adapters" / adapter
+  if adapter != "none" and not path.exists():
+    raise SystemExit(f"No adapter at {path}.")
+  model, ca = load_horizon(adapter, device, BASE_MODEL_ID)
+  cfg_path = path / "training_config.json"
+  cfg = json.loads(cfg_path.read_text()) if adapter != "none" and cfg_path.exists() else {}
+  return model, ca, cfg
 
 
 @torch.no_grad()
-def run(model, context: np.ndarray, horizon: int, device) -> np.ndarray:
-  x = torch.tensor(context, dtype=torch.float32, device=device)[None]
-  with torch.autocast("cuda", dtype=torch.bfloat16, enabled=device.type == "cuda"):
-    out = model(past_values=x, forecast_context_len=x.shape[1])
+def run(model, ca, candles: np.ndarray, horizon: int, device) -> np.ndarray:
+  """candles: [T, 4] close/high/low/volume. Candle-aware models (ca) read all four."""
+  from contextlib import nullcontext
+
+  x = torch.tensor(candles, dtype=torch.float32, device=device)[None]
+  with torch.autocast("cuda", dtype=torch.bfloat16, enabled=device.type == "cuda"),        (ca.features(x) if ca is not None else nullcontext()):
+    out = model(past_values=x[..., 0], forecast_context_len=x.shape[1])
   return out.full_predictions[0, :horizon].float().cpu().numpy()  # [h, 10]
 
 
@@ -71,15 +69,17 @@ def binance_recent(symbol: str, interval: str, n: int) -> pd.DataFrame:
   )
   r.raise_for_status()
   rows = r.json()[:-1]  # drop the still-forming candle
-  return pd.DataFrame(
-      {"timestamp": pd.to_datetime([k[0] for k in rows], unit="ms", utc=True),
-       "close": [float(k[4]) for k in rows]}
-  )
+  return pd.DataFrame({
+      "timestamp": pd.to_datetime([k[0] for k in rows], unit="ms", utc=True),
+      "open": [float(k[1]) for k in rows], "high": [float(k[2]) for k in rows],
+      "low": [float(k[3]) for k in rows], "close": [float(k[4]) for k in rows],
+      "volume": [float(k[5]) for k in rows],
+  })
 
 
 def main() -> None:
   p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-  p.add_argument("--adapter", default="horizon-c1", help="Adapter name under adapters/, or 'none'")
+  p.add_argument("--adapter", default="horizon-c2", help="Adapter name under adapters/, or 'none'")
   p.add_argument("--symbol", default="BTCUSDT")
   p.add_argument("--interval", default="1h")
   p.add_argument("--csv", help="Use a CSV instead of Binance (needs a timestamp column + --column)")
@@ -91,7 +91,7 @@ def main() -> None:
   args = p.parse_args()
 
   device = pick_device()
-  model, cfg = load_model(args.adapter, device)
+  model, ca, cfg = load_model(args.adapter, device)
   ctx = args.context_len or cfg.get("context_len", 512)
   hor = args.horizon or cfg.get("horizon_len", 24)
 
@@ -101,15 +101,23 @@ def main() -> None:
   else:
     df = binance_recent(args.symbol, args.interval, ctx)
     label = f"{args.symbol} {args.interval}"
-  values = df[args.column].to_numpy(np.float32)[-ctx:]
+  if ca is not None:
+    missing = {"high", "low", "volume"} - set(df.columns)
+    if missing:
+      raise SystemExit(f"{args.adapter} reads full candles; CSV is missing columns: {sorted(missing)}")
+    candles = df[[args.column, "high", "low", "volume"]].to_numpy(np.float32)[-ctx:]
+    candles = candles[len(candles) % 32 :]  # candle encoder works on whole 32-step patches
+  else:
+    candles = np.repeat(df[[args.column]].to_numpy(np.float32)[-ctx:], 4, axis=1)
+  values = candles[:, 0]
   times = df["timestamp"].iloc[-len(values):]
   if len(values) < ctx:
     print(f"Note: only {len(values)} points available (adapter trained on {ctx}).")
 
-  preds = {args.adapter: run(model, values, hor, device)}
+  preds = {args.adapter: run(model, ca, candles, hor, device)}
   if args.compare and args.adapter != "none":
     with model.disable_adapter():
-      preds["base"] = run(model, values, hor, device)
+      preds["base"] = run(model, None, candles, hor, device)
 
   step = times.iloc[-1] - times.iloc[-2]
   future = pd.date_range(times.iloc[-1] + step, periods=hor, freq=step)

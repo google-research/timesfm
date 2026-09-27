@@ -136,3 +136,28 @@ The accuracy that climbs through the candle comes from the candle already being
 partly finished, not from the model. C2 is the only model that never does worse
 than the baseline, but its edge is only 0.1-0.5 points. 1h candles with 5m updates
 show the same pattern.
+
+## Experiment: Horizon-C3 (reads high / low / volume) - no gain, not promoted
+
+`ohlcv.py` adds a small candle encoder to TimesFM's input layer. It starts at
+zero, so C3 is identical to C2 at step 0. The encoder sees, per time step, the
+upper wick, the lower wick, and volume relative to its recent average.
+`finetune_ohlcv.py` trains it on top of C2, and `--no_candle` runs the same
+training with close prices only (`c2-control`), so extra training isn't
+mistaken for a feature gain.
+
+Test period from 2026-07-01, MAE as % of price:
+
+| interval | C2 | control (close only) | C3 (full candle) |
+|---|---|---|---|
+| 1m  | 0.156 | 0.156 | 0.156 |
+| 5m  | 0.369 | 0.370 | 0.369 |
+| 15m | 0.653 | 0.654 | 0.654 |
+| 1h  | 2.027 | 2.024 | 2.024 |
+
+In the 15-min layered routine, all three are within 0.2 points of each other
+at every minute. The encoder does change forecasts (by ~25% of the typical
+predicted move), but not in a way that improves accuracy. Wick and volume
+history adds nothing over the close series for these horizons.
+**Horizon-C2 remains the recommended model.** The C3 code is kept so the
+experiment can be rerun with other inputs.
