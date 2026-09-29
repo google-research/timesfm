@@ -552,7 +552,7 @@ class TimesFM3Forecaster:
           f" {ctx.shape[0]}."
         )
 
-    was_1d_input = len(contexts) > 0 and np.ndim(contexts[0]) == 1
+    was_1d_input = [np.ndim(context) == 1 for context in contexts]
 
     znorm_per_example: list[list[tuple[float, float]]] = []
     if use_znorm:
@@ -738,7 +738,7 @@ class TimesFM3Forecaster:
 
     if make_positive:
       for i in range(num_original_ts):
-        if was_1d_input:
+        if was_1d_input[i]:
           if _is_nonnegative(contexts[i]):
             all_raw_outputs[i] = np.maximum(all_raw_outputs[i], 0.0)
         else:
@@ -750,7 +750,7 @@ class TimesFM3Forecaster:
 
     for i in range(num_original_ts):
       raw = all_raw_outputs[i]
-      if was_1d_input:
+      if was_1d_input[i]:
         raw = raw[0]
         yield ForecastOutput(
           ts_id=original_ts_ids[i],
