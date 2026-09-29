@@ -122,10 +122,10 @@ TimesFM 2.5:
 
 ```shell
 # Install TimesFM with PyTorch
-pip install timesfm[torch]
+pip install "timesfm[torch]"
 
 # Or, for MLX-native inference on Apple silicon (no PyTorch required)
-pip install timesfm[mlx]
+pip install "timesfm[mlx]"
 ```
 
 #### Local Install
@@ -145,7 +145,7 @@ pip install timesfm[mlx]
     source .venv/bin/activate
 
      # Install the package in editable mode with torch
-    uv pip install -e .[torch]
+    uv pip install -e ".[torch]"
     ```
 
 --------------------------------------------------------------------------------

@@ -4,7 +4,7 @@ TimesFM Covariates (XReg) Example
 
 Demonstrates the TimesFM covariate API using synthetic retail sales data.
 TimesFM 1.0 does NOT support forecast_with_covariates(); that requires
-TimesFM 2.5 + `pip install timesfm[xreg]`.
+TimesFM 2.5 + `pip install "timesfm[xreg]"`.
 
 This script:
   1. Generates synthetic 3-store weekly retail data (24-week context, 12-week horizon)
@@ -408,7 +408,7 @@ def demonstrate_api() -> None:
     print("=" * 70)
     print("""
 # Installation
-pip install timesfm[xreg]
+pip install "timesfm[xreg]"
 
 import timesfm
 hparams   = timesfm.TimesFmHparams(backend="cpu", per_core_batch_size=32, horizon_len=12)

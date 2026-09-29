@@ -42,7 +42,7 @@ Use this skill when:
 - You have time series of **any length** (the model handles 1–16,384 context points)
 - You need to **batch-forecast** hundreds or thousands of series efficiently
 - You want a **foundation model** approach instead of hand-tuning ARIMA/ETS parameters
-- You need **covariate forecasting** with exogenous variables (price, promotions, holidays, day-of-week effects) → use `forecast_with_covariates()` (TimesFM 2.5 + `pip install timesfm[xreg]`)
+- You need **covariate forecasting** with exogenous variables (price, promotions, holidays, day-of-week effects) → use `forecast_with_covariates()` (TimesFM 2.5 + `pip install "timesfm[xreg]"`)
 
 
 Do **not** use this skill when:
@@ -150,13 +150,13 @@ python scripts/check_system.py
 
 ```bash
 # Using uv (fast)
-uv pip install timesfm[torch]
+uv pip install "timesfm[torch]"
 
 # Or using pip
-pip install timesfm[torch]
+pip install "timesfm[torch]"
 
 # For JAX/Flax backend (faster on TPU/GPU)
-uv pip install timesfm[flax]
+uv pip install "timesfm[flax]"
 ```
 
 ### Step 3: Install PyTorch for Your Hardware
@@ -200,7 +200,7 @@ point, quantiles = model.forecast(horizon=24, inputs=[
 ### Forecast with Covariates (XReg)
 
 TimesFM 2.5+ supports exogenous variables through `forecast_with_covariates()`.
-Requires `pip install timesfm[xreg]`.
+Requires `pip install "timesfm[xreg]"`.
 
 ```python
 point, quantiles = model.forecast_with_covariates(
