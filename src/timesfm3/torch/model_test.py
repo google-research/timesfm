@@ -135,5 +135,89 @@ class TimesFM3TorchTest(unittest.TestCase):
       self.assertTrue(torch.allclose(orig_out, loaded_out, atol=1e-5))
 
 
+def _build_model(use_sdpa: bool, v_norm: str) -> torch_model_lib.TimesFM3Torch:
+  torch.manual_seed(0)
+  model = torch_model_lib.TimesFM3Torch(
+    input_patch_len=8,
+    output_patch_len=16,
+    quantiles=[0.1, 0.5, 0.9],
+    residual_block_config=configs.ResidualBlockConfig(
+      hidden_dims=32, output_dims=32, use_bias=False, activation="relu", dropout=0.0
+    ),
+    transformer_config=configs.StackedTransformersConfig(
+      num_layers=2,
+      use_remat=False,
+      transformer=configs.TransformerConfig(
+        model_dims=32,
+        hidden_dims=32,
+        num_heads=4,
+        attention_norm="rms",
+        feedforward_norm="rms",
+        qk_norm="rms",
+        v_norm=v_norm,
+        use_rope_seq=True,
+        use_rope_var=True,
+        use_bias=False,
+        ff_activation="relu",
+        deterministic=True,
+        use_sdpa=use_sdpa,
+      ),
+    ),
+    use_stitching=True,
+    use_linear_detrending=True,
+    use_iterative_cpm_revin=True,
+    use_frozen_running_stats=False,
+  )
+  model.eval()
+  return model
+
+
+def _set_fast_path(model: torch_model_lib.TimesFM3Torch, enabled: bool) -> None:
+  for layer in model.modules():
+    if hasattr(layer, "_single_variate_fast_path"):
+      layer._single_variate_fast_path = enabled
+
+
+class SingleVariateFastPathTest(unittest.TestCase):
+  """The V == 1 variate-attention shortcut is used and changes no forecast."""
+
+  def test_fast_path_used_only_for_one_variate(self):
+    model = _build_model(use_sdpa=True, v_norm="none")
+    calls = []
+    for layer in model.modules():
+      if hasattr(layer, "var_attn"):
+        layer.var_attn.query_proj.register_forward_hook(lambda *_: calls.append(1))
+
+    with torch.no_grad():
+      model.decode(target=torch.randn(2, 1, 32), horizon=32)
+    self.assertEqual(len(calls), 0, "V == 1 should skip the variate Q projection")
+
+    with torch.no_grad():
+      model.decode(target=torch.randn(2, 2, 32), horizon=32)
+    self.assertGreater(len(calls), 0, "V > 1 must still run full variate attention")
+
+  def test_decode_matches_full_attention(self):
+    b, context_len, horizon = 3, 37, 48
+    torch.manual_seed(1)
+    target = torch.randn(b, 1, context_len)
+    target[1, 0, 20:23] = float("nan")  # gap inside the context
+    # Series 0 and 2 have front padding, so whole patches are masked.
+    mask = torch.zeros(b, context_len, dtype=torch.bool)
+    mask[0, :13] = True
+    mask[2, :30] = True
+
+    for use_sdpa in (True, False):
+      for v_norm in ("none", "rms"):
+        with self.subTest(use_sdpa=use_sdpa, v_norm=v_norm):
+          model = _build_model(use_sdpa=use_sdpa, v_norm=v_norm)
+          with torch.no_grad():
+            fast = model.decode(target=target, horizon=horizon, mask=mask)
+            _set_fast_path(model, False)
+            ref = model.decode(target=target, horizon=horizon, mask=mask)
+          self.assertEqual(fast.shape, (b, 1, horizon, 3))
+          self.assertTrue(torch.isfinite(fast).all().item())
+          torch.testing.assert_close(fast, ref, rtol=0, atol=0)
+
+
 if __name__ == "__main__":
   unittest.main()

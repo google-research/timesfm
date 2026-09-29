@@ -161,6 +161,47 @@ class MultiHeadAttentionTest(unittest.TestCase):
     )
 
 
+class SinglePositionAttentionTest(unittest.TestCase):
+  """single_position_forward must equal full attention over one key."""
+
+  def _check(self, use_sdpa, v_norm, rescale_logits):
+    torch.manual_seed(0)
+    mha = torch_trans.MultiHeadAttention(
+      num_heads=4,
+      in_features=64,
+      use_rotary_position_embeddings=True,
+      causal_attention=False,
+      v_norm=v_norm,
+      use_sdpa=use_sdpa,
+      rescale_logits=rescale_logits,
+    ).double()
+    x = torch.randn(10, 1, 64, dtype=torch.float64)
+    patch_mask = torch.zeros(10, 1, dtype=torch.bool)
+    patch_mask[3, 0] = True
+    with torch.no_grad():
+      ref, _, _ = mha(x, patch_mask=patch_mask)
+      fast = mha.single_position_forward(x)
+    self.assertEqual(fast.shape, ref.shape)
+
+    # Softmax over one key is exactly 1.0, so unmasked rows match bit for bit.
+    unmasked = ~patch_mask[:, 0]
+    torch.testing.assert_close(fast[unmasked], ref[unmasked], rtol=0, atol=0)
+
+    # Masked row. The manual path still gives the single key weight 1.0, and
+    # the fast path matches it. SDPA returns a different value for a fully
+    # masked row; that value is never read downstream (see
+    # SingleVariateFastPathTest in model_test.py), so it is not compared here.
+    if not use_sdpa:
+      torch.testing.assert_close(fast[3], ref[3], rtol=0, atol=0)
+
+  def test_matches_full_attention(self):
+    for use_sdpa in (True, False):
+      for v_norm in ("none", "rms"):
+        for rescale_logits in (True, False):
+          with self.subTest(use_sdpa=use_sdpa, v_norm=v_norm, rescale=rescale_logits):
+            self._check(use_sdpa, v_norm, rescale_logits)
+
+
 class MixingTransformerTest(unittest.TestCase):
   def test_mixing_transformer_forward(self):
     cfg = configs.TransformerConfig(
