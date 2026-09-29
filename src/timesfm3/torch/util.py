@@ -119,43 +119,29 @@ def update_running_stats(
     Tuple of (new_n, new_mu, new_sigma), each of shape (b, v).
   """
   is_legit = ~mask
-  is_legit_f = is_legit.float()
-  inc_n = is_legit_f.sum(dim=-1)
+  inc_n = is_legit.float().sum(dim=-1)
+  safe_inc_n = inc_n.clamp_min(1.0)
 
   # mean of valid elements in patch
-  x_masked = torch.where(is_legit, x, torch.zeros_like(x))
+  x_masked = x.masked_fill(mask, 0.0)
   inc_sum = x_masked.sum(dim=-1)
-  inc_mu = torch.where(inc_n == 0, torch.zeros_like(inc_sum), inc_sum / inc_n)
+  inc_mu = inc_sum / safe_inc_n
 
-  # std of valid elements in patch
-  x_diff_sq = torch.where(
-    is_legit, (x - inc_mu.unsqueeze(-1)) ** 2, torch.zeros_like(x)
-  )
-  inc_var = torch.where(
-    inc_n == 0,
-    torch.zeros_like(inc_sum),
-    x_diff_sq.sum(dim=-1) / inc_n,
-  )
-  inc_sigma = torch.sqrt(inc_var)
+  # Keep the variance until the final square root; converting it to a
+  # standard deviation and squaring it again only creates extra tensors.
+  x_diff_sq = (x_masked - inc_mu.unsqueeze(-1)).square().masked_fill(mask, 0.0)
+  inc_var = x_diff_sq.sum(dim=-1) / safe_inc_n
 
   new_n = n + inc_n
-  new_mu = torch.where(
-    new_n == 0,
-    torch.zeros_like(mu),
-    (n * mu + inc_mu * inc_n) / new_n,
-  )
+  safe_new_n = new_n.clamp_min(1.0)
+  new_mu = (n * mu + inc_sum) / safe_new_n
   new_sigma = torch.sqrt(
-    torch.where(
-      new_n == 0,
-      torch.zeros_like(sigma),
-      (
-        n * sigma * sigma
-        + inc_n * inc_sigma * inc_sigma
-        + n * (mu - new_mu) * (mu - new_mu)
-        + inc_n * (inc_mu - new_mu) * (inc_mu - new_mu)
-      )
-      / new_n,
-    )
+    (
+      n * sigma.square()
+      + inc_n * inc_var
+      + n * (mu - new_mu).square()
+      + inc_n * (inc_mu - new_mu).square()
+    ) / safe_new_n
   )
   return new_n, new_mu, new_sigma
 
