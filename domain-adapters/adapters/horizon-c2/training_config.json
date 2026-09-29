@@ -1,0 +1,19 @@
+{
+  "model_name": "Horizon-C2",
+  "domain": "crypto (intraday)",
+  "base_model": "google/timesfm-2.5-200m-transformers",
+  "data": "Binance spot: 1m/5m/15m for 10 top USDT pairs (2024-09 onward), 1h for 36 pairs",
+  "intervals": ["1m", "5m", "15m", "1h"],
+  "val_start": "2026-05-01",
+  "test_start": "2026-07-01",
+  "context_len": 512,
+  "horizon_len": 24,
+  "loss": "relative",
+  "lr": 5e-05,
+  "batch_size": 256,
+  "lora_r": 8,
+  "lora_alpha": 16,
+  "lora_dropout": 0.05,
+  "best_step": 600,
+  "note": "Checkpoint picked by validation loss (relative), 1.2216 vs base 1.2692."
+}

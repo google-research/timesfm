@@ -1,0 +1,18 @@
+{
+  "model_name": "Horizon-C1",
+  "domain": "crypto",
+  "base_model": "google/timesfm-2.5-200m-transformers",
+  "data": "Binance spot USDT pairs (36), close price, intervals 1h + 1d",
+  "val_start": "2025-09-01",
+  "test_start": "2026-03-01",
+  "context_len": 512,
+  "horizon_len": 24,
+  "loss": "relative",
+  "lr": 5e-05,
+  "batch_size": 256,
+  "lora_r": 8,
+  "lora_alpha": 16,
+  "lora_dropout": 0.05,
+  "best_step": 200,
+  "note": "Checkpoint picked by validation loss (relative), 9.01 vs base 9.73."
+}
