@@ -69,20 +69,13 @@ class TestStripLeadingNans:
     result = strip_leading_nans(arr)
     np.testing.assert_array_equal(result, np.array([42.0]))
 
-  def test_all_nans_returns_full_array(self):
-    """When every element is NaN, ``np.argmax`` on an all-False mask
-    returns 0 — so the implementation returns the original array, not an
-    empty one.
-
-    This documents the *actual* behavior (which differs from the
-    docstring claim of returning an empty array). Downstream code
-    (``linear_interpolation``) is designed to handle this case.
+  def test_all_nans_returns_empty_array(self):
+    """An all-NaN series has no first valid index. Return empty, matching
+    the docstring, instead of relying on ``np.argmax`` returning 0.
     """
     arr = np.array([np.nan, np.nan, np.nan])
     result = strip_leading_nans(arr)
-    # Actual behavior: argmax(~isnan) = 0 when all NaN → returns full array.
-    assert len(result) == 3
-    assert np.all(np.isnan(result))
+    assert len(result) == 0
 
   def test_preserves_dtype(self):
     """Output dtype must match input dtype (float32 stays float32)."""
@@ -166,3 +159,44 @@ class TestLinearInterpolation:
     arr = np.array([np.nan, 5.0, np.nan])
     result = linear_interpolation(arr)
     np.testing.assert_allclose(result, [5.0, 5.0, 5.0])
+
+  def test_all_nans_fills_with_zero(self):
+    """An all-NaN series has no interpolation anchors. Fill with 0.0, matching
+    v1 and TimesFM3. The truthiness check on an empty ndarray raises on
+    NumPy 2.x (`ValueError: The truth value of an empty array is ambiguous`).
+    """
+    arr = np.array([np.nan, np.nan, np.nan])
+    result = linear_interpolation(arr)
+    np.testing.assert_array_equal(result, np.array([0.0, 0.0, 0.0]))
+
+
+class TestForecastAllNan:
+  """End-to-end forecast path for an all-NaN series.
+
+  ``strip_leading_nans`` returns empty, then ``forecast`` pads with zeros.
+  That does not depend on ``argmax`` leaving the NaNs in place for
+  ``linear_interpolation`` to catch.
+  """
+
+  def test_forecast_pads_all_nan_series_with_zeros(self):
+    from timesfm import configs
+    from timesfm.timesfm_2p5.timesfm_2p5_base import TimesFM_2p5
+
+    seen = {}
+
+    def fake_decode(horizon, values, masks):
+      seen["values"] = [np.asarray(v) for v in values]
+      seen["masks"] = [np.asarray(m) for m in masks]
+      batch = len(values)
+      return np.zeros((batch, horizon)), np.zeros((batch, horizon, 1))
+
+    model = TimesFM_2p5()
+    model.compiled_decode = fake_decode
+    model.global_batch_size = 1
+    model.forecast_config = configs.ForecastConfig(max_context=4, max_horizon=2)
+    points, _ = model.forecast(2, [np.array([np.nan, np.nan, np.nan])])
+    np.testing.assert_array_equal(seen["values"][0], np.zeros(4))
+    np.testing.assert_array_equal(
+        seen["masks"][0], np.array([True, True, True, True])
+    )
+    assert points.shape == (1, 2)
