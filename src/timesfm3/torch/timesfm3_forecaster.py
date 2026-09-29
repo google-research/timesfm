@@ -21,6 +21,7 @@ import gc
 import math
 import os
 from collections.abc import Iterator
+from numbers import Integral
 from typing import Any
 
 import numpy as np
@@ -477,6 +478,16 @@ class TimesFM3Forecaster:
     padding_mode: str = "none",
   ) -> Iterator[ForecastOutput]:
     """Runs inference on a batch of time series with optional covariates."""
+    if isinstance(horizon, bool) or not isinstance(horizon, Integral) or horizon <= 0:
+      raise ValueError("horizon must be a positive integer.")
+    for name, values in (
+      ("ts_ids", ts_ids),
+      ("past_only_covariates", past_only_covariates),
+      ("past_future_covariates", past_future_covariates),
+    ):
+      if values is not None and len(values) != len(contexts):
+        raise ValueError(f"{name} must contain one entry per context.")
+
     global_horizon = (
       math.ceil(horizon / self.config.output_patch_length)
       * self.config.output_patch_length
@@ -503,6 +514,26 @@ class TimesFM3Forecaster:
     pf_2d: list[np.ndarray | None] = []
 
     for idx, ctx in enumerate(contexts):
+      if (
+        np.ndim(ctx) not in (1, 2)
+        or np.shape(ctx)[-1] == 0
+        or (np.ndim(ctx) == 2 and np.shape(ctx)[0] == 0)
+      ):
+        raise ValueError(
+          f"contexts[{idx}] must have at least one time step and, for 2D"
+          " inputs, at least one variate."
+        )
+      for name, covariate, expected_length in (
+        ("past_only_covariates", po_cov_list[idx], np.shape(ctx)[-1]),
+        ("past_future_covariates", pf_cov_list[idx], np.shape(ctx)[-1] + horizon),
+      ):
+        if covariate is not None and (
+          np.ndim(covariate) not in (1, 2)
+          or np.shape(covariate)[-1] != expected_length
+        ):
+          raise ValueError(
+            f"{name}[{idx}] must be a 1D or 2D array with time length {expected_length}."
+          )
       target_clean = np.atleast_2d(np.array(ctx, dtype=np.float32))
       po = po_cov_list[idx]
       po_arr = np.atleast_2d(np.array(po, dtype=np.float32)) if po is not None else None
