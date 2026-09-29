@@ -276,16 +276,12 @@ def get_output_patch_via_roll(
   """
   b, v, n, p = x.shape
   device = x.device
-  rolling_mat = torch.zeros(b, v, n, rolls + 1, p, device=device, dtype=x.dtype)
-  rolling_mat[:, :, :, 0, :] = x
-
-  for i in range(rolls):
-    rolling_mat[:, :, :, i + 1, :] = torch.roll(
-      rolling_mat[:, :, :, i, :], shifts=-1, dims=2
-    )
-
-  # Take [1:] along the roll axis and flatten
-  result = rolling_mat[:, :, :, 1:, :].reshape(b, v, n, rolls * p)
+  # Gather the future patches directly instead of allocating a rolling
+  # workspace and then copying its non-contiguous slice during reshape.
+  future_patch = torch.arange(n, device=device)[:, None] + torch.arange(
+    1, rolls + 1, device=device
+  )[None, :]
+  result = x[:, :, future_patch.remainder(n), :].reshape(b, v, n, rolls * p)
 
   # Build wrap-around mask
   patch_idx = torch.arange(n, device=device)
