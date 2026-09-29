@@ -712,7 +712,9 @@ class TimesFM3Forecaster:
           past_future_covariates=pf_torch,
           mask=mask_torch,
         )
-      ys.append(out_logits.cpu().numpy())
+      # Covariates can make decode return the exact horizon while a batch
+      # without them returns the patch-rounded horizon. Trim before stacking.
+      ys.append(out_logits[:, :num_targets_in, :horizon, :].cpu().numpy())
 
     try_gc(self.device)
     all_raw_outputs = np.concatenate(ys, axis=0)
