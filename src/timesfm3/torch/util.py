@@ -378,10 +378,16 @@ def stitch_patches(
 
   middles = next_patches[:, :, :, overlap:patch_len, :]
 
-  output_chunks = torch.cat([stitched_overlaps, middles], dim=3)
-
-  mid = output_chunks.reshape(b, v, (num_patches - 1) * patch_len, q)
-
-  tail = patch_preds[:, :, -1, patch_len:, :]
-
-  return torch.cat([first_chunk, mid, tail], dim=2)
+  result = torch.empty(
+    (b, v, num_patches * patch_len + overlap, q),
+    dtype=patch_preds.dtype,
+    device=patch_preds.device,
+  )
+  result[:, :, :patch_len, :] = first_chunk
+  middle = result[:, :, patch_len : num_patches * patch_len, :].view(
+    b, v, num_patches - 1, patch_len, q
+  )
+  middle[:, :, :, :overlap, :] = stitched_overlaps
+  middle[:, :, :, overlap:, :] = middles
+  result[:, :, num_patches * patch_len :, :] = patch_preds[:, :, -1, patch_len:, :]
+  return result
