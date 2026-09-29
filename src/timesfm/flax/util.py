@@ -101,7 +101,8 @@ def revin(
   elif len(mu.shape) == len(x.shape) - 2:
     mu = mu[..., None, None]
     sigma = sigma[..., None, None]
+  safe_sigma = jnp.where(sigma < _TOLERANCE, 1.0, sigma)
   if reverse:
-    return x * sigma + mu
+    return x * safe_sigma + mu
   else:
-    return (x - mu) / jnp.where(sigma < _TOLERANCE, 1.0, sigma)
+    return (x - mu) / safe_sigma

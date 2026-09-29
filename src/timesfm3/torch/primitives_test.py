@@ -287,6 +287,22 @@ class UtilTest(unittest.TestCase):
     expected = torch.tensor([[[0.0, 0.0, 0.0]]])
     np.testing.assert_allclose(normalized_x.numpy(), expected.numpy(), atol=1e-6)
 
+  def test_revin_zero_sigma_roundtrip(self):
+    x = torch.tensor([[[4.5, 5.0, 5.5]]])
+    mu = torch.tensor([[5.0]])
+    sigma = torch.tensor([[0.0]])
+    normalized_x = torch_util.revin(x, mu, sigma, reverse=False)
+    recovered_x = torch_util.revin(normalized_x, mu, sigma, reverse=True)
+    np.testing.assert_allclose(recovered_x.numpy(), x.numpy(), atol=1e-5)
+
+  def test_revin_near_zero_sigma_roundtrip(self):
+    x = torch.tensor([[[1.0, 2.0, 3.0]]])
+    mu = torch.tensor([[2.0]])
+    sigma = torch.tensor([[1e-7]])
+    normalized_x = torch_util.revin(x, mu, sigma, reverse=False)
+    recovered_x = torch_util.revin(normalized_x, mu, sigma, reverse=True)
+    np.testing.assert_allclose(recovered_x.numpy(), x.numpy(), atol=1e-5)
+
   def test_get_output_patch_via_roll(self):
     x = torch.tensor([[[[1, 2], [3, 4], [5, 6], [7, 8]]]], dtype=torch.float32)
     rolls = 2
