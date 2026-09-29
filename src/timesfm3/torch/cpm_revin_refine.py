@@ -97,13 +97,8 @@ def cpm_iterative_revin_refine(
     is_cpm = patch_cpm_mask[:, i : i + 1]  # (b, 1)
 
     # Select the block_offset[b]-th patch for each batch element
-    offset_onehot = torch.eq(
-      torch.arange(rolls, device=device).unsqueeze(0),
-      block_offset.unsqueeze(1),
-    ).float()
-    predicted_values_step = torch.einsum(
-      "br,bvrp->bvp", offset_onehot, anchor_predicted_values
-    )
+    offset_index = block_offset[:, None, None, None].expand(b, v, 1, patch_len)
+    predicted_values_step = anchor_predicted_values.gather(2, offset_index).squeeze(2)
 
     # Update running stats with the estimated patch.
     new_n, new_mu, new_sigma = util.update_running_stats(
