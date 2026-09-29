@@ -22,6 +22,7 @@ The PyTorch backend lives in ``timesfm3.torch`` and the MLX (Apple Silicon) back
 
 _TORCH_EXPORTS = frozenset(
   {
+    "ForecastDiagnostics",
     "ForecastOutput",
     "ModelConfig",
     "ResidualBlockConfig",
@@ -30,6 +31,7 @@ _TORCH_EXPORTS = frozenset(
     "TimesFM3Forecaster",
     "TimesFM3Torch",
     "TransformerConfig",
+    "forecast_confidence_diagnostics",
     "_ModelConfig",
   }
 )
