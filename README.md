@@ -6,12 +6,12 @@ model developed by Google Research for time-series forecasting.
 *   Paper:
     [A decoder-only foundation model for time-series forecasting](https://arxiv.org/abs/2310.10688),
     ICML 2024.
-*   <span style="color:red">(NEW!)</span> TimesFM 3.0 Checkpoint:
-    [`google/timesfm-3.0-pytorch`](https://huggingface.co/google/timesfm-3.0-pytorch).
-*   Checkpoints (up to 2.5):
+*   🆕 TimesFM 3.0 Checkpoint:
+    [`google/timesfm-3.0-pytorch`](https://huggingface.co/google/timesfm-3.0-pytorch). Checkpoints up to 2.5:
     [TimesFM Hugging Face Collection](https://huggingface.co/collections/google/timesfm-release-66e4be5fdb56e960c1e482a6).
-*   [Google Research blog](https://research.google/blog/a-decoder-only-foundation-model-for-time-series-forecasting/)
-    (New blog post for TimesFM 3.0 coming soon!).
+*   Google Reseach blog posts:
+    * [TimesFM-3: A zero-shot foundation model for multivariate forecasting](https://research.google/blog/timesfm-3-a-zero-shot-foundation-model-for-multivariate-forecasting/)
+    * [A decoder-only foundation model for time-series forecasting](https://research.google/blog/a-decoder-only-foundation-model-for-time-series-forecasting/)   
 *   TimesFM in Google 1P Products:
     *   [BigQuery ML](https://cloud.google.com/bigquery/docs/timesfm-model):
         Enterprise level SQL queries for scalability and reliability.
@@ -22,7 +22,7 @@ model developed by Google Research for time-series forecasting.
 
 This open version is not an officially supported Google product.
 
-**Latest Model Version:** TimesFM 3.0
+**Latest Model Version:** TimesFM 3.0 ✨
 
 **Archived Model Versions:**
 
@@ -32,6 +32,9 @@ This open version is not an officially supported Google product.
     them.
 
 --------------------------------------------------------------------------------
+## Update — September 2026
+
+TimesFM 3.0 finishes rollout in Google Cloud [BigQuery ML](https://docs.cloud.google.com/bigquery/docs/timesfm-model), supporting commercial and production uses (see clarified [license notice](https://github.com/google-research/timesfm#license-notice-for-pretrained-weights)).
 
 ## Update — August 2026
 
@@ -57,12 +60,9 @@ time-series foundation model benchmarks.
 
 ### License notice for pretrained weights
 
-> **Important:** The TimesFM source code in this repository is licensed under
-> Apache-2.0, and model weights up to version 2.5 remain Apache-2.0. However,
-> for the time being, TimesFM 3.0 pretrained weights are distributed under the
-> separate `timesfm-non-commercial-license-v1.0` license and are restricted to
-> non-commercial, non-production use. Commercial or production use of the
-> default pretrained weights is **not permitted**.
+> **Important:** The TimesFM source code in this repository is licensed under `Apache-2.0`, and model weights up to version 2.5 remain `Apache-2.0`. However, TimesFM 3.0 pretrained weights are distributed under the separate [`timesfm-non-commercial-license-v1.0`](https://huggingface.co/google/timesfm-3.0-pytorch/blob/main/LICENSE) license and are restricted to non-commercial, non-production use. Commercial or production use of downloaded / self-hosted weights is **not permitted**.
+
+> **Commercial & Production Use:** Commercial and production use of TimesFM 3.0 is **fully permitted** through authorized Google Cloud services, including [BigQuery ML](https://docs.cloud.google.com/bigquery/docs/timesfm-model), which are governed by the [Google Cloud Terms of Service](https://cloud.google.com/product-terms).
 
 --------------------------------------------------------------------------------
 
