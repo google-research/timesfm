@@ -15,6 +15,7 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.utils.data import DataLoader, Dataset
 from timesfm.pytorch_patched_decoder import create_quantiles
 
+from tqdm import tqdm
 import wandb
 
 
@@ -139,6 +140,8 @@ class FinetuningConfig:
       val_check_interval: How often within one training epoch to check val metrics. (also from Pytorch Lightning)
         Can be: float (0.0-1.0): fraction of epoch (e.g., 0.5 = validate twice per epoch)
                 int: validate every N batches
+      progress_bar: Whether to display tqdm progress bars during training and
+        validation. Only shown on rank 0 in distributed training.
     """
 
   batch_size: int = 32
@@ -157,6 +160,7 @@ class FinetuningConfig:
   wandb_project: str = "timesfm-finetuning"
   log_every_n_steps: int = 50
   val_check_interval: float = 0.5
+  progress_bar: bool = True
 
 
 class TimesFMFinetuner:
@@ -291,7 +295,10 @@ class TimesFMFinetuner:
     total_loss = 0.0
     num_batches = len(train_loader)
 
-    for batch in train_loader:
+    is_main = not self.config.distributed or dist.get_rank() == 0
+    loader = tqdm(train_loader, desc="Training", leave=False) if self.config.progress_bar and is_main else train_loader
+
+    for batch_idx, batch in enumerate(loader):
       loss, _ = self._process_batch(batch)
 
       optimizer.zero_grad()
@@ -299,6 +306,11 @@ class TimesFMFinetuner:
       optimizer.step()
 
       total_loss += loss.item()
+
+      if self.config.progress_bar and is_main and hasattr(loader, "set_postfix"):
+        if (batch_idx + 1) % self.config.log_every_n_steps == 0 or batch_idx == num_batches - 1:
+          avg_loss = total_loss / (batch_idx + 1)
+          loader.set_postfix(loss=avg_loss)
 
     avg_loss = total_loss / num_batches
 
@@ -322,8 +334,11 @@ class TimesFMFinetuner:
     total_loss = 0.0
     num_batches = len(val_loader)
 
+    is_main = not self.config.distributed or dist.get_rank() == 0
+    loader = tqdm(val_loader, desc="Validating", leave=False) if self.config.progress_bar and is_main else val_loader
+
     with torch.no_grad():
-      for batch in val_loader:
+      for batch in loader:
         loss, _ = self._process_batch(batch)
         total_loss += loss.item()
 
