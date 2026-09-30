@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-TimesFM Covariates (XReg) Example
+TimesFM 3.0 Covariates Example
 
-Demonstrates the TimesFM covariate API using synthetic retail sales data.
-TimesFM 1.0 does NOT support forecast_with_covariates(); that requires
-TimesFM 2.5 + `pip install timesfm[xreg]`.
+Demonstrates the TimesFM 3.0 covariate API using synthetic retail sales data.
+TimesFM 3.0 accepts numeric past-only and past-future covariate arrays through
+`predict()` / `predict_batch()`.
 
 This script:
   1. Generates synthetic 3-store weekly retail data (24-week context, 12-week horizon)
@@ -153,7 +153,7 @@ def create_visualization(data: dict) -> None:
         gridspec_kw={"hspace": 0.42, "wspace": 0.32},
     )
     fig.suptitle(
-        "TimesFM Covariates (XReg) -- Retail Sales with Exogenous Variables\n"
+        "TimesFM 3.0 Covariates -- Retail Sales with Exogenous Variables\n"
         "Shared x-axis: Week 0-23 = context (observed) | Week 24-35 = forecast horizon",
         fontsize=13,
         fontweight="bold",
@@ -297,7 +297,7 @@ def create_visualization(data: dict) -> None:
     ax.annotate(
         f"Holiday weeks: +{h_lift:.0f} units avg\n"
         f"Promotion weeks: +{p_lift:.0f} units avg\n"
-        f"Future event schedules must be known for XReg",
+        f"Future event schedules must be known for past-future covariates",
         xy=(0.97, 0.05),
         xycoords="axes fraction",
         ha="right",
@@ -404,52 +404,77 @@ def create_visualization(data: dict) -> None:
 
 def demonstrate_api() -> None:
     print("\n" + "=" * 70)
-    print("  TIMESFM COVARIATES API (TimesFM 2.5)")
+    print("  TIMESFM 3.0 COVARIATES API")
     print("=" * 70)
     print("""
 # Installation
-pip install timesfm[xreg]
+pip install "timesfm[torch]"
 
-import timesfm
-hparams   = timesfm.TimesFmHparams(backend="cpu", per_core_batch_size=32, horizon_len=12)
-ckpt      = timesfm.TimesFmCheckpoint(huggingface_repo_id="google/timesfm-2.5-200m-pytorch")
-model     = timesfm.TimesFm(hparams=hparams, checkpoint=ckpt)
+import numpy as np
+from timesfm3 import TimesFM3Forecaster
 
-point_fc, quant_fc = model.forecast_with_covariates(
-    inputs=[sales_a, sales_b, sales_c],
-    dynamic_numerical_covariates={"price": [price_a, price_b, price_c]},
-    dynamic_categorical_covariates={"holiday": [hol_a, hol_b, hol_c]},
-    static_categorical_covariates={"store_type": ["premium","standard","discount"]},
-    xreg_mode="xreg + timesfm",
-    normalize_xreg_target_per_input=True,
+forecaster = TimesFM3Forecaster.from_pretrained(
+    "google/timesfm-3.0-pytorch", device="cpu"
 )
-# point_fc:  (num_series, horizon_len)
-# quant_fc:  (num_series, horizon_len, 10)
+
+data = generate_sales_data()
+store_ids = ["store_A", "store_B", "store_C"]
+context_len, horizon = 24, 12
+contexts = [
+    data["stores"][sid]["sales"][:context_len].astype(np.float32)
+    for sid in store_ids
+]
+
+# One numeric covariate array per target series. Each row is a channel known
+# through context + horizon, here: price, promotion, holiday, and day of week.
+past_future_covariates = [
+    np.stack([
+        data["covariates"]["price"][sid],
+        data["covariates"]["promotion"][sid],
+        data["covariates"]["holiday"][sid],
+        data["covariates"]["day_of_week"][sid],
+    ]).astype(np.float32)
+    for sid in store_ids
+]
+
+outputs = list(forecaster.predict_batch(
+    contexts=contexts,
+    horizon=horizon,
+    past_future_covariates=past_future_covariates,
+    return_quantiles=True,
+    use_symmetric_averaging=False,
+))
+point_fc = np.stack([output.forecast for output in outputs])
+quant_fc = np.stack([output.quantiles for output in outputs])
+# point_fc: (3, horizon)
+# quant_fc: (3, horizon, 9)
+
+# TimesFM 3.0 covariates are numeric arrays. Encode categorical/static
+# features numerically; static channels can be repeated across time.
 """)
 
 
-def explain_xreg_modes() -> None:
+def explain_covariate_types() -> None:
     print("\n" + "=" * 70)
-    print("  XREG MODES")
+    print("  TIMESFM 3.0 COVARIATE TYPES")
     print("=" * 70)
     print("""
-"xreg + timesfm" (DEFAULT)
-  1. TimesFM makes baseline forecast
-  2. Fit regression on residuals (actual - baseline) ~ covariates
-  3. Final = TimesFM baseline + XReg adjustment
-  Best when: covariates explain residual variation (e.g. promotions)
+past_only_covariates
+  Numeric channels observed only during the context window.
+  Shape per series: (num_channels, context_len).
 
-"timesfm + xreg"
-  1. Fit regression: target ~ covariates
-  2. TimesFM forecasts the residuals
-  3. Final = XReg prediction + TimesFM residual forecast
-  Best when: covariates explain the main signal (e.g. temperature)
+past_future_covariates
+  Numeric channels whose values are known through the forecast horizon.
+  Shape per series: (num_channels, context_len + horizon).
+
+For categorical features such as holiday type or store class, encode them
+numerically before constructing the covariate arrays.
 """)
 
 
 def main() -> None:
     print("=" * 70)
-    print("  TIMESFM COVARIATES (XREG) EXAMPLE")
+    print("  TIMESFM 3.0 COVARIATES EXAMPLE")
     print("=" * 70)
 
     print("\n Generating synthetic retail sales data...")
@@ -461,7 +486,7 @@ def main() -> None:
     print(f"   Covariates:     {list(data['covariates'].keys())}")
 
     demonstrate_api()
-    explain_xreg_modes()
+    explain_covariate_types()
 
     print("\n Creating 2x2 visualization (shared x-axis)...")
     create_visualization(data)
@@ -499,7 +524,7 @@ def main() -> None:
     print(f"   Saved: {csv_path}  ({len(df)} rows x {len(df.columns)} cols)")
 
     metadata = {
-        "description": "Synthetic retail sales data with covariates for TimesFM XReg demo",
+        "description": "Synthetic retail sales data with covariates for TimesFM 3.0 demo",
         "note_on_real_data": (
             "For real datasets (e.g., Kaggle Rossmann Store Sales), download to "
             "tempfile.mkdtemp() -- do NOT commit to this repo."
@@ -530,9 +555,10 @@ def main() -> None:
             "promotion": "+150 units per promotion week",
             "price": "-20 units per $1 above base price",
         },
-        "xreg_modes": {
-            "xreg + timesfm": "Regression on TimesFM residuals (default)",
-            "timesfm + xreg": "TimesFM on regression residuals",
+        "timesfm3_covariates": {
+            "past_only": "numeric channels observed during context only",
+            "past_future": "numeric channels known through the forecast horizon",
+            "categorical_note": "encode categorical features numerically before use",
         },
         "bug_fixes_history": [
             "v1: Variable-shadowing -- all stores had identical covariates",
@@ -551,9 +577,9 @@ def main() -> None:
     print("=" * 70)
     print("""
 Key points:
-  1. Requires timesfm[xreg] + TimesFM 2.5+ for actual inference
+  1. Uses the TimesFM 3.0 predict_batch covariate interface
   2. Dynamic covariates need values for BOTH context AND horizon (future must be known!)
-  3. Static covariates: one value per series (store_type, region)
+  3. Encode categorical/static features numerically before passing them to TimesFM 3.0
   4. All 4 visualization panels share the same week x-axis (0-35)
   5. Effect decomposition shows holidays/promotions dominate over price variation
 
