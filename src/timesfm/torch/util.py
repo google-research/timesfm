@@ -69,6 +69,8 @@ def update_running_stats(
 
   new_var = (term1 + term2 + term3 + term4) / new_n_safe
   new_var = torch.where(new_n == 0, 0.0, new_var)
+  # Use a tighter clamp to prevent numerical drift that can accumulate
+  # across autoregressive decode steps and produce NaN outputs.
   new_sigma = torch.sqrt(torch.clamp(new_var, min=0.0))
 
   return (w := (new_n, new_mu, new_sigma), w)
@@ -91,4 +93,7 @@ def revin(
   if reverse:
     return x * sigma + mu
   else:
-    return (x - mu) / torch.where(sigma < _TOLERANCE, 1.0, sigma)
+    # Clamp sigma to prevent division by values that are extremely close to zero,
+    # which can amplify numerical noise into NaN/Inf over multiple decode steps.
+    safe_sigma = torch.where(sigma < _TOLERANCE, 1.0, sigma)
+    return (x - mu) / safe_sigma
