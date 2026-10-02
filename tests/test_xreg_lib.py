@@ -63,3 +63,28 @@ def test_fit_handles_single_category_without_intercept():
   )
 
   np.testing.assert_array_equal(outputs, np.zeros((1, 2)))
+
+
+@pytest.mark.parametrize("max_rows_per_col", [1, 10])
+def test_fit_preserves_targets_without_predictors_when_subsampling(max_rows_per_col):
+  model = xreg_lib.BatchedInContextXRegLinear(
+    targets=[[1.0, 2.0, 3.0]],
+    train_lens=[3],
+    test_lens=[2],
+    train_dynamic_categorical_covariates={"kind": [["same"] * 3]},
+    test_dynamic_categorical_covariates={"kind": [["same"] * 2]},
+  )
+
+  outputs, context, targets, x_train, x_test = model.fit(
+    use_intercept=False,
+    max_rows_per_col=max_rows_per_col,
+    debug_info=True,
+    assert_covariates=True,
+    assert_covariate_shapes=True,
+  )
+
+  np.testing.assert_array_equal(outputs, np.zeros((1, 2)))
+  np.testing.assert_array_equal(context, np.zeros((1, 3)))
+  np.testing.assert_array_equal(targets, [1.0, 2.0, 3.0, 0.0])
+  assert x_train.shape == (4, 0)
+  assert x_test.shape == (2, 0)

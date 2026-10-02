@@ -460,7 +460,7 @@ class BatchedInContextXRegLinear(BatchedInContextXRegBase):
         x_tr_fit = x_tr.copy()
         if max_rows_per_col:
           nrows, ncols = x_tr_fit.shape
-          if nrows > (w := ncols * max_rows_per_col):
+          if ncols > 0 and nrows > (w := ncols * max_rows_per_col):
             subsample = jax.random.choice(
                 jax.random.PRNGKey(max_rows_per_col_sample_seed),
                 nrows,
