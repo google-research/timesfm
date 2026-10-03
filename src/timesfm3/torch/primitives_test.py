@@ -40,6 +40,89 @@ class TransformationsTest(unittest.TestCase):
     z = torch_trans.signed_log(y, reverse=True)
     np.testing.assert_allclose(z.numpy(), x.numpy(), atol=1e-5)
 
+  def test_signed_log_derivatives_include_unit_slope_at_zero(self):
+    for reverse in (False, True):
+      for dtype in (torch.float32, torch.float64):
+        with self.subTest(reverse=reverse, dtype=dtype):
+          x = torch.tensor(
+            [-4.0, -0.1, -0.0, 0.0, 0.1, 4.0], dtype=dtype, requires_grad=True
+          )
+          before = x.detach().clone()
+          actual = torch_trans.signed_log(x, reverse=reverse)
+          (derivative,) = torch.autograd.grad(actual.sum(), x)
+          expected = (
+            torch.exp(x.detach().abs()) if reverse else 1 / (1 + x.detach().abs())
+          )
+          torch.testing.assert_close(derivative, expected)
+          torch.testing.assert_close(x.detach(), before)
+          self.assertEqual(actual.dtype, dtype)
+          self.assertEqual(actual.device, x.device)
+          self.assertEqual(actual.shape, x.shape)
+
+  def test_signed_log_autograd_matches_finite_differences(self):
+    for reverse in (False, True):
+      with self.subTest(reverse=reverse):
+        x = torch.tensor(
+          [-2.0, -0.25, 0.0, 0.25, 2.0], dtype=torch.float64, requires_grad=True
+        )
+        self.assertTrue(
+          torch.autograd.gradcheck(
+            lambda value: torch_trans.signed_log(value, reverse=reverse),
+            (x,),
+            eps=1e-7,
+            atol=1e-6,
+            rtol=1e-5,
+          )
+        )
+
+  def test_signed_log_roundtrip_preserves_tangents_for_noncontiguous_inputs(self):
+    x = torch.tensor(
+      [[-2.0, 0.0, 3.0], [0.25, -0.5, 0.0]], dtype=torch.float64, requires_grad=True
+    )
+    selected = x.T
+    self.assertFalse(selected.is_contiguous())
+    restored = torch_trans.signed_log(torch_trans.signed_log(selected), reverse=True)
+    (derivative,) = torch.autograd.grad(restored.sum(), x)
+    torch.testing.assert_close(restored, selected)
+    torch.testing.assert_close(derivative, torch.ones_like(x))
+
+  def test_signed_log_compiled_training_can_leave_zero_initialization(self):
+    for reverse in (False, True):
+      with self.subTest(reverse=reverse):
+
+        def objective(parameter):
+          prediction = torch_trans.signed_log(parameter, reverse=reverse)
+          return ((prediction - 1.0) ** 2).mean()
+
+        compiled = torch.compile(objective, backend="aot_eager", fullgraph=True)
+        parameter = torch.nn.Parameter(torch.zeros(3))
+        optimizer = torch.optim.SGD([parameter], lr=0.1)
+        first = compiled(parameter)
+        first.backward()
+        torch.testing.assert_close(
+          parameter.grad, torch.full_like(parameter, -2.0 / 3.0)
+        )
+        optimizer.step()
+        self.assertLess(float(compiled(parameter).detach()), float(first.detach()))
+
+  def test_signed_log_values_registry_and_empty_inputs_remain_unchanged(self):
+    for reverse in (False, True):
+      for dtype in (torch.float16, torch.bfloat16, torch.float32, torch.float64):
+        with self.subTest(reverse=reverse, dtype=dtype):
+          x = torch.tensor(
+            [-float("inf"), -4.0, -1e-4, 0.0, 1e-4, 4.0, float("inf"), float("nan")],
+            dtype=dtype,
+          )
+          expected = torch.sign(x) * (
+            torch.expm1(x.abs()) if reverse else torch.log1p(x.abs())
+          )
+          actual = torch_trans.get_transform("signed_log")(x, reverse=reverse)
+          torch.testing.assert_close(actual, expected, equal_nan=True)
+          empty = torch.empty((2, 0), dtype=dtype)
+          self.assertEqual(
+            torch_trans.signed_log(empty, reverse=reverse).shape, empty.shape
+          )
+
   def test_signed_sqrt(self):
     x = torch.tensor([-9.0, -1.0, 0.0, 1.0, 16.0], dtype=torch.float32)
     y = torch_trans.signed_sqrt(x)

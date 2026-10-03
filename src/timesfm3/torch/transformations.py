@@ -34,9 +34,13 @@ class TransformFn(Protocol):
 
 def signed_log(x: torch.Tensor, *, reverse: bool = False) -> torch.Tensor:
   """Signed-log transform: sign(x) * log(1 + |x|)."""
+  # Both branches have derivative one at zero. Choosing a nonzero sign there
+  # avoids the zero gradient of sign(x) * f(abs(x)) without changing values.
+  sign = torch.where(x < 0, -torch.ones_like(x), torch.ones_like(x))
+  magnitude = sign * x
   if reverse:
-    return torch.sign(x) * torch.expm1(torch.abs(x))
-  return torch.sign(x) * torch.log1p(torch.abs(x))
+    return sign * torch.expm1(magnitude)
+  return sign * torch.log1p(magnitude)
 
 
 def _max_output_signed_log(value_clip: float) -> torch.Tensor:
