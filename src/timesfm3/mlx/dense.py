@@ -30,8 +30,8 @@ _ACTIVATIONS = {
 
 
 class ResidualBlock(nn.Module):
-  """Two linear layers with a residual connection (no bias) -- matches the pre-transformer
-  residual block of the PyTorch backend.
+  """Two linear layers with a residual connection -- matches the pre-transformer residual block
+  of the PyTorch backend.
 
   ``output_layer(activation(hidden_layer(prenorm(x)))) + residual_layer(x)`` (or ``+ x`` when
   ``identity_skip``).
@@ -44,13 +44,14 @@ class ResidualBlock(nn.Module):
     activation: str = "relu",
     prenorm: str = "none",
     identity_skip: bool = False,
+    use_bias: bool = False,
   ):
     super().__init__()
-    self.hidden_layer = nn.Linear(in_dim, out_dim, bias=False)
-    self.output_layer = nn.Linear(out_dim, out_dim, bias=False)
+    self.hidden_layer = nn.Linear(in_dim, out_dim, bias=use_bias)
+    self.output_layer = nn.Linear(out_dim, out_dim, bias=use_bias)
     self.identity_skip = identity_skip
     if not identity_skip:
-      self.residual_layer = nn.Linear(in_dim, out_dim, bias=False)
+      self.residual_layer = nn.Linear(in_dim, out_dim, bias=use_bias)
     self.activation = _ACTIVATIONS[activation]
     self.pre_norm = normalization.RMSNorm(in_dim) if prenorm == "rms" else None
 
