@@ -436,8 +436,11 @@ class TimesFM_2p5_200M_torch(
         is_positive = None
 
       if fc.normalize_inputs:
-        mu = torch.mean(inputs, dim=-1, keepdim=True)
-        sigma = torch.std(inputs, dim=-1, keepdim=True)
+        # Compute statistics at a bounded scale to avoid float32 overflow.
+        magnitude = inputs.abs().amax(dim=-1, keepdim=True).clamp_min(1.0)
+        scaled_inputs = inputs / magnitude
+        mu = torch.mean(scaled_inputs, dim=-1, keepdim=True) * magnitude
+        sigma = torch.std(scaled_inputs, dim=-1, keepdim=True) * magnitude
         inputs = revin(inputs, mu, sigma, reverse=False)
       else:
         mu, sigma = None, None
