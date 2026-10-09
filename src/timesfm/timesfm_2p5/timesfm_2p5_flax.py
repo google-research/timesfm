@@ -509,8 +509,8 @@ class TimesFM_2p5_200M_flax(timesfm_2p5_base.TimesFM_2p5):
     dryrun: bool = True,
     **kwargs
   ):
-    # Acrobym used during validation.
-    print("Compiling model...")
+    # Acronym used during validation.
+    logging.info("Compiling model...")
 
     fc = forecast_config
     if fc.max_context % self.model.p != 0:
@@ -611,4 +611,4 @@ class TimesFM_2p5_200M_flax(timesfm_2p5_base.TimesFM_2p5):
           (self.global_batch_size, self.forecast_config.max_context), dtype=jnp.bool
         ),
       )
-    print("Compiling done.")
+    logging.info("Compiling done.")
