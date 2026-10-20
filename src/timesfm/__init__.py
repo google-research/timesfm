@@ -14,7 +14,11 @@
 
 """TimesFM API."""
 
+import logging
+
 from .configs import ForecastConfig
+
+_root_handlers = tuple(logging.root.handlers)
 
 try:
   from .timesfm_2p5 import timesfm_2p5_torch
@@ -32,3 +36,13 @@ try:
   from timesfm3 import TimesFM3Forecaster, TimesFM3Torch
 except ImportError:
   pass
+
+def _restore_root_handlers(root_handlers):
+  """Removes handlers added as a side effect of optional imports."""
+  for handler in tuple(logging.root.handlers):
+    if handler not in root_handlers:
+      logging.root.removeHandler(handler)
+
+
+_restore_root_handlers(_root_handlers)
+del _restore_root_handlers, _root_handlers
