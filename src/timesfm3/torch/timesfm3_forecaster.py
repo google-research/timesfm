@@ -303,7 +303,8 @@ def _make_torch_model(
         feedforward_norm="rms",
         qk_norm="rms",
         use_rope_seq=True,
-        use_rope_var=True,
+        # Must match the published checkpoint (config.json) and TimesFM3Torch.
+        use_rope_var=False,
         use_bias=False,
         ff_activation="relu",
         deterministic=True,

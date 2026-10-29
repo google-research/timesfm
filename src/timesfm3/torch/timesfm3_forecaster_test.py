@@ -193,6 +193,18 @@ class TimesFM3ForecasterTest(unittest.TestCase):
       out = forecaster.predict(ctx, horizon=8)
       self.assertEqual(out.forecast.shape, (8,))
 
+  def test_local_checkpoint_file_uses_published_architecture(self):
+    # A local .safetensors/.pth file has no config.json, so _make_torch_model
+    # supplies the architecture. It must match google/timesfm-3.0-pytorch's
+    # config.json (use_rope_var=False). RoPE has no weights, so a mismatch
+    # loads without error and silently changes multivariate and covariate
+    # forecasts.
+    with mock.patch.object(torch_model_lib, "TimesFM3Torch") as model_cls:
+      timesfm3_forecaster._make_torch_model(timesfm3_forecaster._ModelConfig())
+    transformer = model_cls.call_args.kwargs["transformer_config"].transformer
+    self.assertTrue(transformer.use_rope_seq)
+    self.assertFalse(transformer.use_rope_var)
+
 
 class _RecordingFakeModel(FakeModel):
   """FakeModel that records decode inputs and infers horizon like the real model."""
