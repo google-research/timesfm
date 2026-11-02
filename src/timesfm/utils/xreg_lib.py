@@ -59,7 +59,12 @@ def _to_padded_jax_array(x: np.ndarray) -> jax.Array:
 
 # Per time series normalization: forward.
 def normalize(batch):
-  stats = [(np.mean(x), np.where((w := np.std(x)) > _TOL, w, 1.0)) for x in batch]
+  stats = [
+    (np.mean(x), np.where((w := np.std(x)) > _TOL, w, 1.0))
+    if len(x)
+    else (0.0, 1.0)  # Empty series, e.g. no context to fit on: keep as is.
+    for x in batch
+  ]
   new_batch = [(x - stat[0]) / stat[1] for x, stat in zip(batch, stats)]
   return new_batch, stats
 
