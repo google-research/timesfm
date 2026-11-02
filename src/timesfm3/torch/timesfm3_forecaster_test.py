@@ -194,6 +194,84 @@ class TimesFM3ForecasterTest(unittest.TestCase):
       self.assertEqual(out.forecast.shape, (8,))
 
 
+class TimesFM3ForecasterUseSdpaTest(unittest.TestCase):
+  """ModelConfig.use_sdpa must reach every attention module."""
+
+  def setUp(self):
+    super().setUp()
+    torch.manual_seed(0)
+    self.resblock_config = configs.ResidualBlockConfig(
+      hidden_dims=16, output_dims=16, use_bias=False, activation="relu"
+    )
+    self.transformer_config = configs.StackedTransformersConfig(
+      num_layers=2,
+      transformer=configs.TransformerConfig(
+        model_dims=16,
+        hidden_dims=16,
+        num_heads=2,
+        attention_norm="rms",
+        feedforward_norm="rms",
+        qk_norm="rms",
+        use_rope_seq=True,
+        use_rope_var=False,
+        use_bias=False,
+        ff_activation="relu",
+        deterministic=True,
+      ),
+    )
+    self.model = torch_model_lib.TimesFM3Torch(
+      input_patch_len=8,
+      output_patch_len=16,
+      quantiles=[0.1, 0.5, 0.9],
+      residual_block_config=self.resblock_config,
+      transformer_config=self.transformer_config,
+    )
+    self.model.pre_transformer_resblock.set_input_dims(2 * (8 + 16))
+    for p in self.model.parameters():
+      torch.nn.init.normal_(p, std=0.2)
+    self.context = np.sin(np.arange(64, dtype=np.float64) / 3.0) * 5.0 + 10.0
+
+  def _assert_use_sdpa(self, forecaster, expected):
+    layers = forecaster.model.transformer_stack.layers
+    self.assertEqual(len(layers), 2)
+    for layer in layers:
+      self.assertIs(layer.seq_attn.use_sdpa, expected)
+      self.assertIs(layer.var_attn.use_sdpa, expected)
+
+  def test_use_sdpa_local_checkpoint_file(self):
+    with tempfile.TemporaryDirectory() as tmpdir:
+      path = f"{tmpdir}/model.pt"
+      torch.save(self.model.state_dict(), path)
+      outputs = {}
+      for use_sdpa in (True, False):
+        forecaster = timesfm3_forecaster.TimesFM3Forecaster(
+          checkpoint_path=path,
+          device="cpu",
+          input_patch_length=8,
+          output_patch_length=16,
+          quantiles=[0.1, 0.5, 0.9],
+          median_quantile_index=1,
+          residual_block_config=self.resblock_config,
+          transformer_config=self.transformer_config,
+          use_sdpa=use_sdpa,
+        )
+        self._assert_use_sdpa(forecaster, use_sdpa)
+        outputs[use_sdpa] = forecaster.predict(self.context, horizon=16).forecast
+    np.testing.assert_allclose(outputs[True], outputs[False], rtol=1e-4, atol=1e-4)
+
+  def test_use_sdpa_from_pretrained(self):
+    with tempfile.TemporaryDirectory() as tmpdir:
+      self.model.save_pretrained(tmpdir)
+      outputs = {}
+      for use_sdpa in (True, False):
+        forecaster = timesfm3_forecaster.TimesFM3Forecaster.from_pretrained(
+          tmpdir, device="cpu", use_sdpa=use_sdpa
+        )
+        self._assert_use_sdpa(forecaster, use_sdpa)
+        outputs[use_sdpa] = forecaster.predict(self.context, horizon=16).forecast
+    np.testing.assert_allclose(outputs[True], outputs[False], rtol=1e-4, atol=1e-4)
+
+
 class _RecordingFakeModel(FakeModel):
   """FakeModel that records decode inputs and infers horizon like the real model."""
 
