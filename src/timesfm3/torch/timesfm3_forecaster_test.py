@@ -21,7 +21,7 @@ from unittest import mock
 import numpy as np
 import torch
 
-from . import configs, timesfm3_forecaster
+from . import configs, evaluator, timesfm3_forecaster
 from . import model as torch_model_lib
 
 
@@ -381,6 +381,22 @@ class TimesFM3ForecasterCovariateWindowTest(unittest.TestCase):
       )
     )
     self.assertEqual(len(outputs), 3)
+
+  def test_evaluator_predict_batch_accepts_2d_array(self):
+    # Same as above for TimesFM3Evaluator, which had its own `if not contexts`
+    # guard. Cover both the default and the univariate=True paths.
+    with mock.patch.object(
+      evaluator.TimesFM3Evaluator, "_init_model", autospec=True
+    ):
+      ev = evaluator.TimesFM3Evaluator(self.config)
+    ev.model = _RecordingFakeModel()
+    ev.device = torch.device("cpu")
+    contexts = np.random.rand(3, 12).astype(np.float32)
+    for univariate in (False, True):
+      outputs = list(
+        ev.predict_batch(contexts=contexts, horizon=4, univariate=univariate)
+      )
+      self.assertEqual([o.forecast.shape for o in outputs], [(4,)] * 3)
 
 
 if __name__ == "__main__":
