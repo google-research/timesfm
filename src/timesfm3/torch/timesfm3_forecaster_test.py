@@ -41,9 +41,12 @@ class FakeModel(torch.nn.Module):
     horizon=8,
     past_only_covariates=None,
     past_future_covariates=None,
+    past_only_mask=None,
+    past_future_mask=None,
     mask=None,
   ):
     del autoregressive_index, past_only_covariates, past_future_covariates, mask
+    del past_only_mask, past_future_mask
     b, v, _ = target.shape
     shape = (b, v, horizon, self.quantiles)
     return torch.ones(shape, dtype=torch.float32) * 2.0
@@ -208,8 +211,11 @@ class _RecordingFakeModel(FakeModel):
     horizon=8,
     past_only_covariates=None,
     past_future_covariates=None,
+    past_only_mask=None,
+    past_future_mask=None,
     mask=None,
   ):
+    del past_only_mask, past_future_mask
     if past_future_covariates is not None:
       horizon = past_future_covariates.shape[-1] - target.shape[-1]
     self.calls.append(
@@ -381,6 +387,72 @@ class TimesFM3ForecasterCovariateWindowTest(unittest.TestCase):
       )
     )
     self.assertEqual(len(outputs), 3)
+
+
+class TimesFM3ForecasterCovariatePlaceholderTest(unittest.TestCase):
+  """A query without covariates must not depend on its batch mates' covariates."""
+
+  def _forecaster(self):
+    torch.manual_seed(0)
+    model = torch_model_lib.TimesFM3Torch(
+      input_patch_len=8,
+      output_patch_len=16,
+      quantiles=[0.1, 0.5, 0.9],
+      residual_block_config=configs.ResidualBlockConfig(
+        hidden_dims=16, output_dims=16, use_bias=False, activation="relu"
+      ),
+      transformer_config=configs.StackedTransformersConfig(
+        num_layers=1,
+        transformer=configs.TransformerConfig(
+          model_dims=16,
+          hidden_dims=16,
+          num_heads=2,
+          attention_norm="rms",
+          feedforward_norm="rms",
+          qk_norm="rms",
+          use_rope_seq=True,
+          use_rope_var=False,
+          use_bias=False,
+          ff_activation="relu",
+          deterministic=True,
+        ),
+      ),
+    )
+    # Perturb every weight (norm scales are zero-initialized) so the
+    # covariate channels actually influence the output.
+    with torch.no_grad():
+      for p in model.parameters():
+        p.add_(torch.randn_like(p) * 0.3)
+    with tempfile.TemporaryDirectory() as tmpdir:
+      model.save_pretrained(tmpdir)
+      forecaster = timesfm3_forecaster.TimesFM3Forecaster.from_pretrained(
+        tmpdir, device="cpu"
+      )
+    forecaster.config.per_core_batch_size = 2
+    return forecaster
+
+  def test_no_covariate_query_unaffected_by_batch_mate(self):
+    forecaster = self._forecaster()
+    rng = np.random.default_rng(0)
+    horizon = 16
+    # Same context length, so no padding differs between the two runs.
+    ctx_a = (np.sin(np.arange(64) / 3) + 5).astype(np.float32)
+    ctx_b = (np.cos(np.arange(64) / 5) * 3).astype(np.float32)
+    pf_b = rng.normal(size=64 + horizon).astype(np.float32)
+    po_b = rng.normal(size=64).astype(np.float32)
+
+    alone = next(iter(forecaster.predict_batch([ctx_a], horizon=horizon)))
+    for kwargs in (
+      {"past_future_covariates": [None, pf_b]},
+      {"past_only_covariates": [None, po_b]},
+    ):
+      with self.subTest(**{k: "set" for k in kwargs}):
+        batched = list(
+          forecaster.predict_batch([ctx_a, ctx_b], horizon=horizon, **kwargs)
+        )
+        np.testing.assert_allclose(
+          batched[0].forecast, alone.forecast, rtol=1e-4, atol=1e-4
+        )
 
 
 if __name__ == "__main__":
