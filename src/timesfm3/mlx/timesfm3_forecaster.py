@@ -199,13 +199,17 @@ class TimesFM3Forecaster:
     )
     median_idx = self.config.median_quantile_index
     cap = self.config.max_context_length
+    # Decode at the horizon rounded up to whole output patches and trim back, as
+    # the torch backend does; the stitched decode depends on the decoded length.
+    opl = self.model.config.output_patch_len
+    global_horizon = math.ceil(horizon / opl) * opl
 
     def _decode_np(tgt_2d, po_2d, pf_2d):
       # One series (2D target + optional 2D covariates) -> (num_variates, h, q).
       return np.array(
         self.model.decode(
           mx.array(tgt_2d)[None],
-          horizon,
+          global_horizon,
           past_only_covariates=mx.array(po_2d)[None] if po_2d is not None else None,
           past_future_covariates=mx.array(pf_2d)[None] if pf_2d is not None else None,
         )
@@ -272,7 +276,8 @@ class TimesFM3Forecaster:
         groups.setdefault(a.shape[0], []).append(i)
       for _length, idxs in groups.items():
         batch = mx.array(np.stack([arrs[i] for i in idxs]))[:, None, :]
-        logits = np.array(self.model.decode(batch, horizon))  # (B, 1, h, q)
+        logits = np.array(self.model.decode(batch, global_horizon))
+        logits = logits[:, :, :horizon, :]  # (B, 1, h, q)
         if sort_quantiles:
           logits = np.sort(logits, axis=-1)
         for bi, i in enumerate(idxs):
@@ -283,7 +288,6 @@ class TimesFM3Forecaster:
     else:
       # General path: multivariate targets, covariates, symmetric averaging,
       # z-normalization and/or padding, one series at a time.
-      opl = self.model.config.output_patch_len
       for i, c in enumerate(contexts):
         was_1d = np.ndim(c) == 1
         tgt_orig = np.atleast_2d(np.asarray(c, dtype=np.float32))  # (u, ctx)
@@ -320,13 +324,12 @@ class TimesFM3Forecaster:
         # the model sees a covariate for every decoded step. The output is still
         # trimmed back to the requested horizon below.
         if padding_mode == "edge" and pf is not None:
-          global_horizon = math.ceil(horizon / opl) * opl
           pad_len = global_horizon - horizon
           if pad_len > 0:
             pf = np.pad(pf, [(0, 0), (0, pad_len)], mode="edge")
 
         final = _series_logits(tgt, po, pf)  # (num_variates, decoded_h, q)
-        final = final[:, :horizon, :]  # trim edge-padded horizon back to requested
+        final = final[:, :horizon, :]  # trim decoded horizon back to requested
         if use_znorm:
           for r in range(tgt.shape[0]):
             mu, sigma = tgt_stats[r]
