@@ -81,13 +81,6 @@ class TimesFM_2p5_200M_torch_module(nn.Module):
     tensors = load_file(path)
     self.load_state_dict(tensors, strict=True)
     self.to(self.device)
-    torch_compile = True
-    if "torch_compile" in kwargs:
-      torch_compile = kwargs["torch_compile"]
-    if torch_compile:
-      logging.info("Compiling model...")
-      self = torch.compile(self)
-
     self.eval()
 
   def forward(
@@ -257,7 +250,7 @@ class TimesFM_2p5_200M_torch_module(nn.Module):
       to_concat = [t_pf[:, -1, ...]]
       if t_ar is not None:
         to_concat.append(t_ar.reshape(1, -1, self.q))
-      torch_forecast = torch.cat(to_concat, dim=1)[..., :horizon]
+      torch_forecast = torch.cat(to_concat, dim=1)[:, :horizon, :]
       torch_forecast = torch_forecast.squeeze(0)
       outputs.append(torch_forecast.detach().cpu().numpy())
     return outputs
@@ -278,16 +271,35 @@ class TimesFM_2p5_200M_torch(
 
   DEFAULT_REPO_ID = "google/timesfm-2.5-200m-pytorch"
   WEIGHTS_FILENAME = "model.safetensors"
+  CONFIG_FILENAME = "config.json"
 
   def __init__(
     self,
     torch_compile: bool = True,
     config: Optional[dict] = None,
+    **kwargs,
   ):
     self.model = TimesFM_2p5_200M_torch_module()
     self.torch_compile = torch_compile
     if config is not None:
       self._hub_mixin_config = config
+
+  def load_checkpoint(self, path: str, **kwargs):
+    """Loads a TimesFM model from a checkpoint directory or file."""
+    if os.path.isdir(path):
+      model_file_path = os.path.join(path, self.WEIGHTS_FILENAME)
+      if not os.path.exists(model_file_path):
+        raise FileNotFoundError(
+          f"{self.WEIGHTS_FILENAME} not found in directory {path}"
+        )
+    else:
+      model_file_path = path
+
+    torch_compile = kwargs.pop("torch_compile", self.torch_compile)
+    self.model.load_checkpoint(model_file_path, **kwargs)
+    if torch_compile:
+      logging.info("Compiling model...")
+      self.model.forward = torch.compile(self.model.forward)
 
   @classmethod
   def _from_pretrained(
@@ -308,6 +320,19 @@ class TimesFM_2p5_200M_torch(
     method provided by `PyTorchModelHubMixin`.
     """
     # Determine the path to the model weights.
+    try:
+      hf_hub_download(
+          repo_id=model_id,
+          filename=cls.CONFIG_FILENAME,
+          revision=revision,
+          cache_dir=cache_dir,
+          force_download=force_download,
+          local_files_only=local_files_only,
+          token=token,
+      )
+    except Exception:
+      pass
+    
     model_file_path = ""
     if os.path.isdir(model_id):
       logging.info("Loading checkpoint from local directory: %s", model_id)
@@ -333,7 +358,7 @@ class TimesFM_2p5_200M_torch(
 
     logging.info("Loading checkpoint from: %s", model_file_path)
     # Load the weights into the model.
-    instance.model.load_checkpoint(
+    instance.load_checkpoint(
       model_file_path, torch_compile=instance.torch_compile
     )
     return instance
@@ -436,7 +461,10 @@ class TimesFM_2p5_200M_torch(
         flipped_pf_outputs = flip_quantile_fn(flipped_pf_outputs)
         to_cat = [flipped_pf_outputs[:, -1, ...]]
         if flipped_ar_outputs is not None:
-          to_cat.append(flipped_ar_outputs.reshape(batch_size, -1, self.model.q))
+          flipped_ar_outputs = flip_quantile_fn(
+            flipped_ar_outputs.reshape(batch_size, -1, self.model.q)
+          )
+          to_cat.append(flipped_ar_outputs)
         flipped_full_forecast = torch.cat(to_cat, dim=1)
         quantile_spreads = (quantile_spreads - flipped_quantile_spreads) / 2
         pf_outputs = (pf_outputs - flipped_pf_outputs) / 2

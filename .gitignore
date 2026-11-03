@@ -1,11 +1,29 @@
+# Python & Virtual Environments
 .venv/
 dist/
 __pycache__/
 *.egg-info/
+.pytest_cache/
+
+# Model Checkpoints & Wandb
 checkpoints/
 wandb/
+*.safetensors
+*.pth
+*.pt
+
+# Datasets & Heavy Benchmark Caches
 datasets/
 results/
+TIME/
+fev/
+gift-eval/
+TimesFM-3_multivariate/
+time_benchmark_leaderboard.csv
+*.html
+
+# Logs & Temporary files
 uv.lock
 development_setup.md
 debug.log
+*.log

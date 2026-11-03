@@ -447,6 +447,21 @@ class TimesFM_2p5_200M_flax(timesfm_2p5_base.TimesFM_2p5):
 
   model: nnx.Module = TimesFM_2p5_200M_flax_module()
 
+  def __init__(self, **kwargs):
+    self.model = TimesFM_2p5_200M_flax_module()
+
+  def load_checkpoint(self, path: str):
+    """Loads a TimesFM model from a checkpoint."""
+    if os.path.isdir(path):
+      model_file_path = path
+    else:
+      model_file_path = os.path.dirname(path)
+
+    checkpointer = ocp.StandardCheckpointer()
+    graph, state = nnx.split(self.model)
+    state = checkpointer.restore(model_file_path, state)
+    self.model = nnx.merge(graph, state)
+
   @classmethod
   def from_pretrained(
     cls,
@@ -485,10 +500,7 @@ class TimesFM_2p5_200M_flax(timesfm_2p5_base.TimesFM_2p5):
       )
       logging.info("Loading checkpoint from: %s", model_file_path)
 
-    checkpointer = ocp.StandardCheckpointer()
-    graph, state = nnx.split(instance.model)
-    state = checkpointer.restore(model_file_path, state)
-    instance.model = nnx.merge(graph, state)
+    instance.load_checkpoint(model_file_path)
     return instance
 
   def compile(

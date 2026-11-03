@@ -16,6 +16,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -57,11 +59,11 @@ def main() -> None:
         label="Historical (NOAA GISTEMP)",
     )
 
-    # Plot 90% CI (outer band)
-    ax.fill_between(dates, q10, q90, alpha=0.2, color="#dc2626", label="90% CI")
+    # Plot 80% CI (outer band)
+    ax.fill_between(dates, q10, q90, alpha=0.2, color="#dc2626", label="80% CI")
 
-    # Plot 80% CI (inner band)
-    ax.fill_between(dates, q20, q80, alpha=0.3, color="#dc2626", label="80% CI")
+    # Plot 60% CI (inner band)
+    ax.fill_between(dates, q20, q80, alpha=0.3, color="#dc2626", label="60% CI")
 
     # Plot point forecast
     ax.plot(

@@ -1,12 +1,13 @@
 [project]
 name = "timesfm"
-version = "2.0.0"
+version = "3.0.2"
 description = "A time series foundation model."
 authors = [
     {name = "Rajat Sen", email = "senrajat@google.com"},
     {name = "Yichen Zhou", email = "yichenzhou@google.com"},
     {name = "Abhimanyu Das", email = "abhidas@google.com"},
     {name = "Petros Mol", email = "pmol@google.com"},
+    {name = "Ayush Jain", email="ayuj@google.com"},
     {name = "Michael Chertushkin", email = "chertushkinmichael@gmail.com"},
 ]
 license = {text = "Apache-2.0"}
@@ -14,13 +15,18 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "numpy>=1.26.4",
-    "huggingface_hub[cli]>=0.23.0",
+    "huggingface_hub>=0.28.0",
     "safetensors>=0.5.3",
 ]
 
 [project.optional-dependencies]
 torch = [
     "torch>=2.0.0",
+]
+mlx = [
+    "mlx>=0.32",
+    "safetensors>=0.4.0",
+    "huggingface-hub>=0.24.0",
 ]
 flax = [
     "flax",
@@ -38,6 +44,9 @@ xreg = [
 [tool.ruff]
 line-length = 88
 indent-width = 2
+
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [build-system]
 requires = ["setuptools>=61.0"]
