@@ -24,13 +24,25 @@ Any agent that supports the open [Agent Skills standard](https://agentskills.io)
 
 ## Working in this repo
 
-If you are developing TimesFM itself (not using it), the source lives in `src/timesfm/`.
+If you are developing TimesFM itself (not using it), the source lives in:
+
+- `src/timesfm3/` — TimesFM 3.0 (PyTorch backend in `torch/`, MLX backend in `mlx/`)
+- `src/timesfm/` — TimesFM 2.5 (PyTorch and Flax)
+
 Archived v1/v2 code and notebooks are in `v1/`.
 
 Run tests:
 
 ```bash
-pytest v1/tests/
+pip install -e ".[torch]" pytest
+
+# TimesFM 3.0 (MLX tests are skipped unless `mlx` is installed)
+pytest src/timesfm3/
+
+# TimesFM 2.5 (tests/test_model_loading.py also needs the `flax` extra)
+pytest tests/ --ignore=tests/test_model_loading.py
 ```
+
+Tests for the archived v1/v2 code are in `v1/tests/`.
 
 See `README.md` for full developer setup.
