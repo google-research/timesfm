@@ -186,9 +186,19 @@ def _get_available_ram_gb() -> float:
             result = subprocess.run(
                 ["vm_stat"], capture_output=True, text=True, check=True
             )
-            free = 0
+            lines = result.stdout.split("\n")
+            # The header reports the Mach page size, e.g.
+            # "Mach Virtual Memory Statistics: (page size of 16384 bytes)".
+            # It is 16384 on Apple Silicon and 4096 on Intel; hardcoding
+            # 4096 under-reports available RAM 4x on Apple Silicon.
             page_size = 4096
-            for line in result.stdout.split("\n"):
+            if lines and "page size of" in lines[0]:
+                try:
+                    page_size = int(lines[0].split("page size of", 1)[1].split()[0])
+                except (IndexError, ValueError):
+                    pass
+            free = 0
+            for line in lines:
                 if "Pages free" in line or "Pages inactive" in line:
                     val = line.split(":")[1].strip().rstrip(".")
                     free += int(val) * page_size
