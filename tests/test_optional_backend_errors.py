@@ -16,8 +16,9 @@
 
 `import timesfm` must keep working without the optional extras (`timesfm[torch]`,
 `timesfm[flax]`), and touching a backend whose import failed must report the
-original failure plus the extra to install instead of a bare `AttributeError`
-(see #318 and #287).
+original failure plus the extra to install, while still reading as an absent
+attribute so that `hasattr` and `getattr` probes do not raise (see #318 and
+#287).
 
 Missing dependencies are simulated with an import blocker inside subprocesses,
 so these tests behave the same whether or not the extras are installed in the
@@ -94,14 +95,14 @@ def test_torch_backend_error_names_the_extra():
 
       try:
         timesfm.TimesFM_2p5_200M_torch
-      except ImportError as exc:
+      except AttributeError as exc:
         message = str(exc)
         assert "TimesFM_2p5_200M_torch" in message, message
         assert 'timesfm[torch]' in message, message
         assert "No module named 'torch'" in message, message
         assert exc.__cause__ is not None, "original error must be chained"
       else:
-        raise AssertionError("expected ImportError")
+        raise AssertionError("expected AttributeError")
       """,
     blocked_modules=("torch",),
   )
@@ -115,26 +116,51 @@ def test_flax_backend_error_names_the_extra():
 
       try:
         timesfm.TimesFM_2p5_200M_flax
-      except ImportError as exc:
+      except AttributeError as exc:
         message = str(exc)
         assert "TimesFM_2p5_200M_flax" in message, message
         assert 'timesfm[flax]' in message, message
         assert exc.__cause__ is not None, "original error must be chained"
       else:
-        raise AssertionError("expected ImportError")
+        raise AssertionError("expected AttributeError")
       """,
     blocked_modules=("jax",),
   )
   assert result.returncode == 0, result.stderr
 
 
-def test_from_import_reports_the_missing_extra():
+def test_hasattr_reports_a_missing_backend_as_unavailable():
+  # Probing an optional backend must not raise: `hasattr` and `getattr` with
+  # a default are how callers check for a backend before choosing a fallback,
+  # so an unavailable backend has to read as absent rather than as an error.
+  result = _run_python(
+    """
+      import timesfm
+
+      assert hasattr(timesfm, "TimesFM_2p5_200M_torch") is False
+      assert getattr(timesfm, "TimesFM_2p5_200M_torch", None) is None
+      assert hasattr(timesfm, "TimesFM_2p5_200M_flax") is False
+      assert getattr(timesfm, "TimesFM_2p5_200M_flax", None) is None
+      assert hasattr(timesfm, "TimesFM3Forecaster") is False
+      assert getattr(timesfm, "TimesFM3Forecaster", None) is None
+      assert hasattr(timesfm, "TimesFM3Torch") is False
+      assert getattr(timesfm, "TimesFM3Torch", None) is None
+      """,
+    blocked_modules=("torch", "jax"),
+  )
+  assert result.returncode == 0, result.stderr
+
+
+def test_from_import_raises_import_error_for_a_missing_extra():
+  # `from timesfm import ...` reports a missing name the way it always has;
+  # the install hint lives on the attribute error, which is where the name
+  # is reached directly.
   result = _run_python(
     """
       try:
         from timesfm import TimesFM3Forecaster
       except ImportError as exc:
-        assert 'timesfm[torch]' in str(exc), str(exc)
+        assert "TimesFM3Forecaster" in str(exc), str(exc)
       else:
         raise AssertionError("expected ImportError")
       """,

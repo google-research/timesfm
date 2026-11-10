@@ -55,14 +55,23 @@ def __getattr__(name: str) -> object:
   """Surface optional-backend import failures with an actionable message.
 
   Mirrors the lazy re-export pattern already used by `timesfm3.__getattr__`:
-  names whose backend failed to import raise an `ImportError` that chains the
-  original failure and names the extra to install, while unknown names keep
-  raising the standard `AttributeError` that introspection tools expect.
+  names whose backend failed to import raise an `AttributeError` that chains
+  the original failure and names the extra to install, while unknown names
+  keep raising the standard `AttributeError` that introspection tools expect.
+
+  The error stays an `AttributeError` because that is the contract callers
+  probe with: `hasattr(timesfm, "TimesFM_2p5_200M_torch")` and
+  `getattr(timesfm, "TimesFM_2p5_200M_torch", None)` must report the backend
+  as unavailable rather than raising, so code that checks for a backend before
+  choosing a fallback does not crash at the check. The install hint is in the
+  message, so the failure still explains itself when it is read.
   """
   if name in _BACKEND_IMPORT_ERRORS:
     original_error = _BACKEND_IMPORT_ERRORS[name]
-    raise ImportError(
-      f"timesfm.{name} could not be imported ({original_error!r})."
-      f" Install the optional backend with: {_BACKEND_INSTALL_HINTS[name]}"
+    raise AttributeError(
+      f"module {__name__!r} has no attribute {name!r}: the optional backend"
+      f" could not be imported ({original_error!r}). Install the optional"
+      f" backend with: {_BACKEND_INSTALL_HINTS[name]}",
+      name=name,
     ) from original_error
   raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
