@@ -47,9 +47,25 @@ __all__ = [
 ]
 
 
+_TORCH_INSTALL_HINT = 'pip install "timesfm[torch]"'
+
+
 def __getattr__(name):  # PEP 562: lazily re-export the torch backend at the top level
   if name in _TORCH_EXPORTS:
-    from . import torch as _torch_backend
-
+    try:
+      from . import torch as _torch_backend
+    except ImportError as exc:
+      # The torch backend is optional, so a missing PyTorch is a missing
+      # attribute rather than an error to raise out of the probe: `hasattr`
+      # and `getattr(name, default)` are how callers check for a backend
+      # before choosing a fallback, and they must not crash at the check.
+      # The install hint stays in the message so the failure still explains
+      # itself when it is read.
+      raise AttributeError(
+        f"module {__name__!r} has no attribute {name!r}: the optional torch"
+        f" backend could not be imported ({exc!r}). Install the optional"
+        f" backend with: {_TORCH_INSTALL_HINT}",
+        name=name,
+      ) from exc
     return getattr(_torch_backend, name)
   raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
