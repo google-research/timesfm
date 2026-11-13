@@ -57,8 +57,9 @@ class _ModelConfig:
     default_factory=lambda: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
   )
 
-  # Median quantile index for the forecast.
-  median_quantile_index: int = 4
+  # Index of the quantile returned as the point forecast. None picks the
+  # quantile closest to 0.5 in the (possibly checkpoint-supplied) list.
+  median_quantile_index: int | None = None
 
   # Whether to use stitching.
   use_stitching: bool = True
@@ -162,6 +163,11 @@ def linear_interpolation(arr: np.ndarray) -> np.ndarray:
         row[nan_mask[r]] = mu
 
   return result[0] if was_1d else result
+
+
+def _median_quantile_index(quantiles: list[float]) -> int:
+  """Returns the index of the quantile closest to 0.5."""
+  return min(range(len(quantiles)), key=lambda i: abs(quantiles[i] - 0.5))
 
 
 def _znorm_stats(arr: np.ndarray) -> tuple[float, float]:
@@ -353,6 +359,11 @@ class TimesFM3Forecaster:
     else:
       self.config = config
     self._init_model()
+    if self.config.median_quantile_index is None:
+      self.config = dataclasses.replace(
+        self.config,
+        median_quantile_index=_median_quantile_index(self.config.quantiles),
+      )
 
   @classmethod
   def from_pretrained(
@@ -402,8 +413,8 @@ class TimesFM3Forecaster:
       )
       # Synchronize forecaster config with the loaded model config
       median_q_idx = self.config.median_quantile_index
-      if median_q_idx >= len(self.model.quantiles):
-        median_q_idx = len(self.model.quantiles) // 2
+      if median_q_idx is not None and median_q_idx >= len(self.model.quantiles):
+        median_q_idx = None
 
       self.config = dataclasses.replace(
         self.config,

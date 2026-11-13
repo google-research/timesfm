@@ -196,6 +196,52 @@ class TimesFM3ForecasterTest(unittest.TestCase):
       out = forecaster.predict(ctx, horizon=8)
       self.assertEqual(out.forecast.shape, (8,))
 
+  def test_point_forecast_uses_checkpoint_median_quantile(self):
+    # A checkpoint whose quantile list differs from the default 9 must still
+    # return its 0.5 quantile as the point forecast, not index 4 (0.9 here).
+    torch.manual_seed(0)
+    model = torch_model_lib.TimesFM3Torch(
+      input_patch_len=8,
+      output_patch_len=16,
+      quantiles=[0.1, 0.25, 0.5, 0.75, 0.9],
+      residual_block_config=configs.ResidualBlockConfig(
+        hidden_dims=16, output_dims=16, use_bias=False, activation="relu"
+      ),
+      transformer_config=configs.StackedTransformersConfig(
+        num_layers=1,
+        transformer=configs.TransformerConfig(
+          model_dims=16,
+          hidden_dims=16,
+          num_heads=2,
+          attention_norm="rms",
+          feedforward_norm="rms",
+          qk_norm="rms",
+          use_rope_seq=True,
+          use_rope_var=False,
+          use_bias=False,
+          ff_activation="relu",
+          deterministic=True,
+        ),
+      ),
+    )
+    with torch.no_grad():
+      for p in model.parameters():
+        p.add_(torch.randn_like(p) * 0.3)
+    ctx = (np.sin(np.arange(64) / 3) * 5 + 10).astype(np.float32)
+    with tempfile.TemporaryDirectory() as tmpdir:
+      model.save_pretrained(tmpdir)
+      forecaster = timesfm3_forecaster.TimesFM3Forecaster.from_pretrained(
+        tmpdir, device="cpu"
+      )
+      explicit = timesfm3_forecaster.TimesFM3Forecaster.from_pretrained(
+        tmpdir, device="cpu", median_quantile_index=3
+      )
+    self.assertEqual(forecaster.config.median_quantile_index, 2)
+    out = forecaster.predict(ctx, horizon=16, return_quantiles=True)
+    np.testing.assert_array_equal(out.forecast, out.quantiles[:, 2])
+    # An explicit index is still honoured.
+    self.assertEqual(explicit.config.median_quantile_index, 3)
+
   def test_local_checkpoint_file_uses_published_architecture(self):
     # A local .safetensors/.pth file has no config.json, so _make_torch_model
     # supplies the architecture. It must match google/timesfm-3.0-pytorch's
