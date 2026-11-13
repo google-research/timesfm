@@ -140,10 +140,21 @@ def _torch_dot_product_attention(query, key, value, mask=None):
   key = key.permute(0, 2, 1, 3)
   value = value.permute(0, 2, 1, 3)
 
+  # A left-padded (masked) patch can see no key at all. torch < 2.5 returns
+  # NaN for such a row and the NaN then leaks into every other position
+  # through the values of the next layer; torch >= 2.5 returns zeros. Unmask
+  # those rows for the kernel and zero them afterwards so both agree.
+  has_key = None
+  if mask is not None:
+    has_key = torch.any(mask, dim=-1, keepdim=True)
+    mask = torch.logical_or(mask, torch.logical_not(has_key))
+
   # 2. Call the fused attention kernel
   #    - Pass the mask to `attn_mask`.
   #    - Set `scale=1.0` to disable the default 1/sqrt(d_k) scaling.
   output = F.scaled_dot_product_attention(query, key, value, attn_mask=mask, scale=1.0)
+  if has_key is not None:
+    output = torch.where(has_key, output, 0.0)
 
   # 3. Permute the output back to the original (B, L, H, D) layout
   output = output.permute(0, 2, 1, 3)
