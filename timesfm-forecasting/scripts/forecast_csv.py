@@ -121,7 +121,11 @@ def forecast_series(
     """Forecast all series and return results dict."""
     inputs = []
     for col in value_cols:
-        values = df[col].dropna().values.astype(np.float32)
+        # Retain missing observations so every column keeps the CSV time grid.
+        # TimesFM interpolates gaps; dropping them shifts time.
+        values = df[col].to_numpy(dtype=np.float32)
+        if values.size == 0 or np.isnan(values).all():
+            raise ValueError(f"Column {col!r} has no observed values to forecast.")
         inputs.append(values)
 
     print(f"Forecasting {len(inputs)} series with horizon={horizon}...")
