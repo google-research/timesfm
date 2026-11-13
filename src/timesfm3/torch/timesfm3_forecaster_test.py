@@ -561,5 +561,25 @@ class TimesFM3ForecasterCovariatePlaceholderTest(unittest.TestCase):
         )
 
 
+
+class TimesFM3ForecasterBatchIndependenceTest(unittest.TestCase):
+  """A series' forecast must not depend on the lengths of its batch mates."""
+
+  def test_forecast_unaffected_by_longer_batch_mate(self):
+    forecaster = TimesFM3ForecasterCovariatePlaceholderTest._forecaster(self)
+    horizon = 16
+    ctx_short = (np.sin(np.arange(40) / 3) * 5 + 10).astype(np.float32)
+    ctx_long = (np.cos(np.arange(100) / 5) * 3 + 1).astype(np.float32)
+
+    alone_short = next(iter(forecaster.predict_batch([ctx_short], horizon=horizon)))
+    alone_long = next(iter(forecaster.predict_batch([ctx_long], horizon=horizon)))
+    for contexts in ([ctx_short, ctx_long], [ctx_long, ctx_short]):
+      batched = list(forecaster.predict_batch(contexts, horizon=horizon))
+      for context, out in zip(contexts, batched):
+        alone = alone_short if context is ctx_short else alone_long
+        np.testing.assert_allclose(
+          out.forecast, alone.forecast, rtol=1e-4, atol=1e-4
+        )
+
 if __name__ == "__main__":
   unittest.main()
