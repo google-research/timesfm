@@ -48,6 +48,7 @@ class TimesFM3Mlx(nn.Module):
       activation=cfg.residual_activation,
       prenorm=cfg.residual_prenorm,
       identity_skip=cfg.residual_identity_skip,
+      use_bias=cfg.residual_use_bias,
     )
     self.transformer_stack = transformer.StackedMixingTransformer(cfg)
     self.output_head = nn.Linear(
@@ -58,11 +59,19 @@ class TimesFM3Mlx(nn.Module):
     self._compiled_forward = None
 
   # ---- full-sequence forward over patched inputs (target-only path) ----
-  def _forward_logits(self, values, masks, patch_is_target, patch_cpm_mask=None):
+  def _forward_logits(
+    self, values, masks, patch_is_target, patch_cpm_mask=None, freeze_after=None
+  ):
     cfg = self.config
     values = mx.where(mx.isnan(values), 0.0, values)
     values = mx.clip(values, -cfg.value_clip, cfg.value_clip)
     running_n, mu, sigma = util.get_running_stats(values, masks)
+    if freeze_after is not None:
+      n = mu.shape[2]
+      if 0 <= freeze_after < n - 1:
+        frozen = (mx.arange(n) > freeze_after)[None, None, :]
+        mu = mx.where(frozen, mu[:, :, freeze_after : freeze_after + 1], mu)
+        sigma = mx.where(frozen, sigma[:, :, freeze_after : freeze_after + 1], sigma)
     vals_norm = util.revin(values, mu, sigma)
     vals_norm = mx.where(masks, 0.0, vals_norm)
     vals_fcov, wrap = util.output_patch_via_roll(values, cfg.rolls)
@@ -283,7 +292,10 @@ class TimesFM3Mlx(nn.Module):
       ],
       axis=1,
     )
-    logits = self._forward_fn()(values_bvnp, masks_bvnp, patch_is_target, horizon_cpm)
+    freeze_after = num_ctx_patches - 1 if cfg.use_frozen_running_stats else None
+    logits = self._forward_fn()(
+      values_bvnp, masks_bvnp, patch_is_target, horizon_cpm, freeze_after
+    )
 
     if cfg.use_stitching:
       fidx = mx.arange(num_forecast_patches) + (num_ctx_patches - 1)

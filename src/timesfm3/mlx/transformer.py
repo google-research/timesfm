@@ -68,12 +68,17 @@ class MultiHeadAttention(nn.Module):
     self.head_dim = cfg.head_dim
     self.use_rope = use_rope
     self.causal = causal
-    self.query_proj = nn.Linear(d, d, bias=False)
-    self.key_proj = nn.Linear(d, d, bias=False)
-    self.value_proj = nn.Linear(d, d, bias=False)
-    self.out_proj = nn.Linear(d, d, bias=False)
-    self.query_ln = normalization.RMSNorm(self.head_dim)
-    self.key_ln = normalization.RMSNorm(self.head_dim)
+    use_bias = cfg.use_bias
+    self.query_proj = nn.Linear(d, d, bias=use_bias)
+    self.key_proj = nn.Linear(d, d, bias=use_bias)
+    self.value_proj = nn.Linear(d, d, bias=use_bias)
+    self.out_proj = nn.Linear(d, d, bias=use_bias)
+    if cfg.qk_norm == "rms":
+      self.query_ln = normalization.RMSNorm(self.head_dim)
+      self.key_ln = normalization.RMSNorm(self.head_dim)
+    else:
+      self.query_ln = None
+      self.key_ln = None
     self.per_dim_scale = normalization.PerDimScale(self.head_dim)
     self.v_norm = cfg.v_norm
     self.qk_scale = math.sqrt(self.head_dim) if cfg.use_memory_efficient_attention else 1.0
@@ -93,8 +98,9 @@ class MultiHeadAttention(nn.Module):
       pos = mx.broadcast_to(mx.arange(n)[None, :], (b, n))
       q = rope(q, pos)
       k = rope(k, pos)
-    q = self.query_ln(q)
-    k = self.key_ln(k)
+    if self.query_ln is not None:
+      q = self.query_ln(q)
+      k = self.key_ln(k)
     q = self.per_dim_scale(q)
     if self.v_norm == "rms":
       v = util.rms_norm(v, None)
@@ -135,8 +141,8 @@ class MixingTransformer(nn.Module):
       self.var_attn = MultiHeadAttention(cfg, use_rope=cfg.use_rope_var, causal=False)
     self.pre_ff_ln = normalization.RMSNorm(d)
     self.post_ff_ln = normalization.RMSNorm(d)
-    self.ff0 = nn.Linear(d, cfg.hidden_dims, bias=False)
-    self.ff1 = nn.Linear(cfg.hidden_dims, d, bias=False)
+    self.ff0 = nn.Linear(d, cfg.hidden_dims, bias=cfg.use_bias)
+    self.ff1 = nn.Linear(cfg.hidden_dims, d, bias=cfg.use_bias)
     self.ff_activation = _ACTIVATIONS[cfg.ff_activation]
 
   def __call__(self, x: mx.array, patch_mask: mx.array) -> mx.array:
