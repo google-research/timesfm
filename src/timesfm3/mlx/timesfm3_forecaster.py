@@ -46,6 +46,56 @@ def _znorm_stats(arr: np.ndarray) -> tuple[float, float]:
   return mu, sigma
 
 
+def _linear_interpolation(arr: np.ndarray) -> np.ndarray:
+  """Fills NaNs in each row of a 2D array by linear interpolation.
+
+  A row with no finite values is filled with zeros. Matches the torch backend's
+  ``linear_interpolation``.
+  """
+  nan_mask = np.isnan(arr)
+  if not nan_mask.any():
+    return arr
+  out = arr.copy()
+  for r in range(out.shape[0]):
+    if nan_mask[r].any():
+      valid = ~nan_mask[r]
+      if valid.any():
+        out[r, nan_mask[r]] = np.interp(
+          nan_mask[r].nonzero()[0], valid.nonzero()[0], out[r, valid]
+        )
+      else:
+        out[r] = 0.0
+  return out
+
+
+def _clean_nans(
+  tgt: np.ndarray, po: np.ndarray | None, pf: np.ndarray | None
+) -> tuple[np.ndarray, np.ndarray | None, np.ndarray | None]:
+  """Strips leading all-NaN steps and interpolates the rest, as torch does.
+
+  ``tgt`` is ``(num_targets, context)``; covariates are 2D and are cut by the
+  same number of leading steps so they stay aligned with the target. An
+  all-NaN target becomes zeros.
+  """
+  isnan = np.isnan(tgt).all(axis=0)
+  if isnan.all():
+    tgt = np.zeros_like(tgt)
+  else:
+    first_valid = int(np.argmax(~isnan))
+    if first_valid > 0:
+      tgt = tgt[:, first_valid:]
+      if po is not None:
+        po = po[:, first_valid:]
+      if pf is not None:
+        pf = pf[:, first_valid:]
+  tgt = _linear_interpolation(tgt)
+  if po is not None:
+    po = _linear_interpolation(po)
+  if pf is not None:
+    pf = _linear_interpolation(pf)
+  return tgt, po, pf
+
+
 def _znorm_rows(arr: np.ndarray) -> tuple[np.ndarray, list[tuple[float, float]]]:
   """Z-normalize each row by its own stats; return the normalized array and stats."""
   stats = [_znorm_stats(row) for row in arr]
@@ -270,7 +320,8 @@ class TimesFM3Forecaster:
       # forward pass. decode() is per-series independent (running stats, RevIN,
       # detrending are per row), so this is numerically identical to looping but
       # scales throughput.
-      arrs = [np.asarray(c, dtype=np.float32).reshape(-1)[-cap:] for c in contexts]
+      raw = [np.asarray(c, dtype=np.float32).reshape(1, -1) for c in contexts]
+      arrs = [_clean_nans(r, None, None)[0][0, -cap:] for r in raw]
       groups: dict[int, list[int]] = {}
       for i, a in enumerate(arrs):
         groups.setdefault(a.shape[0], []).append(i)
@@ -281,7 +332,7 @@ class TimesFM3Forecaster:
         if sort_quantiles:
           logits = np.sort(logits, axis=-1)
         for bi, i in enumerate(idxs):
-          forecast, quantiles = _shape(logits[bi], 1, True, arrs[i][None, :])
+          forecast, quantiles = _shape(logits[bi], 1, True, raw[i][:, -cap:])
           results[i] = ForecastOutput(
             ts_id=ids[i], forecast=forecast, quantiles=quantiles
           )
@@ -296,6 +347,7 @@ class TimesFM3Forecaster:
         pf = pf_list[i]
         po = np.atleast_2d(np.asarray(po, dtype=np.float32)) if po is not None else None
         pf = np.atleast_2d(np.asarray(pf, dtype=np.float32)) if pf is not None else None
+        tgt, po, pf = _clean_nans(tgt, po, pf)
 
         # z-normalize on the full series (as torch does, before truncation): each
         # target and covariate row by its own stats. Only target stats are kept,

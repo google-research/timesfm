@@ -430,6 +430,32 @@ class TimesFM3ForecasterParityTest(unittest.TestCase):
       np.testing.assert_allclose(torch_out.forecast, mlx_out.forecast, atol=1e-3)
       np.testing.assert_allclose(torch_out.quantiles, mlx_out.quantiles, atol=1e-3)
 
+  def test_predict_nan_context_matches_torch(self):
+    # The torch forecaster strips leading NaNs and linearly interpolates the
+    # rest (targets and covariates); decode() alone only zeroes NaNs, which
+    # reads them as observed zeros.
+    t, m = self._build_forecasters()
+    rng = np.random.RandomState(0)
+    ctx = (100 + np.cumsum(rng.randn(2, 300), axis=-1)).astype(np.float32)
+    ctx[:, :40] = np.nan  # leading NaNs (stripped)
+    ctx[0, 150:160] = np.nan  # interior gaps (interpolated)
+    ctx[1, 200:205] = np.nan
+    po = rng.randn(300).astype(np.float32)
+    po[60:70] = np.nan
+    pf = rng.randn(300 + 64).astype(np.float32)
+    pf[200:210] = np.nan
+    cases = [
+      # 1D target takes the MLX batched fast path; 2D and covariates the general.
+      (ctx[0], {}),
+      (ctx, {}),
+      (ctx[0], dict(past_only_covariates=po, past_future_covariates=pf)),
+    ]
+    for c, kw in cases:
+      torch_out = t.predict(c, horizon=64, return_quantiles=True, **kw)
+      mlx_out = m.predict(c, horizon=64, return_quantiles=True, **kw)
+      np.testing.assert_allclose(torch_out.forecast, mlx_out.forecast, atol=1e-3)
+      np.testing.assert_allclose(torch_out.quantiles, mlx_out.quantiles, atol=1e-3)
+
 
 if __name__ == "__main__":
   unittest.main()
