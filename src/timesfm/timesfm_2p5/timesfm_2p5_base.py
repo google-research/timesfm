@@ -264,18 +264,26 @@ class TimesFM_2p5:
     # Track the lengths of (1) each input, (2) the part that can be used in the
     # linear model, and (3) the horizon.
     input_lens, train_lens, test_lens = [], [], []
+    # Handle NaNs as `forecast` does: drop leading NaNs, so they are not fit
+    # on, and interpolate the rest. A single NaN target would otherwise turn
+    # the linear fit, shared by the whole batch, into NaNs.
+    filled_inputs = []
 
     for i, input_ts in enumerate(inputs):
       input_len = len(input_ts)
       input_lens.append(input_len)
+      filled_ts = linear_interpolation(
+        strip_leading_nans(np.array(input_ts, dtype=float))
+      )
+      filled_inputs.append(filled_ts)
 
       if xreg_mode == "timesfm + xreg":
         # For fitting residuals, no TimesFM forecast on the first patch. The
         # backcast only covers the last `max_context` points of the input.
-        context_len = min(input_len, self.forecast_config.max_context)
+        context_len = min(len(filled_ts), self.forecast_config.max_context)
         train_lens.append(max(0, context_len - self.model.p))
       elif xreg_mode == "xreg + timesfm":
-        train_lens.append(input_len)
+        train_lens.append(len(filled_ts))
       else:
         raise ValueError(f"Unsupported mode: {xreg_mode}")
 
@@ -343,11 +351,11 @@ class TimesFM_2p5:
       # Explicit start indices: `x[-0:]` would select all of `x`.
       targets = [
         (
-          np.array(input_ts)[input_len - train_len :]
+          filled_ts[len(filled_ts) - train_len :]
           - backcast[len(backcast) - train_len :]
         )
-        for input_ts, backcast, input_len, train_len in zip(
-          inputs, backcasts, input_lens, train_lens
+        for filled_ts, backcast, train_len in zip(
+          filled_inputs, backcasts, train_lens
         )
       ]
       per_instance_stats = None
@@ -390,8 +398,8 @@ class TimesFM_2p5:
     else:
       # Fit a model on the targets then forecast on the residuals via TimesFM.
       targets = [
-        np.array(input_ts)[-train_len:]
-        for input_ts, train_len in zip(inputs, train_lens)
+        filled_ts[len(filled_ts) - train_len :]
+        for filled_ts, train_len in zip(filled_inputs, train_lens)
       ]
       per_instance_stats = None
       if normalize_xreg_target_per_input:
