@@ -64,7 +64,7 @@ class TimesFM3Evaluator(TimesFM3Forecaster):
       list(ts_ids) if ts_ids is not None else [None] * num_original_ts
     )
 
-    if not contexts:
+    if len(contexts) == 0:
       return
 
     if univariate:
