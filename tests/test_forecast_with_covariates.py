@@ -87,3 +87,31 @@ class TestTimesFMPlusXReg:
   def test_all_contexts_within_one_patch(self, tfm):
     with pytest.raises(ValueError, match="input patch length"):
       _forecast(tfm, [20])
+
+
+@pytest.mark.parametrize("xreg_mode", ["xreg + timesfm", "timesfm + xreg"])
+def test_nans_in_inputs_are_handled_like_forecast(tfm, xreg_mode):
+  rng = np.random.default_rng(0)
+  context_lens = [100, 80]
+  inputs = [rng.normal(size=n) + 10.0 for n in context_lens]
+  covariates = [rng.normal(size=n + _HORIZON) for n in context_lens]
+  # Leading NaNs are dropped and inner NaNs are linearly interpolated.
+  with_nans = inputs[0].copy()
+  with_nans[:10] = np.nan
+  with_nans[60] = np.nan
+  cleaned = inputs[0][10:].copy()
+  cleaned[50] = (cleaned[49] + cleaned[51]) / 2
+
+  def forecast(first_input, first_covariate):
+    with torch.no_grad():
+      return tfm.forecast_with_covariates(
+          [first_input, inputs[1]],
+          dynamic_numerical_covariates={"x": [first_covariate, covariates[1]]},
+          xreg_mode=xreg_mode,
+      )
+
+  point, quantile = forecast(with_nans, covariates[0])
+  expected_point, expected_quantile = forecast(cleaned, covariates[0][10:])
+
+  np.testing.assert_allclose(point, expected_point, rtol=1e-5, atol=1e-5)
+  np.testing.assert_allclose(quantile, expected_quantile, rtol=1e-5, atol=1e-5)
