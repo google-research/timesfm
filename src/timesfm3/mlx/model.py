@@ -337,13 +337,21 @@ class TimesFM3Mlx(nn.Module):
       (sum_y - m * sum_t) / mx.maximum(n_v, 1.0),
     )
     detr = ctx_vals - (m[..., None] * t + c[..., None])
+    # Variances are taken around the mean (two passes) rather than as
+    # E[y^2] - E[y]^2: in float32 the latter cancels catastrophically for
+    # series with a large level (around 1e5 std_orig becomes 0), which
+    # silently turns detrending off.
     mean_y = sum_y / mx.maximum(n_v, 1.0)
-    sum_y2 = mx.where(~ctx_masks, ctx_vals**2, 0.0).sum(axis=-1)
-    std_orig = mx.sqrt(mx.maximum(sum_y2 / mx.maximum(n_v, 1.0) - mean_y**2, 0.0))
+    sum_dy2 = mx.where(~ctx_masks, (ctx_vals - mean_y[..., None]) ** 2, 0.0).sum(
+      axis=-1
+    )
+    std_orig = mx.sqrt(sum_dy2 / mx.maximum(n_v, 1.0))
     sum_yd = mx.where(~ctx_masks, detr, 0.0).sum(axis=-1)
     mean_yd = sum_yd / mx.maximum(n_v, 1.0)
-    sum_yd2 = mx.where(~ctx_masks, detr**2, 0.0).sum(axis=-1)
-    std_det = mx.sqrt(mx.maximum(sum_yd2 / mx.maximum(n_v, 1.0) - mean_yd**2, 0.0))
+    sum_dyd2 = mx.where(~ctx_masks, (detr - mean_yd[..., None]) ** 2, 0.0).sum(
+      axis=-1
+    )
+    std_det = mx.sqrt(sum_dyd2 / mx.maximum(n_v, 1.0))
     apply = std_det < cfg.linear_detrending_threshold * std_orig
     return m, c, apply
 
