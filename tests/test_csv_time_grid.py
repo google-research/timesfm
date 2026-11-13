@@ -81,3 +81,22 @@ def test_all_missing_column_is_rejected_before_forecast():
     forecast_csv.forecast_series(model, frame, ["sales", "empty"], 2)
 
   model.forecast.assert_not_called()
+
+
+def test_newest_first_csv_is_forecast_oldest_first(tmp_path):
+  csv_path = tmp_path / "newest_first.csv"
+  pd.DataFrame({
+    "date": pd.date_range("2026-01-01", periods=5)[::-1],
+    "sales": [5.0, 4.0, 3.0, 2.0, 1.0],
+  }).to_csv(csv_path, index=False)
+  model = preprocessing_model()
+
+  frame, columns, date_col = forecast_csv.load_csv(str(csv_path), "date")
+  results = forecast_csv.forecast_series(model, frame, columns, 2)
+
+  (values,) = model.forecast.call_args.kwargs["inputs"]
+  np.testing.assert_array_equal(values, [1.0, 2.0, 3.0, 4.0, 5.0])
+  output_path = tmp_path / "forecast.csv"
+  forecast_csv.write_csv_output(results, str(output_path), frame, date_col, 2)
+  exported = pd.read_csv(output_path, parse_dates=["date"])
+  assert exported["date"].tolist() == list(pd.date_range("2026-01-06", periods=2))

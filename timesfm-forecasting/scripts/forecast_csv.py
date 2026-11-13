@@ -90,6 +90,11 @@ def load_csv(
     # Identify date column
     if date_col and date_col in df.columns:
         df[date_col] = pd.to_datetime(df[date_col])
+        # Exports are often newest-first. The model reads each column as
+        # oldest-to-newest, and the future dates continue from the last row.
+        if not df[date_col].dropna().is_monotonic_increasing:
+            print(f"Sorting rows by '{date_col}' (oldest first).")
+            df = df.sort_values(date_col, kind="stable").reset_index(drop=True)
     elif date_col:
         print(f"⚠️ Date column '{date_col}' not found. Available: {list(df.columns)}")
         date_col = None
