@@ -1,5 +1,5 @@
 {
-  "description": "Synthetic retail sales data with covariates for TimesFM XReg demo",
+  "description": "Synthetic retail sales data with covariates for TimesFM 3.0 demo",
   "note_on_real_data": "For real datasets (e.g., Kaggle Rossmann Store Sales), download to tempfile.mkdtemp() -- do NOT commit to this repo.",
   "stores": {
     "store_A": {
@@ -47,9 +47,10 @@
     "promotion": "+150 units per promotion week",
     "price": "-20 units per $1 above base price"
   },
-  "xreg_modes": {
-    "xreg + timesfm": "Regression on TimesFM residuals (default)",
-    "timesfm + xreg": "TimesFM on regression residuals"
+  "timesfm3_covariates": {
+    "past_only": "numeric channels observed during context only",
+    "past_future": "numeric channels known through the forecast horizon",
+    "categorical_note": "encode categorical features numerically before use"
   },
   "bug_fixes_history": [
     "v1: Variable-shadowing -- all stores had identical covariates",
