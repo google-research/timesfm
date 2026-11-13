@@ -1,0 +1,7 @@
+.venv/
+data/
+adapters/*
+!adapters/horizon-c1/
+!adapters/horizon-c2/
+runs/
+__pycache__/
