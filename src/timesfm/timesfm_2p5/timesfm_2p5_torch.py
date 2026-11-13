@@ -438,8 +438,10 @@ class TimesFM_2p5_200M_torch(
           f"Horizon must be less than the max horizon. {horizon} > {fc.max_horizon}."
         )
 
-      inputs = (
-        torch.from_numpy(np.array(inputs)).to(self.model.device).to(torch.float32)
+      # Normalize in float64 before casting to float32: a series such as
+      # 1e8 + small signal would otherwise be quantized away by the cast.
+      inputs = torch.from_numpy(np.array(inputs, dtype=np.float64)).to(
+        self.model.device
       )
       masks = torch.from_numpy(np.array(masks)).to(self.model.device).to(torch.bool)
       batch_size = inputs.shape[0]
@@ -450,7 +452,7 @@ class TimesFM_2p5_200M_torch(
         is_positive = None
 
       if fc.normalize_inputs:
-        # Compute statistics at a bounded scale to avoid float32 overflow.
+        # Compute statistics at a bounded scale to avoid overflow.
         magnitude = inputs.abs().amax(dim=-1, keepdim=True).clamp_min(1.0)
         scaled_inputs = inputs / magnitude
         mu = torch.mean(scaled_inputs, dim=-1, keepdim=True) * magnitude
@@ -458,6 +460,7 @@ class TimesFM_2p5_200M_torch(
         inputs = revin(inputs, mu, sigma, reverse=False)
       else:
         mu, sigma = None, None
+      inputs = inputs.to(torch.float32)
 
       pf_outputs, quantile_spreads, ar_outputs = self.model.decode(
         forecast_config.max_horizon, inputs, masks
@@ -517,7 +520,9 @@ class TimesFM_2p5_200M_torch(
           )
 
       if fc.normalize_inputs:
-        full_forecast = revin(full_forecast, mu, sigma, reverse=True)
+        full_forecast = revin(
+          full_forecast.to(torch.float64), mu, sigma, reverse=True
+        )
 
       if is_positive is not None:
         full_forecast = torch.where(
