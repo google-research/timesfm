@@ -14,9 +14,17 @@
 
 """Backward-compatibility shim for ``timesfm3.normalization``.
 
-The PyTorch backend moved to ``timesfm3.torch.normalization``. This re-exports it so that
-existing ``from timesfm3.normalization import ...`` imports keep working; new code should
-import from ``timesfm3.torch.normalization`` (or the top-level ``timesfm3`` API).
+The PyTorch backend moved to ``timesfm3.torch.normalization``. This module is an alias
+of it so that existing ``from timesfm3.normalization import ...`` imports keep working;
+new code should import from ``timesfm3.torch.normalization`` (or the top-level
+``timesfm3`` API).
 """
 
-from .torch.normalization import *  # noqa: F401,F403
+import sys
+
+from .torch import normalization as _normalization
+
+# Alias the module rather than star-importing it: `import *` skips names with a
+# leading underscore (`_ModelConfig`, `_make_torch_model`, ...), and a copied
+# name cannot be patched, because the backend keeps reading its own global.
+sys.modules[__name__] = _normalization
