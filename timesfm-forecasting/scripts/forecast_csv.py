@@ -46,8 +46,12 @@ def run_preflight() -> dict:
     return report.to_dict()
 
 
-def load_model(batch_size: int = 32):
-    """Load and compile the TimesFM model."""
+def load_model(batch_size: int = 32, horizon: int = 256):
+    """Load and compile the TimesFM model.
+
+    The model is compiled with max_horizon of at least ``horizon``, since
+    forecasting past the compiled max_horizon raises.
+    """
     import torch
     import timesfm
 
@@ -62,7 +66,7 @@ def load_model(batch_size: int = 32):
     model.compile(
         timesfm.ForecastConfig(
             max_context=1024,
-            max_horizon=256,
+            max_horizon=max(256, horizon),
             normalize_inputs=True,
             use_continuous_quantile_head=True,
             force_flip_invariance=True,
@@ -252,7 +256,7 @@ def main() -> None:
         batch_size = args.batch_size or 32
 
     # 2. Load model
-    model = load_model(batch_size=batch_size)
+    model = load_model(batch_size=batch_size, horizon=args.horizon)
 
     # 3. Load CSV
     df, cols, date_col = load_csv(args.input, args.date_col, value_cols)
