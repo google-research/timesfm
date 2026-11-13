@@ -3,27 +3,67 @@ name: Manual PyPI Publish
 on:
   workflow_dispatch:
 
+permissions: {}
+
+concurrency:
+  group: pypi-publish
+  cancel-in-progress: false
+
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c # v6.0.0
         with:
           python-version: '3.11'
       - name: Install uv
-        run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
-          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+        uses: astral-sh/setup-uv@f94ec6bedd8674c4426838e6b50417d36b6ab231 # v5.3.1
       - name: Create virtual environment
         run: uv venv
       - name: Install build dependencies
-        run: uv pip install build twine
+        run: uv pip install build 'twine==6.*'
       - name: Build package
         run: uv run python -m build
-      - name: Publish to PyPI
+      - name: Authenticate to Google Cloud (OSS Exit Gate)
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          workload_identity_provider: 'projects/305452601764/locations/global/workloadIdentityPools/builders/providers/github'
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
+      - name: Clean up stale releases from staging repo
+        run: |
+          packages=$(gcloud artifacts packages list \
+              --project="oss-exit-gate-prod" \
+              --location="us" \
+              --repository="timesfm--pypi" \
+              --format="value(name)")
+
+          echo "${packages}" | xargs -r -n1 sh -c '
+              echo "Deleting package: $(basename "$1")..."
+              gcloud artifacts packages delete "$1" \
+                  --project="oss-exit-gate-prod" \
+                  --location="us" \
+                  --repository="timesfm--pypi" \
+                  --quiet
+          ' _
+      - name: Stage to OSS Exit Gate and upload manifest
         env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-        run: uv run twine upload dist/*
+          TWINE_USERNAME: oauth2accesstoken
+          RUN_ID: ${{ github.run_id }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
+        run: |
+          export TWINE_PASSWORD="$(gcloud auth print-access-token)"
+          echo "::add-mask::${TWINE_PASSWORD}"
+          uv run twine upload \
+            --repository-url "https://us-python.pkg.dev/oss-exit-gate-prod/timesfm--pypi/" \
+            dist/*
+          echo '{"publish_all": true}' > manifest.json
+          gcloud storage cp manifest.json \
+            "gs://oss-exit-gate-prod-projects-bucket/timesfm/pypi/manifests/manifest-${RUN_ID}-${RUN_ATTEMPT}.json"
