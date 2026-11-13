@@ -110,6 +110,24 @@ class TimesFM3TorchTest(unittest.TestCase):
     self.assertEqual(out.shape, (b, 9, horizon, 3))
     self.assertTrue(torch.isfinite(out).all().item())
 
+  def test_decode_detrending_is_shift_equivariant_at_large_levels(self):
+    # A trending series and the same series shifted by a large constant must
+    # take the same detrending decision, so their forecasts differ only by
+    # the shift. Computing the variances as E[y^2] - E[y]^2 in float32 made
+    # std_orig collapse to 0 at this level, which turned detrending off.
+    context_len, horizon, level = 128, 32, 3e5
+    generator = torch.Generator().manual_seed(0)
+    series = torch.linspace(0.0, 20.0, context_len) + torch.randn(
+      context_len, generator=generator
+    )
+    target = series.view(1, 1, context_len)
+
+    with torch.no_grad():
+      base = self.model.decode(target=target, horizon=horizon)
+      shifted = self.model.decode(target=target + level, horizon=horizon)
+
+    torch.testing.assert_close(shifted - level, base, rtol=0, atol=0.5)
+
   def test_save_and_from_pretrained(self):
     import json
     import os
