@@ -20,12 +20,12 @@ We recommend at least 32GB RAM to load TimesFM dependencies.
 
 ## Update - Dec. 30, 2024
 - We are launching a 500m checkpoint as a part of TimesFM-2.0 release. This new checkpoint can be upto 25% better than v1.0 on leading benchmarks and also has a 4 times longer max. context length.
-- Launched [finetuning support](https://github.com/google-research/timesfm/blob/master/notebooks/finetuning.ipynb) that lets you finetune the weights of the pretrained TimesFM model on your own data.
-- Launched [~zero-shot covariate support](https://github.com/google-research/timesfm/blob/master/notebooks/covariates.ipynb) with external regressors. More details [here](https://github.com/google-research/timesfm?tab=readme-ov-file#covariates-support).
+- Launched [finetuning support](https://github.com/google-research/timesfm/blob/master/v1/notebooks/finetuning.ipynb) that lets you finetune the weights of the pretrained TimesFM model on your own data.
+- Launched [~zero-shot covariate support](https://github.com/google-research/timesfm/blob/master/v1/notebooks/covariates.ipynb) with external regressors. More details [here](https://github.com/google-research/timesfm?tab=readme-ov-file#covariates-support).
 
 ## Update - Feb. 17, 2024
-- We are providing the option for [finetuning using Pytorch](https://github.com/google-research/timesfm/blob/master/notebooks/finetuning_torch.ipynb), which mimics the previously added functionality from [finetuning support](https://github.com/google-research/timesfm/blob/master/notebooks/finetuning.ipynb).
-- We are also providing the Multi-GPU finetuining with Pytorch. We currently support DDP multi-gpu finetuning, other variants of multi-gpu training (pipeline parallelism/model parallelism) might be added later. In order to use it, follow the steps in [finetuning example](https://github.com/google-research/timesfm/blob/master/finetuning/finetuning_example.py) .
+- We are providing the option for [finetuning using Pytorch](https://github.com/google-research/timesfm/blob/master/v1/notebooks/finetuning_torch.ipynb), which mimics the previously added functionality from [finetuning support](https://github.com/google-research/timesfm/blob/master/v1/notebooks/finetuning.ipynb).
+- We are also providing the Multi-GPU finetuining with Pytorch. We currently support DDP multi-gpu finetuning, other variants of multi-gpu training (pipeline parallelism/model parallelism) might be added later. In order to use it, follow the steps in [finetuning example](https://github.com/google-research/timesfm/blob/master/v1/src/finetuning/finetuning_example.py) .
 
 ## Checkpoint timesfm-1.0-200m (-pytorch)
 
@@ -246,7 +246,7 @@ forecast_df = tfm.forecast_on_df(
 
 ## Covariates Support
 
-We now have an external regressors library on top of TimesFM that can support static covariates as well as dynamic covariates available in the future. We have an usage example in [notebooks/covariates.ipynb](https://github.com/google-research/timesfm/blob/master/notebooks/covariates.ipynb).
+We now have an external regressors library on top of TimesFM that can support static covariates as well as dynamic covariates available in the future. We have an usage example in [notebooks/covariates.ipynb](https://github.com/google-research/timesfm/blob/master/v1/notebooks/covariates.ipynb).
 
 If you plan to use the **`forecast_with_covariates`** on timesfm `torch` version, you need to install **JAX** and **jaxlib**. 
 You must manually install the dependencies for **`forecast_with_covariates`** support:
@@ -291,11 +291,11 @@ In this example, besides the `Daily_sales`, we also have covariates `Category`, 
 
 **Notice:** Here we make it mandatory that the dynamic covariates need to cover both the forecasting context and horizon. For example, all dynamic covariates in the example have 14 values: the first 7 correspond to the observed 7 days, and the last 7 correspond to the next 7 days.
 
-We can now provide the past data of the two products along with static and dynamic covariates as a batch input to TimesFM and produce forecasts that take into the account the covariates. To learn more, check out the example in [notebooks/covariates.ipynb](https://github.com/google-research/timesfm/blob/master/notebooks/covariates.ipynb).
+We can now provide the past data of the two products along with static and dynamic covariates as a batch input to TimesFM and produce forecasts that take into the account the covariates. To learn more, check out the example in [notebooks/covariates.ipynb](https://github.com/google-research/timesfm/blob/master/v1/notebooks/covariates.ipynb).
 
 ## Finetuning
 
-We have provided an example of finetuning the model on a new dataset in [notebooks/finetuning.ipynb](https://github.com/google-research/timesfm/blob/master/notebooks/finetuning.ipynb).
+We have provided an example of finetuning the model on a new dataset in [notebooks/finetuning.ipynb](https://github.com/google-research/timesfm/blob/master/v1/notebooks/finetuning.ipynb).
 
 ## Contribution Style guide
 
