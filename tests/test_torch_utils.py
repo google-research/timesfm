@@ -254,6 +254,33 @@ class TestRevIN:
     expected = torch.tensor([[-1.0, 0.0, 1.0]])
     torch.testing.assert_close(normed, expected, atol=1e-5, rtol=1e-5)
 
+  def test_zero_sigma_roundtrip_identity(self):
+    """Zero variance must reconstruct the original input in roundtrip.
+
+    When sigma is zero, forward normalization guards division by using
+    effective scale 1.0. Reverse denormalization must symmetrically use the
+    same effective scale 1.0 to preserve forecast deltas.
+    """
+    x = torch.tensor([[4.5, 5.0, 5.5]])
+    mu = torch.tensor([5.0])
+    sigma = torch.tensor([0.0])
+
+    normed = revin(x, mu, sigma, reverse=False)
+    recovered = revin(normed, mu, sigma, reverse=True)
+
+    torch.testing.assert_close(recovered, x, atol=1e-5, rtol=1e-5)
+
+  def test_near_zero_sigma_roundtrip_identity(self):
+    """Near-zero variance below tolerance must reconstruct original input in roundtrip."""
+    x = torch.tensor([[1.0, 2.0, 3.0]])
+    mu = torch.tensor([2.0])
+    sigma = torch.tensor([_TOLERANCE / 2])
+
+    normed = revin(x, mu, sigma, reverse=False)
+    recovered = revin(normed, mu, sigma, reverse=True)
+
+    torch.testing.assert_close(recovered, x, atol=1e-5, rtol=1e-5)
+
   def test_roundtrip_with_batched_3d_input(self):
     """RevIN must broadcast correctly for (batch, patches, patch_len)
     tensors — the actual shape used during patched decoding."""

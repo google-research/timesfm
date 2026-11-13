@@ -47,9 +47,9 @@ def revin(
     mu, sigma = mu[..., None], sigma[..., None]
   elif mu.ndim == x.ndim - 2:
     mu, sigma = mu[..., None, None], sigma[..., None, None]
-  if reverse:
-    return x * sigma + mu
   safe_sigma = mx.where(sigma < DIV_TOL, 1.0, sigma)
+  if reverse:
+    return x * safe_sigma + mu
   return (x - mu) / safe_sigma
 
 

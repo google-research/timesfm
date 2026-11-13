@@ -251,10 +251,11 @@ def revin(
     sigma = sigma.unsqueeze(-1).unsqueeze(-1)
   else:
     raise ValueError(f"Unsupported shapes for x and mu: {x.shape}, {mu.shape}.")
+  safe_sigma = _make_safe_for_division(sigma)
   if reverse:
-    return x * sigma + mu
+    return x * safe_sigma + mu
   else:
-    return (x - mu) / _make_safe_for_division(sigma)
+    return (x - mu) / safe_sigma
 
 
 def get_output_patch_via_roll(
