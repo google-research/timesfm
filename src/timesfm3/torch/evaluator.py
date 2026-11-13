@@ -216,7 +216,7 @@ class TimesFM3Evaluator(TimesFM3Forecaster):
           )
         chunk_results.append(trimmed_outs)
 
-      was_1d_input = len(contexts) > 0 and np.ndim(contexts[0]) == 1
+      was_1d_input = [np.ndim(context) == 1 for context in contexts]
 
       for i in range(num_original_ts):
         combined_f = (
@@ -233,9 +233,9 @@ class TimesFM3Evaluator(TimesFM3Forecaster):
           if chunk_results[0][i].quantiles is not None
           else None
         )
-        if was_1d_input and combined_f is not None:
+        if was_1d_input[i] and combined_f is not None:
           combined_f = combined_f[0]
-        if was_1d_input and combined_q is not None:
+        if was_1d_input[i] and combined_q is not None:
           combined_q = combined_q[0]
 
         yield ForecastOutput(
