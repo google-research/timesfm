@@ -684,25 +684,30 @@ class TimesFM3Forecaster:
         yield ForecastOutput(ts_id=original_ts_ids[i], forecast=None)
       return
 
-    # Yield batches of size per_core_batch_size
-    batch_size = self.config.per_core_batch_size
-    ys = []
-    num_queries = len(queries)
-    num_batches = math.ceil(num_queries / batch_size)
-
-    for i in range(num_batches):
-      query_batch = queries[i * batch_size : (i + 1) * batch_size]
-      if not query_batch:
-        continue
-
-      # Dynamic per-batch context length rounded up to patch length boundary
-      max_ctx_in_batch = max(q.context_length for q in query_batch)
-      batch_context = min(
-        math.ceil(max_ctx_in_batch / self.config.input_patch_length)
-        * self.config.input_patch_length,
+    # Batch only queries that share a padded context length. RoPE positions
+    # count from the first (padded) patch, so left-padding a series up to a
+    # longer batch mate's length changes its forecast. Each query is padded
+    # to its own length rounded up to a patch boundary, as when run alone.
+    patch_len = self.config.input_patch_length
+    groups: dict[int, list[int]] = {}
+    for query_idx, query in enumerate(queries):
+      query_context = min(
+        math.ceil(query.context_length / patch_len) * patch_len,
         self.global_context,
       )
-      batch_context = max(batch_context, self.config.input_patch_length)
+      query_context = max(query_context, patch_len)
+      groups.setdefault(query_context, []).append(query_idx)
+
+    batch_size = self.config.per_core_batch_size
+    ys: list[np.ndarray | None] = [None] * len(queries)
+    batches = [
+      (batch_context, idxs[start : start + batch_size])
+      for batch_context, idxs in groups.items()
+      for start in range(0, len(idxs), batch_size)
+    ]
+
+    for batch_context, batch_idxs in batches:
+      query_batch = [queries[j] for j in batch_idxs]
 
       formatted_batch = [q.format(batch_context) for q in query_batch]
 
@@ -772,10 +777,12 @@ class TimesFM3Forecaster:
         )
       # Covariates can make decode return the exact horizon while a batch
       # without them returns the patch-rounded horizon. Trim before stacking.
-      ys.append(out_logits[:, :num_targets_in, :horizon, :].cpu().numpy())
+      batch_out = out_logits[:, :num_targets_in, :horizon, :].cpu().numpy()
+      for j, out in zip(batch_idxs, batch_out):
+        ys[j] = out
 
     try_gc(self.device)
-    all_raw_outputs = np.concatenate(ys, axis=0)
+    all_raw_outputs = np.stack(ys, axis=0)
     all_raw_outputs = all_raw_outputs[:, :num_targets_in, :, :]
 
     if sort_quantiles:
