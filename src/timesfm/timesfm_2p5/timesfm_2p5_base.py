@@ -374,7 +374,6 @@ class TimesFM_2p5:
       )
       if normalize_xreg_target_per_input:
         xregs = xreg_lib.renormalize(xregs, per_instance_stats)
-      xregs = np.array(xregs)
       new_point_outputs = [
         (point_output[-self.forecast_config.max_horizon :][:test_len] + xreg)
         for point_output, test_len, xreg in zip(point_outputs, test_lens, xregs)

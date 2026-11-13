@@ -60,6 +60,31 @@ def _forecast(tfm, context_lens, normalize=True):
   return np.asarray(point), np.asarray(quantile)
 
 
+@pytest.mark.parametrize("xreg_mode", ["xreg + timesfm", "timesfm + xreg"])
+@pytest.mark.parametrize("normalize", [True, False])
+def test_per_input_horizons_can_differ(tfm, xreg_mode, normalize):
+  # The horizon of each input is inferred from its dynamic covariates, so the
+  # inputs of one batch can ask for different horizon lengths.
+  rng = np.random.default_rng(0)
+  context_lens, horizons = [100, 80], [8, _HORIZON]
+  inputs = [rng.normal(size=n) + 10.0 for n in context_lens]
+  covariates = [
+      rng.normal(size=n + h) for n, h in zip(context_lens, horizons)
+  ]
+  with torch.no_grad():
+    point, quantile = tfm.forecast_with_covariates(
+        inputs,
+        dynamic_numerical_covariates={"x": covariates},
+        xreg_mode=xreg_mode,
+        normalize_xreg_target_per_input=normalize,
+    )
+
+  assert [p.shape for p in point] == [(h,) for h in horizons]
+  assert [q.shape[0] for q in quantile] == horizons
+  assert all(np.isfinite(p).all() for p in point)
+  assert all(np.isfinite(q).all() for q in quantile)
+
+
 class TestTimesFMPlusXReg:
   """The "timesfm + xreg" mode must handle contexts of any length."""
 
