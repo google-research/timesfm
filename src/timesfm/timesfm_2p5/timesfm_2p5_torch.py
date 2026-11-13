@@ -404,6 +404,12 @@ class TimesFM_2p5_200M_torch(
     else:
       quantile_indices = list(range(10))
 
+    if fc.max_context <= 0:
+      # `forecast` keeps the last `max_context` points with `value[-context:]`,
+      # which for 0 keeps the whole series instead of truncating it.
+      raise ValueError(
+        f"max_context must be a positive integer, got {fc.max_context}."
+      )
     if fc.max_context % self.model.p != 0:
       logging.info(
         "When compiling, max context needs to be multiple of the patch size"
