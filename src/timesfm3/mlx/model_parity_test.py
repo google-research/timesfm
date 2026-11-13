@@ -418,6 +418,24 @@ class TimesFM3ForecasterParityTest(unittest.TestCase):
     m.model = mlx_model
     return t, m
 
+  def test_predict_batch_rejects_invalid_inputs_like_torch(self):
+    t, m = self._build_forecasters()
+    ctx = np.random.RandomState(0).randn(300).astype(np.float32)
+    bad_calls = [
+      # A past-future covariate one patch short used to make MLX silently
+      # return a 32-step forecast for horizon=64.
+      dict(contexts=[ctx], horizon=64, past_future_covariates=[np.zeros(300 + 32)]),
+      dict(contexts=[ctx], horizon=64, past_only_covariates=[np.zeros(200)]),
+      dict(contexts=[ctx, ctx], horizon=64, ts_ids=["a"]),
+      dict(contexts=[ctx], horizon=64, ts_ids=["a", "b"]),
+      dict(contexts=[np.zeros(0, np.float32)], horizon=64),
+      dict(contexts=[ctx], horizon=0),
+    ]
+    for kw in bad_calls:
+      for forecaster in (t, m):
+        with self.assertRaises(ValueError):
+          list(forecaster.predict_batch(**kw))
+
   def test_predict_horizon_not_multiple_of_output_patch(self):
     t, m = self._build_forecasters()
     rng = np.random.RandomState(0)

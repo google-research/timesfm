@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import dataclasses
 import math
+from numbers import Integral
 from typing import Iterator
 
 import mlx.core as mx
@@ -188,6 +189,38 @@ class TimesFM3Forecaster:
     """
     if padding_mode not in ("none", "edge"):
       raise ValueError(f"Unknown padding_mode: {padding_mode!r}")
+    # Same input checks as the torch backend.
+    if isinstance(horizon, bool) or not isinstance(horizon, Integral) or horizon <= 0:
+      raise ValueError("horizon must be a positive integer.")
+    for name, values in (
+      ("ts_ids", ts_ids),
+      ("past_only_covariates", past_only_covariates),
+      ("past_future_covariates", past_future_covariates),
+    ):
+      if values is not None and len(values) != len(contexts):
+        raise ValueError(f"{name} must contain one entry per context.")
+    for idx, ctx in enumerate(contexts):
+      if (
+        np.ndim(ctx) not in (1, 2)
+        or np.shape(ctx)[-1] == 0
+        or (np.ndim(ctx) == 2 and np.shape(ctx)[0] == 0)
+      ):
+        raise ValueError(
+          f"contexts[{idx}] must have at least one time step and, for 2D"
+          " inputs, at least one variate."
+        )
+      for name, covariates, expected_length in (
+        ("past_only_covariates", past_only_covariates, np.shape(ctx)[-1]),
+        ("past_future_covariates", past_future_covariates, np.shape(ctx)[-1] + horizon),
+      ):
+        covariate = covariates[idx] if covariates is not None else None
+        if covariate is not None and (
+          np.ndim(covariate) not in (1, 2)
+          or np.shape(covariate)[-1] != expected_length
+        ):
+          raise ValueError(
+            f"{name}[{idx}] must be a 1D or 2D array with time length {expected_length}."
+          )
     if len(contexts) == 0:
       return
 
