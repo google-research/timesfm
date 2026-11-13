@@ -24,9 +24,14 @@ on CPU — no model checkpoint or GPU required.
 import torch
 import pytest
 
-from timesfm.configs import RandomFourierFeaturesConfig, ResidualBlockConfig
+from timesfm.configs import (
+  RandomFourierFeaturesConfig,
+  ResidualBlockConfig,
+  TransformerConfig,
+)
 from timesfm.torch.dense import RandomFourierFeatures, ResidualBlock
 from timesfm.torch.normalization import RMSNorm
+from timesfm.torch.transformer import Transformer
 
 
 # ---------------------------------------------------------------------------
@@ -260,3 +265,53 @@ class TestRandomFourierFeatures:
     x = torch.randn(2, 5, 8)
     out = layer(x)
     assert out.shape == (2, 5, 16)
+
+
+# ---------------------------------------------------------------------------
+# Transformer with left-padded patches
+# ---------------------------------------------------------------------------
+
+
+class TestTransformerPadding:
+  """Left-padded (masked) patches must not affect the unmasked ones."""
+
+  def test_masked_prefix_matches_unpadded_input(self):
+    # A masked patch can attend to no key. torch < 2.5 returns NaN for such a
+    # query row, and the second layer then mixes that NaN into every row
+    # through the values, so any series shorter than max_context came back
+    # all-NaN.
+    torch.manual_seed(0)
+    cfg = TransformerConfig(
+      model_dims=16,
+      hidden_dims=32,
+      num_heads=2,
+      attention_norm="rms",
+      feedforward_norm="rms",
+      qk_norm="rms",
+      use_bias=False,
+      use_rotary_position_embeddings=True,
+      ff_activation="swish",
+      fuse_qkv=True,
+    )
+    layers = [Transformer(cfg) for _ in range(2)]
+    for layer in layers:
+      for name, param in layer.named_parameters():
+        if name.endswith("scale"):
+          torch.nn.init.ones_(param)
+
+    def run(x, patch_mask):
+      with torch.no_grad():
+        for layer in layers:
+          x, _ = layer(x, patch_mask)
+      return x
+
+    num_padded, num_valid = 3, 5
+    valid = torch.randn(1, num_valid, 16)
+    padded = torch.cat([torch.zeros(1, num_padded, 16), valid], dim=1)
+    patch_mask = torch.tensor([[True] * num_padded + [False] * num_valid])
+
+    out_padded = run(padded, patch_mask)
+    out_valid = run(valid, torch.zeros(1, num_valid, dtype=torch.bool))
+
+    assert torch.isfinite(out_padded).all()
+    torch.testing.assert_close(out_padded[:, num_padded:], out_valid)
