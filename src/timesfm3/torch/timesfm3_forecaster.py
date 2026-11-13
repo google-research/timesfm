@@ -28,6 +28,7 @@ import torch
 
 from . import configs, util
 from . import model as torch_model_lib
+from . import transformer as transformer_lib
 
 _MAX_CONTEXT_LENGTH = 15360
 _SIGMA_THRESHOLD: float = 1e-7
@@ -310,6 +311,13 @@ def _make_torch_model(
       ),
     )
   )
+  # SDPA is a runtime choice with no weights, so ModelConfig.use_sdpa wins.
+  transformer_config = dataclasses.replace(
+    transformer_config,
+    transformer=dataclasses.replace(
+      transformer_config.transformer, use_sdpa=config.use_sdpa
+    ),
+  )
 
   t_model = torch_model_lib.TimesFM3Torch(
     input_patch_len=config.input_patch_length,
@@ -412,6 +420,10 @@ class TimesFM3Forecaster:
         use_frozen_running_stats=self.model.use_frozen_running_stats,
         input_transform=self.model.input_transform,
       )
+      # SDPA has no weights, so honour ModelConfig.use_sdpa over config.json.
+      for module in self.model.modules():
+        if isinstance(module, transformer_lib.MultiHeadAttention):
+          module.use_sdpa = self.config.use_sdpa
     else:
       # Local file (.safetensors or .pth / .pt)
       self.model = _make_torch_model(self.config)
