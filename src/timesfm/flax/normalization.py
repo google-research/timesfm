@@ -27,7 +27,13 @@ Num = jaxtyping.Num
 
 
 class RMSNorm(nnx.Module):
-  """RMS normalization."""
+  """RMS normalization.
+
+  The scale is initialized to zeros on purpose: a freshly constructed layer
+  outputs zeros, so at init the residual connection carries the signal.
+  Loading a checkpoint overwrites the scale. See
+  `test_zero_scale_produces_zeros` in tests/test_torch_layers.py.
+  """
 
   __data__ = ("scale",)
 
