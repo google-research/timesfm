@@ -37,6 +37,9 @@ class TestForceFlipInvariance:
     # past the first output patch (128 steps).
     torch.manual_seed(0)
     tfm = TimesFM_2p5_200M_torch(torch_compile=False)
+    # The random-init test follows the device selected by the runtime just as
+    # a loaded checkpoint does.
+    tfm.model.to(tfm.model.device)
     tfm.model.eval()
 
     # max_horizon 256 > output patch length 128 so the AR branch is exercised.
