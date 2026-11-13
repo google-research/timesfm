@@ -145,7 +145,9 @@ class RotaryPositionalEmbedding(nn.Module):
     first_half, second_half = inputs.chunk(2, dim=-1)
     first_part = first_half * cos_val - second_half * sin_val
     second_part = second_half * cos_val + first_half * sin_val
-    return torch.cat([first_part, second_part], dim=-1)
+    # Compute rotation angles in float32, but keep Q/K in the input dtype
+    # so attention can combine them with the value projection.
+    return torch.cat([first_part, second_part], dim=-1).to(inputs.dtype)
 
 
 class MultiHeadAttention(nn.Module):
@@ -382,7 +384,7 @@ class MultiHeadAttention(nn.Module):
         query = query * math.sqrt(self.head_dim)
         attn_logits = torch.matmul(query, key.transpose(-2, -1)) + float_mask
       attn_weights = F.softmax(attn_logits, dim=-1)
-      x = torch.matmul(attn_weights, value)
+      x = torch.matmul(attn_weights.to(value.dtype), value)
 
     # Transpose back: (b, h, n, d) -> (b, n, h, d)
     x = x.transpose(1, 2).contiguous()

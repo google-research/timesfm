@@ -54,6 +54,17 @@ class RotaryEmbeddingTest(unittest.TestCase):
     out = rope(x)
     self.assertEqual(out.shape, (2, 8, 16))
 
+  def test_rope_preserves_low_precision_dtype(self):
+    for dtype in (torch.bfloat16, torch.float16):
+      for shape in ((2, 4, 16), (2, 4, 2, 16)):
+        with self.subTest(dtype=dtype, shape=shape):
+          rope = torch_trans.RotaryPositionalEmbedding(embedding_dims=16)
+          x = torch.randn(shape).to(dtype)
+          expected = rope(x.float()).to(dtype)
+          out = rope(x)
+          self.assertEqual(out.dtype, dtype)
+          torch.testing.assert_close(out, expected)
+
   def test_rope_with_position(self):
     rope = torch_trans.RotaryPositionalEmbedding(embedding_dims=16)
     x = torch.randn(2, 4, 16)
@@ -93,6 +104,23 @@ class MultiHeadAttentionTest(unittest.TestCase):
     self.assertEqual(out_step.shape, (b, 1, d))
     self.assertIsNotNone(updated_cache)
     self.assertEqual(updated_cache.next_index[0].item(), 1)
+
+  def test_mha_low_precision(self):
+    for dtype in (torch.bfloat16, torch.float16):
+      for use_sdpa in (False, True):
+        for use_rope in (False, True):
+          with self.subTest(dtype=dtype, sdpa=use_sdpa, rope=use_rope):
+            mha = torch_trans.MultiHeadAttention(
+              num_heads=2,
+              in_features=16,
+              use_rotary_position_embeddings=use_rope,
+              use_sdpa=use_sdpa,
+            ).to(dtype=dtype)
+            x = torch.randn(2, 4, 16).to(dtype)
+            out, _, _ = mha(x)
+            self.assertEqual(out.dtype, dtype)
+            self.assertEqual(out.shape, x.shape)
+            self.assertTrue(torch.isfinite(out).all())
 
   def test_mha_decode_heterogeneous_batch(self):
     """Verifies that heterogeneous sequence offsets within a batch do not corrupt KV cache."""
