@@ -716,33 +716,41 @@ def main() -> None:
     )
     args = parser.parse_args()
 
+    has_dataset = bool(args.num_series and args.context_length)
+    dataset_args = (
+        args.num_series,
+        args.context_length,
+        args.horizon,
+        args.batch_size,
+        args.model,
+    )
+
+    def dataset_fit() -> dict[str, Any]:
+        fits, message, memory = check_dataset_fit(*dataset_args)
+        return {"fits": fits, "message": message, "memory_gb": memory}
+
     # Handle dataset estimation only mode
-    if args.estimate_only and args.num_series and args.context_length:
-        print_memory_estimate(
-            args.num_series,
-            args.context_length,
-            args.horizon,
-            args.batch_size,
-            args.model,
-        )
+    if args.estimate_only and has_dataset:
+        if args.json:
+            # Keep --json output parseable: no human-readable report.
+            print(json.dumps(dataset_fit(), indent=2))
+        else:
+            print_memory_estimate(*dataset_args)
         sys.exit(0)
 
     # Run system checks
     report = run_checks(args.model)
 
-    # Add dataset check if parameters provided
-    if args.num_series and args.context_length:
-        print_memory_estimate(
-            args.num_series,
-            args.context_length,
-            args.horizon,
-            args.batch_size,
-            args.model,
-        )
-
     if args.json:
-        print(json.dumps(report.to_dict(), indent=2))
+        result = report.to_dict()
+        # Add dataset check if parameters provided
+        if has_dataset:
+            result["dataset"] = dataset_fit()
+        print(json.dumps(result, indent=2))
     else:
+        # Add dataset check if parameters provided
+        if has_dataset:
+            print_memory_estimate(*dataset_args)
         print_report(report)
 
     # Exit with non-zero if any check failed
