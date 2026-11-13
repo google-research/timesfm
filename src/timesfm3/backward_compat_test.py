@@ -64,6 +64,28 @@ class BackwardCompatImportTest(unittest.TestCase):
     ):
       importlib.import_module(f"timesfm3.{name}")
 
+  def test_legacy_private_names_still_resolve(self):
+    # `_ModelConfig` is still listed in `timesfm3.__all__`, and these were all
+    # importable from the old top-level modules before the torch move.
+    from timesfm3.timesfm3_forecaster import _ModelConfig, _make_torch_model
+    from timesfm3.evaluator import _MAX_VARIATES_PER_FORWARD
+    from timesfm3.util import _make_safe_for_division
+
+    from timesfm3.torch import evaluator, timesfm3_forecaster, util
+
+    self.assertIs(_ModelConfig, timesfm3_forecaster._ModelConfig)
+    self.assertIs(_make_torch_model, timesfm3_forecaster._make_torch_model)
+    self.assertEqual(_MAX_VARIATES_PER_FORWARD, evaluator._MAX_VARIATES_PER_FORWARD)
+    self.assertIs(_make_safe_for_division, util._make_safe_for_division)
+
+  def test_patching_a_legacy_path_reaches_the_backend(self):
+    from unittest import mock
+
+    from timesfm3.torch import evaluator
+
+    with mock.patch("timesfm3.evaluator._MAX_VARIATES_PER_FORWARD", 3):
+      self.assertEqual(evaluator._MAX_VARIATES_PER_FORWARD, 3)
+
 
 if __name__ == "__main__":
   unittest.main()

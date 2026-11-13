@@ -14,9 +14,17 @@
 
 """Backward-compatibility shim for ``timesfm3.cpm_revin_refine``.
 
-The PyTorch backend moved to ``timesfm3.torch.cpm_revin_refine``. This re-exports it so that
-existing ``from timesfm3.cpm_revin_refine import ...`` imports keep working; new code should
-import from ``timesfm3.torch.cpm_revin_refine`` (or the top-level ``timesfm3`` API).
+The PyTorch backend moved to ``timesfm3.torch.cpm_revin_refine``. This module is an alias
+of it so that existing ``from timesfm3.cpm_revin_refine import ...`` imports keep working;
+new code should import from ``timesfm3.torch.cpm_revin_refine`` (or the top-level
+``timesfm3`` API).
 """
 
-from .torch.cpm_revin_refine import *  # noqa: F401,F403
+import sys
+
+from .torch import cpm_revin_refine as _cpm_revin_refine
+
+# Alias the module rather than star-importing it: `import *` skips names with a
+# leading underscore (`_ModelConfig`, `_make_torch_model`, ...), and a copied
+# name cannot be patched, because the backend keeps reading its own global.
+sys.modules[__name__] = _cpm_revin_refine
