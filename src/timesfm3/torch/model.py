@@ -496,16 +496,22 @@ class TimesFM3Torch(
 
       ctx_vals_detrended = ctx_vals - (m_trend * t_ctx_bvc_normalized + c_trend)
 
+      # Variances are taken around the mean (two passes) rather than as
+      # E[y^2] - E[y]^2: in float32 the latter cancels catastrophically for
+      # series with a large level (around 1e5 std_orig becomes 0), which
+      # silently turns detrending off.
       mean_y = sum_y / torch.clamp_min(n_v, 1.0)
-      sum_y2 = torch.where(valid, ctx_vals**2, 0.0).sum(dim=-1, keepdim=True)
-      var_orig = torch.clamp_min(sum_y2 / torch.clamp_min(n_v, 1.0) - mean_y**2, 0.0)
-      std_orig = torch.sqrt(var_orig)
+      sum_dy2 = torch.where(valid, (ctx_vals - mean_y) ** 2, 0.0).sum(
+        dim=-1, keepdim=True
+      )
+      std_orig = torch.sqrt(sum_dy2 / torch.clamp_min(n_v, 1.0))
 
       sum_yd = torch.where(valid, ctx_vals_detrended, 0.0).sum(dim=-1, keepdim=True)
       mean_yd = sum_yd / torch.clamp_min(n_v, 1.0)
-      sum_yd2 = torch.where(valid, ctx_vals_detrended**2, 0.0).sum(dim=-1, keepdim=True)
-      var_det = torch.clamp_min(sum_yd2 / torch.clamp_min(n_v, 1.0) - mean_yd**2, 0.0)
-      std_det = torch.sqrt(var_det)
+      sum_dyd2 = torch.where(valid, (ctx_vals_detrended - mean_yd) ** 2, 0.0).sum(
+        dim=-1, keepdim=True
+      )
+      std_det = torch.sqrt(sum_dyd2 / torch.clamp_min(n_v, 1.0))
 
       apply_detrend = std_det < self.linear_detrending_threshold * std_orig
       ctx_vals = torch.where(apply_detrend, ctx_vals_detrended, ctx_vals)
