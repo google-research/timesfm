@@ -798,11 +798,13 @@ class TimesFM3Forecaster:
 
     if make_positive:
       for i in range(num_original_ts):
+        # Contexts may be plain lists; _is_nonnegative needs an ndarray.
+        context = np.asarray(contexts[i], dtype=np.float32)
         if was_1d_input[i]:
-          if _is_nonnegative(contexts[i]):
+          if _is_nonnegative(context):
             all_raw_outputs[i] = np.maximum(all_raw_outputs[i], 0.0)
         else:
-          nonneg = _is_nonnegative(contexts[i])
+          nonneg = _is_nonnegative(context)
           assert isinstance(nonneg, np.ndarray)
           for r in range(num_targets_in):
             if nonneg[r]:
