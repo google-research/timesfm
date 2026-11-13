@@ -1,0 +1,73 @@
+# Aegis3 Report — {{ project }}
+
+## Executive summary
+
+| Severity | Count |
+|---|---|
+{% for sev in ["critical","high","medium","low","info"] -%}
+| {{ sev }} | {{ (by_severity.get(sev) or []) | length }} |
+{% endfor %}
+
+## OWASP Smart Contract Top 10 (2026) coverage
+
+| Category | Findings |
+|---|---|
+{% set buckets = {} -%}
+{% for f in findings -%}
+{% if f.owasp_sc_2026 -%}
+{% if buckets.update({f.owasp_sc_2026: buckets.get(f.owasp_sc_2026, 0) + 1}) %}{% endif %}
+{% endif -%}
+{% endfor -%}
+{% for k, v in buckets.items() -%}
+| {{ k }} | {{ v }} |
+{% endfor %}
+
+## Findings
+
+{% for f in findings %}
+### {{ f.severity | upper }} — {{ f.title }}
+
+- detector: `{{ f.detector }}`
+- source tool: `{{ f.source_tool }}` (rule `{{ f.source_rule }}`)
+- confidence: {{ f.confidence }}
+{% if f.swc_id %}- SWC: {{ f.swc_id }}{% endif %}
+{% if f.owasp_sc_2026 %}- OWASP-SC-2026: {{ f.owasp_sc_2026 }}{% endif %}
+{% if f.cwe %}- CWE: {{ f.cwe }}{% endif %}
+
+**Description.** {{ f.description }}
+
+**Locations.**
+{% for loc in f.locations -%}
+- `{{ loc.file or "?" }}{% if loc.line %}:{{ loc.line }}{% endif %}`{% if loc.contract %} (`{{ loc.contract }}`{% if loc.function %}.`{{ loc.function }}`{% endif %}){% endif %}
+{% endfor %}
+
+{% if f.evidence %}
+**Evidence.**
+{% if f.evidence.witness_tx %}- witness tx: `{{ f.evidence.witness_tx }}`{% endif %}
+{% if f.evidence.fuzz_seed %}- fuzz seed: `{{ f.evidence.fuzz_seed }}`{% endif %}
+{% if f.evidence.notes %}- notes: {{ f.evidence.notes }}{% endif %}
+{% endif %}
+
+---
+{% endfor %}
+
+## Exploit hypotheses
+
+{% for h in hypotheses %}
+### {{ h.title }} ({{ h.template_id }})
+
+{{ h.narrative }}
+
+**Preconditions.**
+{% for p in h.preconditions %}- {{ p }}
+{% endfor %}
+
+**Steps.**
+{% for s in h.steps %}1. {{ s }}
+{% endfor %}
+
+**Impact.** {{ h.impact }}
+**OWASP-SC-2026.** {{ h.owasp_sc_2026 }}
+
+---
+{% endfor %}
