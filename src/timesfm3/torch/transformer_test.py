@@ -287,6 +287,51 @@ class StackedMixingTransformerTest(unittest.TestCase):
     out, _, _ = stack(inputs, patch_mask=patch_mask)
     self.assertEqual(out.shape, (b, v, n, d))
 
+  def test_masked_prefix_matches_unpadded_input(self):
+    # Left padding masks whole leading patches, whose query rows then see no
+    # key. On torch < 2.5 SDPA returns NaN for those rows, and the second
+    # layer spreads it to every position.
+    torch.manual_seed(0)
+    for use_sdpa in (True, False):
+      with self.subTest(use_sdpa=use_sdpa):
+        stack_cfg = configs.StackedTransformersConfig(
+          num_layers=2,
+          use_remat=False,
+          transformer=configs.TransformerConfig(
+            model_dims=32,
+            hidden_dims=32,
+            num_heads=4,
+            attention_norm="rms",
+            feedforward_norm="rms",
+            qk_norm="rms",
+            use_rope_seq=True,
+            use_rope_var=False,
+            use_bias=False,
+            ff_activation="relu",
+            deterministic=True,
+            use_sdpa=use_sdpa,
+          ),
+        )
+        stack = torch_trans.StackedMixingTransformer(
+          config=stack_cfg, use_variate_attention=True
+        )
+        b, v, n, d, num_padded = 2, 2, 8, 32, 3
+        inputs = torch.randn(b, v, n, d)
+        patch_mask = torch.zeros(b, v, n, dtype=torch.bool)
+        patch_mask[:, :, :num_padded] = True
+
+        with torch.no_grad():
+          padded, _, _ = stack(inputs, patch_mask=patch_mask)
+          unpadded, _, _ = stack(
+            inputs[:, :, num_padded:],
+            patch_mask=patch_mask[:, :, num_padded:],
+          )
+
+        self.assertTrue(torch.isfinite(padded).all().item())
+        torch.testing.assert_close(
+          padded[:, :, num_padded:], unpadded, rtol=1e-5, atol=1e-5
+        )
+
 
 if __name__ == "__main__":
   unittest.main()

@@ -353,13 +353,20 @@ class MultiHeadAttention(nn.Module):
         # MEA=True equivalent: Flax passes Q*√d with rescale_logits=False
         # → no internal division → net scale = √d.
         attn_scale = math.sqrt(self.head_dim)
+      # A masked (left-padded) query row can see no key. torch < 2.5 returns
+      # NaN for such rows, and the NaN then reaches every position through
+      # the next layer (0 * NaN in the masked softmax). Let those rows attend
+      # to everything and zero them afterwards, which is what torch >= 2.5
+      # returns.
+      has_key = attn_mask.any(dim=-1, keepdim=True)
       x = F.scaled_dot_product_attention(
         query,
         key,
         value,
-        attn_mask=attn_mask.expand(-1, self.num_heads, -1, -1),
+        attn_mask=(attn_mask | ~has_key).expand(-1, self.num_heads, -1, -1),
         scale=attn_scale,
       )
+      x = torch.where(has_key, x, 0.0)
     else:
       # --- Manual attention path ---
       # Convert mask: True=attend -> 0.0, False=mask -> -1e9 (matching Flax
