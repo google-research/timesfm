@@ -266,8 +266,10 @@ class TimesFM_2p5:
       input_lens.append(input_len)
 
       if xreg_mode == "timesfm + xreg":
-        # For fitting residuals, no TimesFM forecast on the first patch.
-        train_lens.append(max(0, input_len - self.model.p))
+        # For fitting residuals, no TimesFM forecast on the first patch. The
+        # backcast only covers the last `max_context` points of the input.
+        context_len = min(input_len, self.forecast_config.max_context)
+        train_lens.append(max(0, context_len - self.model.p))
       elif xreg_mode == "xreg + timesfm":
         train_lens.append(input_len)
       else:
@@ -289,6 +291,12 @@ class TimesFM_2p5:
           "Forecast horizon length inferred from the dynamic covariates is longer than the"
           f"max_horizon defined in the forecast config: {test_lens[-1]} > {self.forecast_config.max_horizon=}."
         )
+
+    if xreg_mode == "timesfm + xreg" and not any(train_lens):
+      raise ValueError(
+        "For xreg_mode='timesfm + xreg', at least one input must be longer than"
+        f" the input patch length ({self.model.p}) to fit the covariates on."
+      )
 
     # Prepare the covariates into train and test.
     train_dynamic_numerical_covariates = collections.defaultdict(list)
@@ -324,12 +332,19 @@ class TimesFM_2p5:
       point_outputs, quantile_outputs = self.forecast(
         horizon=self.forecast_config.max_horizon, inputs=inputs
       )
+      backcasts = [
+        point_output[: -self.forecast_config.max_horizon]
+        for point_output in point_outputs
+      ]
+      # Explicit start indices: `x[-0:]` would select all of `x`.
       targets = [
         (
-          np.array(input_ts)[-train_len:]
-          - point_output[: -self.forecast_config.max_horizon][-train_len:]
+          np.array(input_ts)[input_len - train_len :]
+          - backcast[len(backcast) - train_len :]
         )
-        for input_ts, point_output, train_len in zip(inputs, point_outputs, train_lens)
+        for input_ts, backcast, input_len, train_len in zip(
+          inputs, backcasts, input_lens, train_lens
+        )
       ]
       per_instance_stats = None
       if normalize_xreg_target_per_input:
