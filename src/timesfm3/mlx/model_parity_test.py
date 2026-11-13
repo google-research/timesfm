@@ -31,6 +31,7 @@ from __future__ import annotations
 import os
 import tempfile
 import unittest
+from unittest import mock
 
 import numpy as np
 
@@ -339,6 +340,50 @@ class TimesFM3KnownDivergenceTest(unittest.TestCase):
     ctx = np.random.RandomState(2).randn(1, 2, 128).astype(np.float32)
     torch_out, mlx_out = _decode_both(torch_model, mlx_model, ctx, horizon=24)
     np.testing.assert_allclose(torch_out, mlx_out, atol=1e-4)
+
+
+@unittest.skipUnless(_HAS_MLX, "mlx is not installed (Apple silicon only)")
+@unittest.skipUnless(_torch_available(), "requires torch as the parity oracle")
+class TimesFM3ForecasterParityTest(unittest.TestCase):
+  """Forecaster-level parity: predict() of both backends on shared weights."""
+
+  def _build_forecasters(self):
+    # Production patch sizes (32 in / 64 out). The torch forecaster decodes at the
+    # horizon rounded up to whole output patches and trims, so a horizon that is
+    # not a multiple of 64 only matches if MLX does the same.
+    import torch
+
+    from ..torch import timesfm3_forecaster as torch_forecaster
+    from . import timesfm3_forecaster as mlx_forecaster
+
+    with mock.patch.dict(globals(), _INPUT_PATCH_LEN=32, _OUTPUT_PATCH_LEN=64):
+      torch_model, mlx_model = _build_pair()
+    t = torch_forecaster.TimesFM3Forecaster.__new__(torch_forecaster.TimesFM3Forecaster)
+    t.config = torch_forecaster._ModelConfig(
+      input_patch_length=32,
+      output_patch_length=64,
+      quantiles=_QUANTILES,
+      median_quantile_index=1,
+      device="cpu",
+    )
+    t.device = torch.device("cpu")
+    t.model = torch_model
+    m = mlx_forecaster.TimesFM3Forecaster.__new__(mlx_forecaster.TimesFM3Forecaster)
+    m.config = mlx_forecaster._ModelConfig(median_quantile_index=1, compile=False)
+    m.model = mlx_model
+    return t, m
+
+  def test_predict_horizon_not_multiple_of_output_patch(self):
+    t, m = self._build_forecasters()
+    rng = np.random.RandomState(0)
+    ctx = (100 + np.cumsum(rng.randn(512))).astype(np.float32)
+    # A 1D target takes the MLX batched fast path; a 2D one the general path.
+    for c in (ctx, np.stack([ctx, ctx[::-1]])):
+      torch_out = t.predict(c, horizon=80, return_quantiles=True)
+      mlx_out = m.predict(c, horizon=80, return_quantiles=True)
+      self.assertEqual(mlx_out.forecast.shape, torch_out.forecast.shape)
+      np.testing.assert_allclose(torch_out.forecast, mlx_out.forecast, atol=1e-3)
+      np.testing.assert_allclose(torch_out.quantiles, mlx_out.quantiles, atol=1e-3)
 
 
 if __name__ == "__main__":
