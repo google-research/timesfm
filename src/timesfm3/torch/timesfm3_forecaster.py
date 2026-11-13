@@ -690,6 +690,7 @@ class TimesFM3Forecaster:
       )
 
       po_torch = None
+      po_mask_torch = None
       if any(po is not None for po in batched_po):
         # A query without covariates in a batch where others have them gets
         # a zero placeholder shaped like the real covariate arrays (channel
@@ -701,8 +702,15 @@ class TimesFM3Forecaster:
         po_torch = torch.from_numpy(np.stack(po_arrs, axis=0)).to(
           self.device, dtype=torch.float32
         )
+        # Mask the placeholder rows so decode ignores them instead of
+        # reading them as an observed all-zero covariate.
+        po_mask = [np.full(po_ref.shape, po is None) for po in batched_po]
+        po_mask_torch = torch.from_numpy(np.stack(po_mask, axis=0)).to(
+          self.device, dtype=torch.bool
+        )
 
       pf_torch = None
+      pf_mask_torch = None
       if any(pf is not None for pf in batched_pf):
         # Same for past-future covariates. decode infers the horizon from
         # the covariate width (pf.shape[-1] - context) and slices the future
@@ -715,6 +723,10 @@ class TimesFM3Forecaster:
         pf_torch = torch.from_numpy(np.stack(pf_arrs, axis=0)).to(
           self.device, dtype=torch.float32
         )
+        pf_mask = [np.full(pf_ref.shape, pf is None) for pf in batched_pf]
+        pf_mask_torch = torch.from_numpy(np.stack(pf_mask, axis=0)).to(
+          self.device, dtype=torch.bool
+        )
 
       with torch.inference_mode():
         out_logits = self.model.decode(
@@ -722,6 +734,8 @@ class TimesFM3Forecaster:
           horizon=batched_hor[0],
           past_only_covariates=po_torch,
           past_future_covariates=pf_torch,
+          past_only_mask=po_mask_torch,
+          past_future_mask=pf_mask_torch,
           mask=mask_torch,
         )
       ys.append(out_logits.cpu().numpy())
