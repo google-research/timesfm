@@ -151,6 +151,27 @@ class TimesFM3MlxModelTest(unittest.TestCase):
       bool(model._detrend(mx.array(flat)[None, None], masks, 128)[2][0, 0])
     )
 
+  def test_decode_detrending_is_shift_equivariant_at_large_levels(self):
+    # A trending series and the same series shifted by a large constant must
+    # take the same detrending decision, so their forecasts differ only by
+    # the shift. Computing the variances as E[y^2] - E[y]^2 in float32 made
+    # std_orig collapse to 0 at this level, which turned detrending off.
+    model = self._tiny_model()
+    context_len, horizon, level = 512, 32, 1e5
+    rng = np.random.RandomState(0)
+    series = (np.linspace(0.0, 20.0, context_len) + rng.randn(context_len)).astype(
+      np.float32
+    )
+    masks = mx.zeros((1, 1, context_len), dtype=mx.bool_)
+    target = mx.array(series)[None, None]
+    self.assertTrue(bool(model._detrend(target, masks, context_len)[2][0, 0]))
+    self.assertTrue(
+      bool(model._detrend(target + level, masks, context_len)[2][0, 0])
+    )
+    base = np.array(model.decode(target, horizon=horizon))
+    shifted = np.array(model.decode(target + level, horizon=horizon))
+    np.testing.assert_allclose(shifted - level, base, rtol=0, atol=0.5)
+
 
 @unittest.skipUnless(
   _HAS_MLX and _weights_cached(),
