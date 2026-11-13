@@ -39,3 +39,30 @@ def test_large_input_normalization(monkeypatch, magnitude, device):
   reference = inputs.astype(np.float64)
   expected = reference.mean() + reference.std(ddof=1)
   np.testing.assert_allclose(forecast, expected, rtol=1e-5)
+
+
+def test_normalization_preserves_signal_on_large_offset(monkeypatch):
+  # A small signal on a large level (1e8 + [1, 2, 3, 4]) is below float32
+  # resolution at that level (spacing 8), so it must be normalized before the
+  # cast to float32 or the model only sees a constant series.
+  def decode(horizon, inputs, masks):
+    torch.testing.assert_close(inputs.std(dim=-1), torch.ones(1))
+    return torch.ones(1, 1, 128, 10), None, None
+
+  monkeypatch.setattr(
+      timesfm_2p5_torch, "TimesFM_2p5_200M_torch_module",
+      lambda: SimpleNamespace(
+          p=32, o=128, os=1024, q=10, device="cpu", device_count=1,
+          config=SimpleNamespace(context_limit=16384), decode=decode,
+      ),
+  )
+  model = timesfm_2p5_torch.TimesFM_2p5_200M_torch(torch_compile=False)
+  model.compile(ForecastConfig(
+      max_context=32, max_horizon=128, normalize_inputs=True,
+      use_continuous_quantile_head=False, force_flip_invariance=False,
+      infer_is_positive=False, fix_quantile_crossing=False,
+  ))
+  inputs = 1e8 + np.tile(np.array([1, 2, 3, 4], dtype=np.float64), 8)[None]
+  point, _ = model.compiled_decode(1, inputs, np.zeros_like(inputs, dtype=bool))
+  expected = inputs.mean() + inputs.std(ddof=1)
+  np.testing.assert_allclose(point, expected, rtol=0, atol=1e-6)
