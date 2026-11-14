@@ -158,6 +158,58 @@ class TimesFM3Torch(
       bias=True,
     )
 
+  # Options that change what forward() computes without changing the set of
+  # parameters, so they may differ from the values a checkpoint was saved with.
+  RUNTIME_OPTIONS = frozenset(
+    {
+      "use_variate_attention",
+      "value_clip",
+      "use_stitching",
+      "use_linear_detrending",
+      "linear_detrending_threshold",
+      "use_iterative_cpm_revin",
+      "use_frozen_running_stats",
+      "input_transform",
+    }
+  )
+
+  def set_runtime_options(self, **options: Any) -> None:
+    """Overrides inference options on an already-constructed model.
+
+    Disabling variate attention skips the variate attention blocks in every
+    layer (their weights stay loaded but unused), which is what an ablation
+    needs. Enabling it requires the model to have been built with those blocks.
+
+    Args:
+      **options: Any subset of RUNTIME_OPTIONS.
+
+    Raises:
+      ValueError: If an option is unknown or cannot be applied to this model.
+    """
+    unknown = set(options) - self.RUNTIME_OPTIONS
+    if unknown:
+      raise ValueError(f"Not runtime options: {sorted(unknown)}.")
+
+    if "use_variate_attention" in options:
+      enabled = bool(options["use_variate_attention"])
+      layers = self.transformer_stack.layers
+      if enabled and not all(hasattr(layer, "var_attn") for layer in layers):
+        raise ValueError(
+          "use_variate_attention=True needs variate attention weights, but"
+          " this model was built without them."
+        )
+      for layer in layers:
+        layer.use_variate_attention = enabled
+
+    if options.get("use_stitching") and self.output_patch_len <= self.input_patch_len:
+      raise ValueError("use_stitching requires output_patch_len > input_patch_len")
+
+    for name, value in options.items():
+      setattr(self, name, value)
+
+    if self.use_stitching:
+      self._stitching_extract_len = min(2 * self.input_patch_len, self.output_patch_len)
+
   def to_dict(self) -> dict[str, Any]:
     """Returns a serializable dictionary of model configuration."""
     return {

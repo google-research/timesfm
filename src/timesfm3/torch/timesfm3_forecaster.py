@@ -348,10 +348,17 @@ class TimesFM3Forecaster:
   def __init__(self, config: _ModelConfig | None = None, **kwargs):
     if config is None:
       self.config = _ModelConfig(**kwargs)
-    elif kwargs:
-      self.config = dataclasses.replace(config, **kwargs)
+      # Only options the caller passed count as requests. A default that
+      # happens to differ from the checkpoint's config.json is not one.
+      self._requested_fields = frozenset(kwargs)
     else:
-      self.config = config
+      self.config = dataclasses.replace(config, **kwargs) if kwargs else config
+      defaults = _ModelConfig()
+      self._requested_fields = frozenset(kwargs) | frozenset(
+        f.name
+        for f in dataclasses.fields(config)
+        if getattr(config, f.name) != getattr(defaults, f.name)
+      )
     self._init_model()
 
   @classmethod
@@ -361,13 +368,20 @@ class TimesFM3Forecaster:
     device: str | None = None,
     **kwargs: Any,
   ) -> TimesFM3Forecaster:
-    """Instantiates a TimesFM3Forecaster from a pretrained HF repo or directory."""
-    config = _ModelConfig(
+    """Instantiates a TimesFM3Forecaster from a pretrained HF repo or directory.
+
+    The architecture comes from the checkpoint's config.json. Inference options
+    in kwargs (for example ``use_variate_attention=False`` or
+    ``use_stitching=False``) override the checkpoint's values. Architecture
+    options (patch lengths, quantiles, residual block and transformer configs)
+    cannot be overridden, and passing a value that disagrees with the
+    checkpoint raises ValueError.
+    """
+    return cls(
       checkpoint_path=pretrained_model_name_or_path,
       device=device,
       **kwargs,
     )
-    return cls(config=config)
 
   @property
   def global_context(self) -> int:
@@ -376,6 +390,46 @@ class TimesFM3Forecaster:
       math.ceil(_MAX_CONTEXT_LENGTH / self.config.input_patch_length)
       * self.config.input_patch_length
     )
+
+  def _check_architecture_matches_checkpoint(self):
+    """Raises if a requested architecture option disagrees with config.json.
+
+    These options determine the parameter shapes, so the loaded weights cannot
+    honour a different value. Failing loudly beats silently using the
+    checkpoint's value, which makes ablations look like they changed nothing.
+    """
+
+    def _without_sdpa(transformer_config):
+      # use_sdpa has no weights and is set from ModelConfig.use_sdpa.
+      if transformer_config is None:
+        return None
+      return dataclasses.replace(
+        transformer_config,
+        transformer=dataclasses.replace(transformer_config.transformer, use_sdpa=True),
+      )
+
+    loaded = {
+      "input_patch_length": self.model.input_patch_len,
+      "output_patch_length": self.model.output_patch_len,
+      "quantiles": list(self.model.quantiles),
+      "residual_block_config": self.model.residual_block_config,
+      "transformer_config": _without_sdpa(self.model.transformer_config),
+    }
+    for name, loaded_value in loaded.items():
+      if name not in self._requested_fields:
+        continue
+      requested = getattr(self.config, name)
+      if name == "quantiles":
+        requested = list(requested)
+      elif name == "transformer_config":
+        requested = _without_sdpa(requested)
+      if requested is not None and requested != loaded_value:
+        raise ValueError(
+          f"{name}={requested!r} does not match the checkpoint at"
+          f" {self.config.checkpoint_path!r}, which has {loaded_value!r}. This"
+          " option sets the model architecture and cannot be overridden when"
+          " loading pretrained weights."
+        )
 
   def _init_model(self):
     """Initializes the PyTorch model and loads weights."""
@@ -400,6 +454,15 @@ class TimesFM3Forecaster:
         revision=self.config.revision,
         local_files_only=self.config.local_files_only,
       )
+      self._check_architecture_matches_checkpoint()
+      runtime_overrides = {
+        name: getattr(self.config, name)
+        for name in torch_model_lib.TimesFM3Torch.RUNTIME_OPTIONS
+        if name in self._requested_fields
+      }
+      if runtime_overrides:
+        self.model.set_runtime_options(**runtime_overrides)
+
       # Synchronize forecaster config with the loaded model config
       median_q_idx = self.config.median_quantile_index
       if median_q_idx >= len(self.model.quantiles):
