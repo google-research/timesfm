@@ -209,8 +209,8 @@ class TimesFM3ForecasterTest(unittest.TestCase):
     self.assertFalse(transformer.use_rope_var)
 
 
-class TimesFM3ForecasterUseSdpaTest(unittest.TestCase):
-  """ModelConfig.use_sdpa must reach every attention module."""
+class _TinyRealModelMixin:
+  """Builds a small randomly initialized TimesFM3Torch for loading tests."""
 
   def setUp(self):
     super().setUp()
@@ -245,6 +245,10 @@ class TimesFM3ForecasterUseSdpaTest(unittest.TestCase):
     for p in self.model.parameters():
       torch.nn.init.normal_(p, std=0.2)
     self.context = np.sin(np.arange(64, dtype=np.float64) / 3.0) * 5.0 + 10.0
+
+
+class TimesFM3ForecasterUseSdpaTest(_TinyRealModelMixin, unittest.TestCase):
+  """ModelConfig.use_sdpa must reach every attention module."""
 
   def _assert_use_sdpa(self, forecaster, expected):
     layers = forecaster.model.transformer_stack.layers
@@ -285,6 +289,92 @@ class TimesFM3ForecasterUseSdpaTest(unittest.TestCase):
         self._assert_use_sdpa(forecaster, use_sdpa)
         outputs[use_sdpa] = forecaster.predict(self.context, horizon=16).forecast
     np.testing.assert_allclose(outputs[True], outputs[False], rtol=1e-4, atol=1e-4)
+
+
+class TimesFM3ForecasterPretrainedOverridesTest(_TinyRealModelMixin, unittest.TestCase):
+  """from_pretrained kwargs must be honoured or rejected, never ignored (#502)."""
+
+  def _load(self, model, **kwargs):
+    with tempfile.TemporaryDirectory() as tmpdir:
+      model.save_pretrained(tmpdir)
+      return timesfm3_forecaster.TimesFM3Forecaster.from_pretrained(
+        tmpdir, device="cpu", **kwargs
+      )
+
+  def _forecast(self, forecaster):
+    return forecaster.predict(self.context, horizon=16).forecast
+
+  def test_disabling_variate_attention_changes_forecast(self):
+    default = self._load(self.model)
+    ablated = self._load(self.model, use_variate_attention=False)
+
+    self.assertFalse(ablated.config.use_variate_attention)
+    self.assertFalse(ablated.model.use_variate_attention)
+    for layer in ablated.model.transformer_stack.layers:
+      self.assertFalse(layer.use_variate_attention)
+    self.assertFalse(np.allclose(self._forecast(default), self._forecast(ablated)))
+
+  def test_disabling_variate_attention_matches_model_built_without_it(self):
+    ablated = self._load(self.model, use_variate_attention=False)
+
+    reference = torch_model_lib.TimesFM3Torch(
+      input_patch_len=8,
+      output_patch_len=16,
+      quantiles=[0.1, 0.5, 0.9],
+      residual_block_config=self.resblock_config,
+      transformer_config=self.transformer_config,
+      use_variate_attention=False,
+    )
+    reference.pre_transformer_resblock.set_input_dims(2 * (8 + 16))
+    state = {k: v for k, v in self.model.state_dict().items() if "var_attn" not in k}
+    reference.load_state_dict(state)
+
+    np.testing.assert_allclose(
+      self._forecast(ablated),
+      self._forecast(self._load(reference)),
+      rtol=1e-5,
+      atol=1e-5,
+    )
+
+  def test_runtime_option_overrides_checkpoint(self):
+    forecaster = self._load(self.model, use_stitching=False, value_clip=50.0)
+    self.assertFalse(forecaster.model.use_stitching)
+    self.assertFalse(forecaster.config.use_stitching)
+    self.assertEqual(forecaster.model.value_clip, 50.0)
+
+  def test_unpassed_options_follow_checkpoint(self):
+    # A ModelConfig default is not a request: the checkpoint's value wins.
+    self.model.set_runtime_options(use_stitching=False)
+    forecaster = self._load(self.model)
+    self.assertFalse(forecaster.model.use_stitching)
+    self.assertFalse(forecaster.config.use_stitching)
+
+  def test_enabling_variate_attention_without_weights_raises(self):
+    model = torch_model_lib.TimesFM3Torch(
+      input_patch_len=8,
+      output_patch_len=16,
+      quantiles=[0.1, 0.5, 0.9],
+      residual_block_config=self.resblock_config,
+      transformer_config=self.transformer_config,
+      use_variate_attention=False,
+    )
+    with self.assertRaisesRegex(ValueError, "use_variate_attention"):
+      self._load(model, use_variate_attention=True)
+
+  def test_mismatched_architecture_option_raises(self):
+    with self.assertRaisesRegex(ValueError, "quantiles"):
+      self._load(self.model, quantiles=[0.1, 0.9])
+    with self.assertRaisesRegex(ValueError, "output_patch_length"):
+      self._load(self.model, output_patch_length=32)
+
+  def test_matching_architecture_option_is_accepted(self):
+    forecaster = self._load(
+      self.model,
+      quantiles=[0.1, 0.5, 0.9],
+      transformer_config=self.transformer_config,
+      use_sdpa=False,
+    )
+    self.assertEqual(forecaster.config.quantiles, [0.1, 0.5, 0.9])
 
 
 class _RecordingFakeModel(FakeModel):
