@@ -55,7 +55,7 @@ Do **not** use this skill when:
 
 
 > **Note on Anomaly Detection**: TimesFM does not have built-in anomaly detection, but you
-> can use the **quantile forecasts as prediction intervals** — values outside the 90% CI
+> can use the **quantile forecasts as prediction intervals** — values outside the 80% PI
 > (q10–q90) are statistically unusual. See `examples/anomaly-detection/` for a full example.
 
 ## ⚠️ Mandatory Preflight: System Requirements Check
@@ -217,18 +217,18 @@ point, quantiles = model.forecast_with_covariates(
 ```python
 point, q = model.forecast(horizon=H, inputs=[values])
 
-lower_90 = q[0, :, 1]  # 10th percentile
-upper_90 = q[0, :, 9]  # 90th percentile
+lower_80 = q[0, :, 1]  # 10th percentile
+upper_80 = q[0, :, 9]  # 90th percentile
 
 actual = test_values
-anomalies = (actual < lower_90) | (actual > upper_90)
+anomalies = (actual < lower_80) | (actual > upper_80)
 ```
 
 | Severity | Condition | Interpretation |
 | -------- | --------- | -------------- |
-| **Normal** | Inside 80% CI | Expected behavior |
-| **Warning** | Outside 80% CI | Unusual but possible |
-| **Critical** | Outside 90% CI | Statistically rare (< 10% probability) |
+| **Normal** | Inside 60% PI (q20–q80) | Expected behavior |
+| **Warning** | Outside 60% PI, inside 80% PI | Unusual but possible |
+| **Critical** | Outside 80% PI (q10–q90) | Unusual (about 20% chance under the forecast) |
 
 > See `examples/anomaly-detection/` for a complete worked example with visualization.
 
