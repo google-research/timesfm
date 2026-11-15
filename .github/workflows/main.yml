@@ -1,4 +1,4 @@
-name: Python package build
+name: Python package build and test
 
 on:
   push:
@@ -26,3 +26,22 @@ jobs:
           uv pip install build ".[torch,flax]"
       - name: Build package
         run: uv run python -m build
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+      - name: Install package with test dependencies
+        run: |
+          uv pip install -e ".[torch]" pytest
+      - name: Run unit tests
+        run: |
+          python -m pytest tests/ -v
