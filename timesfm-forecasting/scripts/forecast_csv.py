@@ -145,6 +145,20 @@ def forecast_series(
     return results
 
 
+def infer_freq(dates: pd.Series):
+    """Infer the frequency of `dates` without pandas' return-type warning.
+
+    pandas >= 3.1 warns that `pd.infer_freq` will return a DateOffset instead
+    of a string. Opt in to that behaviour when the option exists; older pandas
+    keeps returning a string. `pd.date_range` accepts either.
+    """
+    try:
+        with pd.option_context("future.infer_freq_returns_offset", True):
+            return pd.infer_freq(dates)
+    except KeyError:  # pandas < 3.1: the option does not exist (OptionError).
+        return pd.infer_freq(dates)
+
+
 def write_csv_output(
     results: dict[str, dict],
     output_path: str,
@@ -160,7 +174,7 @@ def write_csv_output(
         if date_col and date_col in df.columns:
             try:
                 last_date = df[date_col].dropna().iloc[-1]
-                freq = pd.infer_freq(df[date_col].dropna())
+                freq = infer_freq(df[date_col].dropna())
                 if freq:
                     future_dates = pd.date_range(
                         last_date, periods=horizon + 1, freq=freq
