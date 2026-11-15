@@ -54,7 +54,7 @@ def update_running_stats(
   )
   inc_var = inc_var_numerator / inc_n_safe
   inc_var = torch.where(inc_n == 0, 0.0, inc_var)
-  inc_sigma = torch.sqrt(inc_var)
+  inc_sigma = torch.sqrt(inc_var + 1e-8)
 
   new_n = n + inc_n
   new_n_safe = torch.where(new_n == 0, 1.0, new_n)
@@ -69,7 +69,7 @@ def update_running_stats(
 
   new_var = (term1 + term2 + term3 + term4) / new_n_safe
   new_var = torch.where(new_n == 0, 0.0, new_var)
-  new_sigma = torch.sqrt(torch.clamp(new_var, min=0.0))
+  new_sigma = torch.sqrt(torch.clamp(new_var, min=0.0) + 1e-8)
 
   return (w := (new_n, new_mu, new_sigma), w)
 

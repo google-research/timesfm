@@ -198,7 +198,7 @@ def _masked_mean_std(inputs: JTensor,
   centered = (arr - masked_mean[:, None]) * mask
   masked_var = jnp.sum(centered**2, axis=1) / num_valid_elements
   masked_var = jnp.where(masked_var < 0.0, 0.0, masked_var)
-  masked_std = jnp.sqrt(masked_var)
+  masked_std = jnp.sqrt(masked_var + 1e-8)
 
   return masked_mean, masked_std
 
