@@ -131,8 +131,6 @@ def try_gc(
       if total > 0 and (allocated / total) > gc_memory_threshold:
         gc.collect()
         torch.cuda.empty_cache()
-        return
-  gc.collect()
 
 
 def linear_interpolation(arr: np.ndarray) -> np.ndarray:
