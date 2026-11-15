@@ -18,13 +18,16 @@ from .configs import ResidualBlockConfig, StackedTransformersConfig, Transformer
 from .evaluator import TimesFM3Evaluator
 from .model import TimesFM3Torch
 from .timesfm3_forecaster import (
+    ForecastDiagnostics,
     ForecastOutput,
     ModelConfig,
     TimesFM3Forecaster,
+    forecast_confidence_diagnostics,
     _ModelConfig,
 )
 
 __all__ = [
+    "ForecastDiagnostics",
     "ForecastOutput",
     "ModelConfig",
     "ResidualBlockConfig",
@@ -33,5 +36,6 @@ __all__ = [
     "TimesFM3Forecaster",
     "TimesFM3Torch",
     "TransformerConfig",
+    "forecast_confidence_diagnostics",
     "_ModelConfig",
 ]
