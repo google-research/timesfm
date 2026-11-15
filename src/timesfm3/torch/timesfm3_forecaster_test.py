@@ -85,6 +85,33 @@ class TimesFM3ForecasterTest(unittest.TestCase):
     self.assertTrue(timesfm3_forecaster._is_nonnegative(arr_pos))
     self.assertFalse(timesfm3_forecaster._is_nonnegative(arr_neg))
 
+  @mock.patch.object(timesfm3_forecaster.gc, "collect")
+  def test_try_gc_skips_collection_below_threshold(self, mock_collect):
+    # A full gc.collect() takes tens of ms once torch is imported, so it must
+    # not run on every predict call when memory is not under pressure.
+    timesfm3_forecaster.try_gc(torch.device("cpu"))
+    timesfm3_forecaster.try_gc(None)
+    mock_collect.assert_not_called()
+
+  @mock.patch.object(timesfm3_forecaster.gc, "collect")
+  @mock.patch.object(torch.cuda, "empty_cache")
+  @mock.patch.object(torch.cuda, "is_available", return_value=True)
+  def test_try_gc_collects_above_threshold(self, _, mock_empty, mock_collect):
+    props = mock.Mock(total_memory=100)
+    with (
+      mock.patch.object(torch.cuda, "get_device_properties", return_value=props),
+      mock.patch.object(torch.cuda, "memory_allocated", return_value=50),
+    ):
+      timesfm3_forecaster.try_gc("cuda")
+      mock_collect.assert_not_called()
+    with (
+      mock.patch.object(torch.cuda, "get_device_properties", return_value=props),
+      mock.patch.object(torch.cuda, "memory_allocated", return_value=95),
+    ):
+      timesfm3_forecaster.try_gc("cuda")
+    mock_collect.assert_called_once()
+    mock_empty.assert_called_once()
+
   @mock.patch.object(
     timesfm3_forecaster.TimesFM3Forecaster, "_init_model", autospec=True
   )
