@@ -213,6 +213,7 @@ class TimesFM_2p5:
     ridge: float = 0.0,
     max_rows_per_col: int = 0,
     force_on_cpu: bool = False,
+    fit_xreg_per_input: bool = False,
   ):
     """Forecasts on a list of time series with covariates.
 
@@ -234,6 +235,10 @@ class TimesFM_2p5:
       ridge: ridge penalty for the linear model.
       max_rows_per_col: max number of rows per column for the linear model.
       force_on_cpu: whether to force running on cpu for the linear model.
+      fit_xreg_per_input: whether to fit a separate XReg model for each input.
+        By default one XReg model is fitted on all inputs in the call, so the
+        forecast for one input depends on the other inputs in the batch. Set
+        this to True to fit each input on its own covariates only.
 
     Returns:
       A tuple of two lists. The first is the outputs of the model. The second is
@@ -330,6 +335,67 @@ class TimesFM_2p5:
           )
           test_covariates[covariate_name].append(covariate_value[input_len:])
 
+    def fit_xreg(targets, debug_info):
+      """Fits the XReg model on all inputs at once, or on each input alone."""
+      groups = [[i] for i in range(len(targets))] if fit_xreg_per_input else [None]
+
+      def select(values, group):
+        if group is None:
+          return values
+        return [values[i] for i in group]
+
+      def select_covariates(covariates, group):
+        if group is None:
+          return covariates
+        return {
+          name: select(values, group) for name, values in (covariates or {}).items()
+        }
+
+      outputs, outputs_on_context = [], []
+      for group in groups:
+        if group is not None and train_lens[group[0]] == 0:
+          # Nothing to fit on, so no covariate contribution for this input.
+          outputs.append(np.zeros(test_lens[group[0]]))
+          outputs_on_context.append(np.zeros(0))
+          continue
+        result = xreg_lib.BatchedInContextXRegLinear(
+          targets=select(targets, group),
+          train_lens=select(train_lens, group),
+          test_lens=select(test_lens, group),
+          train_dynamic_numerical_covariates=select_covariates(
+            train_dynamic_numerical_covariates, group
+          ),
+          test_dynamic_numerical_covariates=select_covariates(
+            test_dynamic_numerical_covariates, group
+          ),
+          train_dynamic_categorical_covariates=select_covariates(
+            train_dynamic_categorical_covariates, group
+          ),
+          test_dynamic_categorical_covariates=select_covariates(
+            test_dynamic_categorical_covariates, group
+          ),
+          static_numerical_covariates=select_covariates(
+            static_numerical_covariates, group
+          ),
+          static_categorical_covariates=select_covariates(
+            static_categorical_covariates, group
+          ),
+        ).fit(
+          ridge=ridge,
+          one_hot_encoder_drop=None if ridge > 0 else "first",
+          max_rows_per_col=max_rows_per_col,
+          force_on_cpu=force_on_cpu,
+          debug_info=debug_info,
+          assert_covariates=True,
+          assert_covariate_shapes=True,
+        )
+        if debug_info:
+          outputs.extend(result[0])
+          outputs_on_context.extend(result[1])
+        else:
+          outputs.extend(result)
+      return outputs, outputs_on_context
+
     # Fit models.
     if xreg_mode == "timesfm + xreg":
       # Forecast via TimesFM then fit a model on the residuals.
@@ -353,25 +419,7 @@ class TimesFM_2p5:
       per_instance_stats = None
       if normalize_xreg_target_per_input:
         targets, per_instance_stats = xreg_lib.normalize(targets)
-      xregs = xreg_lib.BatchedInContextXRegLinear(
-        targets=targets,
-        train_lens=train_lens,
-        test_lens=test_lens,
-        train_dynamic_numerical_covariates=train_dynamic_numerical_covariates,
-        test_dynamic_numerical_covariates=test_dynamic_numerical_covariates,
-        train_dynamic_categorical_covariates=train_dynamic_categorical_covariates,
-        test_dynamic_categorical_covariates=test_dynamic_categorical_covariates,
-        static_numerical_covariates=static_numerical_covariates,
-        static_categorical_covariates=static_categorical_covariates,
-      ).fit(
-        ridge=ridge,
-        one_hot_encoder_drop=None if ridge > 0 else "first",
-        max_rows_per_col=max_rows_per_col,
-        force_on_cpu=force_on_cpu,
-        debug_info=False,
-        assert_covariates=True,
-        assert_covariate_shapes=True,
-      )
+      xregs, _ = fit_xreg(targets, debug_info=False)
       if normalize_xreg_target_per_input:
         xregs = xreg_lib.renormalize(xregs, per_instance_stats)
       xregs = np.array(xregs)
@@ -396,25 +444,7 @@ class TimesFM_2p5:
       per_instance_stats = None
       if normalize_xreg_target_per_input:
         targets, per_instance_stats = xreg_lib.normalize(targets)
-      xregs, xregs_on_context, _, _, _ = xreg_lib.BatchedInContextXRegLinear(
-        targets=targets,
-        train_lens=train_lens,
-        test_lens=test_lens,
-        train_dynamic_numerical_covariates=train_dynamic_numerical_covariates,
-        test_dynamic_numerical_covariates=test_dynamic_numerical_covariates,
-        train_dynamic_categorical_covariates=train_dynamic_categorical_covariates,
-        test_dynamic_categorical_covariates=test_dynamic_categorical_covariates,
-        static_numerical_covariates=static_numerical_covariates,
-        static_categorical_covariates=static_categorical_covariates,
-      ).fit(
-        ridge=ridge,
-        one_hot_encoder_drop=None if ridge > 0 else "first",
-        max_rows_per_col=max_rows_per_col,
-        force_on_cpu=force_on_cpu,
-        debug_info=True,
-        assert_covariates=True,
-        assert_covariate_shapes=True,
-      )
+      xregs, xregs_on_context = fit_xreg(targets, debug_info=True)
       point_outputs, quantile_outputs = self.forecast(
         horizon=self.forecast_config.max_horizon,
         inputs=[

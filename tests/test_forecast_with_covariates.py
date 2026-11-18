@@ -87,3 +87,59 @@ class TestTimesFMPlusXReg:
   def test_all_contexts_within_one_patch(self, tfm):
     with pytest.raises(ValueError, match="input patch length"):
       _forecast(tfm, [20])
+
+
+class TestFitXRegPerInput:
+  """With `fit_xreg_per_input`, a forecast must not depend on the other inputs."""
+
+  @staticmethod
+  def _series(rng, slope):
+    covariate = rng.normal(size=100 + _HORIZON)
+    series = 10.0 + slope * covariate[:100] + 0.1 * rng.normal(size=100)
+    return series, covariate
+
+  @pytest.mark.parametrize("xreg_mode", ["xreg + timesfm", "timesfm + xreg"])
+  @pytest.mark.parametrize("per_input", [True, False])
+  def test_forecast_alone_and_in_batch(self, tfm, xreg_mode, per_input):
+    rng = np.random.default_rng(0)
+    a, cov_a = self._series(rng, 2.0)
+    # The covariate has the opposite effect on b.
+    b, cov_b = self._series(rng, -2.0)
+    with torch.no_grad():
+      alone, _ = tfm.forecast_with_covariates(
+          [a],
+          dynamic_numerical_covariates={"x": [cov_a]},
+          xreg_mode=xreg_mode,
+          fit_xreg_per_input=per_input,
+      )
+      batched, _ = tfm.forecast_with_covariates(
+          [a, b],
+          dynamic_numerical_covariates={"x": [cov_a, cov_b]},
+          xreg_mode=xreg_mode,
+          fit_xreg_per_input=per_input,
+      )
+
+    same = np.allclose(alone[0], batched[0], atol=1e-4)
+    # The default fits one model on the whole batch, so b changes a's forecast.
+    assert same == per_input
+
+  @pytest.mark.parametrize("xreg_mode", ["xreg + timesfm", "timesfm + xreg"])
+  def test_static_covariates_and_short_input(self, tfm, xreg_mode):
+    rng = np.random.default_rng(1)
+    # In "timesfm + xreg" mode the last input is too short to fit on.
+    context_lens = [100, 60, 20]
+    with torch.no_grad():
+      point, _ = tfm.forecast_with_covariates(
+          [rng.normal(size=n) + 10.0 for n in context_lens],
+          dynamic_numerical_covariates={
+              "x": [rng.normal(size=n + _HORIZON) for n in context_lens]
+          },
+          static_numerical_covariates={"s": [1.0, 2.0, 3.0]},
+          static_categorical_covariates={"g": ["a", "b", "a"]},
+          xreg_mode=xreg_mode,
+          fit_xreg_per_input=True,
+      )
+
+    point = np.asarray(point)
+    assert point.shape == (len(context_lens), _HORIZON)
+    assert np.isfinite(point).all()
