@@ -27,7 +27,7 @@ def signed_log(x: mx.array, *, reverse: bool = False) -> mx.array:
   """Signed-log transform: ``sign(x) * log(1 + |x|)``."""
   # Both branches have derivative one at zero. Choosing a nonzero sign there
   # avoids the zero gradient of sign(x) * f(abs(x)) without changing values.
-  sign = mx.where(x < 0, -1.0, 1.0)
+  sign = mx.where(x < 0, -mx.ones_like(x), mx.ones_like(x))
   magnitude = sign * x
   if reverse:
     return sign * mx.expm1(magnitude)

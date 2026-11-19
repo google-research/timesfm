@@ -76,6 +76,18 @@ class TransformationsTest(unittest.TestCase):
             mlx_trans.signed_log(empty, reverse=reverse).shape, empty.shape
         )
 
+  def test_signed_log_preserves_input_dtype(self):
+    # Regression test: mx.where(cond, -1.0, 1.0) with Python float literals
+    # produces a float32 sign regardless of input dtype, silently upcasting
+    # float16/bfloat16 inputs. mx.ones_like(x) keeps the sign (and the
+    # result) in the input's own dtype, matching torch's ones_like-based
+    # implementation.
+    for dtype in (mx.float16, mx.bfloat16, mx.float32):
+      with self.subTest(dtype=dtype):
+        x = mx.array([-4.0, -0.0, 0.0, 4.0], dtype=dtype)
+        y = mlx_trans.signed_log(x)
+        self.assertEqual(y.dtype, dtype)
+
   def test_signed_sqrt(self):
     x = mx.array([-9.0, -1.0, 0.0, 1.0, 16.0], dtype=mx.float32)
     y = mlx_trans.signed_sqrt(x)
