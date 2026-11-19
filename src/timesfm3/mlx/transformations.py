@@ -25,9 +25,13 @@ import mlx.core as mx
 
 def signed_log(x: mx.array, *, reverse: bool = False) -> mx.array:
   """Signed-log transform: ``sign(x) * log(1 + |x|)``."""
+  # Both branches have derivative one at zero. Choosing a nonzero sign there
+  # avoids the zero gradient of sign(x) * f(abs(x)) without changing values.
+  sign = mx.where(x < 0, -1.0, 1.0)
+  magnitude = sign * x
   if reverse:
-    return mx.sign(x) * mx.expm1(mx.abs(x))
-  return mx.sign(x) * mx.log1p(mx.abs(x))
+    return sign * mx.expm1(magnitude)
+  return sign * mx.log1p(magnitude)
 
 
 def signed_sqrt(x: mx.array, *, reverse: bool = False) -> mx.array:
