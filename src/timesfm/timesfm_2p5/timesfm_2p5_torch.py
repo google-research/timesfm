@@ -237,15 +237,23 @@ class TimesFM_2p5_200M_torch_module(nn.Module):
       A list of numpy arrays of forecasts.
     """
     outputs = []
+    device = next(self.parameters()).device
     for each_input in inputs:
-      input_t = torch.tensor(each_input, dtype=torch.float32)
+      input_t = torch.tensor(each_input, dtype=torch.float32, device=device)
       mask = torch.zeros_like(input_t, dtype=torch.bool)
       len_front_mask = self.p - (len(each_input) % self.p)
       if len_front_mask < self.p:
         input_t = torch.cat(
-          [torch.zeros(len_front_mask, dtype=torch.float32), input_t], dim=0
+          [
+            torch.zeros(len_front_mask, dtype=torch.float32, device=device),
+            input_t,
+          ],
+          dim=0,
         )
-        mask = torch.cat([torch.ones(len_front_mask, dtype=torch.bool), mask], dim=0)
+        mask = torch.cat(
+          [torch.ones(len_front_mask, dtype=torch.bool, device=device), mask],
+          dim=0,
+        )
       input_t = input_t[None, ...]
       mask = mask[None, ...]
       t_pf, _, t_ar = self.decode(horizon, input_t, mask)
