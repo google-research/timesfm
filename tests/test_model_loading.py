@@ -56,10 +56,36 @@ class TestModelLoading:
 
       # 5. Run a simple prediction step to verify the loaded model performs forward pass
       import numpy as np
-      inputs = [np.random.randn(32)]
+      inputs = [np.random.randn(32), np.random.randn(20)]
       forecasts = tfm3.model.forecast_naive(horizon=10, inputs=inputs)
-      assert len(forecasts) == 1
+      assert len(forecasts) == 2
       assert forecasts[0].shape == (10, 10)
+      assert forecasts[1].shape == (10, 10)
+
+  def test_forecast_naive_matches_module_device(self):
+    """Verifies forecast_naive runs on the module's current parameter device."""
+    import numpy as np
+    import torch
+
+    tfm = TimesFM_2p5_200M_torch(torch_compile=False)
+    inputs = [np.ones(32, dtype=np.float32), np.ones(20, dtype=np.float32)]
+
+    # Before load_checkpoint(), module weights reside on CPU even when CUDA is available.
+    cpu_forecasts = tfm.model.forecast_naive(horizon=10, inputs=inputs)
+    assert len(cpu_forecasts) == 2
+    assert cpu_forecasts[0].shape == (10, 10)
+    assert cpu_forecasts[1].shape == (10, 10)
+    assert np.all(np.isfinite(cpu_forecasts[0]))
+    assert np.all(np.isfinite(cpu_forecasts[1]))
+
+    if torch.cuda.is_available():
+      tfm.model.to(tfm.model.device)
+      gpu_forecasts = tfm.model.forecast_naive(horizon=10, inputs=inputs)
+      assert len(gpu_forecasts) == 2
+      assert gpu_forecasts[0].shape == (10, 10)
+      assert gpu_forecasts[1].shape == (10, 10)
+      assert np.all(np.isfinite(gpu_forecasts[0]))
+      assert np.all(np.isfinite(gpu_forecasts[1]))
 
   def test_torch_compile_wraps_forward(self):
     """Verifies that torch_compile=True compiles model.forward, not a no-op."""
