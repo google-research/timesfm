@@ -9,7 +9,7 @@ model developed by Google Research for time-series forecasting.
 *   🆕 TimesFM 3.0 Checkpoint:
     [`google/timesfm-3.0-pytorch`](https://huggingface.co/google/timesfm-3.0-pytorch). Checkpoints up to 2.5:
     [TimesFM Hugging Face Collection](https://huggingface.co/collections/google/timesfm-release-66e4be5fdb56e960c1e482a6).
-*   Google Reseach blog posts:
+*   Google Research blog posts:
     * [TimesFM-3: A zero-shot foundation model for multivariate forecasting](https://research.google/blog/timesfm-3-a-zero-shot-foundation-model-for-multivariate-forecasting/)
     * [A decoder-only foundation model for time-series forecasting](https://research.google/blog/a-decoder-only-foundation-model-for-time-series-forecasting/)   
 *   TimesFM in Google 1P Products:
