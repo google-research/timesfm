@@ -515,6 +515,10 @@ class TimesFM_2p5_200M_flax(timesfm_2p5_base.TimesFM_2p5):
     print("Compiling model...")
 
     fc = forecast_config
+    if fc.max_context <= 0:
+      raise ValueError(
+        f"max_context must be a positive integer, got {fc.max_context}."
+      )
     if fc.max_context % self.model.p != 0:
       logging.info(
         "When compiling, max context needs to be multiple of the patch size"
